@@ -1,0 +1,58 @@
+{
+  "policy_name": "hantavirus_llm_structured_extraction_policy",
+  "policy_version": "0.1",
+  "description": "Optional LLM-based structured extraction policy for converting hantavirus evidence chunks into structured records.",
+  "enabled_env_var": "HDC_ENABLE_LLM_EXTRACTION",
+  "default_enabled": false,
+  "fallback_to_rule_based_env_var": "HDC_LLM_FALLBACK_TO_RULE_BASED",
+  "default_fallback_to_rule_based": true,
+  "llm_extraction_method": "llm_structured_output_extractor",
+  "system_prompt": "You are a public health data extraction agent. Extract only explicitly stated human hantavirus case, outbreak, or surveillance data from the provided evidence chunk. Do not infer missing values. Do not calculate derived quantities. If a value is not explicitly stated, return null. Preserve source_url, source_type, source_id, supporting_chunk_id, and evidence_quote. Return structured JSON only.",
+  "required_output_rules": [
+    "Extract only human hantavirus case, outbreak, or surveillance records.",
+    "Do not extract rodent-only surveillance unless human cases are explicitly reported.",
+    "Do not infer missing case counts, deaths, dates, countries, or locations.",
+    "Do not calculate derived quantities such as CFR, duration, or rates unless explicitly stated.",
+    "Keep confirmed, probable, suspected, and unspecified cases separate.",
+    "If confirmation status is not explicitly stated, use cases_unspecified.",
+    "If a field is not explicitly stated, return null.",
+    "Every record must preserve source_id, source_url, source_type, supporting_chunk_id, and evidence_quote through the downstream HantavirusRecord wrapper.",
+    "If the evidence chunk is context-only or contains no extractable human case/outbreak/surveillance data, return an empty records list.",
+    "Do not include reasoning or chain-of-thought in the output.",
+    "Always set disease to Hantavirus disease unless the chunk is not about human hantavirus data.",
+    "Do not place generic terms such as hantavirus, hantavirus disease, hantavirus infection, hantaviridae, or orthohantavirus in virus_or_syndrome. Use virus_or_syndrome only for HPS, HFRS, or a named virus such as Andes virus, Seoul virus, Sin Nombre virus, Hantaan virus, Puumala virus, or Dobrava-Belgrade virus.",
+    "If a numeric death count is explicitly stated anywhere in the chunk text, including narrative forms such as '5 people died' or '5 deaths were reported', populate deaths.",
+    "If a number refers to cumulative cases, newly reported cases, annual cases, historical total, or a subset, populate statistical_count_type.",
+    "If the text states the period or cutoff for the statistic, populate reporting_period and/or as_of_date.",
+    "If the geographic scope is regional or multi-country, such as EU/EEA, do not force it into a single country. Populate geographic_scope and geographic_scope_type.",
+    "Extract subnational locations such as states, provinces, counties, cities, or regions when explicitly stated.",
+    "If the chunk includes multiple different counts with different statistical meanings, return separate records only when the meanings are clearly distinct.",
+    "For geographic_scope_type, use exactly one of: country, subnational, region, multi_country, global, unknown. Do not use hyphenated variants such as multi-country, sub-national, or free-text variants such as national, nation, or worldwide.",
+    "For statistical_count_type, use exactly one of: cumulative, annual, newly_reported, historical_total, subset, unknown. Do not use hyphenated or free-text variants such as newly-reported, yearly, total, or reported through.",
+    "If the source describes EU/EEA or multiple countries as a combined reporting unit, set geographic_scope='EU/EEA' and geographic_scope_type='multi_country' or 'region'."
+  ],
+  "allowed_statistical_count_types": [
+    "cumulative",
+    "annual",
+    "newly_reported",
+    "historical_total",
+    "subset",
+    "unknown"
+  ],
+  "allowed_geographic_scope_types": [
+    "country",
+    "subnational",
+    "region",
+    "multi_country",
+    "global",
+    "unknown"
+  ],
+  "allowed_fetch_purposes": [
+    "data_extraction"
+  ],
+  "allowed_chunk_kinds": [
+    "text",
+    "table"
+  ],
+  "max_records_per_chunk": 5
+}

@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hdc_workflow"
+version = "0.1.0"
+description = "LangGraph-based data collection workflow for a hantavirus public health case study (Step 1 scaffolding)."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Hantavirus Data Collection Project" }]
+license = { text = "MIT" }
+dependencies = [
+    "langgraph",
+    "langchain",
+    "langchain-openai",
+    "langchain-anthropic",
+    "pydantic>=2",
+    "python-dotenv",
+    "requests",
+    "beautifulsoup4",
+    "pandas",
+    "pytest",
+    "rich",
+]
+
+[project.optional-dependencies]
+dev = [
+    "langgraph-cli[inmem]",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"hdc_workflow" = ["resources/*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

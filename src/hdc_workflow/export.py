@@ -1,0 +1,146 @@
+"""Deterministic export utilities for the final data package.
+
+No LangGraph, no LLM, no network. Writes JSON and CSV artifacts under a
+user-supplied output directory.
+"""
+
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+
+from .config import load_final_package_policy
+from .models import FinalPackagePolicy
+
+
+def ensure_output_dir(path: str | Path) -> Path:
+    p = Path(path)
+    p.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def write_json(data, path: str | Path) -> Path:
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with p.open("w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    return p
+
+
+def write_csv_rows(
+    rows: list[dict],
+    path: str | Path,
+    field_order: list[str] | None = None,
+) -> Path:
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    ordered = list(field_order or [])
+
+    if not rows:
+        with p.open("w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=ordered)
+            writer.writeheader()
+        return p
+
+    extras: set[str] = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        for key in row.keys():
+            if key not in ordered:
+                extras.add(key)
+    fieldnames = ordered + sorted(extras)
+
+    with p.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            cleaned: dict = {}
+            for key in fieldnames:
+                value = row.get(key)
+                if value is None:
+                    cleaned[key] = ""
+                elif isinstance(value, (list, dict)):
+                    cleaned[key] = json.dumps(value, ensure_ascii=False)
+                else:
+                    cleaned[key] = value
+            writer.writerow(cleaned)
+    return p
+
+
+def export_final_data_package(
+    package: dict,
+    output_dir: str | Path,
+) -> dict:
+    """Write the final data package to JSON + CSV files. Returns a manifest."""
+
+    policy = FinalPackagePolicy(**load_final_package_policy())
+    out_dir = ensure_output_dir(output_dir)
+
+    files: dict[str, str] = {}
+
+    files["final_package_json"] = str(
+        write_json(package, out_dir / "final_package.json")
+    )
+    files["final_dataset_csv"] = str(
+        write_csv_rows(
+            package.get("final_dataset") or [],
+            out_dir / "final_dataset.csv",
+            field_order=policy.final_dataset_field_order,
+        )
+    )
+    files["source_registry_json"] = str(
+        write_json(package.get("source_registry") or [], out_dir / "source_registry.json")
+    )
+    files["linked_events_json"] = str(
+        write_json(package.get("linked_events") or [], out_dir / "linked_events.json")
+    )
+    files["conflicts_json"] = str(
+        write_json(package.get("conflicts") or [], out_dir / "conflicts.json")
+    )
+    files["human_review_items_json"] = str(
+        write_json(
+            package.get("human_review_items") or [],
+            out_dir / "human_review_items.json",
+        )
+    )
+    files["collection_trace_json"] = str(
+        write_json(package.get("collection_trace") or [], out_dir / "collection_trace.json")
+    )
+    files["workflow_summaries_json"] = str(
+        write_json(
+            package.get("workflow_summaries") or {},
+            out_dir / "workflow_summaries.json",
+        )
+    )
+    files["package_metadata_json"] = str(
+        write_json(
+            package.get("package_metadata") or {},
+            out_dir / "package_metadata.json",
+        )
+    )
+    files["provenance_manifest_json"] = str(
+        write_json(
+            package.get("provenance_manifest") or {},
+            out_dir / "provenance_manifest.json",
+        )
+    )
+
+    manifest = {
+        "output_dir": str(out_dir),
+        "files": files,
+        "section_counts": {
+            "final_dataset": len(package.get("final_dataset") or []),
+            "source_registry": len(package.get("source_registry") or []),
+            "linked_events": len(package.get("linked_events") or []),
+            "conflicts": len(package.get("conflicts") or []),
+            "human_review_items": len(package.get("human_review_items") or []),
+            "excluded_sources": len(package.get("excluded_sources") or []),
+            "collection_trace": len(package.get("collection_trace") or []),
+            "data_dictionary": len(package.get("data_dictionary") or []),
+        },
+    }
+    return manifest
