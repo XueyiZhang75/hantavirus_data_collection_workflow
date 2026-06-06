@@ -1,0 +1,146 @@
+{
+  // Runtime profile name. 可改成其他 profile 名称；只影响显示和日志，不改变 workflow 行为。
+  "profile_name": "new_mexico_hps_live_llm_workflow_run",
+
+  // Profile description. 用来向使用者说明这个 profile 的用途；不参与节点运行逻辑。
+  "description": "Runtime profile for the HDC workflow. This is not a one-off presentation file: it controls graph input, source overlays, source-role policy, live fetch, LLM stages, source split, validation evidence, and output paths for a real workflow run.",
+
+  "workflow": {
+    // LangGraph graph name. 当前项目主 graph 是 hantavirus_data_collection_workflow；如果以后增加新的 graph，可以在这里切换。
+    "graph_name": "hantavirus_data_collection_workflow",
+
+    // Collection mode. masked_validation 会把 collection source 和 validation source 分开；如果改成其他模式，validation hold-out 逻辑可能不同。
+    "collection_mode": "masked_validation",
+
+    // Seed source overlay. 控制本次 workflow 从哪些 source candidates 起步；换成其他 overlay 就能跑其他地区/疾病/source set。
+    "seed_source_overlay_path": "src/hdc_workflow/resources/live_case_studies/new_mexico_hps_seed_sources.json",
+
+    // Source role policy overlay. 控制哪些 source 是 collection、context_only、validation_reserved；这是 source split 的核心可靠性设置。
+    "source_role_policy_overlay_path": "src/hdc_workflow/resources/live_case_studies/new_mexico_hps_source_role_policy_overlay.json",
+
+    // Held-out validation records. 用于最终 validation comparison；不会作为 collection extraction 的输入。
+    "validation_ground_truth_records_path": "src/hdc_workflow/resources/live_case_studies/new_mexico_hps_ground_truth_records.csv",
+
+    // Fixture documents switch. false = 使用真实网页抓取；true = 使用本地 fixture，适合离线测试，不适合真实产品运行展示。
+    "use_fixture_documents": false
+  },
+
+  // User task submitted to LangGraph Studio. 改这里就等于改用户输入任务；下游 source planning、fetch、extraction 都会围绕它运行。
+  "user_request": "Collect data on hantavirus from 2020 to 2026. For this workflow run, use the New Mexico HPS source set, keep collection sources and validation sources separated, extract cases, deaths, dates, locations, source URLs, source types, and evidence quotes, then route uncertain results to human review.",
+
+  "studio": {
+    // Studio port. null = 使用 LangGraph 默认端口；也可以改成 2024、2025 等固定端口，方便现场打开固定 URL。
+    "port": null,
+
+    // no_reload. true = Studio 启动后不自动 reload，演示更稳定；false = 开发时可自动 reload，但现场可能干扰运行。
+    "no_reload": true
+  },
+
+  "live_web": {
+    // Real webpage fetch switch. true = 抓真实网页；false = 不抓 live web，通常只适合测试或调试。
+    "enabled": true,
+
+    // HTTP timeout in seconds. 网页慢时可调大，比如 60；调小会更快失败，可能减少等待但漏掉慢网站。
+    "timeout_seconds": 30
+  },
+
+  "llm": {
+    // LLM provider. 当前支持 anthropic/openai 风格 provider；provider 变了，对应 API key 环境变量也要存在。
+    "provider": "anthropic",
+
+    // LLM model. 三个 LLM 环节默认共用这个 model；换模型会改变成本、速度和抽取质量。
+    "model": "claude-sonnet-4-6",
+
+    // LLM source planning. true = 让 LLM 辅助生成 source planning/query advice；false = 只用 deterministic query strategy。
+    "source_planning_enabled": true,
+
+    // LLM source critic. true = 让 LLM 评价 source risk/leakage/context-only/human-review 建议；false = 只用规则筛选。
+    "source_critic_enabled": true,
+
+    // LLM structured extraction. true = 让 LLM 从 evidence chunks 抽取 records；false = 使用 rule-based extraction。
+    "structured_extraction_enabled": true,
+
+    // Max evidence chunks sent to extraction LLM. 调大可覆盖更多证据，但会更慢、更花 API；调小更快但可能漏抽。
+    "max_chunks": 8,
+
+    // Max output tokens per LLM call. 调大可减少输出截断风险；调小可控成本，但复杂记录可能输出不完整。
+    "max_tokens": 4096,
+
+    // Fallback switch. true = LLM 失败后退回 rule-based extraction；false = 让失败暴露出来，适合可靠性审计和 workshop。
+    "fallback_to_rule_based": false,
+
+    "source_critic": {
+      // Max sources assessed by LLM critic. 调大覆盖更多 source，但成本/时间增加；调小只评估最核心 source。
+      "max_sources": 6,
+
+      // Whether LLM critic can block fetch. false = LLM 只 advisory，最终安全边界由 deterministic policy 控制；true = critic 可阻止有风险 source 抓取。
+      "review_blocks_fetch": false
+    }
+  },
+
+  "source_sets": {
+    // Profile-level source policy, not a post-fetch result.
+    // 这里列的是本次缩小 workflow profile 的 source allowlist/holdout policy：
+    // workflow 仍会在 source_discovery/source_screening/source_critic 节点生成 source_registry，
+    // 并记录每个 source 的最终 role、fetch decision 和 critic 判断。
+
+    // Collection sources. 这些 source 在本 profile 中允许被抓取、切 evidence，并进入 structured extraction 生成 records。
+    "collection_source_ids": [
+      "src_nmdoh_hps_2024_first_case",
+      "src_nmdoh_hps_2025_first_case_death",
+      "src_nmdoh_hps_2026_first_case_prior_year_summary"
+    ],
+
+    // Context-only sources. 在本 profile 中可以提供背景或定义，但 blocked from structured extraction，不直接生成 records。
+    "context_source_ids": [
+      "src_nmdoh_hps_overview_1975_2025",
+      "src_cdc_hantavirus_reported_cases_through_2023"
+    ],
+
+    // Validation-reserved sources. 在本 profile 中 held out from collection，只用于最终 validation comparison。
+    "validation_reserved_source_ids": [
+      "src_nmdoh_hps_cases_by_county_1975_2025_pdf"
+    ],
+
+    // Source allowlist for this workflow run. 这里控制本次 workflow 可以处理哪些 source IDs；新增 source 时通常也要同步 source overlay/policy。
+    "workflow_source_ids": [
+      "src_nmdoh_hps_2024_first_case",
+      "src_nmdoh_hps_2025_first_case_death",
+      "src_nmdoh_hps_2026_first_case_prior_year_summary",
+      "src_nmdoh_hps_overview_1975_2025",
+      "src_cdc_hantavirus_reported_cases_through_2023",
+      "src_nmdoh_hps_cases_by_county_1975_2025_pdf"
+    ],
+
+    // Source IDs visible to LLM source critic. 可小于 workflow_source_ids，用来控制 critic 成本；不应包含 workflow 外 source。
+    "llm_source_critic_source_ids": [
+      "src_nmdoh_hps_2024_first_case",
+      "src_nmdoh_hps_2025_first_case_death",
+      "src_nmdoh_hps_2026_first_case_prior_year_summary",
+      "src_nmdoh_hps_overview_1975_2025",
+      "src_cdc_hantavirus_reported_cases_through_2023",
+      "src_nmdoh_hps_cases_by_county_1975_2025_pdf"
+    ]
+  },
+
+  "output": {
+    // Output root for workflow artifacts. 每次运行会自动写到 outputs/sessions/<timestamp>/，不覆盖旧结果。
+    "run_output_root": "outputs",
+
+    // Sessionized output. true = 每次 run 创建独立 timestamp session；false = 直接写 run_output_dir/run_output_root。
+    "sessionized": true,
+
+    // Optional fixed session id. null = 自动用 UTC 时间戳；写成字符串可用于复现实验或测试。
+    "session_id": null,
+
+    // Auto-build HTML workflow console after a configured runner finishes. true = 自动生成；false = 只导出 JSON/CSV/MD。
+    "auto_build_console": true,
+
+    // Stable console root used by standalone console builder/latest alias.
+    "console_output_root": "outputs/workflow_console",
+
+    // Also write latest aliases under outputs/workflow_runs/latest_* and outputs/workflow_console/.
+    // true 方便打开最近一次结果；session 文件夹仍然保留不覆盖。
+    "write_latest_alias": true
+  }
+}

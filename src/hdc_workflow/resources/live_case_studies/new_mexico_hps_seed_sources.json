@@ -1,0 +1,164 @@
+{
+  "catalog_name": "new_mexico_hps_live_case_study_seed_sources",
+  "catalog_version": "0.1",
+  "description": "Case-specific seed source overlay for the New Mexico HPS real-source masked-validation workflow profile.",
+  "live_case_study_id": "new_mexico_hps_2024_2026",
+  "seed_sources": [
+    {
+      "seed_source_id": "src_nmdoh_hps_2024_first_case",
+      "title": "NMDOH: New Mexico reports first hantavirus pulmonary syndrome case of 2024",
+      "url": "https://www.nmhealth.org/news/safety/2024/2/?view=2065",
+      "publisher": "New Mexico Department of Health",
+      "source_type": "official_public_health_agency",
+      "priority": 1,
+      "source_purpose": "Collection source for reported 2024 New Mexico HPS case information.",
+      "expected_fields": [
+        "cases",
+        "deaths",
+        "date",
+        "location",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "hantavirus",
+        "pulmonary syndrome",
+        "New Mexico",
+        "first case",
+        "2024"
+      ],
+      "notes": "Collection-allowed NMDOH HTML press release for the first reported 2024 New Mexico HPS case."
+    },
+    {
+      "seed_source_id": "src_nmdoh_hps_2025_first_case_death",
+      "title": "NMDOH: Hantavirus death confirmed in Santa Fe County woman",
+      "url": "https://www.nmhealth.org/news/awareness/2025/3/?view=2189",
+      "publisher": "New Mexico Department of Health",
+      "source_type": "official_public_health_agency",
+      "priority": 2,
+      "source_purpose": "Collection source for first reported 2025 New Mexico HPS case and death.",
+      "expected_fields": [
+        "cases",
+        "deaths",
+        "date",
+        "location",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "hantavirus",
+        "pulmonary syndrome",
+        "Santa Fe County",
+        "death",
+        "2025"
+      ],
+      "notes": "Collection-allowed NMDOH HTML press release for the first reported 2025 New Mexico HPS death."
+    },
+    {
+      "seed_source_id": "src_nmdoh_hps_2026_first_case_prior_year_summary",
+      "title": "NMDOH: Hantavirus confirmed in Santa Fe County resident",
+      "url": "https://www.nmhealth.org/news/safety/2026/3/?view=2322",
+      "publisher": "New Mexico Department of Health",
+      "source_type": "official_public_health_agency",
+      "priority": 3,
+      "source_purpose": "Collection source for first 2026 HPS case and prior-year 2025 New Mexico HPS summary.",
+      "expected_fields": [
+        "cases",
+        "deaths",
+        "date",
+        "location",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "hantavirus",
+        "HPS",
+        "Santa Fe County",
+        "2026",
+        "seven cases",
+        "three fatal"
+      ],
+      "notes": "Collection-allowed NMDOH HTML press release that may contain 2026 first-case information and 2025 summary context."
+    },
+    {
+      "seed_source_id": "src_nmdoh_hps_overview_1975_2025",
+      "title": "NMDOH: Hantavirus Pulmonary Syndrome",
+      "url": "https://www.nmhealth.org/about/erd/ideb/zdp/hps/",
+      "publisher": "New Mexico Department of Health",
+      "source_type": "official_public_health_agency",
+      "priority": 4,
+      "source_purpose": "Context and validation-candidate source for New Mexico HPS background and historical totals.",
+      "expected_fields": [
+        "disease",
+        "virus_or_syndrome",
+        "date",
+        "location",
+        "cases",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "Hantavirus Pulmonary Syndrome",
+        "New Mexico",
+        "1975",
+        "2025",
+        "cases",
+        "deaths"
+      ],
+      "notes": "Context-only for the New Mexico HPS workflow profile; not allowed to produce structured collection records."
+    },
+    {
+      "seed_source_id": "src_nmdoh_hps_cases_by_county_1975_2025_pdf",
+      "title": "NMDOH: HPS Cases in New Mexico by County, 1975-2025",
+      "url": "https://www.nmhealth.org/data/view/infectious/890/",
+      "publisher": "New Mexico Department of Health",
+      "source_type": "official_public_health_agency",
+      "priority": 5,
+      "source_purpose": "Held-out validation candidate for New Mexico HPS annual/county case totals. PDF; not fetched during collection.",
+      "expected_fields": [
+        "cases",
+        "date",
+        "location",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "HPS Cases in New Mexico by County",
+        "1975-2025",
+        "Total",
+        "2025"
+      ],
+      "notes": "Validation-reserved source. Ground truth is manually curated; PDF/OCR is not automated in the current workflow profile."
+    },
+    {
+      "seed_source_id": "src_cdc_hantavirus_reported_cases_through_2023",
+      "title": "CDC: Reported Cases of Hantavirus Disease",
+      "url": "https://www.cdc.gov/hantavirus/data-research/cases/index.html",
+      "publisher": "CDC",
+      "source_type": "official_public_health_agency",
+      "priority": 6,
+      "source_purpose": "Context and future validation source for US cumulative hantavirus cases through 2023; not directly aligned with New Mexico 2024-2026 annual counts.",
+      "expected_fields": [
+        "cases",
+        "date",
+        "location",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "reported cases",
+        "hantavirus disease",
+        "United States",
+        "2023"
+      ],
+      "notes": "Context-only/future validation candidate for national cumulative counts; not used for New Mexico annual validation in the current workflow profile."
+    }
+  ]
+}

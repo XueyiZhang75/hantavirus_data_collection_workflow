@@ -134,6 +134,28 @@ class SourceRegistryEntry(BaseModel):
     ready_for_content_fetch: bool = False
     requires_human_review: bool = False
     routing_flags: list[str] = Field(default_factory=list)
+    llm_source_critic_enabled: bool = False
+    llm_source_critic_failed: bool = False
+    llm_source_critic_error: str | None = None
+    llm_proposed_source_role: str | None = None
+    llm_proposed_screening_decision: str | None = None
+    llm_credibility_level: str | None = None
+    llm_credibility_reason: str | None = None
+    llm_expected_extractable_fields: list[str] = Field(default_factory=list)
+    llm_semantic_leakage_risk: bool = False
+    llm_semantic_leakage_reason: str | None = None
+    llm_context_only_risk: bool = False
+    llm_validation_candidate_risk: bool = False
+    llm_needs_human_review: bool = False
+    llm_human_review_reason: str | None = None
+    llm_source_critic_confidence: float | None = None
+    llm_reasoning_summary: str | None = None
+    credibility_score: float | None = None
+    credibility_level: str | None = None
+    credibility_rubric_version: str | None = None
+    credibility_score_components: dict = Field(default_factory=dict)
+    credibility_flags: list[str] = Field(default_factory=list)
+    credibility_reason: str | None = None
 
 
 class SeedSource(BaseModel):

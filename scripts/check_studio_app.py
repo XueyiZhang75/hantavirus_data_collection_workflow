@@ -1,8 +1,8 @@
 """Sanity check for the LangGraph Studio entry point.
 
 Imports the compiled `graph` exposed via `hdc_workflow.studio_app`, invokes it
-once with the demo initial state, and prints a short summary. Does not launch
-any long-running Studio server.
+once with a local sanity initial state, and prints a short summary. Does not
+launch any long-running Studio server.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ if str(_SRC) not in sys.path:
 from hdc_workflow.studio_app import graph  # noqa: E402
 
 
-def _demo_initial_state() -> dict:
+def _sanity_initial_state() -> dict:
     return {
         "user_request": (
             "Collect global human hantavirus case, outbreak, and surveillance data "
@@ -53,7 +53,7 @@ def _demo_initial_state() -> dict:
 def main() -> None:
     print(f"graph object type: {type(graph).__name__}")
 
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
 
     final_data_package = result.get("final_data_package")
     candidates = result.get("source_candidates") or []

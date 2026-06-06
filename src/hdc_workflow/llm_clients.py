@@ -1,9 +1,10 @@
-"""Optional LLM client factory + extraction call (Step 14).
+"""Optional LLM client factory + structured LLM calls.
 
 Tests must NOT call real LLMs. The recommended monkeypatch pattern is:
 
     from hdc_workflow import llm_clients
     monkeypatch.setattr(llm_clients, "extract_chunk_with_llm", mock_fn)
+    monkeypatch.setattr(llm_clients, "run_structured_llm_json", mock_fn)
 
 Provider-specific dependencies (langchain_anthropic, langchain_openai) are
 imported lazily inside `build_chat_model`, so importing this module does NOT
@@ -12,20 +13,35 @@ require those packages to be installed.
 
 from __future__ import annotations
 
+import json
 import os
+import re
+
+from pydantic import BaseModel
 
 from .models import LLMExtractionOutput, LLMStructuredExtractionPolicy
+
+
+def _env_flag(name: str) -> bool:
+    return (os.environ.get(name) or "").strip().lower() == "true"
 
 
 def llm_extraction_enabled() -> bool:
     """True only if HDC_ENABLE_LLM_EXTRACTION is set to "true" (case-insensitive)."""
 
-    return (
-        (os.environ.get("HDC_ENABLE_LLM_EXTRACTION") or "")
-        .strip()
-        .lower()
-        == "true"
-    )
+    return _env_flag("HDC_ENABLE_LLM_EXTRACTION")
+
+
+def llm_source_planning_enabled() -> bool:
+    """True only if HDC_ENABLE_LLM_SOURCE_PLANNING is explicitly true."""
+
+    return _env_flag("HDC_ENABLE_LLM_SOURCE_PLANNING")
+
+
+def llm_source_critic_enabled() -> bool:
+    """True only if HDC_ENABLE_LLM_SOURCE_CRITIC is explicitly true."""
+
+    return _env_flag("HDC_ENABLE_LLM_SOURCE_CRITIC")
 
 
 def llm_fallback_to_rule_based() -> bool:
@@ -92,10 +108,10 @@ def _validate_provider_settings(settings: dict) -> None:
     )
 
 
-def build_chat_model():
+def build_chat_model(settings: dict | None = None):
     """Build a chat model for the configured provider. Does NOT invoke it."""
 
-    settings = get_llm_settings()
+    settings = dict(settings or get_llm_settings())
     _validate_provider_settings(settings)
     provider = settings["provider"]
     if provider == "anthropic":
@@ -114,6 +130,195 @@ def build_chat_model():
             temperature=settings["temperature"],
         )
     raise ValueError(f"Unsupported provider: {provider}")
+
+
+def _message_content(result) -> str:
+    if isinstance(result, str):
+        return result
+    if isinstance(result, dict):
+        return json.dumps(result)
+    content = getattr(result, "content", None)
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts: list[str] = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict):
+                text = item.get("text") or item.get("content")
+                if text:
+                    parts.append(str(text))
+        return "\n".join(parts)
+    return str(result)
+
+
+def _strip_markdown_fence(text: str) -> str:
+    stripped = (text or "").strip()
+    fence_match = re.fullmatch(
+        r"```(?:json|JSON)?\s*(.*?)\s*```",
+        stripped,
+        flags=re.DOTALL,
+    )
+    if fence_match:
+        return fence_match.group(1).strip()
+    return stripped
+
+
+def _json_object_substrings(text: str) -> list[str]:
+    substrings: list[str] = []
+    start: int | None = None
+    depth = 0
+    in_string = False
+    escaped = False
+
+    for index, char in enumerate(text):
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+
+        if char == '"':
+            in_string = True
+        elif char == "{":
+            if depth == 0:
+                start = index
+            depth += 1
+        elif char == "}" and depth > 0:
+            depth -= 1
+            if depth == 0 and start is not None:
+                substrings.append(text[start:index + 1])
+                start = None
+    return substrings
+
+
+def _parse_json_object(text: str) -> dict:
+    stripped = _strip_markdown_fence(text)
+    if not stripped:
+        raise ValueError("LLM returned empty output.")
+    try:
+        parsed = json.loads(stripped)
+    except json.JSONDecodeError:
+        candidates = sorted(
+            _json_object_substrings(stripped),
+            key=len,
+            reverse=True,
+        )
+        last_error: json.JSONDecodeError | None = None
+        for candidate in candidates:
+            try:
+                parsed = json.loads(candidate)
+                break
+            except json.JSONDecodeError as exc:
+                last_error = exc
+        else:
+            if last_error is not None:
+                raise last_error
+            raise
+    if not isinstance(parsed, dict):
+        raise ValueError(f"Expected JSON object from LLM, got {type(parsed)!r}.")
+    return parsed
+
+
+def _model_to_dict(result, schema_model: type[BaseModel]) -> dict:
+    if isinstance(result, schema_model):
+        model_instance = result
+    elif isinstance(result, BaseModel):
+        model_instance = schema_model.model_validate(result.model_dump())
+    elif isinstance(result, dict):
+        model_instance = schema_model.model_validate(result)
+    else:
+        model_instance = schema_model.model_validate(_parse_json_object(_message_content(result)))
+    return model_instance.model_dump()
+
+
+def run_structured_llm_json(
+    system_prompt: str,
+    user_prompt: str,
+    expected_schema_name: str,
+    model: str | None = None,
+    temperature: float = 0.0,
+) -> dict:
+    """Call the configured chat model and parse a JSON object response.
+
+    This generic helper is intentionally small. Agent nodes use it only behind
+    explicit feature flags, and tests monkeypatch it so no external API call is
+    made during normal verification.
+    """
+
+    settings = get_llm_settings()
+    if model:
+        settings["model"] = model
+    settings["temperature"] = temperature
+    chat_model = build_chat_model(settings)
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                system_prompt
+                + "\n\nReturn only one valid JSON object for schema: "
+                + expected_schema_name
+                + "."
+            ),
+        },
+        {"role": "user", "content": user_prompt},
+    ]
+    result = chat_model.invoke(messages)
+    if isinstance(result, dict):
+        return result
+    return _parse_json_object(_message_content(result))
+
+
+def run_pydantic_structured_llm(
+    system_prompt: str,
+    user_prompt: str,
+    schema_model: type[BaseModel],
+    model: str | None = None,
+    temperature: float = 0.0,
+) -> dict:
+    """Call the configured chat model with a Pydantic structured output schema."""
+
+    settings = get_llm_settings()
+    if model:
+        settings["model"] = model
+    settings["temperature"] = temperature
+    chat_model = build_chat_model(settings)
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+
+    provider_error: Exception | None = None
+    try:
+        structured_model = chat_model.with_structured_output(schema_model)
+        result = structured_model.invoke(messages)
+        payload = _model_to_dict(result, schema_model)
+        payload["_structured_output_mode"] = "provider_native"
+        return payload
+    except Exception as exc:  # noqa: BLE001 - fallback keeps advisory agents robust
+        provider_error = exc
+
+    try:
+        raw = run_structured_llm_json(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            expected_schema_name=schema_model.__name__,
+            model=settings.get("model"),
+            temperature=temperature,
+        )
+        payload = _model_to_dict(raw, schema_model)
+        payload["_structured_output_mode"] = "fallback_json"
+        return payload
+    except Exception as fallback_exc:
+        raise ValueError(
+            "Pydantic structured LLM call failed. "
+            f"provider_native_error={type(provider_error).__name__}: {provider_error}; "
+            f"fallback_json_error={type(fallback_exc).__name__}: {fallback_exc}"
+        ) from fallback_exc
 
 
 def _format_required_rules(policy: LLMStructuredExtractionPolicy) -> str:

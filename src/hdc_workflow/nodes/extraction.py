@@ -30,6 +30,7 @@ def _parse_llm_max_chunks() -> int | None:
         return None
     return value if value > 0 else None
 from ..config import (
+    load_source_role_policy,
     load_llm_structured_extraction_policy,
     load_structured_extraction_policy,
 )
@@ -699,6 +700,32 @@ def _chunk_is_extractable(
     return True
 
 
+def _context_only_source_ids(role_policy: dict | None) -> set[str]:
+    if not role_policy:
+        return set()
+    return {str(source_id) for source_id in role_policy.get("context_only_source_ids") or []}
+
+
+def _chunk_routing_flags(chunk: dict) -> list[str]:
+    flags = list(chunk.get("routing_flags") or [])
+    metadata = chunk.get("metadata") if isinstance(chunk.get("metadata"), dict) else {}
+    for flag in metadata.get("routing_flags") or []:
+        if flag not in flags:
+            flags.append(flag)
+    return flags
+
+
+def _is_context_only_chunk(chunk: dict, role_policy: dict | None = None) -> bool:
+    if chunk.get("source_id") in _context_only_source_ids(role_policy):
+        return True
+    flags = set(_chunk_routing_flags(chunk))
+    if "context_only" in flags or "blocked_from_structured_extraction" in flags:
+        return True
+    if chunk.get("fetch_purpose") == "context_grounding":
+        return True
+    return chunk.get("source_role") in {"context_source", "context_only"}
+
+
 def _build_record_from_chunk(
     chunk: dict,
     index: int,
@@ -1110,10 +1137,19 @@ def _rule_based_extract_records_from_chunks(
     target_data_count = 0
     extractable_count = 0
     skipped_count = 0
+    skipped_context_only_chunk_count = 0
+    skipped_context_only_source_ids: set[str] = set()
     field_counters: Counter = Counter()
+    role_policy = load_source_role_policy()
 
     for chunk in evidence_chunks:
         if only_chunk_ids is not None and chunk.get("chunk_id") not in only_chunk_ids:
+            continue
+        if _is_context_only_chunk(chunk, role_policy):
+            skipped_count += 1
+            skipped_context_only_chunk_count += 1
+            if chunk.get("source_id"):
+                skipped_context_only_source_ids.add(chunk.get("source_id"))
             continue
         if chunk.get("contains_target_data"):
             target_data_count += 1
@@ -1142,6 +1178,8 @@ def _rule_based_extract_records_from_chunks(
         "target_data_chunk_count": target_data_count,
         "extractable_chunk_count": extractable_count,
         "skipped_chunk_count": skipped_count,
+        "skipped_context_only_chunk_count": skipped_context_only_chunk_count,
+        "skipped_context_only_source_ids": sorted(skipped_context_only_source_ids),
         "field_detection_counts": {
             f: field_counters.get(f, 0) for f in _FIELD_DETECTION_KEYS
         },
@@ -1171,14 +1209,22 @@ def _llm_extract_records_from_chunks(
     target_data_count = 0
     max_chunks = _parse_llm_max_chunks()
     llm_skipped_due_to_chunk_cap_count = 0
+    skipped_context_only_chunk_count = 0
+    skipped_context_only_source_ids: set[str] = set()
+    role_policy = load_source_role_policy()
 
     for chunk in evidence_chunks:
+        if _is_context_only_chunk(chunk, role_policy):
+            skipped_context_only_chunk_count += 1
+            if chunk.get("source_id"):
+                skipped_context_only_source_ids.add(chunk.get("source_id"))
+            continue
         if chunk.get("contains_target_data"):
             target_data_count += 1
         if not _chunk_allowed_for_llm(chunk, llm_policy):
             continue
         llm_eligible_chunk_count += 1
-        # Enforce the optional per-pilot LLM chunk cap. Once the cap has been
+        # Enforce the optional per-run LLM chunk cap. Once the cap has been
         # reached, additional eligible chunks are counted but skipped without
         # incurring further LLM calls.
         if max_chunks is not None and llm_call_count >= max_chunks:
@@ -1244,6 +1290,8 @@ def _llm_extract_records_from_chunks(
         },
         "llm_max_chunks": max_chunks,
         "llm_skipped_due_to_chunk_cap_count": llm_skipped_due_to_chunk_cap_count,
+        "skipped_context_only_chunk_count": skipped_context_only_chunk_count,
+        "skipped_context_only_source_ids": sorted(skipped_context_only_source_ids),
     }
     return records, stats
 
@@ -1296,6 +1344,13 @@ def structured_extraction(state: DataCollectionState) -> dict:
             "rule_based_fallback_record_count": llm_stats.get(
                 "rule_based_fallback_record_count", 0
             ),
+            "skipped_context_only_chunk_count": llm_stats.get(
+                "skipped_context_only_chunk_count", 0
+            ),
+            "skipped_context_only_source_ids": llm_stats.get(
+                "skipped_context_only_source_ids"
+            )
+            or [],
             "llm_max_chunks": llm_stats.get("llm_max_chunks"),
             "llm_skipped_due_to_chunk_cap_count": llm_stats.get(
                 "llm_skipped_due_to_chunk_cap_count", 0
@@ -1316,6 +1371,13 @@ def structured_extraction(state: DataCollectionState) -> dict:
             "rule_based_fallback_record_count": llm_stats.get(
                 "rule_based_fallback_record_count", 0
             ),
+            "skipped_context_only_chunk_count": llm_stats.get(
+                "skipped_context_only_chunk_count", 0
+            ),
+            "skipped_context_only_source_ids": llm_stats.get(
+                "skipped_context_only_source_ids"
+            )
+            or [],
             "fallback_to_rule_based": fallback_to_rule_based,
             "llm_max_chunks": llm_stats.get("llm_max_chunks"),
             "llm_skipped_due_to_chunk_cap_count": llm_stats.get(
@@ -1335,6 +1397,13 @@ def structured_extraction(state: DataCollectionState) -> dict:
             "skipped_chunk_count": det_stats["skipped_chunk_count"],
             "extraction_method": deterministic_policy.extraction_method,
             "field_detection_counts": det_stats["field_detection_counts"],
+            "skipped_context_only_chunk_count": det_stats.get(
+                "skipped_context_only_chunk_count", 0
+            ),
+            "skipped_context_only_source_ids": det_stats.get(
+                "skipped_context_only_source_ids"
+            )
+            or [],
             "extraction_mode": "deterministic_rule_based",
             "llm_enabled": False,
             "llm_call_count": 0,

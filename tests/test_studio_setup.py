@@ -13,7 +13,7 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 
-def _demo_initial_state() -> dict:
+def _sanity_initial_state() -> dict:
     return {
         "user_request": (
             "Collect global human hantavirus case, outbreak, and surveillance data "
@@ -68,7 +68,7 @@ def test_studio_app_exposes_compiled_graph():
 def test_studio_graph_invocation_returns_final_package():
     from hdc_workflow.studio_app import graph
 
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     assert result.get("final_data_package") is not None
     assert len(result.get("source_candidates") or []) >= 10
     assert len(result.get("source_registry") or []) >= 10

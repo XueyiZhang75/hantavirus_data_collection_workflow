@@ -1,8 +1,9 @@
 """LangGraph Studio entry point.
 
-Exposes a compiled `graph` object that the LangGraph CLI / Studio can pick up
-via `langgraph.json`. No LLM calls, no network, no scraping — the underlying
-workflow is the same offline, deterministic graph used by the demo script.
+LangGraph Studio imports the compiled `graph` object declared here. Runtime
+behavior is controlled by environment variables: the same graph can run offline
+fixture checks, live web collection, or a workflow runtime profile with all
+three LLM stages enabled.
 """
 
 from __future__ import annotations

@@ -1,0 +1,37 @@
+{
+  "overlay_name": "mv_hondius_2026_source_role_policy_overlay",
+  "overlay_version": "0.1",
+  "live_case_study_id": "mv_hondius_multicountry_2026",
+  "case_study_name": "MV Hondius 2026 multi-country hantavirus cluster",
+  "description": "Case-specific source-role policy overlay for the MV Hondius masked-validation workflow profile.",
+  "domain_masking_enabled": false,
+  "collection_allowed_source_ids": [
+    "src_reuters_mv_hondius_2026_05_27"
+  ],
+  "context_only_source_ids": [
+    "src_vdh_hantavirus_mv_hondius_context"
+  ],
+  "validation_reserved_source_ids": [
+    "src_who_don600_mv_hondius_2026"
+  ],
+  "validation_reserved_domains": [],
+  "workflow_allowlist_source_ids": [
+    "src_reuters_mv_hondius_2026_05_27",
+    "src_vdh_hantavirus_mv_hondius_context",
+    "src_who_don600_mv_hondius_2026"
+  ],
+  "semantic_leakage_flags": {
+    "src_reuters_mv_hondius_2026_05_27": [
+      "collection_source_explicitly_cites_who"
+    ],
+    "src_vdh_hantavirus_mv_hondius_context": [
+      "context_source_points_to_who_for_latest_counts"
+    ]
+  },
+  "technical_masking_controls": [
+    "WHO DON600 is reserved by explicit source_id.",
+    "Domain masking remains disabled for this workflow profile unless a future overlay explicitly enables it.",
+    "Collection uses an explicit source_id allowlist rather than broad search."
+  ],
+  "notes": "Case-specific overlay for controlled live masked validation. Reuters is collection-allowed but not independent of WHO."
+}

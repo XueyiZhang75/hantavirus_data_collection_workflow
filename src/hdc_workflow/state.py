@@ -16,6 +16,8 @@ class DataCollectionState(TypedDict, total=False):
     screening_criteria: dict | None
     search_queries: dict | None
     search_query_inventory: list[dict]
+    agentic_source_plan: dict | None
+    source_planning_agent_summary: dict | None
     source_candidates: list[dict]
     source_discovery_summary: dict | None
     source_registry: list[dict]

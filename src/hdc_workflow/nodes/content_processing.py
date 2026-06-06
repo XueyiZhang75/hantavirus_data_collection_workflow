@@ -17,9 +17,11 @@ from urllib.parse import urlsplit
 import re
 
 from ..config import (
+    get_collection_mode,
     load_content_fetch_policy,
     load_evidence_chunking_policy,
     load_hantavirus_fixture_documents,
+    load_source_role_policy,
 )
 from ..models import (
     ContentFetchPolicy,
@@ -96,6 +98,110 @@ def _is_search_endpoint(entry: dict, policy: ContentFetchPolicy) -> bool:
     return publisher in policy.search_endpoint_publishers
 
 
+def _domain_for_entry(entry: dict) -> str:
+    url = entry.get("canonical_url") or entry.get("url") or ""
+    if not url:
+        return ""
+    netloc = urlsplit(url).netloc.lower()
+    if netloc.startswith("www."):
+        netloc = netloc[4:]
+    return netloc
+
+
+def _domain_matches_reserved(domain: str, reserved_domains: list[str]) -> bool:
+    if not domain:
+        return False
+    for reserved in reserved_domains:
+        normalized = str(reserved or "").strip().lower()
+        if not normalized:
+            continue
+        if domain == normalized or domain.endswith("." + normalized):
+            return True
+    return False
+
+
+def _is_validation_reserved_entry(
+    entry: dict,
+    collection_mode: str,
+    role_policy: dict | None = None,
+) -> bool:
+    if collection_mode != "masked_validation":
+        return False
+    flags = set(entry.get("routing_flags") or [])
+    has_reserved_marker = (
+        entry.get("source_role") == "validation_reserved"
+        or entry.get("final_screening_decision") == "reserved_for_validation"
+        or "validation_reserved" in flags
+        or "blocked_from_collection" in flags
+    )
+    if has_reserved_marker:
+        return True
+    if role_policy is None:
+        return False
+
+    reserved_ids = set(role_policy.get("validation_reserved_source_ids") or [])
+    if entry.get("source_id") in reserved_ids:
+        return True
+
+    if not role_policy.get("domain_masking_enabled", False):
+        return False
+    reserved_domains = list(role_policy.get("validation_reserved_domains") or [])
+    return _domain_matches_reserved(_domain_for_entry(entry), reserved_domains)
+
+
+def _context_only_source_ids(role_policy: dict | None) -> set[str]:
+    if not role_policy:
+        return set()
+    return {str(source_id) for source_id in role_policy.get("context_only_source_ids") or []}
+
+
+def _routing_flags(obj: dict) -> list[str]:
+    flags = list(obj.get("routing_flags") or [])
+    metadata = obj.get("metadata") if isinstance(obj.get("metadata"), dict) else {}
+    for flag in metadata.get("routing_flags") or []:
+        if flag not in flags:
+            flags.append(flag)
+    return flags
+
+
+def _is_context_only_entry(entry: dict, role_policy: dict | None = None) -> bool:
+    source_id = entry.get("source_id")
+    if source_id in _context_only_source_ids(role_policy):
+        return True
+    flags = set(_routing_flags(entry))
+    if "context_only" in flags or "blocked_from_structured_extraction" in flags:
+        return True
+    return (
+        entry.get("source_role") in {"context_source", "context_only"}
+        and entry.get("final_screening_decision") == "include_for_context_fetch"
+    )
+
+
+def _source_metadata(source_entry: dict) -> dict:
+    return {
+        "source_registry_status": source_entry.get("status"),
+        "expected_fields": list(source_entry.get("expected_fields") or []),
+        "matched_terms": list(source_entry.get("matched_terms") or []),
+        "source_purpose": source_entry.get("source_purpose"),
+        "notes": source_entry.get("notes"),
+        "routing_flags": list(source_entry.get("routing_flags") or []),
+        "requires_human_review": source_entry.get("requires_human_review"),
+    }
+
+
+def _is_context_only_document(doc: dict, role_policy: dict | None = None) -> bool:
+    source_id = doc.get("source_id")
+    if source_id in _context_only_source_ids(role_policy):
+        return True
+    flags = set(_routing_flags(doc))
+    if "context_only" in flags or "blocked_from_structured_extraction" in flags:
+        return True
+    return (
+        doc.get("source_role") in {"context_source", "context_only"}
+        and doc.get("fetch_purpose") == "context_grounding"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Fetch-request construction
 # ---------------------------------------------------------------------------
@@ -105,6 +211,8 @@ def _classify_skip_reason(
     entry: dict,
     policy: ContentFetchPolicy,
     allowlist: set[str] | None = None,
+    collection_mode: str = "standard",
+    role_policy: dict | None = None,
 ) -> str | None:
     """Return a skip reason or None if the entry should be fetched.
 
@@ -114,11 +222,13 @@ def _classify_skip_reason(
     placeholder shows up as `blocked_scheme`.
     """
 
-    # Allowlist takes priority: if the user opted into a small pilot list,
+    # Allowlist takes priority: if the user opted into a small source list,
     # any other source_id should be skipped as `not_in_source_id_allowlist`
     # rather than falsely attributed to a downstream reason.
     if allowlist is not None and entry.get("source_id") not in allowlist:
         return "not_in_source_id_allowlist"
+    if _is_validation_reserved_entry(entry, collection_mode, role_policy):
+        return "validation_reserved"
     if entry.get("requires_human_review"):
         return "human_review"
     if _is_search_endpoint(entry, policy):
@@ -142,19 +252,25 @@ def _build_fetch_requests(
     policy: ContentFetchPolicy,
     live: bool,
     allowlist: set[str] | None = None,
+    collection_mode: str = "standard",
+    role_policy: dict | None = None,
 ) -> tuple[list[ContentFetchRequest], dict[str, int]]:
     registry = list(state.get("source_registry") or [])
     skip_counts: Counter = Counter()
     accepted: list[ContentFetchRequest] = []
 
     for entry in registry:
-        skip_reason = _classify_skip_reason(entry, policy, allowlist)
+        skip_reason = _classify_skip_reason(
+            entry, policy, allowlist, collection_mode, role_policy
+        )
         if skip_reason is not None:
             skip_counts[skip_reason] += 1
             continue
 
         final_decision = entry.get("final_screening_decision") or ""
         fetch_purpose = policy.fetch_purpose_by_decision.get(final_decision, "unknown")
+        if _is_context_only_entry(entry, role_policy):
+            fetch_purpose = "context_grounding"
         url = entry.get("canonical_url") or entry.get("url") or ""
         accepted.append(
             ContentFetchRequest(
@@ -223,10 +339,7 @@ def _make_fixture_document(
             "fixture_mode_enabled": True,
             "synthetic_fixture": True,
             "not_real_public_health_data": True,
-            "source_registry_status": source_entry.get("status"),
-            "expected_fields": list(source_entry.get("expected_fields") or []),
-            "matched_terms": list(source_entry.get("matched_terms") or []),
-            "source_purpose": source_entry.get("source_purpose"),
+            **_source_metadata(source_entry),
             "fixture_id": fixture.fixture_id,
             "fixture_notes": fixture.notes,
         },
@@ -268,11 +381,7 @@ def _make_offline_stub_document(
         metadata={
             "live_fetch_enabled": False,
             "offline_stub_reason": "Live fetching disabled; created metadata stub.",
-            "source_registry_status": source_entry.get("status"),
-            "expected_fields": list(source_entry.get("expected_fields") or []),
-            "matched_terms": list(source_entry.get("matched_terms") or []),
-            "source_purpose": source_entry.get("source_purpose"),
-            "notes": source_entry.get("notes"),
+            **_source_metadata(source_entry),
         },
         parse_status="offline_stub",
         quality_status=None,
@@ -380,10 +489,7 @@ def _fetch_live_document(
         "fetched_at": fetched_at,
         "metadata": {
             "live_fetch_enabled": True,
-            "expected_fields": list(source_entry.get("expected_fields") or []),
-            "matched_terms": list(source_entry.get("matched_terms") or []),
-            "source_purpose": source_entry.get("source_purpose"),
-            "notes": source_entry.get("notes"),
+            **_source_metadata(source_entry),
         },
     }
 
@@ -486,6 +592,8 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
     """
 
     policy = ContentFetchPolicy(**load_content_fetch_policy())
+    role_policy = load_source_role_policy()
+    collection_mode = get_collection_mode(role_policy)
     live = _live_fetch_enabled()
     fixture_enabled = _fixture_documents_enabled()
     fixture_map: dict[str, FixtureDocument] = (
@@ -493,7 +601,9 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
     )
     allowlist = _parse_source_id_allowlist()
 
-    fetch_requests, skip_counts = _build_fetch_requests(state, policy, live, allowlist)
+    fetch_requests, skip_counts = _build_fetch_requests(
+        state, policy, live, allowlist, collection_mode, role_policy
+    )
 
     registry = list(state.get("source_registry") or [])
     registry_by_id = {e.get("source_id"): e for e in registry}
@@ -520,8 +630,28 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
     fetch_purpose_counts = dict(
         Counter(r.fetch_purpose or "unknown" for r in fetch_requests)
     )
+    skipped_validation_reserved_ids = [
+        e.get("source_id")
+        for e in registry
+        if _is_validation_reserved_entry(e, collection_mode, role_policy)
+    ]
+    context_only_source_ids = sorted(
+        {
+            e.get("source_id")
+            for e in registry
+            if e.get("source_id") and _is_context_only_entry(e, role_policy)
+        }
+    )
+    context_only_fetched_source_ids = sorted(
+        {
+            d.source_id
+            for d in documents
+            if d.source_id and d.source_id in set(context_only_source_ids)
+        }
+    )
 
     summary = {
+        "collection_mode": collection_mode,
         "live_fetch_enabled": live,
         "fixture_documents_enabled": fixture_enabled,
         "fixture_document_count": len(fixture_loaded_source_ids),
@@ -529,6 +659,15 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
         "source_id_allowlist_enabled": allowlist is not None,
         "source_id_allowlist": sorted(allowlist) if allowlist else [],
         "skipped_not_in_allowlist_count": skip_counts.get("not_in_source_id_allowlist", 0),
+        "skipped_validation_reserved_count": skip_counts.get(
+            "validation_reserved", 0
+        ),
+        "skipped_validation_reserved_source_ids": [
+            sid for sid in skipped_validation_reserved_ids if sid
+        ],
+        "context_only_source_count": len(context_only_source_ids),
+        "context_only_source_ids": context_only_source_ids,
+        "context_only_fetched_source_ids": context_only_fetched_source_ids,
         "input_registry_count": len(registry),
         "fetch_request_count": len(fetch_requests),
         "document_count": len(documents),
@@ -805,6 +944,25 @@ def _flag_data_presence(
     return False, data_types, context_types, confidence, "context only or no target data signal"
 
 
+def _flag_context_only_presence(
+    text: str,
+    policy: EvidenceChunkingPolicy,
+) -> tuple[bool, list[str], list[str], float, str, bool]:
+    data_hits = _detect_signal_categories(text, policy.target_data_signals)
+    context_hits = _detect_signal_categories(text, policy.context_signals)
+    context_types = list(context_hits.keys())
+    suppressed = bool(data_hits)
+    confidence = 0.40 if context_types else 0.20
+    return (
+        False,
+        [],
+        context_types,
+        confidence,
+        "context-only source; target data suppressed",
+        suppressed,
+    )
+
+
 def _make_evidence_chunk(
     doc: dict,
     chunk_index: int,
@@ -853,6 +1011,7 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
     """Split usable real documents into evidence chunks and flag data presence."""
 
     policy = EvidenceChunkingPolicy(**load_evidence_chunking_policy())
+    role_policy = load_source_role_policy()
     documents = list(state.get("documents") or [])
 
     evidence_chunks: list[EvidenceChunk] = []
@@ -867,6 +1026,9 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
     target_data_count = 0
     context_only_count = 0
     no_signal_count = 0
+    context_only_document_ids: set[str] = set()
+    context_only_chunk_count = 0
+    context_only_target_data_suppressed_count = 0
 
     table_cfg = policy.table_chunking or {}
     table_enabled = bool(table_cfg.get("enabled", False))
@@ -878,6 +1040,9 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
             skipped_count += 1
             continue
         chunkable_count += 1
+        doc_is_context_only = _is_context_only_document(doc, role_policy)
+        if doc_is_context_only and doc.get("source_id"):
+            context_only_document_ids.add(doc.get("source_id"))
         chunk_index = 0
 
         # Text chunks.
@@ -889,9 +1054,17 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
         )
         for tc in text_chunks:
             chunk_index += 1
-            contains, data_types, context_types, confidence, reason_text = (
-                _flag_data_presence(tc["text"], doc, policy)
-            )
+            if doc_is_context_only:
+                contains, data_types, context_types, confidence, reason_text, suppressed = (
+                    _flag_context_only_presence(tc["text"], policy)
+                )
+                context_only_chunk_count += 1
+                if suppressed:
+                    context_only_target_data_suppressed_count += 1
+            else:
+                contains, data_types, context_types, confidence, reason_text = (
+                    _flag_data_presence(tc["text"], doc, policy)
+                )
             chunk = _make_evidence_chunk(
                 doc=doc,
                 chunk_index=chunk_index,
@@ -927,9 +1100,22 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
             for table in tables:
                 for tc in _chunk_table(table, table_cfg):
                     chunk_index += 1
-                    contains, data_types, context_types, confidence, reason_text = (
-                        _flag_data_presence(tc["text"], doc, policy)
-                    )
+                    if doc_is_context_only:
+                        (
+                            contains,
+                            data_types,
+                            context_types,
+                            confidence,
+                            reason_text,
+                            suppressed,
+                        ) = _flag_context_only_presence(tc["text"], policy)
+                        context_only_chunk_count += 1
+                        if suppressed:
+                            context_only_target_data_suppressed_count += 1
+                    else:
+                        contains, data_types, context_types, confidence, reason_text = (
+                            _flag_data_presence(tc["text"], doc, policy)
+                        )
                     chunk = _make_evidence_chunk(
                         doc=doc,
                         chunk_index=chunk_index,
@@ -969,12 +1155,21 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
         "text_chunk_count": text_chunk_count,
         "table_chunk_count": table_chunk_count,
         "total_chunk_count": text_chunk_count + table_chunk_count,
+        "context_only_document_count": len(context_only_document_ids),
+        "context_only_source_ids": sorted(context_only_document_ids),
+        "context_only_chunk_count": context_only_chunk_count,
     }
     presence_summary = {
         "total_chunk_count": text_chunk_count + table_chunk_count,
         "target_data_chunk_count": target_data_count,
         "context_only_chunk_count": context_only_count,
         "no_signal_chunk_count": no_signal_count,
+        "context_only_document_count": len(context_only_document_ids),
+        "context_only_source_ids": sorted(context_only_document_ids),
+        "context_only_guardrail_chunk_count": context_only_chunk_count,
+        "context_only_target_data_suppressed_count": (
+            context_only_target_data_suppressed_count
+        ),
         "data_type_counts": dict(data_type_counter),
         "context_type_counts": dict(context_type_counter),
         "fetch_purpose_counts": dict(fetch_purpose_counter),

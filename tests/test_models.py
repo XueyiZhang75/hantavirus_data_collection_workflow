@@ -13,6 +13,7 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from hdc_workflow.config import (  # noqa: E402
+    get_collection_mode,
     load_content_fetch_policy,
     load_cross_source_consistency_policy,
     load_evidence_chunking_policy,
@@ -25,6 +26,7 @@ from hdc_workflow.config import (  # noqa: E402
     load_llm_structured_extraction_policy,
     load_record_linking_policy,
     load_record_normalization_policy,
+    load_source_role_policy,
     load_source_screening_policy,
     load_source_strategy,
     load_structured_extraction_policy,
@@ -145,6 +147,37 @@ def test_source_screening_policy_model_validates():
     assert "screening_decisions" in policy.decision_labels
     assert "source_roles" in policy.decision_labels
     assert "final_decisions" in policy.decision_labels
+
+
+def test_config_loads_source_role_policy():
+    policy = load_source_role_policy()
+    assert policy["policy_name"] == "hantavirus_source_role_policy"
+    assert policy["default_collection_mode"] == "standard"
+    assert "standard" in policy.get("supported_collection_modes", [])
+    assert "masked_validation" in policy.get("supported_collection_modes", [])
+    assert policy.get("domain_masking_enabled") is False
+    reserved_ids = set(policy.get("validation_reserved_source_ids") or [])
+    assert {
+        "src_cdc_reported_cases",
+        "src_ecdc_surveillance_updates",
+        "src_ecdc_annual_report_2023",
+        "src_who_hantavirus_fact_sheet",
+    } <= reserved_ids
+
+
+def test_get_collection_mode_defaults_standard(monkeypatch):
+    monkeypatch.delenv("HDC_COLLECTION_MODE", raising=False)
+    assert get_collection_mode(load_source_role_policy()) == "standard"
+
+
+def test_get_collection_mode_reads_masked_validation(monkeypatch):
+    monkeypatch.setenv("HDC_COLLECTION_MODE", "masked_validation")
+    assert get_collection_mode(load_source_role_policy()) == "masked_validation"
+
+
+def test_get_collection_mode_falls_back_for_unknown_value(monkeypatch):
+    monkeypatch.setenv("HDC_COLLECTION_MODE", "unexpected")
+    assert get_collection_mode(load_source_role_policy()) == "standard"
 
 
 def test_config_loads_content_fetch_policy():

@@ -1,0 +1,87 @@
+{
+  "catalog_name": "mv_hondius_live_case_study_seed_sources",
+  "catalog_version": "0.1",
+  "description": "Case-specific seed source overlay for the MV Hondius masked-validation workflow profile.",
+  "live_case_study_id": "mv_hondius_multicountry_2026",
+  "seed_sources": [
+    {
+      "seed_source_id": "src_reuters_mv_hondius_2026_05_27",
+      "title": "Reuters: Hantavirus cases from cruise outbreak rise to 13 following new case in Spain, WHO says",
+      "url": "https://www.reuters.com/business/healthcare-pharmaceuticals/hantavirus-cases-cruise-outbreak-rise-13-following-new-case-spain-who-says-2026-05-27/",
+      "publisher": "Reuters",
+      "source_type": "news_and_situation_report",
+      "priority": 1,
+      "source_purpose": "Non-held-out collection source for the MV Hondius 2026 masked-validation workflow profile.",
+      "expected_fields": [
+        "cases",
+        "deaths",
+        "date",
+        "location",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "hantavirus",
+        "MV Hondius",
+        "cruise outbreak",
+        "Spain",
+        "WHO says"
+      ],
+      "notes": "Collection source. High semantic leakage risk because the Reuters article cites WHO; report as source-masked but not independent validation."
+    },
+    {
+      "seed_source_id": "src_who_don600_mv_hondius_2026",
+      "title": "WHO Disease Outbreak News: Hantavirus cluster linked to cruise ship travel, Multi-country",
+      "url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON600",
+      "publisher": "WHO",
+      "source_type": "international_organization_report",
+      "priority": 2,
+      "source_purpose": "Held-out validation source for the MV Hondius masked-validation workflow profile.",
+      "expected_fields": [
+        "cases",
+        "deaths",
+        "date",
+        "location",
+        "case_definition",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "hantavirus",
+        "MV Hondius",
+        "cruise ship",
+        "multi-country",
+        "Andes virus"
+      ],
+      "notes": "Validation-reserved source. Must be blocked from collection and used only through the manually curated ground_truth_records.csv file."
+    },
+    {
+      "seed_source_id": "src_vdh_hantavirus_mv_hondius_context",
+      "title": "Virginia Department of Health hantavirus page",
+      "url": "https://www.vdh.virginia.gov/hantavirus/",
+      "publisher": "Virginia Department of Health",
+      "source_type": "official_public_health_agency",
+      "priority": 3,
+      "source_purpose": "Context source for the MV Hondius outbreak and Andes virus background.",
+      "expected_fields": [
+        "disease",
+        "virus_or_syndrome",
+        "case_definition",
+        "date",
+        "location",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "match_terms": [
+        "hantavirus",
+        "MV Hondius",
+        "Andes virus",
+        "WHO"
+      ],
+      "notes": "Context-only for the MV Hondius workflow profile; may mention outbreak but should not be treated as independent validation."
+    }
+  ]
+}

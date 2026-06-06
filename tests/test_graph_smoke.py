@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 _SRC = Path(__file__).resolve().parents[1] / "src"
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
@@ -12,8 +14,20 @@ if str(_SRC) not in sys.path:
 from hdc_workflow.graph import build_graph  # noqa: E402
 from hdc_workflow.nodes.source_discovery import canonicalize_url  # noqa: E402
 
+_RESERVED_SOURCE_IDS = {
+    "src_cdc_reported_cases",
+    "src_ecdc_surveillance_updates",
+    "src_ecdc_annual_report_2023",
+    "src_who_hantavirus_fact_sheet",
+}
 
-def _demo_initial_state() -> dict:
+
+@pytest.fixture(autouse=True)
+def _default_standard_collection_mode(monkeypatch):
+    monkeypatch.delenv("HDC_COLLECTION_MODE", raising=False)
+
+
+def _sanity_initial_state() -> dict:
     return {
         "user_request": (
             "Collect global human hantavirus case, outbreak, and surveillance data "
@@ -52,20 +66,20 @@ def test_build_graph_compiles():
 
 def test_graph_invocation_returns_final_package():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     assert result.get("final_data_package") is not None
 
 
 def test_collection_trace_has_at_least_fifteen_events():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     trace = result.get("collection_trace") or []
     assert len(trace) >= 15, f"expected >=15 trace events, got {len(trace)}"
 
 
 def test_final_data_package_has_expected_keys():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
     expected_keys = {
         "final_dataset",
@@ -82,7 +96,7 @@ def test_final_data_package_has_expected_keys():
 
 def test_task_scope_infers_global_and_time_window():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     spec = result.get("collection_spec") or {}
     assert spec.get("geography") == "global"
     assert spec.get("time_window") == "2020-2026"
@@ -90,7 +104,7 @@ def test_task_scope_infers_global_and_time_window():
 
 def test_query_strategy_inventory_exists():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     inventory = result.get("search_query_inventory") or []
     assert len(inventory) > 0
     required_keys = {
@@ -110,7 +124,7 @@ def test_query_strategy_inventory_exists():
 
 def test_collection_schema_in_state():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     assert result.get("collection_schema") is not None
     assert result.get("screening_criteria") is not None
     assert result.get("source_strategy") is not None
@@ -118,7 +132,7 @@ def test_collection_schema_in_state():
 
 def test_source_discovery_returns_candidates():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     candidates = result.get("source_candidates") or []
     summary = result.get("source_discovery_summary") or {}
     assert len(candidates) >= 10
@@ -129,7 +143,7 @@ def test_source_discovery_returns_candidates():
 
 def test_source_registry_deduplicates_and_registers_sources():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     registry = result.get("source_registry") or []
     summary = result.get("source_registry_summary") or {}
     assert len(registry) > 0
@@ -157,7 +171,7 @@ def test_source_registry_deduplicates_and_registers_sources():
 
 def test_source_candidates_have_query_metadata_when_possible():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     candidates = result.get("source_candidates") or []
     assert candidates
     with_query = [c for c in candidates if c.get("query_id")]
@@ -171,7 +185,7 @@ def test_source_candidates_have_query_metadata_when_possible():
 
 def test_source_type_coverage():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     registry = result.get("source_registry") or []
     types = {e.get("source_type") for e in registry}
     required = {
@@ -201,7 +215,7 @@ def _registry_by_source_id(registry: list[dict]) -> dict[str, dict]:
 
 def test_source_screening_populates_decisions():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     registry = result.get("source_registry") or []
     assert registry
     for entry in registry:
@@ -216,7 +230,7 @@ def test_source_screening_populates_decisions():
 
 def test_source_critic_populates_final_routing():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     registry = result.get("source_registry") or []
     assert registry
     for entry in registry:
@@ -232,7 +246,7 @@ def test_source_critic_populates_final_routing():
 
 def test_case_data_sources_ready_for_content_fetch():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     registry = _registry_by_source_id(result.get("source_registry") or [])
     for source_id in (
         "src_cdc_reported_cases",
@@ -250,7 +264,7 @@ def test_case_data_sources_ready_for_content_fetch():
 
 def test_context_sources_ready_for_context_fetch():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     registry = _registry_by_source_id(result.get("source_registry") or [])
     for source_id in ("src_cdc_about_hantavirus", "src_who_hantavirus_fact_sheet"):
         entry = registry.get(source_id)
@@ -264,7 +278,7 @@ def test_context_sources_ready_for_context_fetch():
 
 def test_search_endpoints_deferred():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     registry = result.get("source_registry") or []
     search_publishers = {"PubMed", "Europe PMC", "OpenAlex"}
     matched = [e for e in registry if e.get("publisher") in search_publishers]
@@ -277,7 +291,7 @@ def test_search_endpoints_deferred():
 
 def test_placeholder_sources_deferred():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     registry = result.get("source_registry") or []
     placeholders = [
         e for e in registry if (e.get("canonical_url") or "").startswith("seed://")
@@ -291,7 +305,7 @@ def test_placeholder_sources_deferred():
 
 def test_source_type_routing_counts():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     routing_summary = result.get("source_routing_summary") or {}
     assert routing_summary
     assert routing_summary.get("ready_for_content_fetch_count", 0) > 0
@@ -305,9 +319,59 @@ def test_source_type_routing_counts():
         assert key in final_counts, f"final_decision_counts missing {key}"
 
 
+def test_default_collection_mode_does_not_mask_reserved_sources(monkeypatch):
+    monkeypatch.delenv("HDC_COLLECTION_MODE", raising=False)
+    graph = build_graph()
+    result = graph.invoke(_sanity_initial_state())
+    registry = _registry_by_source_id(result.get("source_registry") or [])
+
+    for source_id in _RESERVED_SOURCE_IDS:
+        entry = registry.get(source_id)
+        assert entry, f"missing {source_id} in source_registry"
+        assert entry.get("source_role") != "validation_reserved"
+        assert entry.get("final_screening_decision") != "reserved_for_validation"
+        assert "validation_reserved" not in (entry.get("routing_flags") or [])
+
+    routing_summary = result.get("source_routing_summary") or {}
+    fetch_summary = result.get("content_fetch_summary") or {}
+    assert routing_summary.get("collection_mode") == "standard"
+    assert routing_summary.get("validation_reserved_source_count") == 0
+    assert fetch_summary.get("collection_mode") == "standard"
+    assert fetch_summary.get("fetch_request_count") == 10
+    assert fetch_summary.get("skipped_validation_reserved_count") == 0
+
+
+def test_masked_collection_mode_marks_reserved_sources(monkeypatch):
+    monkeypatch.setenv("HDC_COLLECTION_MODE", "masked_validation")
+    monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
+    monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
+    graph = build_graph()
+    result = graph.invoke(_sanity_initial_state())
+    registry = _registry_by_source_id(result.get("source_registry") or [])
+
+    for source_id in _RESERVED_SOURCE_IDS:
+        entry = registry.get(source_id)
+        assert entry, f"missing {source_id} in source_registry"
+        assert entry.get("source_role") == "validation_reserved"
+        assert entry.get("ready_for_content_fetch") is False
+        assert entry.get("final_screening_decision") == "reserved_for_validation"
+        assert entry.get("status") == "reserved_for_validation"
+        flags = set(entry.get("routing_flags") or [])
+        assert {"validation_reserved", "blocked_from_collection"} <= flags
+
+    routing_summary = result.get("source_routing_summary") or {}
+    assert routing_summary.get("collection_mode") == "masked_validation"
+    assert routing_summary.get("validation_reserved_source_count") == len(
+        _RESERVED_SOURCE_IDS
+    )
+    assert set(routing_summary.get("validation_reserved_source_ids") or []) == (
+        _RESERVED_SOURCE_IDS
+    )
+
+
 def test_human_review_queue_no_duplicates():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     queue = result.get("human_review_queue") or []
     ids = [item.get("review_id") for item in queue if item.get("review_id")]
     assert len(ids) == len(set(ids)), "human_review_queue contains duplicate review_id"
@@ -321,7 +385,7 @@ def test_human_review_queue_no_duplicates():
 def test_content_fetch_requests_created_offline(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     requests = result.get("content_fetch_requests") or []
     assert len(requests) == 10, f"expected 10 fetch requests, got {len(requests)}"
     for r in requests:
@@ -337,7 +401,7 @@ def test_content_fetch_requests_created_offline(monkeypatch):
 def test_documents_created_as_offline_stubs(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     requests = result.get("content_fetch_requests") or []
     documents = result.get("documents") or []
     assert len(documents) == len(requests)
@@ -351,7 +415,7 @@ def test_documents_created_as_offline_stubs(monkeypatch):
 def test_deferred_sources_not_fetched(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     documents = result.get("documents") or []
     fetched_ids = {d.get("source_id") for d in documents}
 
@@ -369,7 +433,7 @@ def test_deferred_sources_not_fetched(monkeypatch):
 def test_document_quality_marks_offline_stubs(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     documents = result.get("documents") or []
     summary = result.get("document_quality_summary") or {}
     assert summary, "document_quality_summary should be populated"
@@ -382,7 +446,7 @@ def test_document_quality_marks_offline_stubs(monkeypatch):
 def test_content_fetch_summary_counts(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     summary = result.get("content_fetch_summary") or {}
     assert summary
     assert summary.get("live_fetch_enabled") is False
@@ -399,6 +463,116 @@ def test_content_fetch_summary_counts(monkeypatch):
     assert total_skipped >= 5
 
 
+def test_masked_content_fetch_blocks_reserved_even_if_ready(monkeypatch):
+    from hdc_workflow.nodes.content_processing import content_fetch_and_parse
+
+    monkeypatch.setenv("HDC_COLLECTION_MODE", "masked_validation")
+    monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
+    monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
+    state = {
+        "source_registry": [
+            {
+                "source_id": "src_cdc_reported_cases",
+                "canonical_url": "https://www.cdc.gov/hantavirus/surveillance",
+                "publisher": "CDC",
+                "source_type": "official_public_health_agency",
+                "source_role": "validation_reserved",
+                "final_screening_decision": "include_for_content_fetch",
+                "ready_for_content_fetch": True,
+                "requires_human_review": False,
+                "routing_flags": ["validation_reserved"],
+            }
+        ],
+        "collection_trace": [],
+    }
+
+    result = content_fetch_and_parse(state)
+
+    assert result.get("content_fetch_requests") == []
+    assert result.get("documents") == []
+    summary = result.get("content_fetch_summary") or {}
+    assert summary.get("collection_mode") == "masked_validation"
+    assert summary.get("skipped_validation_reserved_count") == 1
+    assert summary.get("skipped_validation_reserved_source_ids") == [
+        "src_cdc_reported_cases"
+    ]
+
+
+def test_masked_content_fetch_blocks_reserved_source_id_even_without_reserved_flags(
+    monkeypatch,
+):
+    from hdc_workflow.nodes.content_processing import content_fetch_and_parse
+
+    monkeypatch.setenv("HDC_COLLECTION_MODE", "masked_validation")
+    monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
+    monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
+    state = {
+        "source_registry": [
+            {
+                "source_id": "src_cdc_reported_cases",
+                "canonical_url": "https://www.cdc.gov/hantavirus/surveillance",
+                "publisher": "CDC",
+                "source_type": "official_public_health_agency",
+                "source_role": "data_source",
+                "final_screening_decision": "include_for_content_fetch",
+                "ready_for_content_fetch": True,
+                "requires_human_review": False,
+                "routing_flags": [],
+            }
+        ],
+        "collection_trace": [],
+    }
+
+    result = content_fetch_and_parse(state)
+
+    assert result.get("content_fetch_requests") == []
+    assert result.get("documents") == []
+    summary = result.get("content_fetch_summary") or {}
+    assert summary.get("collection_mode") == "masked_validation"
+    assert summary.get("skipped_validation_reserved_count") == 1
+    assert summary.get("skipped_validation_reserved_source_ids") == [
+        "src_cdc_reported_cases"
+    ]
+
+
+def test_masked_content_fetch_does_not_block_reserved_domain_when_domain_masking_disabled(
+    monkeypatch,
+):
+    from hdc_workflow.nodes.content_processing import content_fetch_and_parse
+
+    monkeypatch.setenv("HDC_COLLECTION_MODE", "masked_validation")
+    monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
+    monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
+    state = {
+        "source_registry": [
+            {
+                "source_id": "src_non_reserved_cdc_page",
+                "canonical_url": "https://www.cdc.gov/hantavirus/about/index.html",
+                "publisher": "CDC",
+                "source_type": "official_public_health_agency",
+                "source_role": "data_source",
+                "final_screening_decision": "include_for_content_fetch",
+                "ready_for_content_fetch": True,
+                "requires_human_review": False,
+                "routing_flags": [],
+            }
+        ],
+        "collection_trace": [],
+    }
+
+    result = content_fetch_and_parse(state)
+
+    requests = result.get("content_fetch_requests") or []
+    documents = result.get("documents") or []
+    assert len(requests) == 1
+    assert len(documents) == 1
+    assert documents[0].get("is_offline_stub") is True
+    summary = result.get("content_fetch_summary") or {}
+    assert summary.get("collection_mode") == "masked_validation"
+    assert summary.get("skipped_validation_reserved_count") == 0
+    assert summary.get("skipped_validation_reserved_source_ids") == []
+
+
 def test_no_network_by_default(monkeypatch):
     """The default workflow path must never call requests.get."""
 
@@ -411,17 +585,17 @@ def test_no_network_by_default(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
 
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     assert result.get("final_data_package") is not None
     summary = result.get("content_fetch_summary") or {}
     assert summary.get("live_fetch_enabled") is False
 
 
-def test_run_live_fetch_demo_exists():
+def test_unified_workflow_run_script_exists():
     from pathlib import Path
 
     project_root = Path(__file__).resolve().parents[1]
-    script = project_root / "scripts" / "run_live_fetch_demo.py"
+    script = project_root / "scripts" / "run_hdc_workflow_configured.py"
     assert script.exists(), f"missing {script}"
 
 
@@ -433,7 +607,7 @@ def test_run_live_fetch_demo_exists():
 def test_default_offline_mode_skips_stub_documents_for_evidence_chunking(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     documents = result.get("documents") or []
     chunks = result.get("evidence_chunks") or []
     summary = result.get("evidence_chunking_summary") or {}
@@ -449,7 +623,7 @@ def test_default_offline_mode_skips_stub_documents_for_evidence_chunking(monkeyp
 def test_data_presence_summary_empty_by_default(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     summary = result.get("data_presence_summary") or {}
     assert summary, "data_presence_summary should be populated"
     assert summary.get("total_chunk_count") == 0
@@ -459,7 +633,7 @@ def test_data_presence_summary_empty_by_default(monkeypatch):
 def test_step5_skip_summary_counts_are_granular(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     summary = result.get("content_fetch_summary") or {}
     assert summary
     assert summary.get("skipped_search_endpoint_count", 0) >= 3
@@ -661,7 +835,7 @@ def _synthetic_text_chunk() -> dict:
 def test_default_offline_mode_has_no_extracted_records(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     assert (result.get("raw_records") or []) == []
     assert (result.get("validated_records") or []) == []
     assert (result.get("rejected_records") or []) == []
@@ -856,7 +1030,7 @@ def _baseline_validated_record(**overrides) -> dict:
 def test_default_offline_mode_has_no_normalized_records(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     assert (result.get("normalized_records") or []) == []
     summary = result.get("record_normalization_summary") or {}
     assert summary, "record_normalization_summary should be populated"
@@ -1125,7 +1299,7 @@ def _baseline_normalized_record(**overrides) -> dict:
 def test_default_offline_mode_has_no_linked_events(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     assert (result.get("linked_events") or []) == []
     summary = result.get("record_linking_summary") or {}
     assert summary, "record_linking_summary should be populated"
@@ -1413,7 +1587,7 @@ def _consistency_event(record_ids: list[str], **overrides) -> dict:
 def test_default_offline_mode_has_no_conflicts(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     assert (result.get("conflicts") or []) == []
     summary = result.get("cross_source_consistency_summary") or {}
     assert summary, "cross_source_consistency_summary should be populated"
@@ -1687,7 +1861,7 @@ def test_quality_gate_routes_to_finalize_when_no_review():
 
 
 def _fixture_initial_state() -> dict:
-    return _demo_initial_state()
+    return _sanity_initial_state()
 
 
 def test_default_mode_does_not_use_fixture_documents(monkeypatch):
@@ -1810,11 +1984,77 @@ def test_fixture_mode_no_network(monkeypatch):
     assert any(d.get("is_fixture_document") for d in documents)
 
 
-def test_run_fixture_workflow_demo_exists():
+def test_fixture_masked_collection_excludes_reserved_records(monkeypatch):
+    monkeypatch.setenv("HDC_COLLECTION_MODE", "masked_validation")
+    monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
+    monkeypatch.setenv("HDC_ENABLE_LIVE_FETCH", "false")
+    monkeypatch.setenv("HDC_ENABLE_LLM_EXTRACTION", "false")
+    graph = build_graph()
+    result = graph.invoke(_fixture_initial_state())
+
+    documents = result.get("documents") or []
+    document_ids = {d.get("source_id") for d in documents}
+    assert not (document_ids & _RESERVED_SOURCE_IDS)
+
+    records = result.get("normalized_records") or []
+    assert not any(r.get("source_id") in _RESERVED_SOURCE_IDS for r in records)
+
+    package = result.get("final_data_package") or {}
+    final_dataset = package.get("final_dataset") or []
+    assert not any(r.get("source_id") in _RESERVED_SOURCE_IDS for r in final_dataset)
+
+    fetch_summary = result.get("content_fetch_summary") or {}
+    assert fetch_summary.get("collection_mode") == "masked_validation"
+    assert fetch_summary.get("skipped_validation_reserved_count") == len(
+        _RESERVED_SOURCE_IDS
+    )
+    assert set(fetch_summary.get("skipped_validation_reserved_source_ids") or []) == (
+        _RESERVED_SOURCE_IDS
+    )
+
+
+def test_fixture_masked_collection_has_non_reserved_records(monkeypatch):
+    monkeypatch.setenv("HDC_COLLECTION_MODE", "masked_validation")
+    monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
+    monkeypatch.setenv("HDC_ENABLE_LIVE_FETCH", "false")
+    monkeypatch.setenv("HDC_ENABLE_LLM_EXTRACTION", "false")
+    graph = build_graph()
+    result = graph.invoke(_fixture_initial_state())
+
+    package = result.get("final_data_package") or {}
+    final_dataset = package.get("final_dataset") or []
+    assert len(final_dataset) >= 1
+
+    source_ids = {record.get("source_id") for record in final_dataset}
+    assert "src_paho_hantavirus_americas_guidelines" in source_ids
+    assert not (source_ids & _RESERVED_SOURCE_IDS)
+
+    records_with_complete_evidence = [
+        record
+        for record in final_dataset
+        if record.get("source_url")
+        and record.get("evidence_quote")
+        and record.get("supporting_chunk_id")
+        and record.get("linked_event_id")
+    ]
+    assert records_with_complete_evidence
+
+    fetch_summary = result.get("content_fetch_summary") or {}
+    assert fetch_summary.get("collection_mode") == "masked_validation"
+    assert fetch_summary.get("live_fetch_enabled") is False
+    assert fetch_summary.get("skipped_validation_reserved_count") == len(
+        _RESERVED_SOURCE_IDS
+    )
+    assert set(fetch_summary.get("skipped_validation_reserved_source_ids") or []) == (
+        _RESERVED_SOURCE_IDS
+    )
+
+
+def test_workflow_console_builder_script_exists():
     from pathlib import Path
 
     project_root = Path(__file__).resolve().parents[1]
-    script = project_root / "scripts" / "run_fixture_workflow_demo.py"
+    script = project_root / "scripts" / "build_workflow_run_console.py"
     assert script.exists(), f"missing {script}"
 
 
@@ -1832,7 +2072,7 @@ def test_fixture_mode_human_review_packets_created(monkeypatch):
     monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     queue = result.get("human_review_queue") or []
     summary = result.get("human_review_summary") or {}
     assert len(queue) > 0
@@ -1849,7 +2089,7 @@ def test_fixture_mode_review_item_contains_conflict_context(monkeypatch):
     monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     queue = result.get("human_review_queue") or []
     conflict_items = [i for i in queue if i.get("item_type") == "cross_source_conflict"]
     assert conflict_items
@@ -1969,11 +2209,11 @@ def test_human_review_direct_invalid_decision():
     assert summary.get("invalid_decision_count", 0) >= 1
 
 
-def test_review_decision_demo_script_exists():
+def test_studio_sanity_check_script_exists():
     from pathlib import Path
 
     project_root = Path(__file__).resolve().parents[1]
-    script = project_root / "scripts" / "run_fixture_workflow_with_review_decision_demo.py"
+    script = project_root / "scripts" / "check_studio_app.py"
     assert script.exists(), f"missing {script}"
 
 
@@ -1981,7 +2221,7 @@ def test_fixture_mode_final_package_contains_review_packets(monkeypatch):
     monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
     items = package.get("human_review_items") or []
     assert items
@@ -1997,7 +2237,7 @@ def test_default_final_package_has_metadata_and_summaries(monkeypatch):
     monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
     assert package
     assert package.get("package_metadata"), "package_metadata missing"
@@ -2013,7 +2253,7 @@ def test_fixture_final_package_has_synthetic_notice(monkeypatch):
     monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
     assert package.get("contains_synthetic_fixture_data") is True
     notice = package.get("synthetic_fixture_notice") or ""
@@ -2027,7 +2267,7 @@ def test_final_package_trace_matches_state_trace_step13(monkeypatch):
     monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     state_trace = result.get("collection_trace") or []
     package = result.get("final_data_package") or {}
     package_trace = package.get("collection_trace") or []
@@ -2041,7 +2281,7 @@ def test_final_package_provenance_manifest_counts_fixture(monkeypatch):
     monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
     prov = package.get("provenance_manifest") or {}
     assert prov.get("normalized_record_count", 0) > 0
@@ -2058,7 +2298,7 @@ def test_workflow_summaries_include_major_steps(monkeypatch):
     monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
     summaries = package.get("workflow_summaries") or {}
     for key in (
@@ -2079,7 +2319,7 @@ def test_export_final_data_package_writes_files(monkeypatch, tmp_path):
     monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
 
     from hdc_workflow.export import export_final_data_package
@@ -2106,12 +2346,15 @@ def test_export_final_data_package_writes_files(monkeypatch, tmp_path):
     assert section_counts.get("final_dataset", 0) > 0
 
 
-def test_export_script_exists():
+def test_unified_workflow_runner_exports_final_package():
     from pathlib import Path
 
     project_root = Path(__file__).resolve().parents[1]
-    script = project_root / "scripts" / "export_fixture_final_package.py"
+    script = project_root / "scripts" / "run_hdc_workflow_configured.py"
     assert script.exists(), f"missing {script}"
+    text = script.read_text(encoding="utf-8")
+    assert "export_final_data_package" in text
+    assert "write_evaluation_outputs" in text
 
 
 # ---------------------------------------------------------------------------
@@ -2138,7 +2381,7 @@ def test_default_mode_llm_extraction_disabled(monkeypatch):
     monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     summary = result.get("structured_extraction_summary") or {}
     assert summary.get("llm_enabled") is False
     assert summary.get("llm_call_count") == 0
@@ -2152,7 +2395,7 @@ def test_fixture_mode_llm_extraction_disabled_by_default(monkeypatch):
     monkeypatch.setenv("HDC_USE_FIXTURE_DOCUMENTS", "true")
     monkeypatch.setenv("HDC_ENABLE_LIVE_FETCH", "false")
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     raw_records = result.get("raw_records") or []
     assert raw_records
     for rec in raw_records:
@@ -2220,7 +2463,7 @@ def test_llm_extraction_path_with_monkeypatched_client(monkeypatch):
     monkeypatch.setattr(llm_clients, "extract_chunk_with_llm", mock_extract)
 
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
 
     raw_records = result.get("raw_records") or []
     assert len(raw_records) > 0
@@ -2252,7 +2495,7 @@ def test_llm_extraction_fallback_on_error(monkeypatch):
     monkeypatch.setattr(llm_clients, "extract_chunk_with_llm", mock_fail)
 
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     raw_records = result.get("raw_records") or []
     summary = result.get("structured_extraction_summary") or {}
     assert summary.get("llm_error_count", 0) > 0
@@ -2280,7 +2523,7 @@ def test_llm_extraction_no_fallback_on_error(monkeypatch):
     monkeypatch.setattr(llm_clients, "extract_chunk_with_llm", mock_fail)
 
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     summary = result.get("structured_extraction_summary") or {}
     assert summary.get("llm_error_count", 0) > 0
     assert summary.get("llm_fallback_count", 0) == 0
@@ -2292,7 +2535,7 @@ def test_final_package_workflow_node_count_matches_trace(monkeypatch):
     monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
     metadata = package.get("package_metadata") or {}
     trace = package.get("collection_trace") or []
@@ -2304,22 +2547,27 @@ def test_llm_extraction_summary_in_workflow_summaries(monkeypatch):
     monkeypatch.delenv("HDC_USE_FIXTURE_DOCUMENTS", raising=False)
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     package = result.get("final_data_package") or {}
     summaries = package.get("workflow_summaries") or {}
     assert "llm_extraction_summary" in summaries
 
 
-def test_llm_extraction_demo_script_exists():
+def test_configured_workflow_script_contains_llm_controls():
     from pathlib import Path
 
     project_root = Path(__file__).resolve().parents[1]
-    script = project_root / "scripts" / "run_fixture_workflow_llm_extraction_demo.py"
+    script = project_root / "scripts" / "run_hdc_workflow_configured.py"
     assert script.exists(), f"missing {script}"
+    text = script.read_text(encoding="utf-8")
+    assert "--disable-all-llm" in text
+    assert "HDC_ENABLE_LLM_SOURCE_PLANNING" in text
+    assert "HDC_ENABLE_LLM_SOURCE_CRITIC" in text
+    assert "HDC_ENABLE_LLM_EXTRACTION" in text
 
 
 # ---------------------------------------------------------------------------
-# Step 15: controlled live-source pilot env controls
+# Controlled live-source workflow env controls
 # ---------------------------------------------------------------------------
 
 
@@ -2332,7 +2580,7 @@ def test_source_id_allowlist_limits_fetch_requests_offline(monkeypatch):
         "src_cdc_reported_cases,src_who_hantavirus_fact_sheet",
     )
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     requests = result.get("content_fetch_requests") or []
     summary = result.get("content_fetch_summary") or {}
     request_ids = {r.get("source_id") for r in requests}
@@ -2351,7 +2599,7 @@ def test_no_allowlist_default_behavior_unchanged(monkeypatch):
     monkeypatch.delenv("HDC_ENABLE_LIVE_FETCH", raising=False)
     monkeypatch.delenv("HDC_SOURCE_ID_ALLOWLIST", raising=False)
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     summary = result.get("content_fetch_summary") or {}
     assert summary.get("source_id_allowlist_enabled") is False
     assert summary.get("fetch_request_count") == 10
@@ -2387,19 +2635,23 @@ def test_llm_max_chunks_cap_with_monkeypatched_client(monkeypatch):
     monkeypatch.setattr(llm_clients, "extract_chunk_with_llm", mock_extract)
 
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     summary = result.get("structured_extraction_summary") or {}
     assert summary.get("llm_call_count", 0) <= 1
     assert summary.get("llm_skipped_due_to_chunk_cap_count", 0) >= 1
     assert summary.get("llm_max_chunks") == 1
 
 
-def test_live_source_llm_pilot_script_exists():
+def test_studio_launcher_script_contains_workflow_controls():
     from pathlib import Path
 
     project_root = Path(__file__).resolve().parents[1]
-    script = project_root / "scripts" / "run_live_source_llm_pilot.py"
+    script = project_root / "scripts" / "start_hdc_workflow_studio.py"
     assert script.exists(), f"missing {script}"
+    text = script.read_text(encoding="utf-8")
+    assert "--disable-live-fetch" in text
+    assert "--enable-all-llm" in text
+    assert "--print-config-only" in text
 
 
 # ---------------------------------------------------------------------------
@@ -2612,7 +2864,7 @@ def test_cross_source_consistency_summary_counts():
 
 def test_final_package_trace_matches_state_trace():
     graph = build_graph()
-    result = graph.invoke(_demo_initial_state())
+    result = graph.invoke(_sanity_initial_state())
     state_trace = result.get("collection_trace") or []
     package = result.get("final_data_package") or {}
     package_trace = package.get("collection_trace") or []

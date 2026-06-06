@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import re
 
+from .. import llm_clients
+from ..agents.source_planning_agent import plan_sources_with_llm
 from ..config import (
     load_hantavirus_collection_schema,
     load_hantavirus_profile,
@@ -177,6 +179,39 @@ def _add_query(
     )
 
 
+def _append_agent_queries(
+    inventory_dicts: list[dict],
+    seen_queries: set[str],
+    agentic_source_plan: dict,
+) -> int:
+    added_count = 0
+    proposed = agentic_source_plan.get("proposed_search_queries") or []
+    if not isinstance(proposed, list):
+        raise ValueError("agentic_source_plan.proposed_search_queries must be a list")
+
+    for item in proposed:
+        if not isinstance(item, dict):
+            raise ValueError("agent-proposed search query must be an object")
+        query = str(item.get("query") or "").strip()
+        if not query or query in seen_queries:
+            continue
+        seen_queries.add(query)
+        added_count += 1
+        new_query = {
+            "query_id": item.get("query_id") or f"q_agent_{added_count:03d}",
+            "query": query,
+            "source_type": item.get("source_type") or "news_and_situation_report",
+            "priority": int(item.get("priority") or 5),
+            "rationale": item.get("rationale")
+            or "LLM source planning agent proposed this search query.",
+            "expected_fields": list(item.get("expected_fields") or _expected_fields_default()),
+            "query_source": "llm_source_planning_agent",
+            "discovery_method": "llm_source_planning_agent",
+        }
+        inventory_dicts.append(new_query)
+    return added_count
+
+
 def query_strategy_builder(state: DataCollectionState) -> dict:
     """Build deterministic queries grouped both as SearchQuerySet and a typed inventory."""
 
@@ -189,6 +224,7 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
     spec_dict = state.get("collection_spec") or {}
     geography = spec_dict.get("geography")
     time_window = spec_dict.get("time_window")
+    schema_dict = state.get("collection_schema") or load_hantavirus_collection_schema()
 
     include_terms = profile.include_terms
     syndrome_terms = profile.syndrome_terms
@@ -331,25 +367,82 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
             expected_fields,
         )
 
+    inventory_dicts = [q.model_dump() for q in inventory]
+
+    planning_enabled = llm_clients.llm_source_planning_enabled()
+    agentic_source_plan: dict | None = None
+    source_planning_agent_summary = {
+        "llm_source_planning_enabled": planning_enabled,
+        "status": "disabled",
+        "agent_query_count": 0,
+        "agent_query_added_count": 0,
+        "agent_candidate_hint_count": 0,
+        "warnings": [],
+    }
+
+    if planning_enabled:
+        try:
+            agentic_source_plan = plan_sources_with_llm(
+                user_request=state.get("user_request", "") or "",
+                collection_spec=spec_dict,
+                disease_profile=profile.model_dump(),
+                source_strategy=strategy.model_dump(),
+                collection_schema=schema_dict,
+            )
+            agent_query_count = len(
+                agentic_source_plan.get("proposed_search_queries") or []
+            )
+            added_count = _append_agent_queries(
+                inventory_dicts, seen, agentic_source_plan
+            )
+            source_planning_agent_summary.update(
+                {
+                    "status": "success",
+                    "agent_name": agentic_source_plan.get("agent_name"),
+                    "agent_version": agentic_source_plan.get("agent_version"),
+                    "agent_query_count": agent_query_count,
+                    "agent_query_added_count": added_count,
+                    "agent_candidate_hint_count": len(
+                        agentic_source_plan.get("candidate_source_hints") or []
+                    ),
+                    "human_review_recommended": bool(
+                        agentic_source_plan.get("human_review_recommended", False)
+                    ),
+                    "warnings": list(agentic_source_plan.get("warnings") or []),
+                }
+            )
+        except Exception as exc:  # noqa: BLE001 - agent is advisory only
+            agentic_source_plan = None
+            source_planning_agent_summary.update(
+                {
+                    "status": "failed",
+                    "failure_type": type(exc).__name__,
+                    "failure_message": str(exc),
+                    "warnings": [
+                        "llm_source_planning_failed_rule_based_fallback_used"
+                    ],
+                }
+            )
+
     # Group into the backward-compatible SearchQuerySet structure.
     official_source_queries = [
-        item.query for item in inventory
-        if item.source_type == "official_public_health_agency"
+        item["query"] for item in inventory_dicts
+        if item.get("source_type") == "official_public_health_agency"
     ]
     literature_queries = [
-        item.query for item in inventory
-        if item.source_type == "peer_reviewed_literature"
+        item["query"] for item in inventory_dicts
+        if item.get("source_type") == "peer_reviewed_literature"
     ]
     news_and_report_queries = [
-        item.query for item in inventory
-        if item.source_type in (
+        item["query"] for item in inventory_dicts
+        if item.get("source_type") in (
             "news_and_situation_report",
             "international_organization_report",
         )
     ]
     database_queries = [
-        item.query for item in inventory
-        if item.source_type == "structured_database"
+        item["query"] for item in inventory_dicts
+        if item.get("source_type") == "structured_database"
     ]
 
     query_set = SearchQuerySet(
@@ -359,24 +452,29 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
         database_queries=database_queries,
     )
 
-    inventory_dicts = [q.model_dump() for q in inventory]
-
     trace = append_trace(
         state,
         node_name="query_strategy_builder",
-        message=f"Built {len(inventory)} deterministic search queries across 5 source categories.",
+        message=(
+            f"Built {len(inventory_dicts)} search queries across 5 source "
+            f"categories (llm_source_planning_enabled={planning_enabled})."
+        ),
         metadata={
-            "inventory_size": len(inventory),
+            "inventory_size": len(inventory_dicts),
+            "deterministic_inventory_size": len(inventory),
             "official_source_query_count": len(query_set.official_source_queries),
             "literature_query_count": len(query_set.literature_queries),
             "news_and_report_query_count": len(query_set.news_and_report_queries),
             "database_query_count": len(query_set.database_queries),
             "geography": geography,
             "time_window": time_window,
+            **source_planning_agent_summary,
         },
     )
     return {
         "search_queries": query_set.model_dump(),
         "search_query_inventory": inventory_dicts,
+        "agentic_source_plan": agentic_source_plan,
+        "source_planning_agent_summary": source_planning_agent_summary,
         "collection_trace": trace,
     }
