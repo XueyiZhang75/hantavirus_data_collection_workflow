@@ -1,0 +1,141 @@
+{
+  "profile_name": "hantavirus_shanghai_2024-1-1_2026-6-9_real_workflow",
+  "description": "Interactive real data collection workflow run. Live search, live fetch, and LLM stages are enabled by default; API keys are read from environment variables.",
+  "workflow": {
+    "collection_mode": "standard",
+    "use_fixture_documents": false
+  },
+  "user_request": "Collect hantavirus cases, deaths, dates, locations, source URLs, source types, and evidence quotes for shanghai from 2024-1-1 to 2026-6-9.",
+  "structured_task": {
+    "disease": "hantavirus",
+    "location": "shanghai",
+    "start_date": "2024-1-1",
+    "end_date": "2026-6-9",
+    "target_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "source_preferences": [
+      "official_public_health_agency",
+      "international_organization_report",
+      "structured_database",
+      "peer_reviewed_literature",
+      "news_and_situation_report"
+    ],
+    "collection_mode": "standard",
+    "user_request": "Collect hantavirus cases, deaths, dates, locations, source URLs, source types, and evidence quotes for shanghai from 2024-1-1 to 2026-6-9.",
+    "run_label": "hantavirus_shanghai_2024_1_1_2026_6_9_20260609_141441_utc"
+  },
+  "studio": {
+    "port": null,
+    "no_reload": true
+  },
+  "live_web": {
+    "enabled": true,
+    "timeout_seconds": 30
+  },
+  "source_search": {
+    "enabled": true,
+    "mode": "live",
+    "provider": "tavily",
+    "fixture_path": "src/hdc_workflow/resources/search_fixtures/example_search_results.json",
+    "max_queries": 3,
+    "max_results_per_query": 5,
+    "max_total_results": 15,
+    "timeout_seconds": 20,
+    "combine_with_seed_catalog": false,
+    "cache_enabled": true,
+    "provider_channel_allowlist": [
+      "web_search",
+      "official_site_search",
+      "news_search",
+      "literature_api",
+      "database_search"
+    ]
+  },
+  "content_fetch": {
+    "fetch_search_derived_sources": true,
+    "max_search_derived_sources": 5,
+    "max_total_sources": 8,
+    "min_credibility_score": 0.55,
+    "allowed_final_roles": [
+      "collection",
+      "validation",
+      "collection_support",
+      "context"
+    ],
+    "allow_needs_review": false,
+    "domain_allowlist": [],
+    "domain_blocklist": [],
+    "max_bytes": 1000000,
+    "parse_pdf_text": true,
+    "parse_tables": true,
+    "store_raw_text": false,
+    "user_agent": "data-collection-workflow/0.1",
+    "content_fixture_map_path": null
+  },
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "source_planning_enabled": true,
+    "source_critic_enabled": true,
+    "structured_extraction_enabled": true,
+    "max_chunks": 8,
+    "max_tokens": 4096,
+    "fallback_to_rule_based": false,
+    "source_critic": {
+      "max_sources": 6,
+      "review_blocks_fetch": false
+    },
+    "source_credibility": {
+      "enabled": true,
+      "max_sources": 6,
+      "source_id_allowlist": []
+    }
+  },
+  "disease_intelligence": {
+    "llm_enabled": true,
+    "force_llm": false,
+    "fallback_to_curated": true
+  },
+  "anomaly_detection": {
+    "enabled": true,
+    "max_cases_threshold": 1000000,
+    "max_deaths_threshold": 100000,
+    "spike_multiplier": 10,
+    "min_prior_records": 1
+  },
+  "human_review": {
+    "decisions_path": null,
+    "apply_decisions": false,
+    "require_reviewer_id": true
+  },
+  "source_sets": {
+    "source_id_allowlist_enabled": false,
+    "collection_source_ids": [],
+    "context_source_ids": [],
+    "validation_reserved_source_ids": [],
+    "workflow_source_ids": [],
+    "llm_source_critic_source_ids": []
+  },
+  "output": {
+    "run_output_root": "outputs",
+    "sessionized": true,
+    "session_id": "hantavirus_shanghai_2024_1_1_2026_6_9_20260609_141441_utc",
+    "auto_build_console": true,
+    "console_output_root": "outputs/workflow_console",
+    "write_latest_alias": true
+  }
+}
