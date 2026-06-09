@@ -33,6 +33,11 @@ NODE_STORY = [
         "把一句自然语言请求变成 collection_spec：疾病、人群、地理范围、时间窗、字段清单。",
     ),
     (
+        "executable_source_planning",
+        "来源计划变成可执行规格",
+        "生成 source objectives、source categories 和 planned queries，并明确标记 planned_not_executed。",
+    ),
+    (
         "query_strategy_builder",
         "策略被显式记录",
         "生成可审计的查询 inventory，而不是把检索关键词藏在脚本里。",
@@ -40,7 +45,7 @@ NODE_STORY = [
     (
         "source_discovery",
         "来源发现",
-        "从离线 seed catalog 生成 source candidates，并记录 discovery provenance。",
+        "从 seed catalog 和显式启用的 fixture/live search metadata 生成 source candidates，并记录 discovery provenance。",
     ),
     (
         "source_screening",
@@ -59,8 +64,8 @@ NODE_STORY = [
     ),
     (
         "structured_extraction",
-        "证据变成记录",
-        "从 target-data chunks 抽取 HantavirusRecord；可切换规则抽取或 LLM 抽取。",
+        "Evidence becomes records",
+        "Extracts PublicHealthRecord-style generic public-health records from target-data chunks; rule-based and LLM modes remain switchable.",
     ),
     (
         "record_normalization",
@@ -110,6 +115,14 @@ def _initial_state() -> dict:
         "validated_records": [],
         "normalized_records": [],
         "linked_events": [],
+        "event_clusters": [],
+        "duplicate_clusters": [],
+        "validation_cases": [],
+        "validation_comparisons": [],
+        "validation_results": [],
+        "validation_summary": None,
+        "trusted_source_validation_summary": None,
+        "cross_source_validation_summary": None,
         "conflicts": [],
         "human_review_queue": [],
         "human_review_decisions": [],
@@ -121,8 +134,12 @@ def _initial_state() -> dict:
         "screening_criteria": None,
         "search_queries": None,
         "search_query_inventory": [],
+        "source_search_results": [],
+        "source_search_execution_summary": None,
         "content_fetch_requests": [],
         "content_fetch_summary": None,
+        "document_parse_summary": None,
+        "fetch_manifest": [],
         "fixture_document_summary": None,
         "document_quality_summary": None,
         "final_data_package": None,
@@ -226,10 +243,50 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         live_fetch_summary = {}
     live_fetch_summary = _sanitize_workflow_artifact(live_fetch_summary)
 
+    document_parse_summary = _read_json_file(
+        diagnostics_dir / "document_parse_summary.json"
+    )
+    if not isinstance(document_parse_summary, dict):
+        document_parse_summary = (
+            workflow_summaries.get("document_parse_summary")
+            if isinstance(workflow_summaries, dict)
+            else {}
+        )
+    document_parse_summary = _sanitize_workflow_artifact(
+        document_parse_summary or {}
+    )
+
+    fetch_manifest = _read_json_file(diagnostics_dir / "fetch_manifest.json")
+    if not isinstance(fetch_manifest, list):
+        fetch_manifest = []
+    fetch_manifest = _sanitize_workflow_artifact(fetch_manifest)
+
     llm_stage_summary = _read_json_file(diagnostics_dir / "llm_stage_summary.json")
     if not isinstance(llm_stage_summary, dict):
         llm_stage_summary = {}
     llm_stage_summary = _sanitize_workflow_artifact(llm_stage_summary)
+
+    source_credibility_summary = _read_json_file(
+        diagnostics_dir / "source_credibility_summary.json"
+    )
+    if not isinstance(source_credibility_summary, dict):
+        source_credibility_summary = (
+            workflow_summaries.get("source_credibility_summary")
+            if isinstance(workflow_summaries, dict)
+            else {}
+        )
+    source_credibility_summary = _sanitize_workflow_artifact(
+        source_credibility_summary or {}
+    )
+
+    source_credibility_assessments = _read_json_file(
+        diagnostics_dir / "source_credibility_assessments.json"
+    )
+    if not isinstance(source_credibility_assessments, list):
+        source_credibility_assessments = []
+    source_credibility_assessments = _sanitize_workflow_artifact(
+        source_credibility_assessments
+    )
 
     run_summary = _read_json_file(summary_path)
     if not isinstance(run_summary, dict):
@@ -237,6 +294,23 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
     run_summary = _sanitize_workflow_artifact(run_summary)
 
     records = list(package.get("final_dataset") or [])
+    final_dataset_post_review = list(package.get("final_dataset_post_review") or [])
+    anomaly_results = list(package.get("anomaly_results") or [])
+    human_review_application_summary = (
+        package.get("human_review_application_summary")
+        or _summary_value(workflow_summaries, "human_review_application_summary")
+        or {}
+    )
+    applied_human_review_decisions = list(
+        package.get("applied_human_review_decisions") or []
+    )
+    rejected_human_review_decisions = list(
+        package.get("rejected_human_review_decisions") or []
+    )
+    human_review_audit_trail = list(package.get("human_review_audit_trail") or [])
+    records_excluded_by_human_review = list(
+        package.get("records_excluded_by_human_review") or []
+    )
     review_items = list(package.get("human_review_items") or [])
     collection_spec = {
         "task_type": "public_health_case_and_outbreak_collection",
@@ -268,13 +342,43 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         "rejected_records": [],
         "normalized_records": records,
         "linked_events": package.get("linked_events") or [],
+        "event_clusters": package.get("event_clusters") or [],
+        "duplicate_clusters": package.get("duplicate_clusters") or [],
+        "validation_cases": package.get("validation_cases") or [],
+        "validation_comparisons": package.get("validation_comparisons") or [],
+        "validation_results": package.get("validation_results") or [],
+        "anomaly_results": anomaly_results,
+        "anomaly_summary": package.get("anomaly_summary")
+        or _summary_value(workflow_summaries, "anomaly_summary"),
+        "validation_summary": package.get("validation_summary")
+        or _summary_value(workflow_summaries, "validation_summary"),
+        "trusted_source_validation_summary": package.get(
+            "trusted_source_validation_summary"
+        )
+        or _summary_value(workflow_summaries, "trusted_source_validation_summary"),
+        "cross_source_validation_summary": package.get(
+            "cross_source_validation_summary"
+        )
+        or _summary_value(workflow_summaries, "cross_source_validation_summary"),
         "conflicts": package.get("conflicts") or [],
         "human_review_queue": review_items,
+        "applied_human_review_decisions": applied_human_review_decisions,
+        "rejected_human_review_decisions": rejected_human_review_decisions,
+        "human_review_audit_trail": human_review_audit_trail,
+        "human_review_application_summary": human_review_application_summary,
+        "final_dataset_post_review": final_dataset_post_review,
+        "records_excluded_by_human_review": records_excluded_by_human_review,
         "final_data_package": package,
         "current_route": run_summary.get("current_route")
         or ("human_review" if review_items else "final_data_package_builder"),
+        "executable_source_plan_summary": _summary_value(
+            workflow_summaries, "executable_source_plan_summary"
+        ),
         "source_planning_agent_summary": _summary_value(
             workflow_summaries, "source_planning_agent_summary"
+        ),
+        "source_search_execution_summary": _summary_value(
+            workflow_summaries, "source_search_execution_summary"
         ),
         "source_discovery_summary": _summary_value(
             workflow_summaries, "source_discovery_summary"
@@ -288,9 +392,19 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         "source_routing_summary": _summary_value(
             workflow_summaries, "source_routing_summary"
         ),
+        "source_credibility_summary": _summary_value(
+            workflow_summaries, "source_credibility_summary"
+        )
+        or source_credibility_summary,
+        "source_credibility_assessments": source_credibility_assessments,
         "content_fetch_summary": _summary_value(
             workflow_summaries, "content_fetch_summary"
         ),
+        "document_parse_summary": _summary_value(
+            workflow_summaries, "document_parse_summary"
+        )
+        or document_parse_summary,
+        "fetch_manifest": fetch_manifest,
         "fixture_document_summary": None,
         "document_quality_summary": _summary_value(
             workflow_summaries, "document_quality_summary"
@@ -316,6 +430,12 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         "record_linking_summary": _summary_value(
             workflow_summaries, "record_linking_summary"
         ),
+        "event_clustering_summary": _summary_value(
+            workflow_summaries, "event_clustering_summary"
+        ),
+        "duplicate_detection_summary": _summary_value(
+            workflow_summaries, "duplicate_detection_summary"
+        ),
         "cross_source_consistency_summary": _summary_value(
             workflow_summaries, "cross_source_consistency_summary"
         ),
@@ -327,6 +447,8 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         ),
         "workflow_run_result": {
             "live_fetch_summary": live_fetch_summary,
+            "document_parse_summary": document_parse_summary,
+            "fetch_manifest": fetch_manifest,
             "llm_stage_summary": llm_stage_summary,
             "run_summary": run_summary,
         },
@@ -606,6 +728,27 @@ def _stage_payload(result: dict) -> list[dict]:
             "takeaway": "第一步先把用户任务变成可执行 collection spec：疾病、地点、年份、字段和 validation 规则都进入 state。",
         },
         {
+            "node": "executable_source_planning",
+            "title": "Plan: 生成可执行但尚未执行的来源发现计划",
+            "agentic_role": "Executable source planning",
+            "state_writes": [
+                "agentic_source_plan",
+                "executable_source_plan_summary",
+                "source_planning_agent_summary",
+            ],
+            "trace": trace.get("executable_source_planning", {}),
+            "show": {
+                "executable_source_plan_summary": result.get(
+                    "executable_source_plan_summary"
+                ),
+                "planned_query_sample": _sample(
+                    (result.get("agentic_source_plan") or {}).get("planned_queries"),
+                    6,
+                ),
+            },
+            "takeaway": "这一节点把 source planning 变成可审计 plan；所有 query 都是 planned_not_executed，真实搜索执行留给后续 source discovery 扩展。",
+        },
+        {
             "node": "query_strategy_builder",
             "title": "Plan: 生成检索策略和查询清单",
             "agentic_role": "Search strategy",
@@ -626,6 +769,9 @@ def _stage_payload(result: dict) -> list[dict]:
             "state_writes": ["source_candidates", "source_registry"],
             "trace": trace.get("source_screening", {}),
             "show": {
+                "source_search_execution_summary": result.get(
+                    "source_search_execution_summary"
+                ),
                 "source_discovery_summary": result.get("source_discovery_summary"),
                 "source_screening_summary": result.get("source_screening_summary"),
                 "source_registry_sample": _sample(result.get("source_registry"), 6),
@@ -633,13 +779,41 @@ def _stage_payload(result: dict) -> list[dict]:
             "takeaway": "source screening 输出可被后续节点消费的 registry，并决定哪些来源可抽取、哪些只能做 validation 或 context。",
         },
         {
+            "node": "source_screening",
+            "title": "Verify: source credibility scoring and final role assignment",
+            "agentic_role": "Credibility rubric / role gate",
+            "state_writes": [
+                "source_credibility_assessments",
+                "source_credibility_summary",
+                "source_registry.source_role_final",
+            ],
+            "trace": trace.get("source_screening", {}),
+            "show": {
+                "source_credibility_summary": result.get(
+                    "source_credibility_summary"
+                ),
+                "source_credibility_assessments": _sample(
+                    result.get("source_credibility_assessments"), 6
+                ),
+                "source_registry_sample": _sample(result.get("source_registry"), 6),
+            },
+            "takeaway": "Stage 6 adds task-aware credibility scoring to every registry source and records an auditable final role: collection, validation, context, collection_support, search_endpoint, excluded, or needs_human_review.",
+        },
+        {
             "node": "content_fetch_and_parse",
             "title": "Act: 获取真实网页文档",
             "agentic_role": "Document acquisition tool",
-            "state_writes": ["content_fetch_requests", "documents"],
+            "state_writes": [
+                "content_fetch_requests",
+                "documents",
+                "document_parse_summary",
+                "fetch_manifest",
+            ],
             "trace": trace.get("content_fetch_and_parse", {}),
             "show": {
                 "content_fetch_summary": result.get("content_fetch_summary"),
+                "document_parse_summary": result.get("document_parse_summary"),
+                "fetch_manifest": _sample(result.get("fetch_manifest"), 8),
                 "documents_sample": _sample(result.get("documents"), 5),
             },
             "takeaway": "真实产品运行中，这个节点实际访问 allowlist 中的 NMDOH/CDC URL，并记录 fetch status、HTTP status、content type 和 parse status。",
@@ -689,15 +863,18 @@ def _stage_payload(result: dict) -> list[dict]:
             "node": "record_linking",
             "title": "Reason: 把多来源记录链接成同一事件",
             "agentic_role": "Entity / event linking",
-            "state_writes": ["normalized_records", "linked_events"],
+            "state_writes": ["normalized_records", "linked_events", "event_clusters"],
             "trace": trace.get("record_linking", {}),
             "show": {
                 "record_normalization_summary": result.get(
                     "record_normalization_summary"
                 ),
                 "record_linking_summary": result.get("record_linking_summary"),
+                "event_clustering_summary": result.get("event_clustering_summary"),
+                "duplicate_detection_summary": result.get("duplicate_detection_summary"),
                 "normalized_records": result.get("normalized_records"),
                 "linked_events": result.get("linked_events"),
+                "event_clusters": result.get("event_clusters"),
             },
             "takeaway": "这里开始体现事件级推理：来自真实 NMDOH 网页的 records 会按疾病、地点、日期和统计口径链接成事件。",
         },
@@ -705,9 +882,24 @@ def _stage_payload(result: dict) -> list[dict]:
             "node": "cross_source_consistency_check",
             "title": "Critique: 跨来源一致性检查",
             "agentic_role": "Critic / verifier",
-            "state_writes": ["conflicts", "cross_source_consistency_summary"],
+            "state_writes": [
+                "validation_results",
+                "validation_summary",
+                "trusted_source_validation_summary",
+                "cross_source_validation_summary",
+                "conflicts",
+                "cross_source_consistency_summary",
+            ],
             "trace": trace.get("cross_source_consistency_check", {}),
             "show": {
+                "validation_summary": result.get("validation_summary"),
+                "trusted_source_validation_summary": result.get(
+                    "trusted_source_validation_summary"
+                ),
+                "cross_source_validation_summary": result.get(
+                    "cross_source_validation_summary"
+                ),
+                "validation_results": result.get("validation_results"),
                 "cross_source_consistency_summary": result.get(
                     "cross_source_consistency_summary"
                 ),
@@ -725,6 +917,8 @@ def _stage_payload(result: dict) -> list[dict]:
                 "current_route": result.get("current_route"),
                 "human_review_queue_count": len(result.get("human_review_queue") or []),
                 "conflict_count": len(result.get("conflicts") or []),
+                "anomaly_summary": result.get("anomaly_summary"),
+                "anomaly_results": result.get("anomaly_results"),
             },
             "takeaway": "这就是 LangGraph 比普通 pipeline 更直观的地方：分支逻辑是 graph edge，不是隐藏在 if/else 日志里。",
         },
@@ -732,11 +926,26 @@ def _stage_payload(result: dict) -> list[dict]:
             "node": "human_review",
             "title": "Human-in-the-loop: 生成审查包",
             "agentic_role": "Human oversight handoff",
-            "state_writes": ["human_review_queue", "human_review_summary"],
+            "state_writes": [
+                "human_review_queue",
+                "human_review_summary",
+                "human_review_application_summary",
+                "final_dataset_post_review",
+            ],
             "trace": trace.get("human_review", {}),
             "show": {
                 "human_review_summary": result.get("human_review_summary"),
+                "human_review_application_summary": result.get(
+                    "human_review_application_summary"
+                ),
                 "human_review_queue": result.get("human_review_queue"),
+                "applied_human_review_decisions": result.get(
+                    "applied_human_review_decisions"
+                ),
+                "rejected_human_review_decisions": result.get(
+                    "rejected_human_review_decisions"
+                ),
+                "human_review_audit_trail": result.get("human_review_audit_trail"),
             },
             "takeaway": "不是只告诉人“有冲突”，而是把冲突、证据、相关记录、linked event 打包给 reviewer。",
         },
@@ -748,6 +957,10 @@ def _stage_payload(result: dict) -> list[dict]:
             "trace": trace.get("final_data_package_builder", {}),
             "show": {
                 "finalization_summary": result.get("finalization_summary"),
+                "final_dataset_post_review": result.get("final_dataset_post_review"),
+                "records_excluded_by_human_review": result.get(
+                    "records_excluded_by_human_review"
+                ),
                 "package_metadata": (result.get("final_data_package") or {}).get(
                     "package_metadata"
                 ),
@@ -769,7 +982,22 @@ def _report_payload(result: dict) -> dict:
     package = result.get("final_data_package") or {}
     workflow_result = result.get("workflow_run_result") or {}
     live_fetch_summary = workflow_result.get("live_fetch_summary") or {}
+    document_parse_summary = (
+        result.get("document_parse_summary")
+        or workflow_result.get("document_parse_summary")
+        or {}
+    )
+    fetch_manifest = (
+        result.get("fetch_manifest") or workflow_result.get("fetch_manifest") or []
+    )
     llm_replay_summary = workflow_result.get("llm_replay_summary") or {}
+    source_search_summary = result.get("source_search_execution_summary") or {}
+    source_credibility_summary = result.get("source_credibility_summary") or {}
+    anomaly_results = result.get("anomaly_results") or []
+    applied_decisions = result.get("applied_human_review_decisions") or []
+    rejected_decisions = result.get("rejected_human_review_decisions") or []
+    audit_trail = result.get("human_review_audit_trail") or []
+    final_dataset_post_review = result.get("final_dataset_post_review") or []
 
     evidence_links = []
     chunk_by_id = {chunk.get("chunk_id"): chunk for chunk in chunks}
@@ -806,6 +1034,14 @@ def _report_payload(result: dict) -> dict:
             ),
             "live_fetch": bool(live_fetch_summary.get("live_fetch_enabled")),
             "llm_extraction": bool(llm_replay_summary.get("llm_call_succeeded")),
+            "source_search_mode": source_search_summary.get("search_mode"),
+            "source_search_provider": source_search_summary.get("search_provider"),
+            "source_search_executed_queries": source_search_summary.get(
+                "executed_query_count"
+            ),
+            "search_derived_candidates": source_search_summary.get(
+                "candidate_from_search_count"
+            ),
             "truth_label": "Workflow run based on live NMDOH/CDC webpage fetch, source-role masking, Anthropic LLM extraction, validation comparison, and human-review routing.",
         },
         "counts": {
@@ -815,11 +1051,58 @@ def _report_payload(result: dict) -> dict:
             "evidence_chunks": len(chunks),
             "records": len(records),
             "linked_events": len(result.get("linked_events") or []),
+            "event_clusters": len(result.get("event_clusters") or []),
+            "duplicate_clusters": len(result.get("duplicate_clusters") or []),
+            "validation_results": len(result.get("validation_results") or []),
+            "anomaly_results": len(anomaly_results),
             "conflicts": len(conflicts),
             "human_review_items": len(review_items),
+            "applied_review_decisions": len(applied_decisions),
+            "rejected_review_decisions": len(rejected_decisions),
+            "review_audit_entries": len(audit_trail),
+            "final_dataset_post_review": len(final_dataset_post_review),
         },
         "route": result.get("current_route"),
+        "source_credibility": {
+            "summary": source_credibility_summary,
+            "assessment_sample": _sample(
+                result.get("source_credibility_assessments"), 6
+            ),
+        },
+        "fetch_parse": {
+            "live_fetch_summary": live_fetch_summary,
+            "document_parse_summary": document_parse_summary,
+            "fetch_manifest_sample": _sample(fetch_manifest, 8),
+        },
         "stages": _stage_payload(result),
+        "validation": {
+            "validation_summary": result.get("validation_summary") or {},
+            "trusted_source_validation_summary": result.get(
+                "trusted_source_validation_summary"
+            )
+            or {},
+            "cross_source_validation_summary": result.get(
+                "cross_source_validation_summary"
+            )
+            or {},
+            "validation_results_sample": _sample(
+                result.get("validation_results"), 8
+            ),
+        },
+        "stage11": {
+            "anomaly_summary": result.get("anomaly_summary") or {},
+            "anomaly_results_sample": _sample(anomaly_results, 8),
+            "human_review_application_summary": result.get(
+                "human_review_application_summary"
+            )
+            or {},
+            "applied_human_review_decisions_sample": _sample(applied_decisions, 8),
+            "rejected_human_review_decisions_sample": _sample(rejected_decisions, 8),
+            "human_review_audit_trail_sample": _sample(audit_trail, 8),
+            "final_dataset_post_review_sample": _sample(
+                final_dataset_post_review, 8
+            ),
+        },
         "evidence_links": evidence_links,
         "conflicts": conflicts,
         "review_items": review_items,
@@ -849,7 +1132,7 @@ def _build_html(result: dict) -> str:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LangGraph HDC Agent Run Inspector</title>
+  <title>data collection workflow Run Inspector</title>
   <style>
     :root {{
       --bg: #f4f6f8;
@@ -1123,8 +1406,8 @@ def _build_html(result: dict) -> str:
 </head>
 <body>
   <header>
-    <h1>HDC Workflow Run Console</h1>
-    <p>本页面用于展示用户输入任务后，HDC workflow 的节点顺序、state artifacts、质量门和 human-review routing。technical workshop 主线使用真实 NMDOH/CDC 网页 collection 和 Anthropic LLM extraction；本页面负责解释 workflow 如何运行、每个节点写入什么、条件分支在哪里发生。</p>
+    <h1>data collection workflow Run Console</h1>
+    <p>This console shows the node order, state artifacts, quality gates, validation outputs, anomaly detection, and human-review routing for a completed data collection workflow run.</p>
   </header>
   <main>
     <section class="band top-grid">
@@ -1255,8 +1538,14 @@ def _build_html(result: dict) -> str:
         ["evidence_chunks", "Evidence chunks"],
         ["records", "Records"],
         ["linked_events", "Linked events"],
+        ["event_clusters", "Event clusters"],
+        ["duplicate_clusters", "Duplicate clusters"],
+        ["validation_results", "Validation results"],
+        ["anomaly_results", "Anomaly results"],
         ["conflicts", "Conflicts"],
         ["human_review_items", "Review items"],
+        ["applied_review_decisions", "Applied review decisions"],
+        ["final_dataset_post_review", "Post-review records"],
       ];
       document.getElementById("metrics").innerHTML = labels.map(([key, label]) => `
         <div class="metric"><span>${{label}}</span><strong>${{esc(RUN.counts[key])}}</strong></div>
@@ -1391,6 +1680,9 @@ def _build_static_html(result: dict) -> str:
             _metric_card("Evidence chunks", _count(result, "evidence_chunks"), "可追踪证据块"),
             _metric_card("Records", _count(result, "normalized_records"), "结构化数据记录"),
             _metric_card("Linked events", _count(result, "linked_events"), "事件级聚合"),
+            _metric_card("Event clusters", _count(result, "event_clusters"), "duplicate-aware event clusters"),
+            _metric_card("Duplicate clusters", _count(result, "duplicate_clusters"), "non-countable duplicate groups"),
+            _metric_card("Validation results", _count(result, "validation_results"), "trusted-source + cross-source checks"),
             _metric_card("Conflicts", _count(result, "conflicts"), "跨源一致性问题"),
             _metric_card("Route", route, "quality gate 的条件路由结果"),
         ]
@@ -1410,7 +1702,7 @@ def _build_static_html(result: dict) -> str:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LangGraph HDC Workflow Console</title>
+  <title>LangGraph data collection workflow Console</title>
   <style>
     :root {{
       --ink: #172033;
@@ -1578,8 +1870,8 @@ def _build_static_html(result: dict) -> str:
 </head>
 <body>
   <header>
-    <h1>LangGraph Hantavirus Data Collection Workflow</h1>
-    <p>一个产品使用演示：用户输入采集任务后，workflow 把 source routing、真实网页抓取、结构化抽取、validation comparison 和 human review routing 拆成可观察节点。</p>
+    <h1>LangGraph data collection workflow</h1>
+    <p>A product workflow console: after a user submits a collection task, the workflow exposes source routing, content fetch, structured extraction, validation comparison, anomaly checks, and human review routing as inspectable nodes.</p>
   </header>
   <main>
     <section class="band">
@@ -1730,9 +2022,18 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
     source_critic = llm_stage_summary.get("source_critic") or {}
     legacy_llm_replay = workflow_run_result.get("llm_replay_summary") or {}
     live_fetch_summary = workflow_run_result.get("live_fetch_summary", {})
+    document_parse_summary = (
+        result.get("document_parse_summary")
+        or workflow_run_result.get("document_parse_summary")
+        or {}
+    )
+    fetch_manifest = (
+        result.get("fetch_manifest") or workflow_run_result.get("fetch_manifest") or []
+    )
     live_fetch_enabled = live_fetch_summary.get("live_fetch_enabled")
     if live_fetch_enabled is None and data_source == "workflow_run_artifacts":
         live_fetch_enabled = bool(result.get("documents"))
+    source_credibility_summary = result.get("source_credibility_summary") or {}
     summary = {
         "html_path": str(html_path),
         "summary_path": str(summary_path),
@@ -1745,6 +2046,9 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
             "evidence_chunks": _count(result, "evidence_chunks"),
             "normalized_records": _count(result, "normalized_records"),
             "linked_events": _count(result, "linked_events"),
+            "event_clusters": _count(result, "event_clusters"),
+            "duplicate_clusters": _count(result, "duplicate_clusters"),
+            "validation_results": _count(result, "validation_results"),
             "conflicts": _count(result, "conflicts"),
             "human_review_items": _count(result, "human_review_queue"),
         },
@@ -1753,6 +2057,13 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
             result.get("final_data_package") or {}
         ),
         "live_fetch_enabled": live_fetch_enabled,
+        "selected_search_derived_fetch_count": live_fetch_summary.get(
+            "selected_search_derived_fetch_count"
+        ),
+        "parser_status_counts": document_parse_summary.get("parser_status_counts")
+        or live_fetch_summary.get("parser_status_counts")
+        or {},
+        "fetch_manifest_count": len(fetch_manifest),
         "all_three_llm_stages_enabled": bool(
             source_planning.get("enabled")
             and source_critic.get("enabled")
@@ -1767,6 +2078,16 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
             or legacy_llm_replay.get("llm_call_succeeded")
         ),
         "llm_structured_extraction_call_count": structured_llm.get("call_count"),
+        "source_credibility_assessed_source_count": source_credibility_summary.get(
+            "assessed_source_count"
+        ),
+        "source_credibility_role_counts": source_credibility_summary.get(
+            "role_counts"
+        )
+        or {},
+        "source_credibility_needs_review_count": source_credibility_summary.get(
+            "needs_review_count"
+        ),
     }
     summary_path.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"

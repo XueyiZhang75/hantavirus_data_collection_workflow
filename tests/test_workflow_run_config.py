@@ -18,6 +18,7 @@ def test_default_workflow_run_config_drives_env_and_studio_input():
         validation_records_path_from_config,
         workflow_initial_state_from_config,
         workflow_output_dir_from_config,
+        workflow_run_config_with_overrides,
         workflow_run_env_from_config,
     )
 
@@ -41,6 +42,7 @@ def test_default_workflow_run_config_drives_env_and_studio_input():
     assert env["HDC_COLLECTION_MODE"] == "masked_validation"
     assert env["HDC_USE_FIXTURE_DOCUMENTS"] == "false"
     assert env["HDC_ENABLE_LIVE_FETCH"] == "true"
+    assert env["HDC_ENABLE_LLM_DISEASE_INTELLIGENCE"] == "false"
     assert env["HDC_ENABLE_LLM_SOURCE_PLANNING"] == "true"
     assert env["HDC_ENABLE_LLM_SOURCE_CRITIC"] == "true"
     assert env["HDC_ENABLE_LLM_EXTRACTION"] == "true"
@@ -54,7 +56,19 @@ def test_default_workflow_run_config_drives_env_and_studio_input():
     assert validation_records_path_from_config(config).exists()
 
     state = workflow_initial_state_from_config(config, include_empty_fields=False)
-    assert state == {"user_request": config["user_request"]}
+    assert state["user_request"] == config["user_request"]
+    assert state["structured_task"] == config["structured_task"]
+    assert state["structured_task"]["disease"] == "hantavirus"
+    assert state["structured_task"]["location"] == "New Mexico"
+
+    override_request = "Collect dengue data for Florida in 2025."
+    overridden = workflow_run_config_with_overrides(
+        config,
+        user_request=override_request,
+    )
+    assert overridden["user_request"] == override_request
+    assert overridden["structured_task"]["user_request"] == override_request
+    assert overridden["structured_task"]["disease"] == "hantavirus"
 
     output_dir = workflow_output_dir_from_config(config, session_id="test_session")
     assert output_dir == (

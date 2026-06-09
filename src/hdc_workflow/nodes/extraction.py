@@ -40,6 +40,7 @@ from ..models import (
     LLMExtractedRecord,
     LLMExtractionOutput,
     LLMStructuredExtractionPolicy,
+    PublicHealthRecord,
     SchemaValidationResult,
     StructuredExtractionPolicy,
 )
@@ -51,10 +52,12 @@ _FIELD_DETECTION_KEYS = (
     "cases_suspected",
     "cases_unspecified",
     "deaths",
+    "hospitalizations",
     "date_reported",
     "country",
     "subnational_location",
     "virus_or_syndrome",
+    "pathogen_or_syndrome",
 )
 
 # ---------------------------------------------------------------------------
@@ -95,6 +98,121 @@ def _detect_virus_or_syndrome(
     return None
 
 
+def _canonical_disease_name(value: str | None) -> str | None:
+    if value is None:
+        return None
+    lowered = str(value).strip().lower()
+    if not lowered:
+        return None
+    if lowered in {
+        "hantavirus",
+        "hantavirus disease",
+        "hps",
+        "hantavirus pulmonary syndrome",
+    }:
+        return "Hantavirus disease"
+    if lowered in {"covid", "covid-19", "covid 19", "sars-cov-2"}:
+        return "COVID-19"
+    if lowered in {"dengue", "dengue fever", "denv", "dengue virus"}:
+        return "Dengue"
+    return str(value).strip()
+
+
+def _build_extraction_context(
+    state: DataCollectionState | None,
+    policy: StructuredExtractionPolicy,
+) -> dict:
+    state = state or {}
+    structured_task = state.get("structured_task") or {}
+    collection_spec = state.get("collection_spec") or {}
+    disease_intelligence = state.get("disease_intelligence") or {}
+
+    disease_standard_name = _canonical_disease_name(
+        disease_intelligence.get("disease_standard_name")
+        or structured_task.get("disease")
+        or collection_spec.get("disease")
+        or policy.default_disease
+    ) or policy.default_disease
+
+    terms: list[str] = []
+    for key in ("disease_input", "disease_standard_name"):
+        value = disease_intelligence.get(key)
+        if isinstance(value, str):
+            terms.append(value)
+    for key in ("aliases", "abbreviations", "pathogen_terms", "syndrome_terms"):
+        values = disease_intelligence.get(key) or []
+        if isinstance(values, list):
+            terms.extend(str(v) for v in values if v)
+    for value in (structured_task.get("disease"), collection_spec.get("disease")):
+        if value:
+            terms.append(str(value))
+
+    pathogen_terms = [
+        str(v)
+        for key in ("pathogen_terms", "abbreviations", "syndrome_terms")
+        for v in (disease_intelligence.get(key) or [])
+        if v
+    ]
+    if disease_standard_name == "COVID-19":
+        terms.extend(["COVID-19", "SARS-CoV-2"])
+        pathogen_terms.extend(["SARS-CoV-2", "COVID-19"])
+    elif disease_standard_name == "Dengue":
+        terms.extend(["dengue", "DENV", "dengue virus"])
+        pathogen_terms.extend(["DENV", "dengue virus", "dengue"])
+    elif disease_standard_name == "Hantavirus disease":
+        terms.extend(["hantavirus", "HPS", "Sin Nombre virus"])
+
+    seen: set[str] = set()
+    disease_terms = [
+        term
+        for term in terms
+        if term and not (term.lower() in seen or seen.add(term.lower()))
+    ]
+    seen_pathogen: set[str] = set()
+    pathogen_terms = [
+        term
+        for term in pathogen_terms
+        if term
+        and not (term.lower() in seen_pathogen or seen_pathogen.add(term.lower()))
+    ]
+
+    return {
+        "disease_standard_name": disease_standard_name,
+        "disease_terms": disease_terms,
+        "pathogen_terms": pathogen_terms,
+        "target_population": collection_spec.get("target_population") or "humans",
+        "task_location": structured_task.get("location") or collection_spec.get("geography"),
+        "time_window": collection_spec.get("time_window")
+        or structured_task.get("start_date")
+        or structured_task.get("end_date"),
+        "target_fields": list(structured_task.get("target_fields") or []),
+        "is_hantavirus": disease_standard_name == "Hantavirus disease",
+    }
+
+
+def _detect_disease_alias_used(text: str, context: dict | None) -> str | None:
+    lowered = _lower(text)
+    for term in (context or {}).get("disease_terms") or []:
+        if term and term.lower() in lowered:
+            return term
+    return None
+
+
+def _detect_pathogen_or_syndrome(text: str, context: dict | None) -> str | None:
+    lowered = _lower(text)
+    for term in (context or {}).get("pathogen_terms") or []:
+        if term and term.lower() in lowered:
+            canonical = _canonical_disease_name(term)
+            if canonical in {"COVID-19", "Dengue"} and term.lower() not in {
+                "sars-cov-2",
+                "denv",
+                "dengue virus",
+            }:
+                return canonical
+            return term
+    return None
+
+
 _ISO_DATE_RE = re.compile(r"\b(20\d{2}-\d{2}-\d{2})\b")
 _YEAR_RE = re.compile(r"\b(20\d{2})\b")
 
@@ -122,6 +240,9 @@ _LOCATION_PATTERNS: list[tuple[re.Pattern, tuple[str | None, str | None]]] = [
     (re.compile(r"\bin\s+United\s+States\b", re.IGNORECASE), ("United States of America", None)),
     (re.compile(r"\bin\s+USA\b"), ("United States of America", None)),
     (re.compile(r"\bin\s+New\s+Mexico\b", re.IGNORECASE), ("United States of America", "New Mexico")),
+    (re.compile(r"\bNew\s+York\s+City\b|\bNYC\b", re.IGNORECASE), ("United States of America", "New York City")),
+    (re.compile(r"\bNew\s+York\b", re.IGNORECASE), ("United States of America", "New York")),
+    (re.compile(r"\bFlorida\b", re.IGNORECASE), ("United States of America", "Florida")),
     (re.compile(r"\bin\s+China\b", re.IGNORECASE), ("China", None)),
     (re.compile(r"\bin\s+Chile\b", re.IGNORECASE), ("Chile", None)),
     (re.compile(r"\bin\s+Argentina\b", re.IGNORECASE), ("Argentina", None)),
@@ -261,6 +382,28 @@ def _extract_deaths(
     return None
 
 
+_HOSPITALIZATION_NUMERIC_RE = re.compile(
+    r"(?P<num>\d+(?:,\d{3})*(?:\.\d+)?)\s+"
+    r"(?:[\w-]+\s+){0,3}hospitali[sz]ations?\b",
+    re.IGNORECASE,
+)
+_HOSPITALIZATION_COLON_RE = re.compile(
+    r"hospitali[sz]ations?\s*:\s*"
+    r"(?P<num>\d+(?:,\d{3})*(?:\.\d+)?)",
+    re.IGNORECASE,
+)
+
+
+def _extract_hospitalizations(text: str) -> float | None:
+    if not text:
+        return None
+    for pattern in (_HOSPITALIZATION_NUMERIC_RE, _HOSPITALIZATION_COLON_RE):
+        m = pattern.search(text)
+        if m:
+            return _normalize_number(m.group("num"))
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Table extraction
 # ---------------------------------------------------------------------------
@@ -279,6 +422,8 @@ def _classify_table_column(header_lower: str) -> str | None:
         return "cases_unspecified"
     if "death" in header_lower or "fatality" in header_lower:
         return "deaths"
+    if "hospitalization" in header_lower or "hospitalisation" in header_lower:
+        return "hospitalizations"
     if "country" in header_lower:
         return "country"
     if (
@@ -321,7 +466,14 @@ def _extract_from_table_text(
         value = data_cells[idx]
         if not value:
             continue
-        if field in ("cases_confirmed", "cases_probable", "cases_suspected", "cases_unspecified", "deaths"):
+        if field in (
+            "cases_confirmed",
+            "cases_probable",
+            "cases_suspected",
+            "cases_unspecified",
+            "deaths",
+            "hospitalizations",
+        ):
             num = _normalize_number(value)
             if num is not None:
                 result[field] = num
@@ -502,13 +654,32 @@ def _canonicalize_statistical_count_type(
 def _standardize_disease(
     value: str | None,
 ) -> tuple[str, list[str]]:
-    """Always force disease to the canonical 'Hantavirus disease' label."""
+    return _standardize_disease_for_context(value, None)
 
-    canonical = "Hantavirus disease"
+
+def _standardize_disease_for_context(
+    value: str | None,
+    context: dict | None = None,
+) -> tuple[str, list[str]]:
+    """Standardize disease to the active task disease.
+
+    The legacy no-context behavior remains Hantavirus disease. Stage 8 passes
+    context from structured task / disease intelligence so non-hantavirus
+    records keep their disease label.
+    """
+
+    canonical = (
+        _canonical_disease_name((context or {}).get("disease_standard_name"))
+        if context
+        else None
+    ) or "Hantavirus disease"
     warnings: list[str] = []
     if value is None or not isinstance(value, str):
         return canonical, warnings
-    if value.strip() != canonical:
+    input_canonical = _canonical_disease_name(value)
+    if input_canonical and input_canonical != canonical:
+        warnings.append("standardized_disease_name")
+    elif value.strip() != canonical:
         warnings.append("standardized_disease_name")
     return canonical, warnings
 
@@ -654,17 +825,29 @@ def _standardize_geographic_scope(
 def _apply_extraction_semantic_guardrails(
     record_dict: dict,
     chunk: dict | None,
+    context: dict | None = None,
 ) -> dict:
     out = dict(record_dict)
     existing_warnings = list(out.get("semantic_warnings") or [])
 
-    disease, w_d = _standardize_disease(out.get("disease"))
+    disease, w_d = _standardize_disease_for_context(out.get("disease"), context)
     out["disease"] = disease
+    out["disease_standard_name"] = disease
     existing_warnings.extend(w_d)
 
-    vos, w_v = _clean_virus_or_syndrome(out.get("virus_or_syndrome"))
-    out["virus_or_syndrome"] = vos
-    existing_warnings.extend(w_v)
+    if context and not context.get("is_hantavirus"):
+        pathogen = out.get("pathogen_or_syndrome")
+        if not pathogen and chunk:
+            pathogen = _detect_pathogen_or_syndrome(chunk.get("text") or "", context)
+        out["pathogen_or_syndrome"] = pathogen
+        if not out.get("virus_or_syndrome"):
+            out["virus_or_syndrome"] = pathogen
+    else:
+        vos, w_v = _clean_virus_or_syndrome(out.get("virus_or_syndrome"))
+        out["virus_or_syndrome"] = vos
+        if not out.get("pathogen_or_syndrome"):
+            out["pathogen_or_syndrome"] = vos
+        existing_warnings.extend(w_v)
 
     chunk_text = chunk.get("text") if isinstance(chunk, dict) else None
     sct, w_s = _standardize_statistical_count_type(
@@ -730,7 +913,8 @@ def _build_record_from_chunk(
     chunk: dict,
     index: int,
     policy: StructuredExtractionPolicy,
-) -> HantavirusRecord | None:
+    context: dict | None = None,
+) -> PublicHealthRecord | None:
     if not _chunk_is_extractable(chunk, policy):
         return None
 
@@ -738,10 +922,13 @@ def _build_record_from_chunk(
     chunk_kind = chunk.get("chunk_kind") or "text"
 
     virus_or_syndrome = _detect_virus_or_syndrome(text, policy)
+    pathogen_or_syndrome = _detect_pathogen_or_syndrome(text, context)
+    disease_alias_used = _detect_disease_alias_used(text, context)
     date_reported = _extract_year_or_date(text, policy)
     country, subnational_location = _extract_country_or_location(text)
     case_counts = _extract_case_counts(text, policy)
     deaths = _extract_deaths(text, policy)
+    hospitalizations = _extract_hospitalizations(text)
 
     if chunk_kind == "table":
         table_data = _extract_from_table_text(text, policy)
@@ -757,6 +944,8 @@ def _build_record_from_chunk(
                     case_counts[f] = table_data[f]
             if table_data.get("deaths") is not None:
                 deaths = table_data["deaths"]
+            if table_data.get("hospitalizations") is not None:
+                hospitalizations = table_data["hospitalizations"]
             # Refresh case_definition if table populated any case bucket.
             if any(case_counts[b] is not None for b in (
                 "cases_confirmed", "cases_probable", "cases_suspected", "cases_unspecified"
@@ -774,6 +963,7 @@ def _build_record_from_chunk(
         or case_counts["cases_suspected"] is not None
         or case_counts["cases_unspecified"] is not None
         or deaths is not None
+        or hospitalizations is not None
         or date_reported is not None
         or country is not None
         or subnational_location is not None
@@ -793,8 +983,11 @@ def _build_record_from_chunk(
     # statistical_count_type / geographic_scope / virus_or_syndrome are kept
     # consistent with the LLM path.
     pre_record = {
-        "disease": policy.default_disease,
+        "disease": (context or {}).get("disease_standard_name") or policy.default_disease,
+        "disease_standard_name": (context or {}).get("disease_standard_name") or policy.default_disease,
+        "disease_alias_used": disease_alias_used,
         "virus_or_syndrome": virus_or_syndrome,
+        "pathogen_or_syndrome": pathogen_or_syndrome,
         "country": country,
         "subnational_location": subnational_location,
         "date_reported": date_reported,
@@ -803,9 +996,10 @@ def _build_record_from_chunk(
         "cases_suspected": case_counts["cases_suspected"],
         "cases_unspecified": case_counts["cases_unspecified"],
         "deaths": deaths,
+        "hospitalizations": hospitalizations,
         "case_definition": case_counts["case_definition"],
     }
-    cleaned = _apply_extraction_semantic_guardrails(pre_record, chunk)
+    cleaned = _apply_extraction_semantic_guardrails(pre_record, chunk, context)
 
     required_core = policy.required_core_fields_for_valid_record
     field_values = {
@@ -819,10 +1013,23 @@ def _build_record_from_chunk(
         if not field_values.get(f) or (isinstance(field_values.get(f), str) and not str(field_values[f]).strip())
     ]
 
-    return HantavirusRecord(
+    semantic_warnings = list(cleaned.get("semantic_warnings") or [])
+    if _has_any_case_or_death({**cleaned, "hospitalizations": hospitalizations}):
+        if not cleaned.get("date_reported"):
+            semantic_warnings.append("missing_date_for_count_bearing_record")
+        if not (cleaned.get("country") or cleaned.get("subnational_location") or cleaned.get("geographic_scope")):
+            semantic_warnings.append("missing_location_for_count_bearing_record")
+
+    return PublicHealthRecord(
         record_id=record_id,
         disease=cleaned.get("disease") or policy.default_disease,
+        disease_standard_name=cleaned.get("disease_standard_name")
+        or cleaned.get("disease")
+        or policy.default_disease,
+        disease_alias_used=cleaned.get("disease_alias_used"),
         virus_or_syndrome=cleaned.get("virus_or_syndrome"),
+        pathogen_or_syndrome=cleaned.get("pathogen_or_syndrome"),
+        target_population=(context or {}).get("target_population"),
         country=cleaned.get("country"),
         subnational_location=cleaned.get("subnational_location"),
         date_reported=cleaned.get("date_reported"),
@@ -833,6 +1040,7 @@ def _build_record_from_chunk(
         cases_suspected=cleaned.get("cases_suspected"),
         cases_unspecified=cleaned.get("cases_unspecified"),
         deaths=cleaned.get("deaths"),
+        hospitalizations=cleaned.get("hospitalizations"),
         case_definition=cleaned.get("case_definition"),
         source_id=source_id,
         source_url=chunk.get("source_url"),
@@ -845,6 +1053,14 @@ def _build_record_from_chunk(
         supporting_chunk_id=chunk.get("chunk_id"),
         source_title=chunk.get("title"),
         publisher=chunk.get("publisher"),
+        source_role_final=chunk.get("source_role_final"),
+        credibility_score=chunk.get("credibility_score"),
+        credibility_level=chunk.get("credibility_level"),
+        discovery_method=chunk.get("discovery_method"),
+        search_provider=chunk.get("search_provider"),
+        query_id=chunk.get("query_id"),
+        query_used=chunk.get("query_used"),
+        document_id=chunk.get("document_id"),
         document_type=chunk.get("document_type"),
         fetch_purpose=chunk.get("fetch_purpose"),
         chunk_kind=chunk_kind,
@@ -858,12 +1074,18 @@ def _build_record_from_chunk(
         statistical_count_type=cleaned.get("statistical_count_type"),
         reporting_period=cleaned.get("reporting_period"),
         as_of_date=cleaned.get("as_of_date"),
+        count_semantics=cleaned.get("count_semantics") or cleaned.get("statistical_count_type") or "unspecified",
         aggregation_level=cleaned.get("aggregation_level"),
         geographic_scope=cleaned.get("geographic_scope"),
         geographic_scope_type=cleaned.get("geographic_scope_type"),
         population_scope=cleaned.get("population_scope"),
         source_section=cleaned.get("source_section"),
-        semantic_warnings=list(cleaned.get("semantic_warnings") or []),
+        semantic_warnings=semantic_warnings,
+        extraction_warnings=semantic_warnings,
+        record_schema="generic_public_health_record",
+        legacy_record_type=(
+            "HantavirusRecord" if ((context or {}).get("is_hantavirus") is True) else None
+        ),
     )
 
 
@@ -878,14 +1100,23 @@ _CONTENT_FIELDS = (
     "cases_suspected",
     "cases_unspecified",
     "deaths",
+    "hospitalizations",
     "date_reported",
     "country",
     "subnational_location",
+    "geographic_scope",
 )
 
 
 def _has_any_case_or_death(record: dict) -> bool:
-    for f in ("cases_confirmed", "cases_probable", "cases_suspected", "cases_unspecified", "deaths"):
+    for f in (
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+    ):
         if record.get(f) is not None:
             return True
     return False
@@ -929,7 +1160,7 @@ def _validate_record(
 
     validation_errors: list[str] = []
     try:
-        HantavirusRecord(**repaired)
+        PublicHealthRecord(**repaired)
         pydantic_ok = True
     except Exception as exc:
         pydantic_ok = False
@@ -950,6 +1181,25 @@ def _validate_record(
     review_trigger_missing = [
         f for f in policy.fields_that_trigger_human_review_if_missing if _missing(f)
     ]
+    has_count_signal = _has_any_case_or_death(repaired)
+    has_location_signal = any(
+        not _missing(f)
+        for f in ("country", "subnational_location", "locality", "geographic_scope")
+    )
+    has_date_signal = any(
+        not _missing(f)
+        for f in (
+            "date_reported",
+            "event_start_date",
+            "event_end_date",
+            "reporting_period",
+            "as_of_date",
+        )
+    )
+    if has_count_signal and not has_location_signal:
+        review_trigger_missing.append("location")
+    if has_count_signal and not has_date_signal:
+        review_trigger_missing.append("date")
 
     missing_fields = sorted({*missing_core, *review_trigger_missing})
 
@@ -1024,6 +1274,7 @@ def _has_any_llm_content_signal(record_data: dict) -> bool:
         "cases_suspected",
         "cases_unspecified",
         "deaths",
+        "hospitalizations",
         "date_reported",
         "country",
         "subnational_location",
@@ -1039,7 +1290,8 @@ def _build_record_from_llm_output(
     index: int,
     llm_policy: LLMStructuredExtractionPolicy,
     settings: dict,
-) -> HantavirusRecord | None:
+    context: dict | None = None,
+) -> PublicHealthRecord | None:
     data = llm_record.model_dump()
     if not _has_any_llm_content_signal(data):
         return None
@@ -1054,8 +1306,12 @@ def _build_record_from_llm_output(
     # Apply Step 16 semantic guardrails over LLM output (disease standardization,
     # virus_or_syndrome cleanup, statistical_count_type inference, geographic
     # scope handling). Returns a cleaned dict + accumulates semantic_warnings.
-    cleaned = _apply_extraction_semantic_guardrails(data, chunk)
-    disease = cleaned.get("disease") or "Hantavirus disease"
+    cleaned = _apply_extraction_semantic_guardrails(data, chunk, context)
+    disease = (
+        cleaned.get("disease")
+        or (context or {}).get("disease_standard_name")
+        or "Hantavirus disease"
+    )
 
     required_core = ("disease", "source_url", "source_type", "evidence_quote")
     field_values = {
@@ -1071,10 +1327,16 @@ def _build_record_from_llm_output(
         or (isinstance(field_values.get(f), str) and not str(field_values[f]).strip())
     ]
 
-    return HantavirusRecord(
+    return PublicHealthRecord(
         record_id=record_id,
         disease=disease,
+        disease_standard_name=cleaned.get("disease_standard_name") or disease,
+        disease_alias_used=cleaned.get("disease_alias_used")
+        or _detect_disease_alias_used(text, context),
         virus_or_syndrome=cleaned.get("virus_or_syndrome"),
+        pathogen_or_syndrome=cleaned.get("pathogen_or_syndrome")
+        or _detect_pathogen_or_syndrome(text, context),
+        target_population=(context or {}).get("target_population"),
         country=cleaned.get("country"),
         subnational_location=cleaned.get("subnational_location"),
         date_reported=cleaned.get("date_reported"),
@@ -1085,6 +1347,7 @@ def _build_record_from_llm_output(
         cases_suspected=cleaned.get("cases_suspected"),
         cases_unspecified=cleaned.get("cases_unspecified"),
         deaths=cleaned.get("deaths"),
+        hospitalizations=cleaned.get("hospitalizations"),
         case_definition=cleaned.get("case_definition"),
         source_id=source_id,
         source_url=chunk.get("source_url"),
@@ -1097,6 +1360,14 @@ def _build_record_from_llm_output(
         supporting_chunk_id=chunk.get("chunk_id"),
         source_title=chunk.get("title"),
         publisher=chunk.get("publisher"),
+        source_role_final=chunk.get("source_role_final"),
+        credibility_score=chunk.get("credibility_score"),
+        credibility_level=chunk.get("credibility_level"),
+        discovery_method=chunk.get("discovery_method"),
+        search_provider=chunk.get("search_provider"),
+        query_id=chunk.get("query_id"),
+        query_used=chunk.get("query_used"),
+        document_id=chunk.get("document_id"),
         document_type=chunk.get("document_type"),
         fetch_purpose=chunk.get("fetch_purpose"),
         chunk_kind=chunk.get("chunk_kind") or "text",
@@ -1113,6 +1384,7 @@ def _build_record_from_llm_output(
         llm_extraction_error=None,
         extraction_mode="llm",
         statistical_count_type=cleaned.get("statistical_count_type"),
+        count_semantics=cleaned.get("count_semantics") or cleaned.get("statistical_count_type") or "unspecified",
         reporting_period=cleaned.get("reporting_period"),
         as_of_date=cleaned.get("as_of_date"),
         aggregation_level=cleaned.get("aggregation_level"),
@@ -1121,6 +1393,11 @@ def _build_record_from_llm_output(
         population_scope=cleaned.get("population_scope"),
         source_section=cleaned.get("source_section"),
         semantic_warnings=list(cleaned.get("semantic_warnings") or []),
+        extraction_warnings=list(cleaned.get("semantic_warnings") or []),
+        record_schema="generic_public_health_record",
+        legacy_record_type=(
+            "HantavirusRecord" if ((context or {}).get("is_hantavirus") is True) else None
+        ),
     )
 
 
@@ -1129,10 +1406,11 @@ def _rule_based_extract_records_from_chunks(
     deterministic_policy: StructuredExtractionPolicy,
     start_index: int = 1,
     only_chunk_ids: set[str] | None = None,
-) -> tuple[list[HantavirusRecord], dict]:
+    context: dict | None = None,
+) -> tuple[list[PublicHealthRecord], dict]:
     """Refactored deterministic loop; preserves Step 7 behavior."""
 
-    records: list[HantavirusRecord] = []
+    records: list[PublicHealthRecord] = []
     chunk_index_by_source: dict[str, int] = {}
     target_data_count = 0
     extractable_count = 0
@@ -1163,7 +1441,12 @@ def _rule_based_extract_records_from_chunks(
         chunk_index_by_source[source_id] += 1
         idx = chunk_index_by_source[source_id]
 
-        record = _build_record_from_chunk(chunk, idx, deterministic_policy)
+        record = _build_record_from_chunk(
+            chunk,
+            idx,
+            deterministic_policy,
+            context,
+        )
         if record is None:
             skipped_count += 1
             chunk_index_by_source[source_id] -= 1
@@ -1192,11 +1475,12 @@ def _llm_extract_records_from_chunks(
     llm_policy: LLMStructuredExtractionPolicy,
     deterministic_policy: StructuredExtractionPolicy,
     fallback_to_rule_based: bool,
-) -> tuple[list[HantavirusRecord], dict]:
+    context: dict | None = None,
+) -> tuple[list[PublicHealthRecord], dict]:
     """LLM extraction loop with optional per-chunk deterministic fallback."""
 
     settings = llm_clients.get_llm_settings()
-    records: list[HantavirusRecord] = []
+    records: list[PublicHealthRecord] = []
     chunk_index_by_source: dict[str, int] = {}
     llm_eligible_chunk_count = 0
     llm_call_count = 0
@@ -1242,7 +1526,7 @@ def _llm_extract_records_from_chunks(
                 chunk_index_by_source[source_id] = chunk_index_by_source.get(source_id, 0) + 1
                 idx = chunk_index_by_source[source_id]
                 record = _build_record_from_llm_output(
-                    llm_record, chunk, idx, llm_policy, settings
+                    llm_record, chunk, idx, llm_policy, settings, context
                 )
                 if record is None:
                     chunk_index_by_source[source_id] -= 1
@@ -1255,7 +1539,10 @@ def _llm_extract_records_from_chunks(
                 llm_fallback_count += 1
                 start_idx = chunk_index_by_source.get(source_id, 0) + 1
                 fallback_records, _ = _rule_based_extract_records_from_chunks(
-                    [chunk], deterministic_policy, start_index=start_idx
+                    [chunk],
+                    deterministic_policy,
+                    start_index=start_idx,
+                    context=context,
                 )
                 rule_based_fallback_record_count += len(fallback_records)
                 records.extend(fallback_records)
@@ -1297,9 +1584,9 @@ def _llm_extract_records_from_chunks(
 
 
 def structured_extraction(state: DataCollectionState) -> dict:
-    """Convert target-data evidence chunks into HantavirusRecord objects.
+    """Convert target-data evidence chunks into generic public-health records.
 
-    Default = deterministic rule-based extraction (Step 7 behavior). When
+    Default = deterministic rule-based extraction. When
     `HDC_ENABLE_LLM_EXTRACTION=true`, run the optional LLM extractor with
     per-chunk fallback to the deterministic extractor when configured.
     """
@@ -1309,13 +1596,18 @@ def structured_extraction(state: DataCollectionState) -> dict:
     )
     llm_policy = _load_llm_policy()
     chunks = list(state.get("evidence_chunks") or [])
+    extraction_context = _build_extraction_context(state, deterministic_policy)
 
     llm_enabled = llm_clients.llm_extraction_enabled()
     fallback_to_rule_based = llm_clients.llm_fallback_to_rule_based()
 
     if llm_enabled:
         records, llm_stats = _llm_extract_records_from_chunks(
-            chunks, llm_policy, deterministic_policy, fallback_to_rule_based
+            chunks,
+            llm_policy,
+            deterministic_policy,
+            fallback_to_rule_based,
+            extraction_context,
         )
         raw_record_dicts = [r.model_dump() for r in records]
         skipped_count = max(
@@ -1386,7 +1678,7 @@ def structured_extraction(state: DataCollectionState) -> dict:
         }
     else:
         records, det_stats = _rule_based_extract_records_from_chunks(
-            chunks, deterministic_policy
+            chunks, deterministic_policy, context=extraction_context
         )
         raw_record_dicts = [r.model_dump() for r in records]
         summary = {
@@ -1431,6 +1723,47 @@ def structured_extraction(state: DataCollectionState) -> dict:
             "llm_skipped_due_to_chunk_cap_count": 0,
         }
 
+    disease_counts = dict(
+        Counter(str(r.get("disease") or "unknown") for r in raw_record_dicts)
+    )
+    source_type_counts = dict(
+        Counter(str(r.get("source_type") or "unknown") for r in raw_record_dicts)
+    )
+    extraction_method_counts = dict(
+        Counter(str(r.get("extraction_method") or "unknown") for r in raw_record_dicts)
+    )
+    warning_counter: Counter = Counter()
+    for record in raw_record_dicts:
+        for warning in (record.get("semantic_warnings") or []) + (
+            record.get("extraction_warnings") or []
+        ):
+            warning_counter[warning] += 1
+    generic_record_count = sum(
+        1
+        for record in raw_record_dicts
+        if record.get("record_schema") == "generic_public_health_record"
+    )
+    legacy_hantavirus_record_count = sum(
+        1 for record in raw_record_dicts if record.get("disease") == "Hantavirus disease"
+    )
+    summary.update(
+        {
+            "generic_record_count": generic_record_count,
+            "legacy_hantavirus_record_count": legacy_hantavirus_record_count,
+            "disease_counts": disease_counts,
+            "source_type_counts": source_type_counts,
+            "extraction_method_counts": extraction_method_counts,
+            "rejected_record_count": 0,
+            "review_required_record_count": sum(
+                1 for record in raw_record_dicts if record.get("requires_human_review")
+            ),
+            "unsupported_target_field_count": 0,
+            "warnings": dict(warning_counter),
+            "active_disease": extraction_context.get("disease_standard_name"),
+            "record_schema": "generic_public_health_record",
+        }
+    )
+
     trace = append_trace(
         state,
         node_name="structured_extraction",
@@ -1466,12 +1799,26 @@ def schema_validation_and_repair(state: DataCollectionState) -> dict:
     missing_field_counter: Counter = Counter()
     repair_action_counter: Counter = Counter()
     needs_review_count = 0
+    disease_counter: Counter = Counter()
+    source_type_counter: Counter = Counter()
+    extraction_method_counter: Counter = Counter()
+    generic_record_count = 0
+    legacy_hantavirus_record_count = 0
 
     for record in raw_records:
         validated_record, _result = _validate_record(record, policy)
         status = validated_record.get("schema_status") or "rejected"
         status_counter[status] += 1
         prov_counter[validated_record.get("provenance_status") or "unknown"] += 1
+        disease_counter[validated_record.get("disease") or "unknown"] += 1
+        source_type_counter[validated_record.get("source_type") or "unknown"] += 1
+        extraction_method_counter[
+            validated_record.get("extraction_method") or "unknown"
+        ] += 1
+        if validated_record.get("record_schema") == "generic_public_health_record":
+            generic_record_count += 1
+        if validated_record.get("disease") == "Hantavirus disease":
+            legacy_hantavirus_record_count += 1
         for f in validated_record.get("missing_fields") or []:
             missing_field_counter[f] += 1
         for a in validated_record.get("repair_actions") or []:
@@ -1517,6 +1864,14 @@ def schema_validation_and_repair(state: DataCollectionState) -> dict:
         "provenance_status_counts": dict(prov_counter),
         "missing_field_counts": dict(missing_field_counter),
         "repair_action_counts": dict(repair_action_counter),
+        "generic_record_count": generic_record_count,
+        "legacy_hantavirus_record_count": legacy_hantavirus_record_count,
+        "disease_counts": dict(disease_counter),
+        "source_type_counts": dict(source_type_counter),
+        "extraction_method_counts": dict(extraction_method_counter),
+        "review_required_record_count": needs_review_count,
+        "unsupported_target_field_count": 0,
+        "warnings": {},
     }
 
     trace = append_trace(

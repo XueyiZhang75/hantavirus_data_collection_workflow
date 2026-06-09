@@ -23,6 +23,7 @@ from hdc_workflow.evaluation_report_builder import (  # noqa: E402
 )
 from hdc_workflow.export import export_final_data_package, write_json  # noqa: E402
 from hdc_workflow.graph import build_graph  # noqa: E402
+from hdc_workflow.search_providers import search_api_key_present  # noqa: E402
 from hdc_workflow.workflow_run_config import (  # noqa: E402
     COLLECTION_SOURCE_IDS,
     CONTEXT_SOURCE_IDS,
@@ -140,6 +141,7 @@ def _llm_enabled(env_updates: dict[str, str]) -> bool:
         for key in (
             "HDC_ENABLE_LLM_SOURCE_PLANNING",
             "HDC_ENABLE_LLM_SOURCE_CRITIC",
+            "HDC_ENABLE_LLM_SOURCE_CREDIBILITY",
             "HDC_ENABLE_LLM_EXTRACTION",
         )
     )
@@ -243,19 +245,40 @@ def _live_fetch_summary(result: dict) -> dict:
             {
                 "source_id": doc.get("source_id"),
                 "url": doc.get("url"),
+                "canonical_url": doc.get("canonical_url"),
+                "title": doc.get("title"),
+                "discovery_method": doc.get("discovery_method"),
+                "source_role_final": doc.get("source_role_final"),
+                "credibility_score": doc.get("credibility_score"),
+                "credibility_level": doc.get("credibility_level"),
                 "fetch_status": doc.get("fetch_status"),
                 "http_status_code": doc.get("http_status_code"),
                 "quality_status": doc.get("quality_status"),
                 "parse_status": doc.get("parse_status"),
+                "parser_used": doc.get("parser_used"),
+                "content_type": doc.get("content_type"),
                 "clean_text_char_count": len(doc.get("clean_text") or ""),
+                "table_count": doc.get("table_count") or len(doc.get("tables") or []),
                 "is_live_fetched": bool(doc.get("is_live_fetched")),
             }
         )
     return {
-        "live_fetch_enabled": True,
+        "live_fetch_enabled": bool(fetch_summary.get("live_fetch_enabled")),
         "document_count": len(documents),
         "document_source_ids": sorted({row["source_id"] for row in rows if row["source_id"]}),
         "fetch_status_counts": fetch_summary.get("fetch_status_counts") or {},
+        "parser_status_counts": fetch_summary.get("parser_status_counts") or {},
+        "parser_used_counts": fetch_summary.get("parser_used_counts") or {},
+        "selected_search_derived_fetch_count": fetch_summary.get(
+            "selected_search_derived_fetch_count", 0
+        ),
+        "skipped_search_derived_fetch_disabled_count": fetch_summary.get(
+            "skipped_search_derived_fetch_disabled_count", 0
+        ),
+        "skipped_search_derived_by_reason_counts": fetch_summary.get(
+            "skipped_search_derived_by_reason_counts"
+        )
+        or {},
         "quality_status_counts": quality_summary.get("quality_status_counts") or {},
         "skipped_validation_reserved_source_ids": fetch_summary.get(
             "skipped_validation_reserved_source_ids"
@@ -269,21 +292,49 @@ def _live_fetch_summary(result: dict) -> dict:
 
 
 def _llm_stage_summary(result: dict, provider: str, model: str) -> dict:
+    disease_intelligence = result.get("disease_intelligence_summary") or {}
+    executable_plan = result.get("executable_source_plan_summary") or {}
     planning = result.get("source_planning_agent_summary") or {}
     critic = result.get("source_critic_summary") or {}
+    credibility = result.get("source_credibility_summary") or {}
     extraction = result.get("structured_extraction_summary") or {}
     llm_extraction = result.get("llm_extraction_summary") or {}
     return {
         "provider": provider,
         "model": model,
         "api_key_present": api_key_present(provider),
+        "disease_intelligence": {
+            "generation_method": disease_intelligence.get("generation_method"),
+            "disease_standard_name": disease_intelligence.get(
+                "disease_standard_name"
+            ),
+            "query_term_count": disease_intelligence.get("query_term_count", 0),
+            "warnings": disease_intelligence.get("warnings") or [],
+            "llm_call_succeeded": (
+                disease_intelligence.get("generation_method") == "llm_generated"
+            ),
+        },
         "source_planning": {
             "enabled": bool(planning.get("llm_source_planning_enabled")),
             "status": planning.get("status"),
+            "generation_method": executable_plan.get("generation_method")
+            or planning.get("generation_method"),
+            "execution_status": executable_plan.get("execution_status")
+            or planning.get("execution_status"),
+            "planned_query_count": executable_plan.get("planned_query_count", 0),
+            "planned_source_category_count": executable_plan.get(
+                "planned_source_category_count", 0
+            ),
+            "provider_channel_counts": executable_plan.get(
+                "provider_channel_counts"
+            )
+            or {},
             "agent_query_count": planning.get("agent_query_count", 0),
             "agent_query_added_count": planning.get("agent_query_added_count", 0),
             "candidate_hint_count": planning.get("agent_candidate_hint_count", 0),
-            "warnings": planning.get("warnings") or [],
+            "warnings": executable_plan.get("warnings")
+            or planning.get("warnings")
+            or [],
             "failure_type": planning.get("failure_type"),
             "failure_message": planning.get("failure_message"),
         },
@@ -306,6 +357,15 @@ def _llm_stage_summary(result: dict, provider: str, model: str) -> dict:
             "human_review_recommended_count": critic.get(
                 "llm_human_review_recommended_count", 0
             ),
+        },
+        "source_credibility": {
+            "enabled": bool(credibility.get("llm_enabled")),
+            "assessed_source_count": credibility.get("assessed_source_count", 0),
+            "role_counts": credibility.get("role_counts") or {},
+            "risk_flag_counts": credibility.get("risk_flag_counts") or {},
+            "llm_assessed_count": credibility.get("llm_assessed_count", 0),
+            "llm_failure_count": credibility.get("llm_failure_count", 0),
+            "needs_review_count": credibility.get("needs_review_count", 0),
         },
         "structured_extraction": {
             "enabled": bool(extraction.get("llm_enabled")),
@@ -345,6 +405,101 @@ def _write_validation_outputs(
     }
 
 
+def _append_stage11_report_section(
+    lines: list[str],
+    *,
+    anomaly_results: list[dict],
+    anomaly_summary: dict,
+    human_review_application_summary: dict,
+    applied_decisions: list[dict],
+    rejected_decisions: list[dict],
+    audit_trail: list[dict],
+    final_dataset_post_review: list[dict],
+    records_excluded_by_review: list[dict],
+) -> None:
+    lines.extend(
+        [
+            "",
+            "## 9.5 Stage 11 anomaly detection and review application",
+            "",
+            f"- Anomaly result count: `{len(anomaly_results)}`",
+            f"- Anomaly severity counts: `{_format_counts(anomaly_summary.get('severity_counts'))}`",
+            f"- Anomaly needs-human-review count: `{anomaly_summary.get('needs_human_review_count', 0)}`",
+            f"- Decisions provided: `{human_review_application_summary.get('decisions_provided_count', 0)}`",
+            f"- Decisions applied: `{human_review_application_summary.get('decisions_applied_count', 0)}`",
+            f"- Decisions rejected: `{human_review_application_summary.get('decisions_rejected_count', 0)}`",
+            f"- Audit entries: `{len(audit_trail)}`",
+            f"- Final dataset post-review count: `{len(final_dataset_post_review)}`",
+            f"- Records excluded by review: `{len(records_excluded_by_review)}`",
+            "",
+            "| Anomaly ID | Type | Severity | Target | Reason |",
+            "|---|---|---|---|---|",
+        ]
+    )
+    for anomaly in anomaly_results[:12]:
+        target = (
+            anomaly.get("record_id")
+            or anomaly.get("event_cluster_id")
+            or anomaly.get("validation_result_id")
+            or anomaly.get("source_id")
+        )
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    _cell(anomaly.get("anomaly_id")),
+                    _cell(anomaly.get("anomaly_type")),
+                    _cell(anomaly.get("severity")),
+                    _cell(target),
+                    _cell(anomaly.get("reason")),
+                ]
+            )
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
+            "| Applied decision | Type | Target | Audit IDs | Reason |",
+            "|---|---|---|---|---|",
+        ]
+    )
+    for decision in applied_decisions[:12]:
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    _cell(decision.get("decision_id")),
+                    _cell(decision.get("decision_type")),
+                    _cell(", ".join(decision.get("target_ids") or [])),
+                    _cell(", ".join(decision.get("audit_ids") or [])),
+                    _cell(decision.get("reason")),
+                ]
+            )
+            + " |"
+        )
+    if rejected_decisions:
+        lines.extend(
+            [
+                "",
+                "| Rejected decision | Type | Target | Rejection reason |",
+                "|---|---|---|---|",
+            ]
+        )
+        for decision in rejected_decisions[:12]:
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        _cell(decision.get("decision_id")),
+                        _cell(decision.get("decision_type")),
+                        _cell(", ".join(decision.get("target_ids") or [])),
+                        _cell(decision.get("rejection_reason")),
+                    ]
+                )
+                + " |"
+            )
+
+
 def _write_report(
     path: Path,
     *,
@@ -368,7 +523,46 @@ def _write_report(
     review_items = list(result.get("human_review_queue") or [])
     final_package = result.get("final_data_package") or {}
     metadata = final_package.get("package_metadata") or {}
+    anomaly_results = list(
+        result.get("anomaly_results") or final_package.get("anomaly_results") or []
+    )
+    anomaly_summary = (
+        result.get("anomaly_summary") or final_package.get("anomaly_summary") or {}
+    )
+    human_review_application_summary = (
+        result.get("human_review_application_summary")
+        or final_package.get("human_review_application_summary")
+        or {}
+    )
+    applied_decisions = list(
+        result.get("applied_human_review_decisions")
+        or final_package.get("applied_human_review_decisions")
+        or []
+    )
+    rejected_decisions = list(
+        result.get("rejected_human_review_decisions")
+        or final_package.get("rejected_human_review_decisions")
+        or []
+    )
+    audit_trail = list(
+        result.get("human_review_audit_trail")
+        or final_package.get("human_review_audit_trail")
+        or []
+    )
+    final_dataset_post_review = list(
+        result.get("final_dataset_post_review")
+        or final_package.get("final_dataset_post_review")
+        or []
+    )
+    records_excluded_by_review = list(
+        result.get("records_excluded_by_human_review")
+        or final_package.get("records_excluded_by_human_review")
+        or []
+    )
     route = result.get("current_route")
+    source_search = result.get("source_search_execution_summary") or {}
+    source_discovery = result.get("source_discovery_summary") or {}
+    source_credibility = result.get("source_credibility_summary") or {}
 
     node_lines = [
         f"{idx}. `{event.get('node_name')}` - {_preview(event.get('message'), 120)}"
@@ -386,14 +580,21 @@ def _write_report(
         "",
         "## 2. 本次运行模式",
         "",
-        f"- Live webpage fetch: `true`",
-        f"- Fixture documents: `false`",
+        f"- Live webpage fetch: `{live_summary.get('live_fetch_enabled', False)}`",
+        f"- Fixture documents: `{bool((result.get('content_fetch_summary') or {}).get('fixture_documents_enabled'))}`",
         f"- Provider: `{provider}`",
         f"- Model: `{model}`",
         f"- API key present: `{api_key_present(provider)}`",
         f"- LLM source planning: `{llm_summary['source_planning']['enabled']}`",
         f"- LLM source critic: `{llm_summary['source_critic']['enabled']}`",
         f"- LLM structured extraction: `{llm_summary['structured_extraction']['enabled']}`",
+        f"- Source search mode: `{source_search.get('search_mode') or 'disabled'}`",
+        f"- Source search provider: `{source_search.get('search_provider') or 'n/a'}`",
+        f"- Source search executed queries: `{source_search.get('executed_query_count', 0)}`",
+        f"- Search-derived source candidates: `{source_search.get('candidate_from_search_count', 0)}`",
+        f"- Source credibility assessed sources: `{source_credibility.get('assessed_source_count', 0)}`",
+        f"- Source credibility role counts: `{source_credibility.get('role_counts') or {}}`",
+        f"- Source discovery method: `{source_discovery.get('discovery_method')}`",
         f"- Final route: `{route}`",
         "",
         "## 3. Workflow 运行过程",
@@ -441,26 +642,33 @@ def _write_report(
             "## 5. 真实网页抓取结果",
             "",
             f"- Documents fetched/parsed: `{live_summary.get('document_count', 0)}`",
+            f"- Search-derived sources selected for fetch: `{live_summary.get('selected_search_derived_fetch_count', 0)}`",
+            f"- Search-derived skipped by reason: `{live_summary.get('skipped_search_derived_by_reason_counts') or {}}`",
             f"- Fetch status counts: `{_format_counts(live_summary.get('fetch_status_counts'))}`",
+            f"- Parser status counts: `{_format_counts(live_summary.get('parser_status_counts'))}`",
+            f"- Parser used counts: `{_format_counts(live_summary.get('parser_used_counts'))}`",
             f"- Quality status counts: `{_format_counts(live_summary.get('quality_status_counts'))}`",
             f"- Validation-reserved skipped from fetch: `{live_summary.get('skipped_validation_reserved_source_ids')}`",
             "",
-            "| Source ID | Fetch status | HTTP | Quality | Text chars |",
-            "|---|---|---|---|---|",
+            "| Source ID | Fetch status | HTTP | Parse | Parser | Quality | Text chars | Tables |",
+            "|---|---|---|---|---|---|---|---|",
         ]
     )
     for row in live_summary.get("documents") or []:
         lines.append(
             "| "
             + " | ".join(
-                [
-                    _cell(row.get("source_id")),
-                    _cell(row.get("fetch_status")),
-                    _cell(row.get("http_status_code")),
-                    _cell(row.get("quality_status")),
-                    _cell(row.get("clean_text_char_count")),
-                ]
-            )
+                    [
+                        _cell(row.get("source_id")),
+                        _cell(row.get("fetch_status")),
+                        _cell(row.get("http_status_code")),
+                        _cell(row.get("parse_status")),
+                        _cell(row.get("parser_used")),
+                        _cell(row.get("quality_status")),
+                        _cell(row.get("clean_text_char_count")),
+                        _cell(row.get("table_count")),
+                    ]
+                )
             + " |"
         )
 
@@ -472,6 +680,11 @@ def _write_report(
             "### 6.1 LLM Source Planning",
             "",
             f"- Status: `{llm_summary['source_planning'].get('status')}`",
+            f"- Plan generation method: `{llm_summary['source_planning'].get('generation_method')}`",
+            f"- Plan execution status: `{llm_summary['source_planning'].get('execution_status')}`",
+            f"- Planned query count: `{llm_summary['source_planning'].get('planned_query_count')}`",
+            f"- Planned source category count: `{llm_summary['source_planning'].get('planned_source_category_count')}`",
+            f"- Provider channel counts: `{_format_counts(llm_summary['source_planning'].get('provider_channel_counts'))}`",
             f"- Agent query count: `{llm_summary['source_planning'].get('agent_query_count')}`",
             f"- Agent query added count: `{llm_summary['source_planning'].get('agent_query_added_count')}`",
             f"- Candidate hint count: `{llm_summary['source_planning'].get('candidate_hint_count')}`",
@@ -487,7 +700,17 @@ def _write_report(
             f"- Semantic leakage count: `{llm_summary['source_critic'].get('semantic_leakage_count')}`",
             f"- Human review recommended count: `{llm_summary['source_critic'].get('human_review_recommended_count')}`",
             "",
-            "### 6.3 LLM Structured Extraction",
+            "### 6.3 Optional LLM Source Credibility Advisory",
+            "",
+            f"- Enabled: `{llm_summary['source_credibility'].get('enabled')}`",
+            f"- Assessed source count: `{llm_summary['source_credibility'].get('assessed_source_count')}`",
+            f"- Final role counts: `{_format_counts(llm_summary['source_credibility'].get('role_counts'))}`",
+            f"- Risk flag counts: `{_format_counts(llm_summary['source_credibility'].get('risk_flag_counts'))}`",
+            f"- LLM assessed count: `{llm_summary['source_credibility'].get('llm_assessed_count')}`",
+            f"- LLM failure count: `{llm_summary['source_credibility'].get('llm_failure_count')}`",
+            f"- Needs review count: `{llm_summary['source_credibility'].get('needs_review_count')}`",
+            "",
+            "### 6.4 LLM Structured Extraction",
             "",
             f"- Extraction mode: `{llm_summary['structured_extraction'].get('mode')}`",
             f"- Eligible chunk count: `{llm_summary['structured_extraction'].get('eligible_chunk_count')}`",
@@ -563,6 +786,7 @@ def _write_report(
             "",
             f"- Human review item count: `{len(review_items)}`",
             f"- Evaluation review flag count: `{evaluation_summary.get('human_review_flagged_row_count', 0)}`",
+            f"- Anomaly review item count: `{len([item for item in review_items if item.get('item_type') == 'anomaly'])}`",
             "",
             "| Review ID | Type | Related IDs | Reason |",
             "|---|---|---|---|",
@@ -582,6 +806,18 @@ def _write_report(
             + " |"
         )
 
+    _append_stage11_report_section(
+        lines,
+        anomaly_results=anomaly_results,
+        anomaly_summary=anomaly_summary,
+        human_review_application_summary=human_review_application_summary,
+        applied_decisions=applied_decisions,
+        rejected_decisions=rejected_decisions,
+        audit_trail=audit_trail,
+        final_dataset_post_review=final_dataset_post_review,
+        records_excluded_by_review=records_excluded_by_review,
+    )
+
     lines.extend(
         [
             "",
@@ -589,6 +825,9 @@ def _write_report(
             "",
             f"- Run output directory: `{output_dir}`",
             f"- Collection final dataset: `{collection_manifest['files'].get('final_dataset_csv')}`",
+            f"- Collection final dataset post-review: `{collection_manifest['files'].get('final_dataset_post_review_csv')}`",
+            f"- Collection anomaly results: `{collection_manifest['files'].get('anomaly_results_json')}`",
+            f"- Collection human review audit trail: `{collection_manifest['files'].get('human_review_audit_trail_json')}`",
             f"- Collection source registry: `{collection_manifest['files'].get('source_registry_json')}`",
             f"- Validation ground truth: `{validation_manifest.get('ground_truth_records_csv')}`",
             f"- Evaluation report CSV: `{evaluation_outputs.get('evaluation_report_csv')}`",
@@ -623,12 +862,14 @@ def run_workflow(args: argparse.Namespace) -> dict:
     output_dir = workflow_output_dir_from_config(config)
     env_updates = workflow_run_env_from_config(config)
     output_config = config.get("output") or {}
+    validation_records = read_csv_records(validation_records_path_from_config(config))
 
     with temporary_workflow_env(env_updates):
-        result = build_graph().invoke(workflow_initial_state_from_config(config))
+        initial_state = workflow_initial_state_from_config(config)
+        initial_state["validation_records"] = validation_records
+        result = build_graph().invoke(initial_state)
 
     package = dict(result.get("final_data_package") or {})
-    validation_records = read_csv_records(validation_records_path_from_config(config))
     registry = list(result.get("source_registry") or package.get("source_registry") or [])
     validation_manifest = _write_validation_outputs(
         output_dir, validation_records, registry
@@ -670,10 +911,10 @@ def run_workflow(args: argparse.Namespace) -> dict:
     )
     if evaluation_review_items:
         package["human_review_items"] = (
-            list(package.get("human_review_items") or []) + evaluation_review_items
+            evaluation_review_items + list(package.get("human_review_items") or [])
         )
         result["human_review_queue"] = (
-            list(result.get("human_review_queue") or []) + evaluation_review_items
+            evaluation_review_items + list(result.get("human_review_queue") or [])
         )
         result["final_data_package"] = package
         evaluation_summary["evaluation_review_item_count"] = len(evaluation_review_items)
@@ -695,21 +936,194 @@ def run_workflow(args: argparse.Namespace) -> dict:
     diagnostics_dir = output_dir / "diagnostics"
     write_json(source_split, diagnostics_dir / "source_split_summary.json")
     write_json(live_summary, diagnostics_dir / "live_fetch_summary.json")
+    write_json(
+        result.get("content_fetch_summary") or {},
+        diagnostics_dir / "content_fetch_summary.json",
+    )
+    write_json(
+        result.get("document_quality_summary") or {},
+        diagnostics_dir / "document_quality_summary.json",
+    )
+    write_json(
+        result.get("document_parse_summary") or {},
+        diagnostics_dir / "document_parse_summary.json",
+    )
+    write_json(
+        result.get("fetch_manifest") or [],
+        diagnostics_dir / "fetch_manifest.json",
+    )
     write_json(llm_summary, diagnostics_dir / "llm_stage_summary.json")
+    write_json(
+        result.get("source_search_execution_summary") or {},
+        diagnostics_dir / "source_search_execution_summary.json",
+    )
+    write_json(
+        result.get("source_search_results") or [],
+        diagnostics_dir / "search_results_manifest.json",
+    )
+    write_json(
+        result.get("source_discovery_summary") or {},
+        diagnostics_dir / "source_discovery_summary.json",
+    )
+    write_json(
+        result.get("source_credibility_summary") or {},
+        diagnostics_dir / "source_credibility_summary.json",
+    )
+    write_json(
+        result.get("source_credibility_assessments") or [],
+        diagnostics_dir / "source_credibility_assessments.json",
+    )
+    write_json(result.get("raw_records") or [], diagnostics_dir / "raw_records.json")
+    write_json(
+        result.get("validated_records") or [],
+        diagnostics_dir / "validated_records.json",
+    )
+    write_json(
+        result.get("rejected_records") or [],
+        diagnostics_dir / "rejected_records.json",
+    )
+    write_json(
+        result.get("normalized_records") or [],
+        diagnostics_dir / "normalized_records.json",
+    )
+    write_json(
+        result.get("event_clusters") or [],
+        diagnostics_dir / "event_clusters.json",
+    )
+    write_json(
+        result.get("duplicate_clusters") or [],
+        diagnostics_dir / "duplicate_clusters.json",
+    )
+    write_json(
+        result.get("validation_cases") or [],
+        diagnostics_dir / "validation_cases.json",
+    )
+    write_json(
+        result.get("validation_comparisons") or [],
+        diagnostics_dir / "validation_comparisons.json",
+    )
+    write_json(
+        result.get("validation_results") or [],
+        diagnostics_dir / "validation_results.json",
+    )
+    write_json(
+        result.get("validation_summary") or {},
+        diagnostics_dir / "validation_summary.json",
+    )
+    write_json(
+        result.get("trusted_source_validation_summary") or {},
+        diagnostics_dir / "trusted_source_validation_summary.json",
+    )
+    write_json(
+        result.get("cross_source_validation_summary") or {},
+        diagnostics_dir / "cross_source_validation_summary.json",
+    )
+    write_json(result.get("conflicts") or [], diagnostics_dir / "conflicts.json")
+    write_json(
+        result.get("anomaly_results") or [],
+        diagnostics_dir / "anomaly_results.json",
+    )
+    write_json(
+        result.get("anomaly_summary") or {},
+        diagnostics_dir / "anomaly_summary.json",
+    )
+    write_json(
+        result.get("human_review_decisions") or [],
+        diagnostics_dir / "human_review_decisions.json",
+    )
+    write_json(
+        result.get("applied_human_review_decisions") or [],
+        diagnostics_dir / "applied_human_review_decisions.json",
+    )
+    write_json(
+        result.get("rejected_human_review_decisions") or [],
+        diagnostics_dir / "rejected_human_review_decisions.json",
+    )
+    write_json(
+        result.get("human_review_audit_trail") or [],
+        diagnostics_dir / "human_review_audit_trail.json",
+    )
+    write_json(
+        result.get("human_review_application_summary") or {},
+        diagnostics_dir / "human_review_application_summary.json",
+    )
+    write_json(
+        result.get("final_dataset_post_review") or [],
+        diagnostics_dir / "final_dataset_post_review.json",
+    )
+    write_json(
+        result.get("records_excluded_by_human_review") or [],
+        diagnostics_dir / "records_excluded_by_human_review.json",
+    )
+    write_json(
+        result.get("structured_extraction_summary") or {},
+        diagnostics_dir / "structured_extraction_summary.json",
+    )
+    write_json(
+        result.get("schema_validation_summary") or {},
+        diagnostics_dir / "schema_validation_summary.json",
+    )
+    write_json(
+        result.get("record_normalization_summary") or {},
+        diagnostics_dir / "record_normalization_summary.json",
+    )
+    write_json(
+        result.get("event_clustering_summary") or {},
+        diagnostics_dir / "event_clustering_summary.json",
+    )
+    write_json(
+        result.get("duplicate_detection_summary") or {},
+        diagnostics_dir / "duplicate_detection_summary.json",
+    )
     write_json(result.get("collection_trace") or [], diagnostics_dir / "collection_trace.json")
     write_json(
         {
+            "task_intake_summary": result.get("task_intake_summary"),
+            "disease_intelligence_summary": result.get(
+                "disease_intelligence_summary"
+            ),
+            "profile_schema_summary": result.get("profile_schema_summary"),
+            "executable_source_plan_summary": result.get(
+                "executable_source_plan_summary"
+            ),
             "source_planning_agent_summary": result.get("source_planning_agent_summary"),
+            "source_search_execution_summary": result.get(
+                "source_search_execution_summary"
+            ),
+            "source_discovery_summary": result.get("source_discovery_summary"),
+            "source_registry_summary": result.get("source_registry_summary"),
+            "source_screening_summary": result.get("source_screening_summary"),
             "source_critic_summary": result.get("source_critic_summary"),
+            "source_routing_summary": result.get("source_routing_summary"),
+            "source_credibility_summary": result.get("source_credibility_summary"),
+            "content_fetch_summary": result.get("content_fetch_summary"),
+            "document_parse_summary": result.get("document_parse_summary"),
+            "fixture_document_summary": result.get("fixture_document_summary"),
+            "document_quality_summary": result.get("document_quality_summary"),
+            "evidence_chunking_summary": result.get("evidence_chunking_summary"),
+            "data_presence_summary": result.get("data_presence_summary"),
             "structured_extraction_summary": result.get("structured_extraction_summary"),
             "llm_extraction_summary": result.get("llm_extraction_summary"),
             "schema_validation_summary": result.get("schema_validation_summary"),
             "record_normalization_summary": result.get("record_normalization_summary"),
             "record_linking_summary": result.get("record_linking_summary"),
+            "event_clustering_summary": result.get("event_clustering_summary"),
+            "duplicate_detection_summary": result.get("duplicate_detection_summary"),
+            "validation_summary": result.get("validation_summary"),
+            "trusted_source_validation_summary": result.get(
+                "trusted_source_validation_summary"
+            ),
+            "cross_source_validation_summary": result.get(
+                "cross_source_validation_summary"
+            ),
             "cross_source_consistency_summary": result.get(
                 "cross_source_consistency_summary"
             ),
+            "anomaly_summary": result.get("anomaly_summary"),
             "human_review_summary": result.get("human_review_summary"),
+            "human_review_application_summary": result.get(
+                "human_review_application_summary"
+            ),
             "finalization_summary": result.get("finalization_summary"),
         },
         diagnostics_dir / "workflow_summaries.json",
@@ -745,6 +1159,12 @@ def run_workflow(args: argparse.Namespace) -> dict:
         "api_key_present": api_key_present(provider),
         "config_path": str(resolve_workflow_run_config_path(args.config)),
         "live_fetch_enabled": env_updates.get("HDC_ENABLE_LIVE_FETCH") == "true",
+        "live_search_enabled": env_updates.get("HDC_ENABLE_LIVE_SEARCH") == "true",
+        "source_search_mode": env_updates.get("HDC_SEARCH_MODE"),
+        "source_search_provider": env_updates.get("HDC_SEARCH_PROVIDER"),
+        "source_search_api_key_present": search_api_key_present(
+            env_updates.get("HDC_SEARCH_PROVIDER") or ""
+        ),
         "fixture_documents_enabled": False,
         "all_three_llm_stages_enabled": all(
             env_updates.get(key) == "true"
@@ -760,8 +1180,36 @@ def run_workflow(args: argparse.Namespace) -> dict:
         "document_count": live_summary.get("document_count", 0),
         "normalized_record_count": len(result.get("normalized_records") or []),
         "evaluation_row_count": evaluation_summary.get("evaluation_row_count", 0),
+        "validation_result_count": (result.get("validation_summary") or {}).get(
+            "validation_result_count", 0
+        ),
+        "anomaly_result_count": len(result.get("anomaly_results") or []),
+        "anomaly_severity_counts": (
+            result.get("anomaly_summary") or {}
+        ).get("severity_counts")
+        or {},
         "human_review_item_count": len(result.get("human_review_queue") or []),
+        "human_review_decisions_provided_count": (
+            result.get("human_review_application_summary") or {}
+        ).get("decisions_provided_count", 0),
+        "human_review_decisions_applied_count": (
+            result.get("human_review_application_summary") or {}
+        ).get("decisions_applied_count", 0),
+        "human_review_decisions_rejected_count": (
+            result.get("human_review_application_summary") or {}
+        ).get("decisions_rejected_count", 0),
+        "human_review_audit_entry_count": len(
+            result.get("human_review_audit_trail") or []
+        ),
+        "final_dataset_post_review_count": len(
+            result.get("final_dataset_post_review") or []
+        ),
         "llm_stage_summary": llm_summary,
+        "source_search_execution_summary": result.get(
+            "source_search_execution_summary"
+        )
+        or {},
+        "source_credibility_summary": result.get("source_credibility_summary") or {},
         "artifact_paths": {
             "run_report": str(report_path),
             "stable_run_report": str(_TOP_LEVEL_REPORT_PATH)
@@ -772,6 +1220,65 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "evaluation_outputs": evaluation_outputs,
             "source_split_summary": str(diagnostics_dir / "source_split_summary.json"),
             "llm_stage_summary": str(diagnostics_dir / "llm_stage_summary.json"),
+            "source_search_execution_summary": str(
+                diagnostics_dir / "source_search_execution_summary.json"
+            ),
+            "search_results_manifest": str(
+                diagnostics_dir / "search_results_manifest.json"
+            ),
+            "source_discovery_summary": str(
+                diagnostics_dir / "source_discovery_summary.json"
+            ),
+            "source_credibility_summary": str(
+                diagnostics_dir / "source_credibility_summary.json"
+            ),
+            "source_credibility_assessments": str(
+                diagnostics_dir / "source_credibility_assessments.json"
+            ),
+            "content_fetch_summary": str(diagnostics_dir / "content_fetch_summary.json"),
+            "document_quality_summary": str(
+                diagnostics_dir / "document_quality_summary.json"
+            ),
+            "document_parse_summary": str(
+                diagnostics_dir / "document_parse_summary.json"
+            ),
+            "fetch_manifest": str(diagnostics_dir / "fetch_manifest.json"),
+            "validation_cases": str(diagnostics_dir / "validation_cases.json"),
+            "validation_comparisons": str(
+                diagnostics_dir / "validation_comparisons.json"
+            ),
+            "validation_results": str(diagnostics_dir / "validation_results.json"),
+            "validation_summary": str(diagnostics_dir / "validation_summary.json"),
+            "trusted_source_validation_summary": str(
+                diagnostics_dir / "trusted_source_validation_summary.json"
+            ),
+            "cross_source_validation_summary": str(
+                diagnostics_dir / "cross_source_validation_summary.json"
+            ),
+            "conflicts": str(diagnostics_dir / "conflicts.json"),
+            "anomaly_results": str(diagnostics_dir / "anomaly_results.json"),
+            "anomaly_summary": str(diagnostics_dir / "anomaly_summary.json"),
+            "human_review_decisions": str(
+                diagnostics_dir / "human_review_decisions.json"
+            ),
+            "applied_human_review_decisions": str(
+                diagnostics_dir / "applied_human_review_decisions.json"
+            ),
+            "rejected_human_review_decisions": str(
+                diagnostics_dir / "rejected_human_review_decisions.json"
+            ),
+            "human_review_audit_trail": str(
+                diagnostics_dir / "human_review_audit_trail.json"
+            ),
+            "human_review_application_summary": str(
+                diagnostics_dir / "human_review_application_summary.json"
+            ),
+            "final_dataset_post_review": str(
+                diagnostics_dir / "final_dataset_post_review.json"
+            ),
+            "records_excluded_by_human_review": str(
+                diagnostics_dir / "records_excluded_by_human_review.json"
+            ),
         },
     }
     write_json(summary, output_dir / "workflow_run_summary.json")
@@ -871,6 +1378,17 @@ def main() -> int:
     print(f"trace_node_count: {summary.get('trace_node_count')}")
     print(f"current_route: {summary.get('current_route')}")
     print(f"document_count: {summary.get('document_count')}")
+    source_search = summary.get("source_search_execution_summary") or {}
+    print(f"source_search_mode: {summary.get('source_search_mode')}")
+    print(f"source_search_provider: {summary.get('source_search_provider')}")
+    print(
+        "source_search_executed_query_count:",
+        source_search.get("executed_query_count"),
+    )
+    print(
+        "search_derived_candidate_count:",
+        source_search.get("candidate_from_search_count"),
+    )
     print(f"normalized_record_count: {summary.get('normalized_record_count')}")
     print(f"evaluation_row_count: {summary.get('evaluation_row_count')}")
     print(f"human_review_item_count: {summary.get('human_review_item_count')}")
@@ -881,6 +1399,10 @@ def main() -> int:
     print(
         "llm_source_critic_assessed_source_count:",
         (llm.get("source_critic") or {}).get("assessed_source_count"),
+    )
+    print(
+        "source_credibility_assessed_source_count:",
+        (llm.get("source_credibility") or {}).get("assessed_source_count"),
     )
     print(
         "llm_structured_extraction_call_count:",

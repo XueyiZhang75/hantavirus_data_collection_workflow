@@ -1,7 +1,7 @@
 {
-  "policy_name": "hantavirus_structured_extraction_policy",
-  "policy_version": "0.1",
-  "description": "Deterministic structured extraction policy for converting hantavirus evidence chunks into HantavirusRecord objects before LLM-based extraction is implemented.",
+  "policy_name": "generic_public_health_structured_extraction_policy",
+  "policy_version": "0.2",
+  "description": "Deterministic structured extraction policy for converting parsed public-health evidence chunks into generic PublicHealthRecord objects while preserving HantavirusRecord compatibility.",
   "default_disease": "Hantavirus disease",
   "extraction_method": "deterministic_rule_based_extractor",
   "extractable_chunk_conditions": {
@@ -94,7 +94,7 @@
   "fields_that_trigger_human_review_if_missing": [
     "country"
   ],
-  "minimum_content_requirement": "At least one of cases_confirmed, cases_probable, cases_suspected, cases_unspecified, deaths, date_reported, country, or subnational_location should be present.",
+  "minimum_content_requirement": "At least one of cases_confirmed, cases_probable, cases_suspected, cases_unspecified, deaths, hospitalizations, date_reported, country, subnational_location, or geographic_scope should be present.",
   "statistical_count_type_aliases": {
     "cumulative": ["cumulative", "total", "through", "since"],
     "annual": ["annual", "in 2020", "in 2021", "in 2022", "in 2023", "in 2024", "in 2025", "in 2026", "during 2020", "during 2021", "during 2022", "during 2023", "during 2024", "during 2025", "during 2026"],
@@ -103,7 +103,7 @@
     "subset": ["subset", "among", "of which"]
   },
   "repair_rules": [
-    "If disease is missing, set disease to Hantavirus disease.",
+    "If disease is missing, set disease to the active task disease from structured_task or disease_intelligence.",
     "If source_url is missing but the supporting chunk has source_url, copy it from the chunk.",
     "If source_type is missing but the supporting chunk has source_type, copy it from the chunk.",
     "If evidence_quote is missing, use the supporting chunk text as evidence_quote.",

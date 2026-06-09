@@ -2302,6 +2302,10 @@ def test_workflow_summaries_include_major_steps(monkeypatch):
     package = result.get("final_data_package") or {}
     summaries = package.get("workflow_summaries") or {}
     for key in (
+        "task_intake_summary",
+        "disease_intelligence_summary",
+        "profile_schema_summary",
+        "executable_source_plan_summary",
         "source_discovery_summary",
         "source_screening_summary",
         "content_fetch_summary",

@@ -104,7 +104,10 @@ def test_llm_agent_feature_flags_default_off_and_no_real_helper_call(
     routing_summary = result.get("source_routing_summary") or {}
     assert planning_summary.get("llm_source_planning_enabled") is False
     assert routing_summary.get("llm_source_critic_enabled") is False
-    assert result.get("agentic_source_plan") is None
+    plan = result.get("agentic_source_plan") or {}
+    assert plan.get("generation_method") == "deterministic_executable_source_plan"
+    assert plan.get("execution_status") == "planned_not_executed"
+    assert result.get("executable_source_plan_summary")
     assert not [
         item for item in (result.get("search_query_inventory") or [])
         if item.get("query_source") == "llm_source_planning_agent"
@@ -114,34 +117,63 @@ def test_llm_agent_feature_flags_default_off_and_no_real_helper_call(
 def test_source_planning_agent_mocked_output_appends_queries(monkeypatch):
     def mock_llm_json(*args, **kwargs):  # noqa: ARG001
         return {
-            "agent_name": "source_planning_agent",
-            "agent_version": "0.3-test",
+            "plan_id": "plan_agentic_hook_test",
             "_structured_output_mode": "provider_native",
             "disease": "Hantavirus disease",
-            "geography": "global",
+            "location": "global",
             "time_window": "2020-2026",
             "target_fields": ["cases", "deaths", "date", "location"],
-            "source_categories": ["official_public_health_agency"],
-            "proposed_search_queries": [
+            "generation_method": "llm_executable_source_plan",
+            "llm_enabled": True,
+            "execution_status": "planned_not_executed",
+            "warnings": ["candidate_urls_not_allowed_in_executable_plan"],
+            "source_discovery_objectives": [
                 {
-                    "query": '"Andes virus" "MV Hondius" local health agency',
-                    "source_type": "official_public_health_agency",
+                    "objective_id": "obj_agentic_hook_001",
+                    "objective": "Plan official collection queries.",
+                    "source_role_hint": "collection",
+                    "rationale": "Official sources support extractable case records.",
                     "priority": 1,
-                    "rationale": "Look for non-held-out local authority coverage.",
-                    "expected_fields": ["cases", "deaths", "date", "location"],
                 }
             ],
-            "proposed_collection_source_types": [
-                "official_public_health_agency"
+            "planned_source_categories": [
+                {
+                    "source_category_id": "cat_agentic_hook_001",
+                    "source_type": "official_public_health_agency",
+                    "role_hint": "collection",
+                    "priority": 1,
+                    "expected_fields": ["cases", "deaths", "date", "location"],
+                    "why_relevant": "Likely to contain primary case reporting.",
+                    "risk_notes": ["requires_screening_before_fetch"],
+                }
             ],
-            "proposed_validation_source_types": [
-                "international_organization_report"
+            "planned_queries": [
+                {
+                    "query_id": "q_agentic_hook_001",
+                    "query": '"Andes virus" "MV Hondius" local health agency',
+                    "query_type": "general_web",
+                    "provider_channel": "web_search",
+                    "source_type": "official_public_health_agency",
+                    "role_hint": "collection",
+                    "priority": 1,
+                    "expected_fields": ["cases", "deaths", "date", "location"],
+                    "disease_terms_used": ["Andes virus"],
+                    "location_terms_used": ["MV Hondius"],
+                    "time_terms_used": ["2020-2026"],
+                    "rationale": "Look for non-held-out local authority coverage.",
+                    "execution_status": "planned_not_executed",
+                }
             ],
-            "proposed_context_source_types": ["official_background_page"],
-            "candidate_source_hints": ["https://example.org/mv-hondius"],
-            "reasoning_summary": "Prefer accessible non-WHO sources.",
-            "human_review_recommended": True,
-            "warnings": ["candidate_urls_unverified"],
+            "source_planning_risks": [
+                {
+                    "risk_id": "risk_agentic_hook_001",
+                    "risk": "LLM query needs screening before execution.",
+                    "severity": "medium",
+                    "applies_to": ["collection"],
+                    "mitigation": "Keep planned query status as planned_not_executed.",
+                    "human_review_trigger": True,
+                }
+            ],
         }
 
     monkeypatch.setenv("HDC_ENABLE_LLM_SOURCE_PLANNING", "true")
@@ -151,7 +183,8 @@ def test_source_planning_agent_mocked_output_appends_queries(monkeypatch):
     inventory = result.get("search_query_inventory") or []
     agent_queries = [
         item for item in inventory
-        if item.get("query_source") == "llm_source_planning_agent"
+        if item.get("query_source") == "executable_source_plan"
+        and item.get("query_id") == "q_agentic_hook_001"
     ]
 
     assert result.get("agentic_source_plan")
@@ -298,9 +331,10 @@ def test_source_planning_agent_retry_failure_preserves_workflow_fallback(monkeyp
     inventory = result.get("search_query_inventory") or []
     summary = result.get("source_planning_agent_summary") or {}
 
-    assert call_count["count"] == 2
+    assert call_count["count"] == 1
     assert inventory
-    assert summary.get("status") == "failed"
+    assert summary.get("status") == "failed_deterministic_fallback"
+    assert summary.get("generation_method") == "llm_failed_deterministic_fallback"
     assert "LLM returned empty output" in summary.get("failure_message")
     assert not [
         item for item in inventory
@@ -375,8 +409,9 @@ def test_source_planning_agent_malformed_output_falls_back(monkeypatch):
     summary = result.get("source_planning_agent_summary") or {}
 
     assert inventory
-    assert summary.get("status") == "failed"
-    assert "llm_source_planning_failed_rule_based_fallback_used" in (
+    assert summary.get("status") == "failed_deterministic_fallback"
+    assert summary.get("generation_method") == "llm_failed_deterministic_fallback"
+    assert "llm_source_planning_failed_deterministic_fallback_used" in (
         summary.get("warnings") or []
     )
     assert not [

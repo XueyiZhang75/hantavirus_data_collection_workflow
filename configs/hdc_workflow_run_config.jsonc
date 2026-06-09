@@ -28,6 +28,56 @@
   // User task submitted to LangGraph Studio. 改这里就等于改用户输入任务；下游 source planning、fetch、extraction 都会围绕它运行。
   "user_request": "Collect data on hantavirus from 2020 to 2026. For this workflow run, use the New Mexico HPS source set, keep collection sources and validation sources separated, extract cases, deaths, dates, locations, source URLs, source types, and evidence quotes, then route uncertain results to human review.",
 
+  "structured_task": {
+    // Stage 1 structured task input. These machine-readable fields take priority over the legacy free-text user_request during task intake.
+    "disease": "hantavirus",
+
+    // Geographic scope requested by the user. This is separate from source policy; source_sets below still controls which sources are allowed or held out.
+    "location": "New Mexico",
+
+    // Requested time window. The workflow stores both raw bounds and a derived time_window in collection_spec.
+    "start_date": "2020",
+    "end_date": "2026",
+
+    // Fields requested for extraction. These are task-level requested fields, not a replacement for the current HantavirusRecord schema.
+    "target_fields": [
+      "disease",
+      "virus_or_syndrome",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "event_start_date",
+      "event_end_date",
+      "cases_confirmed",
+      "cases_probable",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "case_definition",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+
+    // Preferred source categories for planning and scope documentation. This does not implement broad web search in Stage 1.
+    "source_preferences": [
+      "official_public_health_agency",
+      "international_organization_report",
+      "peer_reviewed_literature",
+      "structured_database",
+      "news_and_situation_report"
+    ],
+
+    // Current collection mode. masked_validation keeps collection/context/validation-reserved source roles separated.
+    "collection_mode": "masked_validation",
+
+    // Human-readable task text retained for Studio display and backward compatibility.
+    "user_request": "Collect data on hantavirus from 2020 to 2026. For this workflow run, use the New Mexico HPS source set, keep collection sources and validation sources separated, extract cases, deaths, dates, locations, source URLs, source types, and evidence quotes, then route uncertain results to human review.",
+
+    // Run label used in collection_spec metadata. Output session ids are still controlled by output.session_id or automatic timestamps.
+    "run_label": "new_mexico_hps_live_llm_workflow_run"
+  },
+
   "studio": {
     // Studio port. null = 使用 LangGraph 默认端口；也可以改成 2024、2025 等固定端口，方便现场打开固定 URL。
     "port": null,
@@ -42,6 +92,46 @@
 
     // HTTP timeout in seconds. 网页慢时可调大，比如 60；调小会更快失败，可能减少等待但漏掉慢网站。
     "timeout_seconds": 30
+  },
+
+  "source_search": {
+    // Controlled source discovery search. Default is disabled, so the workflow
+    // keeps using the offline seed catalog unless this block is explicitly changed.
+    "enabled": false,
+
+    // Allowed values: disabled, fixture, live.
+    // disabled = no provider call; fixture = local JSON results; live = real provider metadata search.
+    "mode": "disabled",
+
+    // Live provider name. Current Stage 5 adapter: tavily.
+    // API keys are read only from environment variables, never from this file.
+    "provider": "tavily",
+
+    // Local fixture path used only when mode = fixture.
+    "fixture_path": "src/hdc_workflow/resources/search_fixtures/example_search_results.json",
+
+    // Safety limits. Lower values make test/smoke runs faster and cheaper.
+    "max_queries": 3,
+    "max_results_per_query": 5,
+    "max_total_results": 15,
+    "timeout_seconds": 15,
+
+    // true = search candidates are combined with the existing seed catalog.
+    // false = only search-derived candidates are returned when search is enabled.
+    "combine_with_seed_catalog": true,
+
+    // Reserved for future cache implementation. Stage 5 records the setting but does not build a cache layer.
+    "cache_enabled": true,
+
+    // Planned query provider_channel values allowed to execute.
+    // manual_user_url is intentionally excluded because Stage 5 does not ingest raw URLs as search results.
+    "provider_channel_allowlist": [
+      "web_search",
+      "official_site_search",
+      "news_search",
+      "literature_api",
+      "database_search"
+    ]
   },
 
   "llm": {
@@ -75,7 +165,30 @@
 
       // Whether LLM critic can block fetch. false = LLM 只 advisory，最终安全边界由 deterministic policy 控制；true = critic 可阻止有风险 source 抓取。
       "review_blocks_fetch": false
+    },
+
+    "source_credibility": {
+      // Optional LLM source credibility advisory. false = deterministic scoring only; true = send source metadata plus deterministic scores to the configured LLM.
+      // The deterministic Stage 6 credibility rubric runs either way and remains the default offline-safe path.
+      "enabled": false,
+
+      // Max sources sent to the optional LLM credibility reviewer. Lower values reduce cost; deterministic scoring still covers every source.
+      "max_sources": 6,
+
+      // Optional source_id allowlist for LLM credibility advisory. Empty list = allow any source up to max_sources; deterministic scoring ignores this limit.
+      "source_id_allowlist": []
     }
+  },
+
+  "disease_intelligence": {
+    // Optional LLM disease intelligence. false = use local curated profiles only; true = call the configured LLM before falling back.
+    "llm_enabled": false,
+
+    // force_llm. true keeps the LLM attempt explicit when enabled; default false keeps curated profiles as the normal deterministic path.
+    "force_llm": false,
+
+    // fallback_to_curated. true = if LLM disease intelligence fails, use curated/generic deterministic fallback and record a warning.
+    "fallback_to_curated": true
   },
 
   "source_sets": {

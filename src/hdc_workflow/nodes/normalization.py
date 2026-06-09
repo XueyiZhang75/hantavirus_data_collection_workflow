@@ -15,6 +15,7 @@ from ..config import load_record_normalization_policy
 from ..models import (
     HantavirusRecord,
     HumanReviewItem,
+    PublicHealthRecord,
     RecordNormalizationPolicy,
     RecordNormalizationResult,
 )
@@ -28,6 +29,10 @@ _NUMERIC_FIELDS = (
     "cases_suspected",
     "cases_unspecified",
     "deaths",
+    "hospitalizations",
+    "icu_admissions",
+    "tests_positive",
+    "tests_total",
 )
 
 # Step 16.1.1: kept in sync with `_GEOGRAPHIC_SCOPE_TYPE_ALIASES` /
@@ -164,6 +169,34 @@ def _normalize_numeric(value):
             return None
         return num
     return None
+
+
+def _normalize_disease(value, disease_standard_name=None) -> tuple[str | None, list[str], list[str]]:
+    raw = _blank_to_none(value)
+    standard = _blank_to_none(disease_standard_name)
+    candidate = standard or raw
+    if candidate is None:
+        return raw, [], ["missing_disease"]
+    lowered = str(candidate).strip().lower()
+    mapping = {
+        "hantavirus": "Hantavirus disease",
+        "hantavirus disease": "Hantavirus disease",
+        "hps": "Hantavirus disease",
+        "hantavirus pulmonary syndrome": "Hantavirus disease",
+        "covid": "COVID-19",
+        "covid-19": "COVID-19",
+        "covid 19": "COVID-19",
+        "sars-cov-2": "COVID-19",
+        "dengue": "Dengue",
+        "dengue fever": "Dengue",
+        "denv": "Dengue",
+        "dengue virus": "Dengue",
+    }
+    canonical = mapping.get(lowered, str(candidate).strip())
+    actions = []
+    if raw and canonical != raw:
+        actions.append("normalized_disease_name")
+    return canonical, actions, []
 
 
 # ---------------------------------------------------------------------------
@@ -423,17 +456,31 @@ def _normalize_record(
 
     # 1. Preserve raw inputs.
     for raw_field, src_field in (
+        ("disease_raw", "disease"),
         ("country_raw", "country"),
         ("subnational_location_raw", "subnational_location"),
+        ("locality_raw", "locality"),
         ("date_reported_raw", "date_reported"),
         ("event_start_date_raw", "event_start_date"),
         ("event_end_date_raw", "event_end_date"),
+        ("reporting_period_raw", "reporting_period"),
+        ("as_of_date_raw", "as_of_date"),
         ("virus_or_syndrome_raw", "virus_or_syndrome"),
         ("case_definition_raw", "case_definition"),
         ("source_type_raw", "source_type"),
     ):
         if normalized.get(raw_field) is None:
             normalized[raw_field] = record.get(src_field)
+
+    disease, disease_actions, disease_warnings = _normalize_disease(
+        normalized.get("disease"),
+        normalized.get("disease_standard_name"),
+    )
+    normalized["disease"] = disease
+    if normalized.get("disease_standard_name") is None:
+        normalized["disease_standard_name"] = disease
+    actions.extend(disease_actions)
+    warnings.extend(disease_warnings)
 
     # 2. Numeric cleanup. Done before case_definition so that inference sees the
     #    cleaned values.
@@ -510,7 +557,7 @@ def _normalize_record(
             warnings.append(w)
 
     # 4. Dates.
-    for date_field in ("date_reported", "event_start_date", "event_end_date"):
+    for date_field in ("date_reported", "event_start_date", "event_end_date", "as_of_date"):
         value = normalized.get(date_field)
         new_value, d_actions, d_warnings = _normalize_date_value(value, policy)
         normalized[date_field] = new_value
@@ -580,7 +627,7 @@ def _normalize_record(
     normalized["requires_human_review"] = requires_human_review
 
     # 11. Pydantic validation produces a clean canonical dict.
-    validated_dict = HantavirusRecord(**normalized).model_dump()
+    validated_dict = PublicHealthRecord(**normalized).model_dump()
 
     result = RecordNormalizationResult(
         record_id=validated_dict.get("record_id", ""),
@@ -617,6 +664,11 @@ def record_normalization(state: DataCollectionState) -> dict:
     case_def_normalized_count = 0
     source_type_warning_count = 0
     needs_review_count = 0
+    disease_counter: Counter = Counter()
+    source_type_counter: Counter = Counter()
+    extraction_method_counter: Counter = Counter()
+    generic_record_count = 0
+    legacy_hantavirus_record_count = 0
 
     country_action_set = {
         "normalized_country_alias",
@@ -631,6 +683,15 @@ def record_normalization(state: DataCollectionState) -> dict:
     for record in validated_records:
         normalized, result = _normalize_record(record, policy)
         normalized_records.append(normalized)
+        disease_counter[normalized.get("disease") or "unknown"] += 1
+        source_type_counter[normalized.get("source_type") or "unknown"] += 1
+        extraction_method_counter[
+            normalized.get("extraction_method") or "unknown"
+        ] += 1
+        if normalized.get("record_schema") == "generic_public_health_record":
+            generic_record_count += 1
+        if normalized.get("disease") == "Hantavirus disease":
+            legacy_hantavirus_record_count += 1
 
         status_counter[result.normalization_status] += 1
         for action in result.normalization_actions:
@@ -686,6 +747,14 @@ def record_normalization(state: DataCollectionState) -> dict:
         "virus_or_syndrome_normalized_count": virus_normalized_count,
         "case_definition_normalized_count": case_def_normalized_count,
         "source_type_warning_count": source_type_warning_count,
+        "generic_record_count": generic_record_count,
+        "legacy_hantavirus_record_count": legacy_hantavirus_record_count,
+        "disease_counts": dict(disease_counter),
+        "source_type_counts": dict(source_type_counter),
+        "extraction_method_counts": dict(extraction_method_counter),
+        "review_required_record_count": needs_review_count,
+        "unsupported_target_field_count": 0,
+        "warnings": dict(warning_counter),
     }
 
     trace = append_trace(

@@ -26,6 +26,12 @@ from ..models import (
     SourceScreeningPolicy,
     SourceScreeningResult,
 )
+from ..source_credibility import (
+    RUBRIC_VERSION as SOURCE_CREDIBILITY_RUBRIC_VERSION,
+    apply_source_credibility_assessment,
+    build_source_credibility_summary,
+    source_credibility_runtime_from_env,
+)
 from ..state import DataCollectionState, append_trace
 
 
@@ -896,8 +902,10 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "HDC_LLM_SOURCE_CRITIC_MAX_SOURCES"
     )
     llm_review_blocks_fetch = _llm_source_critic_review_blocks_fetch()
+    credibility_runtime = source_credibility_runtime_from_env()
 
     updated: list[dict] = []
+    credibility_assessments: list[dict] = []
     critic_decision_counter: Counter = Counter()
     final_decision_counter: Counter = Counter()
     critic_flag_counter: Counter = Counter()
@@ -989,7 +997,12 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
             new_entry = _apply_context_only_override(new_entry)
             context_only_source_ids.append(new_entry.get("source_id", ""))
 
-        new_entry = _apply_source_credibility_rubric(new_entry)
+        new_entry, credibility_assessment = apply_source_credibility_assessment(
+            new_entry,
+            state,
+            credibility_runtime,
+        )
+        credibility_assessments.append(credibility_assessment)
         validated = SourceRegistryEntry(**new_entry).model_dump()
         updated.append(validated)
 
@@ -1016,6 +1029,22 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         if credibility_level == "low":
             low_credibility_source_count += 1
 
+        if validated.get("human_review_recommended"):
+            review_id = f"review_source_credibility_{validated.get('source_id', '')}"
+            if review_id and review_id not in existing_review_ids:
+                new_review_items.append(
+                    HumanReviewItem(
+                        review_id=review_id,
+                        item_type="source_credibility",
+                        related_ids=[validated.get("source_id", "")],
+                        reason=validated.get("human_review_reason")
+                        or validated.get("final_score_explanation")
+                        or "Source credibility assessment recommended human review.",
+                        status="pending",
+                    )
+                )
+                existing_review_ids.add(review_id)
+
         if validated.get("requires_human_review"):
             review_id = f"review_source_{validated.get('source_id', '')}"
             if review_id and review_id not in existing_review_ids:
@@ -1034,6 +1063,10 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
     human_review_queue = list(existing_queue) + [
         item.model_dump() for item in new_review_items
     ]
+    credibility_summary = build_source_credibility_summary(
+        credibility_assessments,
+        credibility_runtime,
+    )
 
     critic_summary = {
         "input_registry_count": len(registry),
@@ -1061,9 +1094,19 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "llm_source_critic_failure_count": llm_source_critic_failure_count,
         "llm_semantic_leakage_count": llm_semantic_leakage_count,
         "llm_human_review_recommended_count": llm_human_review_recommended_count,
-        "credibility_rubric_version": "source_credibility_v1",
+        "credibility_rubric_version": SOURCE_CREDIBILITY_RUBRIC_VERSION,
         "credibility_level_counts": dict(credibility_level_counter),
         "low_credibility_source_count": low_credibility_source_count,
+        "source_credibility_assessed_count": credibility_summary.get(
+            "assessed_source_count", 0
+        ),
+        "source_credibility_llm_enabled": credibility_summary.get("llm_enabled"),
+        "source_credibility_llm_assessed_count": credibility_summary.get(
+            "llm_assessed_count", 0
+        ),
+        "source_credibility_llm_failure_count": credibility_summary.get(
+            "llm_failure_count", 0
+        ),
     }
     routing_summary = {
         "collection_mode": collection_mode,
@@ -1083,9 +1126,13 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "llm_source_critic_review_blocks_fetch": llm_review_blocks_fetch,
         "llm_semantic_leakage_count": llm_semantic_leakage_count,
         "llm_human_review_recommended_count": llm_human_review_recommended_count,
-        "credibility_rubric_version": "source_credibility_v1",
+        "credibility_rubric_version": SOURCE_CREDIBILITY_RUBRIC_VERSION,
         "credibility_level_counts": dict(credibility_level_counter),
         "low_credibility_source_count": low_credibility_source_count,
+        "source_credibility_role_counts": credibility_summary.get("role_counts", {}),
+        "source_credibility_human_review_count": credibility_summary.get(
+            "needs_review_count", 0
+        ),
     }
 
     trace = append_trace(
@@ -1104,5 +1151,7 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "human_review_queue": human_review_queue,
         "source_critic_summary": critic_summary,
         "source_routing_summary": routing_summary,
+        "source_credibility_assessments": credibility_assessments,
+        "source_credibility_summary": credibility_summary,
         "collection_trace": trace,
     }

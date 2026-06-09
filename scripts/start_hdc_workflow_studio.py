@@ -89,6 +89,7 @@ def _llm_enabled(env_updates: dict[str, str]) -> bool:
         for key in (
             "HDC_ENABLE_LLM_SOURCE_PLANNING",
             "HDC_ENABLE_LLM_SOURCE_CRITIC",
+            "HDC_ENABLE_LLM_SOURCE_CREDIBILITY",
             "HDC_ENABLE_LLM_EXTRACTION",
         )
     )
@@ -141,6 +142,9 @@ def _print_launch_context(
         {
             "source_planning": env_updates.get("HDC_ENABLE_LLM_SOURCE_PLANNING"),
             "source_critic": env_updates.get("HDC_ENABLE_LLM_SOURCE_CRITIC"),
+            "source_credibility": env_updates.get(
+                "HDC_ENABLE_LLM_SOURCE_CREDIBILITY"
+            ),
             "structured_extraction": env_updates.get("HDC_ENABLE_LLM_EXTRACTION"),
         },
     )

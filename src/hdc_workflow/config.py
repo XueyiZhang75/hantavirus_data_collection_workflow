@@ -23,6 +23,7 @@ _HUMAN_REVIEW_POLICY_PATH = _RESOURCES_DIR / "human_review_policy.json"
 _FINAL_PACKAGE_POLICY_PATH = _RESOURCES_DIR / "final_package_policy.json"
 _LLM_STRUCTURED_EXTRACTION_POLICY_PATH = _RESOURCES_DIR / "llm_structured_extraction_policy.json"
 _SOURCE_ROLE_POLICY_PATH = _RESOURCES_DIR / "source_role_policy.json"
+_DISEASE_INTELLIGENCE_DIR = _RESOURCES_DIR / "disease_intelligence"
 _SEED_SOURCE_OVERLAY_ENV = "HDC_SEED_SOURCE_OVERLAY_PATH"
 _SOURCE_ROLE_POLICY_OVERLAY_ENV = "HDC_SOURCE_ROLE_POLICY_OVERLAY_PATH"
 
@@ -185,6 +186,39 @@ def load_hantavirus_profile() -> dict:
     """Load the static hantavirus disease profile JSON as a dict."""
 
     return _load_json(_HANTAVIRUS_PROFILE_PATH)
+
+
+def disease_intelligence_profile_slug(disease_input: str | None) -> str | None:
+    """Return a curated disease-intelligence slug for known disease names."""
+
+    text = " ".join(str(disease_input or "").strip().lower().split())
+    if not text:
+        return None
+    normalized = (
+        text.replace("_", " ")
+        .replace("/", " ")
+        .replace("coronavirus disease 2019", "covid-19")
+    )
+    compact = normalized.replace("-", "").replace(" ", "")
+    if "hantavirus" in normalized or normalized == "hps" or compact == "hfrs":
+        return "hantavirus"
+    if compact in {"covid19", "sarscov2"} or "covid" in normalized:
+        return "covid19"
+    if "dengue" in normalized or compact == "denv":
+        return "dengue"
+    return None
+
+
+def load_disease_intelligence_profile(disease_input: str | None) -> dict | None:
+    """Load a curated disease intelligence profile for a known disease."""
+
+    slug = disease_intelligence_profile_slug(disease_input)
+    if not slug:
+        return None
+    path = _DISEASE_INTELLIGENCE_DIR / f"{slug}.json"
+    if not path.exists():
+        return None
+    return _load_json(path)
 
 
 def load_hantavirus_collection_schema() -> dict:

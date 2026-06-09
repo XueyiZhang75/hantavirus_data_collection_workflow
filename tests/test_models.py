@@ -218,7 +218,7 @@ def test_evidence_chunking_policy_model_validates():
 
 def test_config_loads_structured_extraction_policy():
     policy_dict = load_structured_extraction_policy()
-    assert policy_dict["policy_name"] == "hantavirus_structured_extraction_policy"
+    assert policy_dict["policy_name"] == "generic_public_health_structured_extraction_policy"
     assert policy_dict["default_disease"] == "Hantavirus disease"
     assert policy_dict["extraction_method"] == "deterministic_rule_based_extractor"
     required_prov = policy_dict.get("required_provenance_fields") or []
@@ -228,7 +228,7 @@ def test_config_loads_structured_extraction_policy():
 
 def test_structured_extraction_policy_model_validates():
     policy = StructuredExtractionPolicy(**load_structured_extraction_policy())
-    assert policy.policy_name == "hantavirus_structured_extraction_policy"
+    assert policy.policy_name == "generic_public_health_structured_extraction_policy"
     assert policy.default_disease == "Hantavirus disease"
     assert "HPS" in policy.virus_or_syndrome_terms
     assert "confirmed" in policy.case_keywords
@@ -365,7 +365,7 @@ def test_final_package_policy_model_validates():
 
 def test_config_loads_llm_structured_extraction_policy():
     policy_dict = load_llm_structured_extraction_policy()
-    assert policy_dict["policy_name"] == "hantavirus_llm_structured_extraction_policy"
+    assert policy_dict["policy_name"] == "generic_public_health_llm_structured_extraction_policy"
     assert policy_dict.get("required_output_rules"), "required_output_rules empty"
     assert "data_extraction" in (policy_dict.get("allowed_fetch_purposes") or [])
     assert "text" in (policy_dict.get("allowed_chunk_kinds") or [])
@@ -373,7 +373,7 @@ def test_config_loads_llm_structured_extraction_policy():
 
 def test_llm_structured_extraction_policy_model_validates():
     policy = LLMStructuredExtractionPolicy(**load_llm_structured_extraction_policy())
-    assert policy.policy_name == "hantavirus_llm_structured_extraction_policy"
+    assert policy.policy_name == "generic_public_health_llm_structured_extraction_policy"
     assert policy.llm_extraction_method == "llm_structured_output_extractor"
     assert policy.max_records_per_chunk >= 1
 

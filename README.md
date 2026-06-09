@@ -1,10 +1,133 @@
-# Hantavirus Data Collection Workflow
+# data collection workflow
 
-A LangGraph-based data collection workflow for a hantavirus public health case study. The workflow is designed to collect human hantavirus case and outbreak data from multiple sources, screen them, parse documents, extract structured records, normalize the records, link related events, perform cross-source consistency checks, route uncertain items to human review, and emit a final data package.
+**data collection workflow** is a LangGraph-based local package and CLI for
+turning public-health source evidence into auditable structured records. It
+accepts a structured task, plans sources, discovers or loads candidate sources,
+scores credibility, fetches and parses bounded content, extracts generic
+`PublicHealthRecord` records, normalizes records, clusters related events,
+validates against reserved sources, detects anomalies, routes uncertain items to
+human review, and exports a final package.
+
+The current release is disease-generic at the workflow level. Hantavirus / New
+Mexico remains the compatibility case study, while COVID-19 / New York and
+dengue / Florida are included as multi-disease examples for fixture and live
+acceptance checks. The workflow is an evidence organization tool, not medical
+advice or official surveillance.
+
+Key project documents:
+
+- [Final product target](docs/final_product_target.md)
+- [Current state audit](docs/current_state_audit.md)
+- [Live baseline report](docs/live_baseline_report.md)
+- [Structured task input](docs/structured_task_input.md)
+- [Disease intelligence layer](docs/disease_intelligence_layer.md)
+- [Generic profile/schema setup](docs/profile_schema_setup.md)
+- [Executable source planning](docs/executable_source_planning.md)
+- [Real source discovery](docs/real_source_discovery.md)
+- [Stage 0 report](docs/stage_reports/STAGE_0_REPORT.md)
+- [Stage 1 report](docs/stage_reports/STAGE_1_REPORT.md)
+- [Stage 2 report](docs/stage_reports/STAGE_2_REPORT.md)
+- [Stage 3 report](docs/stage_reports/STAGE_3_REPORT.md)
+- [Stage 4 report](docs/stage_reports/STAGE_4_REPORT.md)
+- [Stage 5 report](docs/stage_reports/STAGE_5_REPORT.md)
+
+Controlled source-search execution is available: planned queries from the
+executable source plan can run through fixture or live provider adapters when
+explicitly enabled, producing search-derived source candidates with provenance.
+The default test path remains offline and deterministic.
+
+## Current User Quickstart
+
+The user-facing project name is **data collection workflow**. The internal
+Python package remains `hdc_workflow`.
+
+Current case-study coverage remains Hantavirus / New Mexico, but the workflow
+now also has disease-generic structured task input and deterministic fixture
+examples for COVID-19 / New York and dengue / Florida. Fixed catalogs and
+fixture search results are still used as offline seeds and fallbacks so tests
+and development runs do not require internet access, search provider keys, or
+LLM keys.
+
+For the normal user path, run the interactive real workflow script:
+
+```powershell
+cd "C:\path\to\hantavirus_data_collection_workflow"
+$env:PYTHONPATH = "src"
+$env:TAVILY_API_KEY = [Environment]::GetEnvironmentVariable("TAVILY_API_KEY", "User")
+$env:ANTHROPIC_API_KEY = [Environment]::GetEnvironmentVariable("ANTHROPIC_API_KEY", "User")
+python scripts\run_interactive_workflow.py
+```
+
+The script asks for disease / virus, location, start date, end date, and an
+optional session id. Record fields are fixed by the workflow schema, so normal
+users do not need to decide extraction columns. After the input phase, it runs
+the full real workflow with live search, live fetch, and LLM stages enabled by
+default. It does not print API keys and does not fall back to fixture data.
+
+Example direct run without prompts:
+
+```powershell
+python scripts\run_interactive_workflow.py --disease "hantavirus" --location "New Mexico" --start-date 2020 --end-date 2026 --session-id hantavirus_nm_real
+```
+
+For package/CLI commands, install the package in editable mode, then use:
+
+```powershell
+python -m pip install -e .
+python -m hdc_workflow.cli --help
+data-collection-workflow --help
+```
+
+For a one-off source-tree run without installation, set `PYTHONPATH=src` in the
+current shell before calling `python -m hdc_workflow.cli`.
+
+Deterministic offline fixture examples are for development, testing, and
+acceptance checks. They are not the normal user path. Run them when you are
+modifying the project or need a no-network smoke test. The bundled examples
+include offline fixture COVID-19 and offline fixture dengue runs:
+
+```powershell
+python -m hdc_workflow.cli collect --config configs/examples/covid19_new_york_2024_fixture_review_application_task.jsonc --session-id quickstart_covid19_fixture --disable-all-llm
+python -m hdc_workflow.cli collect --config configs/examples/dengue_florida_2025_fixture_review_application_task.jsonc --session-id quickstart_dengue_fixture --disable-all-llm
+```
+
+Inspect and export a completed session:
+
+```powershell
+python -m hdc_workflow.cli inspect-run --session-dir outputs/sessions/quickstart_covid19_fixture
+python -m hdc_workflow.cli review-summary --session-dir outputs/sessions/quickstart_covid19_fixture
+python -m hdc_workflow.cli export --session-dir outputs/sessions/quickstart_covid19_fixture --output-dir outputs/exports/quickstart_covid19_fixture --format both
+```
+
+API keys are optional and should stay in your shell or user environment, not in
+config files. Live source search uses Tavily search metadata. Configure
+`TAVILY_API_KEY` in your shell or user environment before enabling live search.
+LLM stages are also optional. Configure `ANTHROPIC_API_KEY` for Anthropic
+models, or `OPENAI_API_KEY` for OpenAI models, and then explicitly enable the
+LLM stages in config or with CLI flags. Never put real keys in config files.
+
+Important artifacts include `collection/final_package.json`,
+`collection/final_dataset.csv`, `collection/final_dataset_post_review.json`,
+`diagnostics/validation_results.json`, `diagnostics/anomaly_results.json`,
+`diagnostics/human_review_audit_trail.json`, and the HTML workflow console.
+
+Generate a safe starting config:
+
+```powershell
+python -m hdc_workflow.cli init-config --disease dengue --location Florida --start-date 2025 --end-date 2025 --target-field cases_unspecified --target-field deaths --mode fixture-search --output configs/local_dengue_fixture.jsonc
+python -m hdc_workflow.cli validate-config --config configs/local_dengue_fixture.jsonc
+```
+
+More detailed instructions are in [docs/user_guide.md](docs/user_guide.md), and
+a notebook-style walkthrough is in
+[examples/notebooks/data_collection_workflow_quickstart.md](examples/notebooks/data_collection_workflow_quickstart.md).
 
 ## Project Purpose
 
-This project orchestrates a multi-stage data collection pipeline for hantavirus public health surveillance information. The architecture is centered on a LangGraph `StateGraph` so that each stage of the pipeline is a named, inspectable node and the shared state can be traced end-to-end.
+This project orchestrates a multi-stage public-health data collection workflow.
+The architecture is centered on a LangGraph `StateGraph` so that each stage of
+the pipeline is a named, inspectable node and the shared state can be traced
+end-to-end.
 
 ## Current Implementation Status
 
@@ -252,23 +375,25 @@ Notes:
 In execution order:
 
 1. `task_intake_and_scope_planning`
-2. `hantavirus_profile_and_schema_setup`
-3. `query_strategy_builder`
-4. `source_discovery`
-5. `source_dedup_and_registry`
-6. `source_screening`
-7. `source_critic_and_uncertainty_routing`
-8. `content_fetch_and_parse`
-9. `document_quality_check`
-10. `evidence_chunking_and_data_presence_flagging`
-11. `structured_extraction`
-12. `schema_validation_and_repair`
-13. `record_normalization`
-14. `record_linking`
-15. `cross_source_consistency_check`
-16. `quality_gate_routing`
-17. `human_review` (conditional)
-18. `final_data_package_builder`
+2. `disease_intelligence_builder`
+3. `profile_and_schema_setup`
+4. `executable_source_planning`
+5. `query_strategy_builder`
+6. `source_discovery`
+7. `source_dedup_and_registry`
+8. `source_screening`
+9. `source_critic_and_uncertainty_routing`
+10. `content_fetch_and_parse`
+11. `document_quality_check`
+12. `evidence_chunking_and_data_presence_flagging`
+13. `structured_extraction`
+14. `schema_validation_and_repair`
+15. `record_normalization`
+16. `record_linking`
+17. `cross_source_consistency_check`
+18. `quality_gate_routing`
+19. `human_review` (conditional)
+20. `final_data_package_builder`
 
 `quality_gate_routing` conditionally routes either to `human_review` and then on to `final_data_package_builder`, or directly to `final_data_package_builder`.
 

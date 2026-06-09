@@ -1,0 +1,52 @@
+{
+  "profile_name": "stage4_llm_source_planning_smoke_task",
+  "description": "Stage 4 acceptance smoke for LLM executable source planning only. Live fetch, LLM source critic, and LLM structured extraction remain disabled.",
+  "workflow": {
+    "graph_name": "hantavirus_data_collection_workflow",
+    "collection_mode": "standard",
+    "use_fixture_documents": true
+  },
+  "user_request": "Collect hantavirus data for New Mexico from 2020 to 2026, keeping source planning auditable and planned queries not executed.",
+  "structured_task": {
+    "disease": "hantavirus",
+    "location": "New Mexico",
+    "start_date": "2020",
+    "end_date": "2026",
+    "target_fields": [
+      "cases_confirmed",
+      "cases_probable",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "date_reported",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "source_preferences": [
+      "official_public_health_agency",
+      "international_organization_report",
+      "peer_reviewed_literature",
+      "structured_database",
+      "news_and_situation_report"
+    ],
+    "collection_mode": "standard",
+    "user_request": "Collect hantavirus data for New Mexico from 2020 to 2026, keeping source planning auditable and planned queries not executed.",
+    "run_label": "stage4_llm_source_planning_smoke_task"
+  },
+  "live_web": {
+    "enabled": false,
+    "timeout_seconds": 30
+  },
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "source_planning_enabled": true,
+    "source_critic_enabled": false,
+    "structured_extraction_enabled": false
+  },
+  "output": {
+    "sessionized": true,
+    "session_id": "stage4_llm_source_planning_smoke_attempt"
+  }
+}

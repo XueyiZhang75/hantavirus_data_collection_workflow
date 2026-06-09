@@ -92,11 +92,99 @@ def export_final_data_package(
             field_order=policy.final_dataset_field_order,
         )
     )
+    files["final_dataset_post_review_json"] = str(
+        write_json(
+            package.get("final_dataset_post_review") or [],
+            out_dir / "final_dataset_post_review.json",
+        )
+    )
+    files["final_dataset_post_review_csv"] = str(
+        write_csv_rows(
+            package.get("final_dataset_post_review") or [],
+            out_dir / "final_dataset_post_review.csv",
+            field_order=policy.final_dataset_field_order,
+        )
+    )
+    files["records_excluded_by_human_review_json"] = str(
+        write_json(
+            package.get("records_excluded_by_human_review") or [],
+            out_dir / "records_excluded_by_human_review.json",
+        )
+    )
     files["source_registry_json"] = str(
         write_json(package.get("source_registry") or [], out_dir / "source_registry.json")
     )
     files["linked_events_json"] = str(
         write_json(package.get("linked_events") or [], out_dir / "linked_events.json")
+    )
+    files["event_clusters_json"] = str(
+        write_json(package.get("event_clusters") or [], out_dir / "event_clusters.json")
+    )
+    files["duplicate_clusters_json"] = str(
+        write_json(
+            package.get("duplicate_clusters") or [],
+            out_dir / "duplicate_clusters.json",
+        )
+    )
+    files["validation_cases_json"] = str(
+        write_json(
+            package.get("validation_cases") or [],
+            out_dir / "validation_cases.json",
+        )
+    )
+    files["validation_comparisons_json"] = str(
+        write_json(
+            package.get("validation_comparisons") or [],
+            out_dir / "validation_comparisons.json",
+        )
+    )
+    files["validation_results_json"] = str(
+        write_json(
+            package.get("validation_results") or [],
+            out_dir / "validation_results.json",
+        )
+    )
+    files["validation_results_csv"] = str(
+        write_csv_rows(
+            package.get("validation_results") or [],
+            out_dir / "validation_results.csv",
+        )
+    )
+    files["anomaly_results_json"] = str(
+        write_json(
+            package.get("anomaly_results") or [],
+            out_dir / "anomaly_results.json",
+        )
+    )
+    files["anomaly_results_csv"] = str(
+        write_csv_rows(
+            package.get("anomaly_results") or [],
+            out_dir / "anomaly_results.csv",
+        )
+    )
+    files["applied_human_review_decisions_json"] = str(
+        write_json(
+            package.get("applied_human_review_decisions") or [],
+            out_dir / "applied_human_review_decisions.json",
+        )
+    )
+    files["rejected_human_review_decisions_json"] = str(
+        write_json(
+            package.get("rejected_human_review_decisions") or [],
+            out_dir / "rejected_human_review_decisions.json",
+        )
+    )
+    files["human_review_audit_trail_json"] = str(
+        write_json(
+            package.get("human_review_audit_trail") or [],
+            out_dir / "human_review_audit_trail.json",
+        )
+    )
+    files["human_review_application_summary_json"] = str(
+        write_json(
+            package.get("human_review_application_summary") or {},
+            out_dir / "human_review_application_summary.json",
+        )
     )
     files["conflicts_json"] = str(
         write_json(package.get("conflicts") or [], out_dir / "conflicts.json")
@@ -134,8 +222,29 @@ def export_final_data_package(
         "files": files,
         "section_counts": {
             "final_dataset": len(package.get("final_dataset") or []),
+            "final_dataset_post_review": len(
+                package.get("final_dataset_post_review") or []
+            ),
+            "records_excluded_by_human_review": len(
+                package.get("records_excluded_by_human_review") or []
+            ),
             "source_registry": len(package.get("source_registry") or []),
             "linked_events": len(package.get("linked_events") or []),
+            "event_clusters": len(package.get("event_clusters") or []),
+            "duplicate_clusters": len(package.get("duplicate_clusters") or []),
+            "validation_cases": len(package.get("validation_cases") or []),
+            "validation_comparisons": len(package.get("validation_comparisons") or []),
+            "validation_results": len(package.get("validation_results") or []),
+            "anomaly_results": len(package.get("anomaly_results") or []),
+            "applied_human_review_decisions": len(
+                package.get("applied_human_review_decisions") or []
+            ),
+            "rejected_human_review_decisions": len(
+                package.get("rejected_human_review_decisions") or []
+            ),
+            "human_review_audit_trail": len(
+                package.get("human_review_audit_trail") or []
+            ),
             "conflicts": len(package.get("conflicts") or []),
             "human_review_items": len(package.get("human_review_items") or []),
             "excluded_sources": len(package.get("excluded_sources") or []),

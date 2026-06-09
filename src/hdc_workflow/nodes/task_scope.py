@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import json
+import os
 import re
+from collections import Counter
 
 from .. import llm_clients
-from ..agents.source_planning_agent import plan_sources_with_llm
 from ..config import (
+    load_disease_intelligence_profile,
     load_hantavirus_collection_schema,
     load_hantavirus_profile,
     load_source_strategy,
@@ -14,15 +17,71 @@ from ..config import (
 from ..models import (
     CollectionSchema,
     CollectionSpec,
+    DataFieldSpec,
+    DiseaseIntelligenceProfile,
     DiseaseProfile,
+    ExecutableSourcePlan,
+    HantavirusRecord,
+    PlannedSearchQuery,
     SearchQuery,
     SearchQuerySet,
+    ScreeningCriteria,
+    SourceCategory,
+    SourcePlanningRisk,
     SourceStrategy,
+    StructuredTaskInput,
 )
 from ..state import DataCollectionState, append_trace
 
 _TIME_WINDOW_PATTERN = re.compile(r"(\d{4})\s*(?:-|to|–|—)\s*(\d{4})", re.IGNORECASE)
 _US_TOKEN_PATTERN = re.compile(r"\b(US|USA|United States)\b")
+_DEFAULT_DISEASE = "Hantavirus disease"
+_DEFAULT_TARGET_POPULATION = "human"
+_DEFAULT_TASK_TYPE = "public_health_case_and_outbreak_collection"
+_DEFAULT_REQUIRED_FIELDS = [
+    "disease",
+    "virus_or_syndrome",
+    "country",
+    "subnational_location",
+    "date_reported",
+    "event_start_date",
+    "event_end_date",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "case_definition",
+    "source_url",
+    "source_type",
+    "evidence_quote",
+]
+_DEFAULT_SOURCE_PRIORITY = [
+    "official_public_health_agency",
+    "international_organization_report",
+    "peer_reviewed_literature",
+    "structured_database",
+    "news_and_situation_report",
+]
+_STRUCTURED_TASK_FIELDS = {
+    "disease",
+    "location",
+    "start_date",
+    "end_date",
+    "target_fields",
+    "source_preferences",
+    "collection_mode",
+    "user_request",
+    "run_label",
+}
+_PLANNED_QUERY_URL_PATTERN = re.compile(r"\b(?:https?://|www\.)\S+", re.IGNORECASE)
+_EXECUTABLE_SOURCE_TYPES = [
+    "official_public_health_agency",
+    "international_organization_report",
+    "peer_reviewed_literature",
+    "structured_database",
+    "news_and_situation_report",
+]
 
 
 def _infer_geography(user_request: str) -> str | None:
@@ -42,92 +101,1388 @@ def _infer_time_window(user_request: str) -> str | None:
     return f"{start}-{end}"
 
 
+def _clean_str(value) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _as_str_list(value) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [value.strip()] if value.strip() else []
+    if isinstance(value, list | tuple | set):
+        return [str(item).strip() for item in value if str(item).strip()]
+    return []
+
+
+def _time_window(
+    start_date: str | None,
+    end_date: str | None,
+    user_request: str,
+) -> str | None:
+    start = _clean_str(start_date)
+    end = _clean_str(end_date)
+    if start and end:
+        return start if start == end else f"{start}-{end}"
+    if start:
+        return start
+    if end:
+        return end
+    return _infer_time_window(user_request)
+
+
+def _source_priority_from_preferences(value) -> list[str]:
+    if isinstance(value, dict):
+        for key in ("source_types", "preferred_source_types", "source_priority"):
+            items = _as_str_list(value.get(key))
+            if items:
+                return items
+        keys = [str(key).strip() for key in value.keys() if str(key).strip()]
+        return keys or list(_DEFAULT_SOURCE_PRIORITY)
+    return _as_str_list(value) or list(_DEFAULT_SOURCE_PRIORITY)
+
+
+def _structured_task_from_state(
+    state: DataCollectionState,
+) -> tuple[StructuredTaskInput, str]:
+    payload: dict = {}
+    source = "legacy_user_request"
+
+    nested = state.get("structured_task")
+    if isinstance(nested, dict):
+        payload.update(nested)
+        source = "state.structured_task"
+
+    for field in _STRUCTURED_TASK_FIELDS:
+        value = state.get(field)  # type: ignore[literal-required]
+        if value not in (None, "", [], {}):
+            payload[field] = value
+            source = "state.structured_fields"
+
+    if "user_request" not in payload and state.get("user_request"):
+        payload["user_request"] = state.get("user_request")
+
+    if payload:
+        return StructuredTaskInput(**payload), source
+
+    return StructuredTaskInput(user_request=state.get("user_request")), "default"
+
+
+def _data_focus(disease: str) -> str:
+    if disease == _DEFAULT_DISEASE:
+        return "human hantavirus case, outbreak, and surveillance data"
+    return f"human {disease} case, outbreak, and surveillance data"
+
+
+def _is_hantavirus_like(disease: str | None) -> bool:
+    lowered = (disease or "").strip().lower()
+    return lowered in {"hantavirus", "hantavirus disease", "hps"}
+
+
+def _task_input_warnings(task: StructuredTaskInput) -> list[str]:
+    warnings = ["source_discovery_not_yet_disease_generic"]
+    if task.disease and not _is_hantavirus_like(task.disease):
+        warnings.append("extraction_record_model_still_hantavirus_named")
+    return warnings
+
+
 def task_intake_and_scope_planning(state: DataCollectionState) -> dict:
     """Build a deterministic CollectionSpec with light scope inference."""
 
     user_request = state.get("user_request", "") or ""
+    task, input_source = _structured_task_from_state(state)
+    task_user_request = task.user_request or user_request
 
-    geography = _infer_geography(user_request)
-    time_window = _infer_time_window(user_request)
+    disease = _clean_str(task.disease) or _DEFAULT_DISEASE
+    geography = _clean_str(task.location) or _infer_geography(task_user_request or "")
+    time_window = _time_window(task.start_date, task.end_date, task_user_request or "")
+    required_fields = list(task.target_fields or []) or list(_DEFAULT_REQUIRED_FIELDS)
+    source_priority = _source_priority_from_preferences(task.source_preferences)
+    warnings = _task_input_warnings(task)
 
     spec = CollectionSpec(
-        task_type="public_health_case_and_outbreak_collection",
-        disease="Hantavirus disease",
-        target_population="human",
-        data_focus="human hantavirus case, outbreak, and surveillance data",
+        task_type=_DEFAULT_TASK_TYPE,
+        disease=disease,
+        target_population=_DEFAULT_TARGET_POPULATION,
+        data_focus=_data_focus(disease),
         geography=geography,
         time_window=time_window,
-        required_fields=[
-            "disease",
-            "virus_or_syndrome",
-            "country",
-            "subnational_location",
-            "date_reported",
-            "event_start_date",
-            "event_end_date",
-            "cases_confirmed",
-            "cases_probable",
-            "cases_suspected",
-            "cases_unspecified",
-            "deaths",
-            "case_definition",
-            "source_url",
-            "source_type",
-            "evidence_quote",
-        ],
-        source_priority=[
-            "official_public_health_agency",
-            "international_organization_report",
-            "peer_reviewed_literature",
-            "structured_database",
-            "news_and_situation_report",
-        ],
+        required_fields=required_fields,
+        source_priority=source_priority,
+        start_date=_clean_str(task.start_date),
+        end_date=_clean_str(task.end_date),
+        target_fields=required_fields,
+        source_preferences=task.source_preferences,
+        collection_mode=_clean_str(task.collection_mode),
+        user_request=task_user_request,
+        run_label=_clean_str(task.run_label),
+        task_input_source=input_source,
+        task_input_warnings=warnings,
+    )
+    summary = {
+        "input_source": input_source,
+        "structured_task_present": bool(state.get("structured_task")),
+        "disease": spec.disease,
+        "location": spec.geography,
+        "start_date": spec.start_date,
+        "end_date": spec.end_date,
+        "time_window": spec.time_window,
+        "target_field_count": len(spec.required_fields),
+        "source_preference_count": len(spec.source_priority),
+        "collection_mode": spec.collection_mode,
+        "run_label": spec.run_label,
+        "warnings": warnings,
+    }
+    message = (
+        "Built CollectionSpec from structured task input."
+        if input_source != "legacy_user_request"
+        else "Built backward-compatible CollectionSpec from legacy user_request/defaults."
     )
     trace = append_trace(
         state,
         node_name="task_intake_and_scope_planning",
-        message="Built deterministic CollectionSpec for hantavirus human case, outbreak, and surveillance data.",
+        message=message,
         metadata={
             "task_type": spec.task_type,
             "disease": spec.disease,
             "geography": spec.geography,
             "time_window": spec.time_window,
+            "task_input_source": input_source,
+            "target_field_count": len(spec.required_fields),
+            "warnings": warnings,
         },
     )
     return {
+        "structured_task": task.model_dump(),
         "collection_spec": spec.model_dump(),
+        "task_intake_summary": summary,
         "collection_trace": trace,
     }
 
 
-def hantavirus_profile_and_schema_setup(state: DataCollectionState) -> dict:
-    """Load and validate the hantavirus profile, collection schema, and source strategy."""
+def _generic_disease_intelligence(spec: dict) -> DiseaseIntelligenceProfile:
+    disease = _clean_str(spec.get("disease")) or "unknown disease"
+    location = _clean_str(spec.get("geography")) or "{location}"
+    time_window = _clean_str(spec.get("time_window")) or "{time_window}"
+    fields = _as_str_list(spec.get("required_fields"))
+    return DiseaseIntelligenceProfile(
+        disease_input=disease,
+        disease_standard_name=disease,
+        disease_category="infectious disease",
+        aliases=[disease],
+        case_count_terms=["cases", "case counts"],
+        death_terms=["deaths"],
+        surveillance_terms=[f"{disease} surveillance"],
+        outbreak_terms=["outbreak", "public health alert"],
+        official_source_terms=["public health agency", "health department"],
+        likely_reporting_agencies=["public health agency", "health department"],
+        preferred_source_categories=[
+            "official_public_health_agency",
+            "international_organization_report",
+            "peer_reviewed_literature",
+        ],
+        validation_source_categories=[
+            "official_public_health_agency",
+            "structured_database",
+        ],
+        suggested_geographic_granularity="task_defined",
+        suggested_time_granularity="task_defined",
+        extraction_priority_fields=fields or _DEFAULT_REQUIRED_FIELDS,
+        count_semantics_notes=[
+            "Generic deterministic fallback; disease-specific count semantics are not curated."
+        ],
+        disambiguation_risks=[
+            "Disease-specific exclusions are not curated for this task."
+        ],
+        exclusion_terms=["unrelated disease", "animal-only data without human cases"],
+        suggested_query_terms=[disease, f"{disease} cases", f"{disease} deaths"],
+        suggested_query_templates=[
+            f'"{disease}" cases deaths "{location}" {time_window}'.strip(),
+            f'"{disease}" surveillance "{location}" {time_window}'.strip(),
+        ],
+        confidence=0.5,
+        generation_method="generic_deterministic_fallback",
+        warnings=["generic_disease_intelligence_fallback_used"],
+    )
 
-    profile_dict = load_hantavirus_profile()
-    schema_dict = load_hantavirus_collection_schema()
-    strategy_dict = load_source_strategy()
 
-    profile = DiseaseProfile(**profile_dict)
-    schema = CollectionSchema(**schema_dict)
-    strategy = SourceStrategy(**strategy_dict)
+def _render_query_templates(profile: DiseaseIntelligenceProfile, spec: dict) -> list[str]:
+    location = _clean_str(spec.get("geography")) or "{location}"
+    time_window = _clean_str(spec.get("time_window")) or "{time_window}"
+    rendered = []
+    for template in profile.suggested_query_templates:
+        rendered.append(
+            str(template)
+            .replace("{location}", location)
+            .replace("{time_window}", time_window)
+            .strip()
+        )
+    return rendered
 
+
+def _profile_from_curated_or_generic(spec: dict) -> DiseaseIntelligenceProfile:
+    disease = _clean_str(spec.get("disease"))
+    curated = load_disease_intelligence_profile(disease)
+    if curated is not None:
+        profile = DiseaseIntelligenceProfile(**curated)
+    else:
+        profile = _generic_disease_intelligence(spec)
+    profile.suggested_query_templates = _render_query_templates(profile, spec)
+    return profile
+
+
+def _disease_intelligence_prompt(spec: dict, curated_profile: dict | None) -> str:
+    payload = {
+        "instruction": (
+            "Generate disease intelligence for source planning only. Do not "
+            "perform web search, do not provide URLs, and do not claim source "
+            "discovery. Return structured terminology, source needs, query "
+            "terms, validation source categories, extraction priorities, and "
+            "warnings."
+        ),
+        "collection_spec": spec,
+        "curated_profile_available": curated_profile is not None,
+        "curated_profile_hint": curated_profile or {},
+    }
+    return json.dumps(payload, ensure_ascii=True, indent=2)
+
+
+def _llm_force_enabled() -> bool:
+    return (
+        os.environ.get("HDC_DISEASE_INTELLIGENCE_FORCE_LLM") or ""
+    ).strip().lower() == "true"
+
+
+def _llm_fallback_to_curated() -> bool:
+    return (
+        os.environ.get("HDC_DISEASE_INTELLIGENCE_FALLBACK_TO_CURATED") or "true"
+    ).strip().lower() != "false"
+
+
+def _build_disease_intelligence_summary(
+    profile: DiseaseIntelligenceProfile,
+) -> dict:
+    return {
+        "disease_input": profile.disease_input,
+        "disease_standard_name": profile.disease_standard_name,
+        "generation_method": profile.generation_method,
+        "alias_count": len(profile.aliases),
+        "pathogen_term_count": len(profile.pathogen_terms),
+        "source_category_count": len(profile.preferred_source_categories),
+        "query_term_count": len(profile.suggested_query_terms),
+        "source_need_count": len(profile.likely_reporting_agencies)
+        + len(profile.official_source_terms),
+        "warnings": list(profile.warnings),
+    }
+
+
+def disease_intelligence_builder(state: DataCollectionState) -> dict:
+    """Build disease-specific terminology and source-need intelligence."""
+
+    spec = state.get("collection_spec") or {}
+    disease = _clean_str(spec.get("disease"))
+    curated_raw = load_disease_intelligence_profile(disease)
+    llm_enabled = llm_clients.llm_disease_intelligence_enabled()
+    generation_error: Exception | None = None
+
+    if llm_enabled:
+        try:
+            raw = llm_clients.run_pydantic_structured_llm(
+                system_prompt=(
+                    "You create auditable disease intelligence for the data "
+                    "collection workflow. Return only structured source-planning "
+                    "intelligence; do not search the web and do not invent URLs."
+                ),
+                user_prompt=_disease_intelligence_prompt(spec, curated_raw),
+                schema_model=DiseaseIntelligenceProfile,
+                temperature=0.0,
+            )
+            profile = DiseaseIntelligenceProfile(**raw)
+            profile.generation_method = "llm_generated"
+            profile.suggested_query_templates = _render_query_templates(profile, spec)
+        except Exception as exc:  # noqa: BLE001 - advisory LLM falls back
+            generation_error = exc
+        else:
+            summary = _build_disease_intelligence_summary(profile)
+            trace = append_trace(
+                state,
+                node_name="disease_intelligence_builder",
+                message=(
+                    "Built disease intelligence from LLM output "
+                    f"({profile.disease_standard_name})."
+                ),
+                metadata={
+                    **summary,
+                    "llm_enabled": True,
+                    "llm_failed": False,
+                },
+            )
+            return {
+                "disease_intelligence": profile.model_dump(),
+                "disease_intelligence_summary": summary,
+                "collection_trace": trace,
+            }
+
+    if generation_error is not None and (curated_raw is not None or _llm_fallback_to_curated()):
+        profile = _profile_from_curated_or_generic(spec)
+        if curated_raw is not None:
+            profile.generation_method = "llm_failed_curated_fallback"
+            warning = "llm_disease_intelligence_failed_curated_fallback"
+        else:
+            profile.generation_method = "generic_deterministic_fallback"
+            warning = "llm_disease_intelligence_failed_generic_fallback"
+        if warning not in profile.warnings:
+            profile.warnings.append(warning)
+        profile.warnings.append(
+            f"llm_failure_type:{type(generation_error).__name__}"
+        )
+    elif _llm_force_enabled() and curated_raw is None:
+        profile = _generic_disease_intelligence(spec)
+    else:
+        profile = _profile_from_curated_or_generic(spec)
+
+    summary = _build_disease_intelligence_summary(profile)
     trace = append_trace(
         state,
-        node_name="hantavirus_profile_and_schema_setup",
-        message=f"Loaded hantavirus profile ({profile.disease_standard_name}), collection schema ({schema.schema_name}), and source strategy.",
+        node_name="disease_intelligence_builder",
+        message=(
+            "Built disease intelligence "
+            f"({profile.disease_standard_name}, generation_method={profile.generation_method})."
+        ),
         metadata={
-            "disease_standard_name": profile.disease_standard_name,
-            "include_term_count": len(profile.include_terms),
-            "virus_term_count": len(profile.virus_terms),
-            "core_field_count": len(schema.core_fields),
-            "source_category_count": len(strategy.source_categories),
+            **summary,
+            "llm_enabled": llm_enabled,
+            "llm_failed": generation_error is not None,
         },
+    )
+    return {
+        "disease_intelligence": profile.model_dump(),
+        "disease_intelligence_summary": summary,
+        "collection_trace": trace,
+    }
+
+
+def _unique_preserve_order(values) -> list[str]:
+    result: list[str] = []
+    seen: set[str] = set()
+    for value in _as_str_list(values):
+        key = value.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(value)
+    return result
+
+
+def _schema_slug(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
+    return slug or "generic_disease"
+
+
+def _primary_data_objects(
+    target_fields: list[str],
+    extraction_priority_fields: list[str],
+) -> list[str]:
+    joined = " ".join(target_fields + extraction_priority_fields).lower()
+    objects = ["human case record", "surveillance summary"]
+    if "death" in joined:
+        objects.append("death record")
+    if "hospital" in joined or "icu" in joined:
+        objects.append("hospitalization record")
+    if "outbreak" in joined:
+        objects.append("outbreak event")
+    return _unique_preserve_order(objects)
+
+
+def _build_generated_disease_profile(
+    intelligence: DiseaseIntelligenceProfile,
+    spec: CollectionSpec,
+) -> DiseaseProfile:
+    include_terms = _unique_preserve_order(
+        [
+            intelligence.disease_standard_name,
+            *intelligence.aliases,
+            *intelligence.abbreviations,
+            *intelligence.suggested_query_terms,
+            *intelligence.pathogen_terms,
+        ]
+    )
+    required_fields = _unique_preserve_order(
+        [
+            *spec.required_fields,
+            *spec.target_fields,
+            *intelligence.extraction_priority_fields,
+        ]
+    )
+    return DiseaseProfile(
+        disease_standard_name=intelligence.disease_standard_name,
+        disease_family=intelligence.disease_category,
+        include_terms=include_terms,
+        syndrome_terms=_unique_preserve_order(intelligence.syndrome_terms),
+        virus_terms=_unique_preserve_order(intelligence.pathogen_terms),
+        exclude_terms=_unique_preserve_order(intelligence.exclusion_terms),
+        target_population=spec.target_population or _DEFAULT_TARGET_POPULATION,
+        primary_data_objects=_primary_data_objects(
+            required_fields,
+            intelligence.extraction_priority_fields,
+        ),
+        required_record_fields=required_fields,
+    )
+
+
+_GENERIC_SCHEMA_BASE_FIELDS = [
+    "disease",
+    "virus_or_syndrome",
+    "country",
+    "subnational_location",
+    "date_reported",
+    "event_start_date",
+    "event_end_date",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "case_definition",
+    "source_id",
+    "source_url",
+    "source_type",
+    "evidence_quote",
+    "supporting_chunk_id",
+    "statistical_count_type",
+    "reporting_period",
+    "as_of_date",
+    "geographic_scope",
+    "geographic_scope_type",
+]
+
+_REQUIRED_SCHEMA_FIELDS = {
+    "disease",
+    "source_url",
+    "source_type",
+    "evidence_quote",
+}
+
+_FIELD_TYPES = {
+    "cases_confirmed": "non_negative_number_or_null",
+    "cases_probable": "non_negative_number_or_null",
+    "cases_suspected": "non_negative_number_or_null",
+    "cases_unspecified": "non_negative_number_or_null",
+    "deaths": "non_negative_number_or_null",
+    "source_url": "string",
+    "source_type": "string",
+    "evidence_quote": "string",
+}
+
+_FIELD_DESCRIPTIONS = {
+    "disease": "Standard disease name for the requested task.",
+    "virus_or_syndrome": "Specific pathogen, syndrome, or disease subtype if stated by the source.",
+    "country": "Country where the human cases, deaths, outbreak, or surveillance data occurred.",
+    "subnational_location": "State, province, city, county, district, hospital, or other subnational location as stated.",
+    "date_reported": "Date when the data were reported or published; preserve partial dates when needed.",
+    "event_start_date": "Start date of the case event, outbreak, or reporting period if explicitly stated.",
+    "event_end_date": "End date of the case event, outbreak, or reporting period if explicitly stated.",
+    "cases_confirmed": "Laboratory-confirmed or source-defined confirmed human cases.",
+    "cases_probable": "Source-defined probable human cases.",
+    "cases_suspected": "Source-defined suspected human cases.",
+    "cases_unspecified": "Human cases where confirmation status is not clearly stated.",
+    "deaths": "Deaths attributed to the reported disease event or surveillance period.",
+    "case_definition": "Case definition or count label used by the source.",
+    "source_id": "Workflow source identifier when available.",
+    "source_url": "URL of the source from which the record was extracted.",
+    "source_type": "Source category used by the data collection workflow.",
+    "evidence_quote": "Verbatim source text supporting the extracted record.",
+    "supporting_chunk_id": "Evidence chunk identifier supporting the extracted record.",
+    "statistical_count_type": "Count semantics such as cumulative, annual, newly_reported, or point-in-time.",
+    "reporting_period": "Reporting period or temporal aggregation window stated by the source.",
+    "as_of_date": "Cutoff date for cumulative or dashboard-style counts when stated.",
+    "geographic_scope": "Regional, multi-country, national, or subnational geographic scope if not represented by country alone.",
+    "geographic_scope_type": "Canonical scope type such as country, subnational, region, multi_country, or global.",
+}
+
+
+def _field_spec(name: str) -> DataFieldSpec:
+    return DataFieldSpec(
+        name=name,
+        type=_FIELD_TYPES.get(name, "string_or_null"),
+        required=name in _REQUIRED_SCHEMA_FIELDS,
+        description=_FIELD_DESCRIPTIONS.get(
+            name,
+            "User-requested target field retained for profile/schema planning.",
+        ),
+    )
+
+
+def _unsupported_target_field_warnings(fields: list[str]) -> list[str]:
+    supported = set(HantavirusRecord.model_fields)
+    return [
+        f"target_field_not_yet_supported_by_record_model:{field}"
+        for field in fields
+        if field not in supported
+    ]
+
+
+def _build_generated_collection_schema(
+    intelligence: DiseaseIntelligenceProfile,
+    spec: CollectionSpec,
+    generation_method: str,
+    warnings: list[str],
+) -> CollectionSchema:
+    field_names = _unique_preserve_order(
+        [
+            *_GENERIC_SCHEMA_BASE_FIELDS,
+            *spec.required_fields,
+            *spec.target_fields,
+            *intelligence.extraction_priority_fields,
+        ]
+    )
+    disease_name = intelligence.disease_standard_name
+    rules = [
+        f"Extract only human public-health records about {disease_name}.",
+        "Keep confirmed, probable, suspected, unspecified, death, hospitalization, and surveillance metrics separate when the source distinguishes them.",
+        "Do not infer missing values or calculate derived metrics unless explicitly stated in the source.",
+        "Every extracted record must preserve source_url, source_type, evidence_quote, and supporting_chunk_id when available.",
+        "Preserve reporting_period, as_of_date, statistical_count_type, geographic_scope, and geographic_scope_type when the source states count semantics or aggregate geography.",
+        "Current extraction record model remains HantavirusRecord; unsupported target fields are retained in schema planning with warnings.",
+        *warnings,
+    ]
+    return CollectionSchema(
+        schema_name=f"{_schema_slug(disease_name)}_public_health_collection_schema",
+        schema_version="0.3",
+        description=(
+            "Disease-aware generic public-health collection schema generated "
+            f"for {disease_name} from structured task input and disease intelligence."
+        ),
+        record_type="public_health_case_or_outbreak_record",
+        core_fields=[_field_spec(name) for name in field_names],
+        extraction_rules=rules,
+    )
+
+
+_CANONICAL_SOURCE_TYPES = [
+    "official_public_health_agency",
+    "international_organization_report",
+    "peer_reviewed_literature",
+    "structured_database",
+    "news_and_situation_report",
+]
+
+
+def _source_type_priorities(spec: CollectionSpec, intelligence: DiseaseIntelligenceProfile) -> dict[str, int]:
+    ordered = _unique_preserve_order(
+        [
+            *spec.source_priority,
+            *intelligence.preferred_source_categories,
+            *intelligence.validation_source_categories,
+            *_CANONICAL_SOURCE_TYPES,
+        ]
+    )
+    return {source_type: index + 1 for index, source_type in enumerate(ordered)}
+
+
+def _build_generated_source_strategy(
+    intelligence: DiseaseIntelligenceProfile,
+    spec: CollectionSpec,
+) -> SourceStrategy:
+    priorities = _source_type_priorities(spec, intelligence)
+    source_need_text = ", ".join(
+        _unique_preserve_order(
+            [*intelligence.likely_reporting_agencies, *intelligence.official_source_terms]
+        )[:5]
+    )
+    categories = [
+        SourceCategory(
+            source_type="official_public_health_agency",
+            priority=priorities.get("official_public_health_agency", 1),
+            description=(
+                "Official public health agencies reporting disease-specific "
+                f"case, death, hospitalization, outbreak, or surveillance data. "
+                f"Likely source needs: {source_need_text or 'health department reports'}."
+            ),
+            example_domains=["cdc.gov", "who.int", "ecdc.europa.eu"],
+        ),
+        SourceCategory(
+            source_type="international_organization_report",
+            priority=priorities.get("international_organization_report", 2),
+            description=(
+                "International or regional health organization reports with "
+                "disease-specific surveillance or situation updates."
+            ),
+            example_domains=["who.int", "paho.org", "ecdc.europa.eu"],
+        ),
+        SourceCategory(
+            source_type="peer_reviewed_literature",
+            priority=priorities.get("peer_reviewed_literature", 3),
+            description=(
+                "Peer-reviewed studies containing human case series, outbreak, "
+                "surveillance, or epidemiological data for the requested disease."
+            ),
+            example_databases=["PubMed", "Europe PMC", "OpenAlex"],
+        ),
+        SourceCategory(
+            source_type="structured_database",
+            priority=priorities.get("structured_database", 4),
+            description=(
+                "Structured public-health dashboards, line lists, open data "
+                "portals, or surveillance datasets for requested metrics."
+            ),
+            example_sources=["line lists", "surveillance datasets", "open data portals"],
+        ),
+        SourceCategory(
+            source_type="news_and_situation_report",
+            priority=priorities.get("news_and_situation_report", 5),
+            description=(
+                "Reputable news reports, situation reports, or alerts that may "
+                "contain early disease-specific outbreak signals."
+            ),
+            example_sources=["news reports", "situation updates", "public alerts"],
+        ),
+    ]
+    disease_name = intelligence.disease_standard_name
+    location = spec.geography or "the requested geography"
+    time_window = spec.time_window or "the requested time window"
+    criteria = ScreeningCriteria(
+        include_if_all_apply=[
+            f"The source is about {disease_name} or a listed alias/pathogen term from the disease intelligence profile.",
+            f"The source concerns human cases, deaths, hospitalizations, outbreaks, or surveillance data for {location} during {time_window}.",
+            "The source contains or is likely to contain at least one requested target field or a supporting evidence quote.",
+        ],
+        exclude_if_any_apply=[
+            "The source is only background, prevention-only, clinical overview, vector/animal surveillance, or laboratory-only content without human extractable data.",
+            f"The source is unrelated to {disease_name}.",
+            "The source lacks extractable counts, dates, locations, provenance, or evidence text for the requested task.",
+            "The source is a duplicate of an already registered source.",
+        ],
+        uncertain_if_any_apply=[
+            "Disease match is unclear from the title, snippet, or document text.",
+            "Geography, time window, source provenance, or count semantics are unclear.",
+            "The source may mix disease-specific counts with broader syndrome, pathogen-family, or all-condition counts.",
+        ],
+    )
+    return SourceStrategy(source_categories=categories, screening_criteria=criteria)
+
+
+def _profile_schema_generation_method(intelligence: DiseaseIntelligenceProfile) -> str:
+    if intelligence.generation_method == "generic_deterministic_fallback":
+        return "generic_fallback_profile_schema"
+    return "disease_intelligence_generated_profile_schema"
+
+
+def _profile_schema_summary(
+    *,
+    spec: CollectionSpec,
+    profile: DiseaseProfile,
+    schema: CollectionSchema,
+    strategy: SourceStrategy,
+    generation_method: str,
+    warnings: list[str],
+) -> dict:
+    return {
+        "disease": spec.disease,
+        "profile_generation_method": generation_method,
+        "schema_generation_method": generation_method,
+        "source_strategy_generation_method": generation_method,
+        "disease_profile_standard_name": profile.disease_standard_name,
+        "collection_schema_name": schema.schema_name,
+        "collection_schema_version": schema.schema_version,
+        "core_field_count": len(schema.core_fields),
+        "target_field_count": len(spec.required_fields),
+        "target_fields": list(spec.required_fields),
+        "source_category_count": len(strategy.source_categories),
+        "warnings": list(warnings),
+    }
+
+
+def profile_and_schema_setup(state: DataCollectionState) -> dict:
+    """Build active disease profile, collection schema, and source strategy."""
+
+    spec = CollectionSpec(**(state.get("collection_spec") or {}))
+    if _is_hantavirus_like(spec.disease):
+        profile = DiseaseProfile(**load_hantavirus_profile())
+        schema = CollectionSchema(**load_hantavirus_collection_schema())
+        strategy = SourceStrategy(**load_source_strategy())
+        generation_method = "legacy_hantavirus_profile_schema"
+        warnings: list[str] = []
+    else:
+        intelligence = DiseaseIntelligenceProfile(**(state.get("disease_intelligence") or {}))
+        warnings = _unique_preserve_order(
+            [
+                "source_discovery_not_yet_disease_generic",
+                "extraction_record_model_still_hantavirus_named",
+                "extraction_record_schema_not_yet_disease_generic",
+                *_unsupported_target_field_warnings(
+                    _unique_preserve_order(
+                        [
+                            *spec.required_fields,
+                            *spec.target_fields,
+                            *intelligence.extraction_priority_fields,
+                        ]
+                    )
+                ),
+            ]
+        )
+        generation_method = _profile_schema_generation_method(intelligence)
+        profile = _build_generated_disease_profile(intelligence, spec)
+        schema = _build_generated_collection_schema(
+            intelligence,
+            spec,
+            generation_method,
+            warnings,
+        )
+        strategy = _build_generated_source_strategy(intelligence, spec)
+
+    summary = _profile_schema_summary(
+        spec=spec,
+        profile=profile,
+        schema=schema,
+        strategy=strategy,
+        generation_method=generation_method,
+        warnings=warnings,
+    )
+    trace = append_trace(
+        state,
+        node_name="profile_and_schema_setup",
+        message=(
+            "Built active disease profile, collection schema, and source "
+            f"strategy ({profile.disease_standard_name}, generation_method={generation_method})."
+        ),
+        metadata=summary,
     )
     return {
         "disease_profile": profile.model_dump(),
         "collection_schema": schema.model_dump(),
         "source_strategy": strategy.model_dump(),
         "screening_criteria": strategy.screening_criteria.model_dump(),
+        "profile_schema_summary": summary,
+        "collection_trace": trace,
+    }
+
+
+def hantavirus_profile_and_schema_setup(state: DataCollectionState) -> dict:
+    """Backward-compatible alias for profile_and_schema_setup."""
+
+    return profile_and_schema_setup(state)
+
+
+def _source_plan_target_fields(spec: dict, schema_dict: dict | None) -> list[str]:
+    fields = _as_str_list(spec.get("required_fields")) or _as_str_list(
+        spec.get("target_fields")
+    )
+    if fields:
+        return fields
+    schema_fields = []
+    for field in (schema_dict or {}).get("core_fields") or []:
+        if isinstance(field, dict) and field.get("name"):
+            schema_fields.append(str(field["name"]))
+    return schema_fields or _expected_fields_default()
+
+
+def _source_plan_disease_terms(
+    profile: DiseaseProfile,
+    disease_intelligence: dict,
+) -> list[str]:
+    return _unique_preserve_order(
+        [
+            *(_as_str_list(disease_intelligence.get("suggested_query_terms"))[:6]),
+            *(_as_str_list(disease_intelligence.get("aliases"))[:4]),
+            *(_as_str_list(disease_intelligence.get("abbreviations"))[:4]),
+            *(_as_str_list(disease_intelligence.get("pathogen_terms"))[:4]),
+            *profile.include_terms[:6],
+            *profile.syndrome_terms[:4],
+            *profile.virus_terms[:4],
+            profile.disease_standard_name,
+        ]
+    )
+
+
+def _source_plan_location_terms(geography: str | None) -> list[str]:
+    if not geography:
+        return []
+    if geography.lower() == "global":
+        return ["global"]
+    return [geography]
+
+
+def _source_plan_time_terms(time_window: str | None) -> list[str]:
+    if not time_window:
+        return []
+    years = re.findall(r"\d{4}", time_window)
+    return _unique_preserve_order([time_window, *years])
+
+
+def _plan_slug(value: str | None) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "_", (value or "").lower()).strip("_")
+    return slug or "unspecified"
+
+
+def _source_role_hint(source_type: str) -> str:
+    mapping = {
+        "official_public_health_agency": "collection",
+        "international_organization_report": "validation",
+        "peer_reviewed_literature": "context",
+        "structured_database": "validation",
+        "news_and_situation_report": "collection_support",
+    }
+    return mapping.get(source_type, "collection_support")
+
+
+def _source_query_type(source_type: str) -> str:
+    mapping = {
+        "official_public_health_agency": "official_site",
+        "international_organization_report": "domain_limited",
+        "peer_reviewed_literature": "literature",
+        "structured_database": "database",
+        "news_and_situation_report": "news",
+    }
+    return mapping.get(source_type, "general_web")
+
+
+def _source_provider_channel(source_type: str) -> str:
+    mapping = {
+        "official_public_health_agency": "official_site_search",
+        "international_organization_report": "official_site_search",
+        "peer_reviewed_literature": "literature_api",
+        "structured_database": "database_search",
+        "news_and_situation_report": "news_search",
+    }
+    return mapping.get(source_type, "web_search")
+
+
+def _category_expected_fields(source_type: str, target_fields: list[str]) -> list[str]:
+    if source_type == "peer_reviewed_literature":
+        return _unique_preserve_order(
+            [*target_fields, "case_definition", "evidence_quote"]
+        )
+    if source_type == "structured_database":
+        return _unique_preserve_order(
+            [*target_fields, "cases_confirmed", "deaths", "date_reported"]
+        )
+    if source_type == "news_and_situation_report":
+        return _unique_preserve_order(
+            [*target_fields, "subnational_location", "evidence_quote"]
+        )
+    return list(target_fields)
+
+
+def _source_plan_objectives(
+    disease_name: str,
+    geography: str | None,
+    time_window: str | None,
+) -> list[dict]:
+    location = geography or "the requested geography"
+    period = time_window or "the requested time window"
+    return [
+        {
+            "objective_id": "obj_collection_001",
+            "objective": (
+                f"Identify primary reporting sources for {disease_name} human "
+                f"cases and deaths in {location} during {period}."
+            ),
+            "source_role_hint": "collection",
+            "rationale": "Collection sources should contain extractable records.",
+            "priority": 1,
+        },
+        {
+            "objective_id": "obj_validation_001",
+            "objective": (
+                "Identify independent summary or structured sources to compare "
+                "against collected records."
+            ),
+            "source_role_hint": "validation",
+            "rationale": "Held-back or independent sources support masked validation.",
+            "priority": 2,
+        },
+        {
+            "objective_id": "obj_context_001",
+            "objective": (
+                "Identify context sources for disease terminology, case definitions, "
+                "and count semantics."
+            ),
+            "source_role_hint": "context",
+            "rationale": "Context sources help interpret extraction and normalization.",
+            "priority": 3,
+        },
+        {
+            "objective_id": "obj_review_001",
+            "objective": (
+                "Flag ambiguous source roles, validation leakage risk, or unclear "
+                "count semantics for human review."
+            ),
+            "source_role_hint": "human_review",
+            "rationale": "Uncertain sources should not silently enter extraction.",
+            "priority": 4,
+        },
+    ]
+
+
+def _planned_source_categories(
+    strategy: SourceStrategy,
+    target_fields: list[str],
+) -> list[dict]:
+    categories = []
+    for index, category in enumerate(strategy.source_categories, start=1):
+        source_type = category.source_type
+        if source_type not in _EXECUTABLE_SOURCE_TYPES:
+            continue
+        categories.append(
+            {
+                "source_category_id": f"cat_{index:03d}_{source_type}",
+                "source_type": source_type,
+                "role_hint": _source_role_hint(source_type),
+                "priority": category.priority,
+                "expected_fields": _category_expected_fields(
+                    source_type, target_fields
+                ),
+                "why_relevant": category.description,
+                "risk_notes": [
+                    "planned_only_not_executed_stage4",
+                    "requires_later_search_result_screening",
+                ],
+            }
+        )
+    return categories
+
+
+def _query_location_suffix(location_terms: list[str]) -> str:
+    return f" {' '.join(location_terms)}" if location_terms else ""
+
+
+def _query_time_suffix(time_terms: list[str]) -> str:
+    return f" {' '.join(time_terms[:2])}" if time_terms else ""
+
+
+def _planned_query_text(
+    source_type: str,
+    term: str,
+    location_terms: list[str],
+    time_terms: list[str],
+) -> str:
+    location_suffix = _query_location_suffix(location_terms)
+    time_suffix = _query_time_suffix(time_terms)
+    if source_type == "official_public_health_agency":
+        return f'"{term}" cases deaths public health{location_suffix}{time_suffix}'.strip()
+    if source_type == "international_organization_report":
+        return f'"{term}" outbreak report surveillance{location_suffix}{time_suffix}'.strip()
+    if source_type == "peer_reviewed_literature":
+        return f'"{term}" epidemiology cases deaths{location_suffix}{time_suffix}'.strip()
+    if source_type == "structured_database":
+        return f'"{term}" surveillance dataset cases deaths{location_suffix}{time_suffix}'.strip()
+    return f'"{term}" outbreak report cases deaths{location_suffix}{time_suffix}'.strip()
+
+
+def _planned_queries(
+    categories: list[dict],
+    disease_terms: list[str],
+    location_terms: list[str],
+    time_terms: list[str],
+) -> list[dict]:
+    queries = []
+    seen: set[str] = set()
+    primary_terms = disease_terms[:3] or [_DEFAULT_DISEASE]
+    for category in categories:
+        source_type = category["source_type"]
+        for term in primary_terms[:2]:
+            query = _planned_query_text(
+                source_type, term, location_terms, time_terms
+            )
+            if query in seen:
+                continue
+            seen.add(query)
+            queries.append(
+                {
+                    "query_id": f"q_exec_{len(queries) + 1:03d}",
+                    "query": query,
+                    "query_type": _source_query_type(source_type),
+                    "provider_channel": _source_provider_channel(source_type),
+                    "source_type": source_type,
+                    "role_hint": category["role_hint"],
+                    "priority": category["priority"],
+                    "expected_fields": list(category["expected_fields"]),
+                    "disease_terms_used": [term],
+                    "location_terms_used": list(location_terms),
+                    "time_terms_used": list(time_terms),
+                    "rationale": (
+                        "Executable search query planned for later source "
+                        f"discovery against {source_type}; not executed in Stage 4."
+                    ),
+                    "execution_status": "planned_not_executed",
+                }
+            )
+    return queries
+
+
+def _source_planning_risks() -> list[dict]:
+    return [
+        {
+            "risk_id": "risk_semantic_leakage_001",
+            "risk": (
+                "A source intended for validation may leak into collection if roles "
+                "are not enforced during later discovery."
+            ),
+            "severity": "high",
+            "applies_to": ["validation", "collection"],
+            "mitigation": "Keep validation-reserved sources separate until evaluation.",
+            "human_review_trigger": True,
+        },
+        {
+            "risk_id": "risk_count_semantics_001",
+            "risk": (
+                "Cumulative, annual, newly reported, and suspected counts may be "
+                "mixed across source categories."
+            ),
+            "severity": "medium",
+            "applies_to": ["collection", "validation", "context"],
+            "mitigation": "Require evidence quotes and count-semantics fields.",
+            "human_review_trigger": True,
+        },
+    ]
+
+
+def _deterministic_executable_source_plan(
+    *,
+    spec: dict,
+    profile: DiseaseProfile,
+    strategy: SourceStrategy,
+    schema_dict: dict | None,
+    disease_intelligence: dict,
+    generation_method: str = "deterministic_executable_source_plan",
+    llm_enabled: bool = False,
+    extra_warnings: list[str] | None = None,
+) -> ExecutableSourcePlan:
+    target_fields = _source_plan_target_fields(spec, schema_dict)
+    disease_name = (
+        disease_intelligence.get("disease_standard_name")
+        or profile.disease_standard_name
+        or spec.get("disease")
+        or _DEFAULT_DISEASE
+    )
+    geography = spec.get("geography")
+    time_window = spec.get("time_window")
+    disease_terms = _source_plan_disease_terms(profile, disease_intelligence)
+    location_terms = _source_plan_location_terms(geography)
+    time_terms = _source_plan_time_terms(time_window)
+    categories = _planned_source_categories(strategy, target_fields)
+    planned_queries = _planned_queries(
+        categories,
+        disease_terms,
+        location_terms,
+        time_terms,
+    )
+    plan = ExecutableSourcePlan(
+        plan_id=(
+            "exec_source_plan_"
+            f"{_plan_slug(disease_name)}_{_plan_slug(geography)}_"
+            f"{_plan_slug(time_window)}"
+        ),
+        disease=disease_name,
+        location=geography,
+        time_window=time_window,
+        target_fields=target_fields,
+        generation_method=generation_method,
+        llm_enabled=llm_enabled,
+        execution_status="planned_not_executed",
+        warnings=_unique_preserve_order(
+            [
+                "source_plan_created_not_executed_stage4",
+                "source_discovery_execution_not_implemented_stage4",
+                *(extra_warnings or []),
+            ]
+        ),
+        source_discovery_objectives=_source_plan_objectives(
+            disease_name,
+            geography,
+            time_window,
+        ),
+        planned_source_categories=categories,
+        planned_queries=planned_queries,
+        source_planning_risks=_source_planning_risks(),
+    )
+    return _sanitize_executable_source_plan(plan)
+
+
+def _sanitize_planned_query_text(query: str) -> str:
+    cleaned = _PLANNED_QUERY_URL_PATTERN.sub("", query or "")
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned
+
+
+def _fallback_query_text(plan_dict: dict, query: dict) -> str:
+    parts = _unique_preserve_order(
+        [
+            *(_as_str_list(query.get("disease_terms_used"))),
+            plan_dict.get("disease"),
+            *(_as_str_list(query.get("location_terms_used"))),
+            plan_dict.get("location"),
+            *(_as_str_list(query.get("time_terms_used"))[:1]),
+            "cases deaths",
+        ]
+    )
+    return " ".join(parts)
+
+
+def _sanitize_executable_source_plan(plan: ExecutableSourcePlan) -> ExecutableSourcePlan:
+    plan_dict = plan.model_dump()
+    warnings = list(plan_dict.get("warnings") or [])
+    plan_dict["execution_status"] = "planned_not_executed"
+    for index, query in enumerate(plan_dict.get("planned_queries") or [], start=1):
+        query["execution_status"] = "planned_not_executed"
+        query["query_id"] = query.get("query_id") or f"q_exec_{index:03d}"
+        original = str(query.get("query") or "")
+        sanitized = _sanitize_planned_query_text(original)
+        if sanitized != original:
+            warnings.append(f"llm_planned_query_url_sanitized:{query['query_id']}")
+        if not sanitized:
+            sanitized = _fallback_query_text(plan_dict, query)
+            warnings.append(f"empty_planned_query_replaced:{query['query_id']}")
+        query["query"] = sanitized
+    plan_dict["warnings"] = _unique_preserve_order(warnings)
+    return ExecutableSourcePlan(**plan_dict)
+
+
+def _build_executable_source_plan_prompt(
+    *,
+    user_request: str,
+    spec: dict,
+    profile: dict,
+    strategy: dict,
+    schema_dict: dict,
+    deterministic_plan: ExecutableSourcePlan,
+) -> tuple[str, str]:
+    system_prompt = (
+        "You create executable source discovery plans for the data collection "
+        "workflow. Return only a JSON object matching the ExecutableSourcePlan "
+        "schema. Do not search the web, fetch URLs, claim that sources were "
+        "found, or add discovered source URLs. Every planned query must have "
+        "execution_status='planned_not_executed'."
+    )
+    payload = {
+        "user_request": user_request,
+        "collection_spec": {
+            "disease": spec.get("disease"),
+            "geography": spec.get("geography"),
+            "time_window": spec.get("time_window"),
+            "target_fields": _source_plan_target_fields(spec, schema_dict),
+        },
+        "disease_profile": {
+            "disease_standard_name": profile.get("disease_standard_name"),
+            "include_terms": _as_str_list(profile.get("include_terms")),
+            "syndrome_terms": _as_str_list(profile.get("syndrome_terms")),
+            "virus_terms": _as_str_list(profile.get("virus_terms")),
+        },
+        "source_strategy": {
+            "source_categories": [
+                {
+                    "source_type": item.get("source_type"),
+                    "priority": item.get("priority"),
+                }
+                for item in strategy.get("source_categories") or []
+                if isinstance(item, dict)
+            ]
+        },
+        "allowed_generation_methods": [
+            "llm_executable_source_plan",
+            "deterministic_executable_source_plan",
+            "llm_failed_deterministic_fallback",
+            "invalid_llm_output_deterministic_fallback",
+        ],
+        "allowed_execution_status": ["planned_not_executed"],
+        "allowed_source_types": list(_EXECUTABLE_SOURCE_TYPES),
+        "allowed_role_hints": [
+            "collection",
+            "validation",
+            "context",
+            "collection_support",
+            "human_review",
+        ],
+        "reference_deterministic_plan_shape": deterministic_plan.model_dump(),
+    }
+    return system_prompt, json.dumps(payload, ensure_ascii=True, indent=2)
+
+
+def _merge_llm_executable_plan(
+    raw: dict,
+    deterministic_plan: ExecutableSourcePlan,
+) -> ExecutableSourcePlan:
+    base = deterministic_plan.model_dump()
+    raw_dict = dict(raw or {})
+    structured_output_mode = raw_dict.pop(
+        "_structured_output_mode",
+        raw_dict.get("structured_output_mode"),
+    )
+    merged = {**base, **raw_dict}
+    merged["plan_id"] = merged.get("plan_id") or base["plan_id"]
+    merged["disease"] = merged.get("disease") or base["disease"]
+    merged["location"] = merged.get("location") or base.get("location")
+    merged["time_window"] = merged.get("time_window") or base.get("time_window")
+    merged["target_fields"] = merged.get("target_fields") or base["target_fields"]
+    merged["generation_method"] = "llm_executable_source_plan"
+    merged["llm_enabled"] = True
+    merged["execution_status"] = "planned_not_executed"
+    merged["source_discovery_objectives"] = (
+        merged.get("source_discovery_objectives")
+        or base["source_discovery_objectives"]
+    )
+    merged["planned_source_categories"] = (
+        merged.get("planned_source_categories") or base["planned_source_categories"]
+    )
+    merged["planned_queries"] = merged.get("planned_queries") or base["planned_queries"]
+    merged["source_planning_risks"] = (
+        merged.get("source_planning_risks") or base["source_planning_risks"]
+    )
+    merged["warnings"] = _unique_preserve_order(
+        [
+            "source_plan_created_not_executed_stage4",
+            "source_discovery_execution_not_implemented_stage4",
+            *(_as_str_list(merged.get("warnings"))),
+        ]
+    )
+    merged["structured_output_mode"] = structured_output_mode
+    return _sanitize_executable_source_plan(ExecutableSourcePlan(**merged))
+
+
+def _executable_source_plan_summary(plan: ExecutableSourcePlan) -> dict:
+    plan_dict = plan.model_dump()
+    queries = plan_dict.get("planned_queries") or []
+    categories = plan_dict.get("planned_source_categories") or []
+    return {
+        "plan_id": plan.plan_id,
+        "disease": plan.disease,
+        "location": plan.location,
+        "time_window": plan.time_window,
+        "target_field_count": len(plan.target_fields),
+        "generation_method": plan.generation_method,
+        "llm_enabled": plan.llm_enabled,
+        "execution_status": plan.execution_status,
+        "objective_count": len(plan.source_discovery_objectives),
+        "planned_source_category_count": len(categories),
+        "planned_query_count": len(queries),
+        "risk_count": len(plan.source_planning_risks),
+        "role_hint_counts": dict(Counter(q.get("role_hint") for q in queries)),
+        "source_type_counts": dict(Counter(q.get("source_type") for q in queries)),
+        "provider_channel_counts": dict(
+            Counter(q.get("provider_channel") for q in queries)
+        ),
+        "warnings": list(plan.warnings),
+    }
+
+
+def _source_planning_agent_summary(
+    *,
+    plan: ExecutableSourcePlan,
+    planning_enabled: bool,
+    status: str,
+    failure_type: str | None = None,
+    failure_message: str | None = None,
+) -> dict:
+    summary = {
+        "llm_source_planning_enabled": planning_enabled,
+        "status": status,
+        "generation_method": plan.generation_method,
+        "execution_status": plan.execution_status,
+        "agent_name": "source_planning_agent",
+        "agent_version": "0.4",
+        "agent_query_count": len(plan.planned_queries),
+        "agent_query_added_count": 0,
+        "agent_candidate_hint_count": 0,
+        "human_review_recommended": any(
+            risk.human_review_trigger for risk in plan.source_planning_risks
+        ),
+        "warnings": list(plan.warnings),
+        "structured_output_mode": plan.structured_output_mode,
+    }
+    if failure_type:
+        summary["failure_type"] = failure_type
+    if failure_message:
+        summary["failure_message"] = failure_message
+    return summary
+
+
+def executable_source_planning(state: DataCollectionState) -> dict:
+    """Create an auditable executable source discovery plan without executing it."""
+
+    spec_dict = state.get("collection_spec") or {}
+    profile_dict = state.get("disease_profile") or load_hantavirus_profile()
+    strategy_dict = state.get("source_strategy") or load_source_strategy()
+    schema_dict = state.get("collection_schema") or load_hantavirus_collection_schema()
+    disease_intelligence = state.get("disease_intelligence") or {}
+    profile = DiseaseProfile(**profile_dict)
+    strategy = SourceStrategy(**strategy_dict)
+    planning_enabled = llm_clients.llm_source_planning_enabled()
+
+    deterministic_plan = _deterministic_executable_source_plan(
+        spec=spec_dict,
+        profile=profile,
+        strategy=strategy,
+        schema_dict=schema_dict,
+        disease_intelligence=disease_intelligence,
+        llm_enabled=False,
+    )
+    plan = deterministic_plan
+    status = "deterministic_plan_created"
+    failure_type: str | None = None
+    failure_message: str | None = None
+
+    if planning_enabled:
+        system_prompt, user_prompt = _build_executable_source_plan_prompt(
+            user_request=state.get("user_request", "") or "",
+            spec=spec_dict,
+            profile=profile_dict,
+            strategy=strategy_dict,
+            schema_dict=schema_dict,
+            deterministic_plan=deterministic_plan,
+        )
+        try:
+            raw = llm_clients.run_pydantic_structured_llm(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                schema_model=ExecutableSourcePlan,
+                temperature=0.0,
+            )
+            plan = _merge_llm_executable_plan(raw, deterministic_plan)
+            status = "success"
+        except Exception as exc:  # noqa: BLE001 - fallback keeps offline path usable
+            failure_type = type(exc).__name__
+            failure_message = str(exc)
+            fallback_method = "llm_failed_deterministic_fallback"
+            plan = _deterministic_executable_source_plan(
+                spec=spec_dict,
+                profile=profile,
+                strategy=strategy,
+                schema_dict=schema_dict,
+                disease_intelligence=disease_intelligence,
+                generation_method=fallback_method,
+                llm_enabled=True,
+                extra_warnings=[
+                    "llm_source_planning_failed_deterministic_fallback_used",
+                    f"llm_source_planning_failure_type:{failure_type}",
+                ],
+            )
+            status = "failed_deterministic_fallback"
+
+    plan_summary = _executable_source_plan_summary(plan)
+    source_planning_summary = _source_planning_agent_summary(
+        plan=plan,
+        planning_enabled=planning_enabled,
+        status=status,
+        failure_type=failure_type,
+        failure_message=failure_message,
+    )
+    trace = append_trace(
+        state,
+        node_name="executable_source_planning",
+        message=(
+            f"Built executable source plan with {len(plan.planned_queries)} "
+            "planned queries; no searches were executed."
+        ),
+        metadata=plan_summary,
+    )
+    return {
+        "agentic_source_plan": plan.model_dump(),
+        "executable_source_plan_summary": plan_summary,
+        "source_planning_agent_summary": source_planning_summary,
         "collection_trace": trace,
     }
 
@@ -212,6 +1567,49 @@ def _append_agent_queries(
     return added_count
 
 
+def _append_executable_plan_queries(
+    inventory_dicts: list[dict],
+    seen_queries: set[str],
+    agentic_source_plan: dict | None,
+) -> int:
+    if not agentic_source_plan:
+        return 0
+    planned = agentic_source_plan.get("planned_queries") or []
+    if not isinstance(planned, list):
+        raise ValueError("agentic_source_plan.planned_queries must be a list")
+
+    added_count = 0
+    for index, item in enumerate(planned, start=1):
+        if not isinstance(item, dict):
+            raise ValueError("planned source query must be an object")
+        planned_query = PlannedSearchQuery(**item)
+        query = _sanitize_planned_query_text(planned_query.query)
+        if not query or query in seen_queries:
+            continue
+        seen_queries.add(query)
+        added_count += 1
+        inventory_dicts.append(
+            {
+                "query_id": planned_query.query_id or f"q_exec_{index:03d}",
+                "query": query,
+                "source_type": planned_query.source_type,
+                "priority": planned_query.priority,
+                "rationale": planned_query.rationale,
+                "expected_fields": list(planned_query.expected_fields),
+                "query_source": "executable_source_plan",
+                "discovery_method": "executable_source_plan",
+                "query_type": planned_query.query_type,
+                "provider_channel": planned_query.provider_channel,
+                "role_hint": planned_query.role_hint,
+                "execution_status": planned_query.execution_status,
+                "disease_terms_used": list(planned_query.disease_terms_used),
+                "location_terms_used": list(planned_query.location_terms_used),
+                "time_terms_used": list(planned_query.time_terms_used),
+            }
+        )
+    return added_count
+
+
 def query_strategy_builder(state: DataCollectionState) -> dict:
     """Build deterministic queries grouped both as SearchQuerySet and a typed inventory."""
 
@@ -226,9 +1624,22 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
     time_window = spec_dict.get("time_window")
     schema_dict = state.get("collection_schema") or load_hantavirus_collection_schema()
 
-    include_terms = profile.include_terms
-    syndrome_terms = profile.syndrome_terms
-    virus_terms = profile.virus_terms
+    disease_intelligence = state.get("disease_intelligence") or {}
+    if disease_intelligence:
+        include_terms = _as_str_list(
+            disease_intelligence.get("suggested_query_terms")
+        ) or _as_str_list(disease_intelligence.get("aliases"))
+        syndrome_terms = _as_str_list(disease_intelligence.get("syndrome_terms"))
+        virus_terms = _as_str_list(disease_intelligence.get("pathogen_terms"))
+        disease_name_for_rationale = (
+            disease_intelligence.get("disease_standard_name")
+            or profile.disease_standard_name
+        )
+    else:
+        include_terms = profile.include_terms
+        syndrome_terms = profile.syndrome_terms
+        virus_terms = profile.virus_terms
+        disease_name_for_rationale = profile.disease_standard_name
 
     geo_suffix = ""
     if geography and geography.lower() != "global":
@@ -258,7 +1669,7 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
             _add_query(
                 inventory, seen, next_index, "official",
                 q, "official_public_health_agency", official_priority,
-                f"Target official agency content on {site} for hantavirus human cases and deaths.",
+                f"Target official agency content on {site} for {disease_name_for_rationale} human cases and deaths.",
                 expected_fields,
             )
         for term in syndrome_terms[:3]:
@@ -368,61 +1779,31 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
         )
 
     inventory_dicts = [q.model_dump() for q in inventory]
-
-    planning_enabled = llm_clients.llm_source_planning_enabled()
-    agentic_source_plan: dict | None = None
-    source_planning_agent_summary = {
-        "llm_source_planning_enabled": planning_enabled,
-        "status": "disabled",
-        "agent_query_count": 0,
-        "agent_query_added_count": 0,
-        "agent_candidate_hint_count": 0,
-        "warnings": [],
-    }
-
-    if planning_enabled:
-        try:
-            agentic_source_plan = plan_sources_with_llm(
-                user_request=state.get("user_request", "") or "",
-                collection_spec=spec_dict,
-                disease_profile=profile.model_dump(),
-                source_strategy=strategy.model_dump(),
-                collection_schema=schema_dict,
-            )
-            agent_query_count = len(
-                agentic_source_plan.get("proposed_search_queries") or []
-            )
-            added_count = _append_agent_queries(
-                inventory_dicts, seen, agentic_source_plan
-            )
-            source_planning_agent_summary.update(
-                {
-                    "status": "success",
-                    "agent_name": agentic_source_plan.get("agent_name"),
-                    "agent_version": agentic_source_plan.get("agent_version"),
-                    "agent_query_count": agent_query_count,
-                    "agent_query_added_count": added_count,
-                    "agent_candidate_hint_count": len(
-                        agentic_source_plan.get("candidate_source_hints") or []
-                    ),
-                    "human_review_recommended": bool(
-                        agentic_source_plan.get("human_review_recommended", False)
-                    ),
-                    "warnings": list(agentic_source_plan.get("warnings") or []),
-                }
-            )
-        except Exception as exc:  # noqa: BLE001 - agent is advisory only
-            agentic_source_plan = None
-            source_planning_agent_summary.update(
-                {
-                    "status": "failed",
-                    "failure_type": type(exc).__name__,
-                    "failure_message": str(exc),
-                    "warnings": [
-                        "llm_source_planning_failed_rule_based_fallback_used"
-                    ],
-                }
-            )
+    agentic_source_plan = state.get("agentic_source_plan")
+    source_planning_agent_summary = dict(
+        state.get("source_planning_agent_summary")
+        or {
+            "llm_source_planning_enabled": llm_clients.llm_source_planning_enabled(),
+            "status": "not_run",
+            "agent_query_count": 0,
+            "agent_query_added_count": 0,
+            "agent_candidate_hint_count": 0,
+            "warnings": ["executable_source_planning_node_not_run"],
+        }
+    )
+    planned_query_count = len(
+        (agentic_source_plan or {}).get("planned_queries") or []
+    )
+    executable_query_added_count = _append_executable_plan_queries(
+        inventory_dicts, seen, agentic_source_plan
+    )
+    source_planning_agent_summary.update(
+        {
+            "agent_query_count": planned_query_count,
+            "agent_query_added_count": executable_query_added_count,
+            "query_strategy_consumed_executable_plan": bool(agentic_source_plan),
+        }
+    )
 
     # Group into the backward-compatible SearchQuerySet structure.
     official_source_queries = [
@@ -457,7 +1838,7 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
         node_name="query_strategy_builder",
         message=(
             f"Built {len(inventory_dicts)} search queries across 5 source "
-            f"categories (llm_source_planning_enabled={planning_enabled})."
+            f"categories (executable_source_plan_present={bool(agentic_source_plan)})."
         ),
         metadata={
             "inventory_size": len(inventory_dicts),
@@ -468,13 +1849,13 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
             "database_query_count": len(query_set.database_queries),
             "geography": geography,
             "time_window": time_window,
+            "executable_source_plan_present": bool(agentic_source_plan),
             **source_planning_agent_summary,
         },
     )
     return {
         "search_queries": query_set.model_dump(),
         "search_query_inventory": inventory_dicts,
-        "agentic_source_plan": agentic_source_plan,
         "source_planning_agent_summary": source_planning_agent_summary,
         "collection_trace": trace,
     }

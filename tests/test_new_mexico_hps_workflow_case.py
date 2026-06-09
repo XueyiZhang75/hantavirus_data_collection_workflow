@@ -127,7 +127,8 @@ def test_new_mexico_masked_routing_blocks_validation_pdf(monkeypatch):
     assert validation["source_role"] == "validation_reserved"
     assert validation["final_screening_decision"] == "reserved_for_validation"
     assert validation["ready_for_content_fetch"] is False
-    assert validation["credibility_rubric_version"] == "source_credibility_v1"
+    assert validation["credibility_rubric_version"] == "source_credibility_v2"
+    assert validation["source_role_final"] == "validation"
     assert validation["credibility_level"] in {"high", "medium"}
     assert 0.0 <= validation["credibility_score"] <= 1.0
     assert {

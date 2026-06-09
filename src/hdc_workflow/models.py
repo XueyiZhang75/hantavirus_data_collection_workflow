@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -14,6 +16,59 @@ class CollectionSpec(BaseModel):
     time_window: str | None = None
     required_fields: list[str]
     source_priority: list[str]
+    start_date: str | None = None
+    end_date: str | None = None
+    target_fields: list[str] = Field(default_factory=list)
+    source_preferences: list[str] | dict | None = None
+    collection_mode: str | None = None
+    user_request: str | None = None
+    run_label: str | None = None
+    task_input_source: str | None = None
+    task_input_warnings: list[str] = Field(default_factory=list)
+
+
+class StructuredTaskInput(BaseModel):
+    disease: str | None = None
+    location: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    target_fields: list[str] = Field(default_factory=list)
+    source_preferences: list[str] | dict | None = None
+    collection_mode: str | None = None
+    user_request: str | None = None
+    run_label: str | None = None
+
+
+class DiseaseIntelligenceProfile(BaseModel):
+    disease_input: str
+    disease_standard_name: str
+    disease_category: str | None = None
+    aliases: list[str] = Field(default_factory=list)
+    abbreviations: list[str] = Field(default_factory=list)
+    pathogen_terms: list[str] = Field(default_factory=list)
+    syndrome_terms: list[str] = Field(default_factory=list)
+    clinical_terms: list[str] = Field(default_factory=list)
+    transmission_terms: list[str] = Field(default_factory=list)
+    case_count_terms: list[str] = Field(default_factory=list)
+    death_terms: list[str] = Field(default_factory=list)
+    hospitalization_terms: list[str] = Field(default_factory=list)
+    surveillance_terms: list[str] = Field(default_factory=list)
+    outbreak_terms: list[str] = Field(default_factory=list)
+    official_source_terms: list[str] = Field(default_factory=list)
+    likely_reporting_agencies: list[str] = Field(default_factory=list)
+    preferred_source_categories: list[str] = Field(default_factory=list)
+    validation_source_categories: list[str] = Field(default_factory=list)
+    suggested_geographic_granularity: str | None = None
+    suggested_time_granularity: str | None = None
+    extraction_priority_fields: list[str] = Field(default_factory=list)
+    count_semantics_notes: list[str] = Field(default_factory=list)
+    disambiguation_risks: list[str] = Field(default_factory=list)
+    exclusion_terms: list[str] = Field(default_factory=list)
+    suggested_query_terms: list[str] = Field(default_factory=list)
+    suggested_query_templates: list[str] = Field(default_factory=list)
+    confidence: float | None = None
+    generation_method: str = "curated_profile"
+    warnings: list[str] = Field(default_factory=list)
 
 
 class DiseaseProfile(BaseModel):
@@ -80,6 +135,191 @@ class SearchQuery(BaseModel):
     expected_fields: list[str]
 
 
+SourceRoleHint = Literal[
+    "collection",
+    "validation",
+    "context",
+    "collection_support",
+    "human_review",
+]
+
+ExecutableSourceType = Literal[
+    "official_public_health_agency",
+    "international_organization_report",
+    "peer_reviewed_literature",
+    "structured_database",
+    "news_and_situation_report",
+]
+
+ExecutableQueryType = Literal[
+    "general_web",
+    "official_site",
+    "domain_limited",
+    "literature",
+    "news",
+    "database",
+]
+
+ExecutableProviderChannel = Literal[
+    "web_search",
+    "official_site_search",
+    "literature_api",
+    "news_search",
+    "database_search",
+    "manual_user_url",
+]
+
+ExecutableSourcePlanGenerationMethod = Literal[
+    "deterministic_executable_source_plan",
+    "llm_executable_source_plan",
+    "llm_failed_deterministic_fallback",
+    "invalid_llm_output_deterministic_fallback",
+]
+
+ExecutableSourcePlanExecutionStatus = Literal["planned_not_executed"]
+
+
+class SourceDiscoveryObjective(BaseModel):
+    objective_id: str
+    objective: str
+    source_role_hint: SourceRoleHint
+    rationale: str
+    priority: int = 5
+
+
+class PlannedSourceCategory(BaseModel):
+    source_category_id: str
+    source_type: ExecutableSourceType
+    role_hint: SourceRoleHint
+    priority: int = 5
+    expected_fields: list[str] = Field(default_factory=list)
+    why_relevant: str
+    risk_notes: list[str] = Field(default_factory=list)
+
+
+class PlannedSearchQuery(BaseModel):
+    query_id: str
+    query: str
+    query_type: ExecutableQueryType = "general_web"
+    provider_channel: ExecutableProviderChannel = "web_search"
+    source_type: ExecutableSourceType = "news_and_situation_report"
+    role_hint: SourceRoleHint = "collection_support"
+    priority: int = 5
+    expected_fields: list[str] = Field(default_factory=list)
+    disease_terms_used: list[str] = Field(default_factory=list)
+    location_terms_used: list[str] = Field(default_factory=list)
+    time_terms_used: list[str] = Field(default_factory=list)
+    rationale: str
+    execution_status: ExecutableSourcePlanExecutionStatus = "planned_not_executed"
+
+
+class SearchResult(BaseModel):
+    title: str | None = None
+    url: str | None = None
+    snippet: str | None = None
+    published_date: str | None = None
+    source: str | None = None
+    rank: int | None = None
+    query: str | None = None
+    query_id: str | None = None
+    provider_channel: str | None = None
+    source_type: str | None = None
+    role_hint: str | None = None
+    retrieved_at: str | None = None
+    provider: str | None = None
+    query_type: str | None = None
+    raw: dict = Field(default_factory=dict)
+
+
+class SearchProviderResponse(BaseModel):
+    provider: str
+    query_id: str | None = None
+    query: str | None = None
+    results: list[SearchResult] = Field(default_factory=list)
+    raw_result_count: int = 0
+    error: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class LLMSourceCredibilitySuggestion(BaseModel):
+    source_role_recommendation: str | None = None
+    credibility_level: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+    human_review_recommended: bool = False
+    explanation: str | None = None
+    confidence: float | None = None
+
+
+class SourceCredibilityAssessment(BaseModel):
+    source_id: str
+    canonical_url: str | None = None
+    title: str | None = None
+    publisher: str | None = None
+    domain: str | None = None
+    source_type: str | None = None
+    discovery_method: str | None = None
+    query_id: str | None = None
+    query_used: str | None = None
+    role_hint: str | None = None
+    source_role_recommendation: str
+    source_role_final: str
+    credibility_score: float
+    credibility_level: str
+    authority_score: float
+    local_relevance_score: float
+    disease_relevance_score: float
+    timeliness_score: float
+    geographic_granularity_score: float
+    data_granularity_score: float
+    machine_readability_score: float
+    independence_score: float
+    provenance_score: float
+    risk_penalty: float
+    final_score_explanation: str
+    role_assignment_reason: str
+    risk_flags: list[str] = Field(default_factory=list)
+    human_review_recommended: bool = False
+    human_review_reason: str | None = None
+    assessment_method: str
+    llm_used: bool = False
+    llm_failed: bool = False
+    llm_error_type: str | None = None
+    llm_source_role_recommendation: str | None = None
+    llm_source_credibility_explanation: str | None = None
+    llm_source_credibility_confidence: float | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class SourcePlanningRisk(BaseModel):
+    risk_id: str
+    risk: str
+    severity: str = "medium"
+    applies_to: list[str] = Field(default_factory=list)
+    mitigation: str
+    human_review_trigger: bool = False
+
+
+class ExecutableSourcePlan(BaseModel):
+    plan_id: str
+    disease: str
+    location: str | None = None
+    time_window: str | None = None
+    target_fields: list[str] = Field(default_factory=list)
+    generation_method: ExecutableSourcePlanGenerationMethod
+    llm_enabled: bool = False
+    execution_status: ExecutableSourcePlanExecutionStatus = "planned_not_executed"
+    warnings: list[str] = Field(default_factory=list)
+    source_discovery_objectives: list[SourceDiscoveryObjective] = Field(
+        default_factory=list
+    )
+    planned_source_categories: list[PlannedSourceCategory] = Field(
+        default_factory=list
+    )
+    planned_queries: list[PlannedSearchQuery] = Field(default_factory=list)
+    source_planning_risks: list[SourcePlanningRisk] = Field(default_factory=list)
+    structured_output_mode: str | None = None
+
+
 class SourceCandidate(BaseModel):
     source_id: str
     title: str | None = None
@@ -98,6 +338,18 @@ class SourceCandidate(BaseModel):
     matched_terms: list[str] = Field(default_factory=list)
     source_purpose: str | None = None
     notes: str | None = None
+    search_provider: str | None = None
+    search_rank: int | None = None
+    provider_channel: str | None = None
+    role_hint: str | None = None
+    planned_query_id: str | None = None
+    planned_query_source_type: str | None = None
+    search_result_id: str | None = None
+    canonical_url: str | None = None
+    domain: str | None = None
+    result_source: str | None = None
+    query_type: str | None = None
+    additional_query_ids: list[str] = Field(default_factory=list)
 
 
 class SourceRegistryEntry(BaseModel):
@@ -107,6 +359,7 @@ class SourceRegistryEntry(BaseModel):
     publisher: str | None = None
     source_type: str | None = None
     published_date: str | None = None
+    snippet: str | None = None
     status: str
     screening_decision: str | None = None
     screening_confidence: float | None = None
@@ -123,6 +376,17 @@ class SourceRegistryEntry(BaseModel):
     matched_terms: list[str] = Field(default_factory=list)
     source_purpose: str | None = None
     notes: str | None = None
+    search_provider: str | None = None
+    search_rank: int | None = None
+    provider_channel: str | None = None
+    role_hint: str | None = None
+    planned_query_id: str | None = None
+    planned_query_source_type: str | None = None
+    search_result_id: str | None = None
+    domain: str | None = None
+    result_source: str | None = None
+    query_type: str | None = None
+    additional_query_ids: list[str] = Field(default_factory=list)
     source_role: str | None = None
     screening_flags: list[str] = Field(default_factory=list)
     expected_extractable_fields: list[str] = Field(default_factory=list)
@@ -156,6 +420,35 @@ class SourceRegistryEntry(BaseModel):
     credibility_score_components: dict = Field(default_factory=dict)
     credibility_flags: list[str] = Field(default_factory=list)
     credibility_reason: str | None = None
+    source_role_recommendation: str | None = None
+    source_role_final: str | None = None
+    authority_score: float | None = None
+    local_relevance_score: float | None = None
+    disease_relevance_score: float | None = None
+    timeliness_score: float | None = None
+    geographic_granularity_score: float | None = None
+    data_granularity_score: float | None = None
+    machine_readability_score: float | None = None
+    independence_score: float | None = None
+    provenance_score: float | None = None
+    risk_penalty: float | None = None
+    final_score_explanation: str | None = None
+    role_assignment_reason: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+    human_review_recommended: bool = False
+    human_review_reason: str | None = None
+    assessment_method: str | None = None
+    llm_used: bool = False
+    llm_failed: bool = False
+    llm_error_type: str | None = None
+    llm_source_role_recommendation: str | None = None
+    llm_source_credibility_explanation: str | None = None
+    llm_source_credibility_confidence: float | None = None
+    warnings: list[str] = Field(default_factory=list)
+    source_excluded_by_human_review: bool = False
+    source_review_status: str | None = None
+    review_decision_ids: list[str] = Field(default_factory=list)
+    human_review_audit_ids: list[str] = Field(default_factory=list)
 
 
 class SeedSource(BaseModel):
@@ -243,6 +536,17 @@ class ContentFetchRequest(BaseModel):
     publisher: str | None = None
     source_type: str | None = None
     source_role: str | None = None
+    discovery_method: str | None = None
+    search_provider: str | None = None
+    query_id: str | None = None
+    query_used: str | None = None
+    planned_query_id: str | None = None
+    provider_channel: str | None = None
+    role_hint: str | None = None
+    source_role_final: str | None = None
+    credibility_score: float | None = None
+    credibility_level: str | None = None
+    source_credibility_risk_flags: list[str] = Field(default_factory=list)
     final_screening_decision: str
     fetch_purpose: str
     priority: int | None = None
@@ -447,9 +751,21 @@ class Document(BaseModel):
     url: str | None = None
     canonical_url: str | None = None
     title: str | None = None
+    published_date: str | None = None
     publisher: str | None = None
     source_type: str | None = None
     source_role: str | None = None
+    discovery_method: str | None = None
+    search_provider: str | None = None
+    query_id: str | None = None
+    query_used: str | None = None
+    planned_query_id: str | None = None
+    provider_channel: str | None = None
+    role_hint: str | None = None
+    source_role_final: str | None = None
+    credibility_score: float | None = None
+    credibility_level: str | None = None
+    source_credibility_risk_flags: list[str] = Field(default_factory=list)
     final_screening_decision: str | None = None
     fetch_purpose: str | None = None
     fetch_status: str | None = None
@@ -457,6 +773,10 @@ class Document(BaseModel):
     http_status_code: int | None = None
     content_type: str | None = None
     fetched_at: str | None = None
+    retrieved_at: str | None = None
+    parser_used: str | None = None
+    text_char_count: int | None = None
+    table_count: int | None = None
     content_hash: str | None = None
     is_live_fetched: bool = False
     is_offline_stub: bool = False
@@ -483,6 +803,16 @@ class EvidenceChunk(BaseModel):
     publisher: str | None = None
     source_type: str | None = None
     source_role: str | None = None
+    source_role_final: str | None = None
+    credibility_score: float | None = None
+    credibility_level: str | None = None
+    discovery_method: str | None = None
+    search_provider: str | None = None
+    query_id: str | None = None
+    query_used: str | None = None
+    planned_query_id: str | None = None
+    provider_channel: str | None = None
+    role_hint: str | None = None
     quality_status: str | None = None
     chunk_index: int | None = None
     chunk_kind: str | None = None
@@ -583,6 +913,103 @@ class HantavirusRecord(BaseModel):
         return self
 
 
+class PublicHealthRecord(HantavirusRecord):
+    """Disease-generic public-health record.
+
+    This extends the legacy HantavirusRecord field set instead of replacing it.
+    Downstream code that expects the old fields can still read them, while
+    Stage 8 cross-disease runs can preserve disease, count, geography, and
+    provenance fields that are not hantavirus-specific.
+    """
+
+    disease_standard_name: str | None = None
+    disease_alias_used: str | None = None
+    pathogen_or_syndrome: str | None = None
+    target_population: str | None = None
+
+    locality: str | None = None
+    locality_raw: str | None = None
+    admin_level: str | None = None
+    location_confidence: float | None = None
+    location_notes: str | None = None
+
+    reporting_period_raw: str | None = None
+    as_of_date_raw: str | None = None
+    date_confidence: float | None = None
+    date_notes: str | None = None
+
+    hospitalizations: float | None = None
+    icu_admissions: float | None = None
+    tests_positive: float | None = None
+    tests_total: float | None = None
+    positivity_rate: float | None = None
+    incidence_rate: float | None = None
+    cumulative_count: float | None = None
+    new_count: float | None = None
+    count_value_raw: str | None = None
+    count_unit: str | None = None
+    count_semantics: str | None = None
+    count_confidence: float | None = None
+    count_notes: str | None = None
+
+    source_role_final: str | None = None
+    credibility_score: float | None = None
+    credibility_level: str | None = None
+    discovery_method: str | None = None
+    search_provider: str | None = None
+    query_id: str | None = None
+    query_used: str | None = None
+    document_id: str | None = None
+    evidence_context: str | None = None
+    extraction_model: str | None = None
+    extraction_warnings: list[str] = Field(default_factory=list)
+    human_review_reason: str | None = None
+    notes: str | None = None
+    record_schema: str = "generic_public_health_record"
+    legacy_record_type: str | None = None
+
+    event_cluster_id: str | None = None
+    event_cluster_status: str | None = None
+    event_member_status: str | None = None
+    countable: bool | None = None
+    duplicate_of_record_id: str | None = None
+    representative_record_id: str | None = None
+    duplicate_detection_method: str | None = None
+    duplicate_detection_confidence: float | None = None
+    duplicate_detection_reason: str | None = None
+    duplicate_review_required: bool = False
+    duplicate_review_reason: str | None = None
+    event_cluster_warnings: list[str] = Field(default_factory=list)
+    review_status: str | None = None
+    review_decision_ids: list[str] = Field(default_factory=list)
+    record_excluded_by_human_review: bool = False
+    final_dataset_included: bool | None = None
+    human_review_applied: bool = False
+    human_review_audit_ids: list[str] = Field(default_factory=list)
+    anomaly_status: str | None = None
+    anomaly_ids: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _non_negative_generic_counts(self) -> "PublicHealthRecord":
+        numeric_fields = (
+            "hospitalizations",
+            "icu_admissions",
+            "tests_positive",
+            "tests_total",
+            "positivity_rate",
+            "incidence_rate",
+            "cumulative_count",
+            "new_count",
+        )
+        for field_name in numeric_fields:
+            value = getattr(self, field_name)
+            if value is not None and value < 0:
+                raise ValueError(
+                    f"{field_name} must be non-negative when provided (got {value})."
+                )
+        return self
+
+
 class LinkedEvent(BaseModel):
     linked_event_id: str
     record_ids: list[str]
@@ -609,6 +1036,377 @@ class LinkedEvent(BaseModel):
     conflict_ids: list[str] = Field(default_factory=list)
     consistency_warnings: list[str] = Field(default_factory=list)
     checked_by: str | None = None
+
+
+class EventClusterMember(BaseModel):
+    record_id: str
+    event_member_status: str
+    countable: bool
+    duplicate_of_record_id: str | None = None
+    duplicate_detection_confidence: float | None = None
+    duplicate_detection_reason: str | None = None
+    source_id: str | None = None
+    source_url: str | None = None
+    source_type: str | None = None
+    publisher: str | None = None
+    evidence_quote: str | None = None
+
+
+class EventCluster(BaseModel):
+    event_cluster_id: str
+    cluster_status: str
+    disease: str | None = None
+    disease_standard_name: str | None = None
+    location_key: str | None = None
+    country: str | None = None
+    subnational_location: str | None = None
+    locality: str | None = None
+    admin_level: str | None = None
+    date_key: str | None = None
+    date_reported: str | None = None
+    event_start_date: str | None = None
+    event_end_date: str | None = None
+    reporting_period: str | None = None
+    as_of_date: str | None = None
+    statistical_count_type: str | None = None
+    count_semantics: str | None = None
+    representative_record_id: str | None = None
+    representative_selection_reason: str | None = None
+    member_record_ids: list[str] = Field(default_factory=list)
+    members: list[EventClusterMember] = Field(default_factory=list)
+    countable_record_ids: list[str] = Field(default_factory=list)
+    non_countable_duplicate_record_ids: list[str] = Field(default_factory=list)
+    related_record_ids: list[str] = Field(default_factory=list)
+    conflict_record_ids: list[str] = Field(default_factory=list)
+    source_ids: list[str] = Field(default_factory=list)
+    source_urls: list[str] = Field(default_factory=list)
+    source_types: list[str] = Field(default_factory=list)
+    publishers: list[str] = Field(default_factory=list)
+    discovery_methods: list[str] = Field(default_factory=list)
+    search_providers: list[str] = Field(default_factory=list)
+    source_role_final_values: list[str] = Field(default_factory=list)
+    credibility_score_range: dict = Field(default_factory=dict)
+    canonical_cases_confirmed: float | None = None
+    canonical_cases_probable: float | None = None
+    canonical_cases_suspected: float | None = None
+    canonical_cases_unspecified: float | None = None
+    canonical_deaths: float | None = None
+    canonical_hospitalizations: float | None = None
+    canonical_count_notes: str | None = None
+    source_count: int = 0
+    independent_source_count: int = 0
+    same_event_score: float | None = None
+    cluster_reason: str | None = None
+    duplicate_reason: str | None = None
+    needs_human_review: bool = False
+    human_review_reason: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+    review_status: str | None = None
+    review_decision_ids: list[str] = Field(default_factory=list)
+    human_review_applied: bool = False
+    human_review_audit_ids: list[str] = Field(default_factory=list)
+
+
+class DuplicateDetectionDecision(BaseModel):
+    event_cluster_id: str
+    member_record_ids: list[str] = Field(default_factory=list)
+    representative_record_id: str | None = None
+    decision: str
+    confidence: float | None = None
+    reason: str | None = None
+    requires_human_review: bool = False
+
+
+ValidationUnit = Literal[
+    "record",
+    "event_cluster",
+    "aggregate",
+    "field",
+    "source",
+    "scope",
+]
+
+ValidationType = Literal[
+    "trusted_source_comparison",
+    "held_out_source_comparison",
+    "cross_source_support",
+    "cross_source_conflict",
+    "event_cluster_support",
+    "aggregate_comparison",
+    "scope_check",
+    "count_semantics_check",
+    "provenance_check",
+]
+
+ComparabilityStatus = Literal[
+    "comparable",
+    "partially_comparable",
+    "not_comparable",
+    "insufficient_information",
+    "needs_human_review",
+]
+
+MatchStatus = Literal[
+    "matched",
+    "partially_matched",
+    "conflict",
+    "missing_collection",
+    "missing_validation",
+    "not_comparable",
+    "outside_requested_scope",
+    "insufficient_information",
+    "needs_human_review",
+]
+
+ValidationStatus = Literal[
+    "validated",
+    "partially_validated",
+    "conflict",
+    "not_comparable",
+    "missing_counterpart",
+    "outside_scope",
+    "needs_human_review",
+    "unvalidated",
+]
+
+
+class ComparabilityAssessment(BaseModel):
+    comparability_status: ComparabilityStatus
+    match_status: MatchStatus
+    validation_status: ValidationStatus
+    reason: str
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ValidationCase(BaseModel):
+    validation_case_id: str
+    validation_type: ValidationType
+    validation_unit: ValidationUnit
+    record_ids: list[str] = Field(default_factory=list)
+    event_cluster_ids: list[str] = Field(default_factory=list)
+    source_ids: list[str] = Field(default_factory=list)
+    source_urls: list[str] = Field(default_factory=list)
+    disease: str | None = None
+    location: str | None = None
+    date_or_period: str | None = None
+    reason: str | None = None
+    metadata: dict = Field(default_factory=dict)
+
+
+class ValidationComparison(BaseModel):
+    comparison_id: str
+    validation_case_id: str
+    validation_type: ValidationType
+    validation_unit: ValidationUnit
+    left_record_ids: list[str] = Field(default_factory=list)
+    right_record_ids: list[str] = Field(default_factory=list)
+    left_event_cluster_ids: list[str] = Field(default_factory=list)
+    right_event_cluster_ids: list[str] = Field(default_factory=list)
+    left_source_ids: list[str] = Field(default_factory=list)
+    right_source_ids: list[str] = Field(default_factory=list)
+    compared_field: str | None = None
+    left_value: float | str | bool | dict | list | None = None
+    right_value: float | str | bool | dict | list | None = None
+    comparability_status: ComparabilityStatus = "insufficient_information"
+    reason: str | None = None
+
+
+class ValidationResult(BaseModel):
+    validation_result_id: str
+    validation_case_id: str
+    validation_type: ValidationType
+    validation_unit: ValidationUnit
+    comparison_id: str
+    left_record_ids: list[str] = Field(default_factory=list)
+    right_record_ids: list[str] = Field(default_factory=list)
+    left_event_cluster_ids: list[str] = Field(default_factory=list)
+    right_event_cluster_ids: list[str] = Field(default_factory=list)
+    left_source_ids: list[str] = Field(default_factory=list)
+    right_source_ids: list[str] = Field(default_factory=list)
+    left_source_urls: list[str] = Field(default_factory=list)
+    right_source_urls: list[str] = Field(default_factory=list)
+    left_source_roles: list[str] = Field(default_factory=list)
+    right_source_roles: list[str] = Field(default_factory=list)
+    left_discovery_methods: list[str] = Field(default_factory=list)
+    right_discovery_methods: list[str] = Field(default_factory=list)
+    compared_field: str
+    disease: str | None = None
+    location: str | None = None
+    geographic_scope: str | None = None
+    date_or_period: str | None = None
+    reporting_period: str | None = None
+    as_of_date: str | None = None
+    statistical_count_type: str | None = None
+    count_semantics: str | None = None
+    left_value: float | str | bool | dict | list | None = None
+    right_value: float | str | bool | dict | list | None = None
+    tolerance: float | None = None
+    comparability_status: ComparabilityStatus
+    match_status: MatchStatus
+    validation_status: ValidationStatus
+    confidence: float | None = None
+    reason: str
+    evidence_summary: str | None = None
+    needs_human_review: bool = False
+    human_review_reason: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+    review_status: str | None = None
+    review_decision_ids: list[str] = Field(default_factory=list)
+    human_review_applied: bool = False
+    human_review_audit_ids: list[str] = Field(default_factory=list)
+
+
+class TrustedSourceValidationResult(ValidationResult):
+    """ValidationResult specialization for trusted/held-out validation."""
+
+
+class CrossSourceValidationResult(ValidationResult):
+    """ValidationResult specialization for event-cluster cross-source checks."""
+
+
+AnomalyUnit = Literal[
+    "record",
+    "event_cluster",
+    "aggregate",
+    "validation_result",
+    "source",
+    "workflow_run",
+]
+
+AnomalySeverity = Literal["info", "low", "medium", "high", "critical"]
+
+
+class AnomalyRule(BaseModel):
+    rule_id: str
+    anomaly_type: str
+    description: str
+    severity: AnomalySeverity = "medium"
+    deterministic: bool = True
+
+
+class AnomalyDetectionDecision(BaseModel):
+    anomaly_id: str
+    decision: str
+    reason: str | None = None
+    reviewer_id: str | None = None
+    decided_at: str | None = None
+
+
+class AnomalyResult(BaseModel):
+    anomaly_id: str
+    anomaly_type: str
+    anomaly_unit: AnomalyUnit
+    severity: AnomalySeverity
+    record_id: str | None = None
+    event_cluster_id: str | None = None
+    validation_result_id: str | None = None
+    source_id: str | None = None
+    compared_field: str | None = None
+    disease: str | None = None
+    location: str | None = None
+    date_or_period: str | None = None
+    source_ids: list[str] = Field(default_factory=list)
+    source_urls: list[str] = Field(default_factory=list)
+    evidence_summary: str | None = None
+    observed_value: float | str | bool | dict | list | None = None
+    expected_or_reference_value: float | str | bool | dict | list | None = None
+    threshold: float | str | None = None
+    reason: str
+    recommended_action: str | None = None
+    needs_human_review: bool = False
+    human_review_reason: str | None = None
+    detection_method: str = "deterministic_anomaly_detection"
+    warnings: list[str] = Field(default_factory=list)
+    anomaly_status: str = "open"
+    review_decision_ids: list[str] = Field(default_factory=list)
+    human_review_audit_ids: list[str] = Field(default_factory=list)
+
+
+class AnomalySummary(BaseModel):
+    anomaly_result_count: int = 0
+    needs_human_review_count: int = 0
+    severity_counts: dict[str, int] = Field(default_factory=dict)
+    anomaly_type_counts: dict[str, int] = Field(default_factory=dict)
+    detection_method: str = "deterministic_anomaly_detection"
+    thresholds: dict = Field(default_factory=dict)
+
+
+class HumanReviewDecisionInput(BaseModel):
+    decision_id: str
+    decision_type: str
+    target_type: str
+    target_ids: list[str] = Field(default_factory=list)
+    review_id: str | None = None
+    reviewer_id: str | None = None
+    decided_at: str | None = None
+    reason: str | None = None
+    notes: str | None = None
+    patch: dict = Field(default_factory=dict)
+    corrected_fields: dict = Field(default_factory=dict)
+    confidence: float | None = None
+    apply_decision: bool = False
+
+
+class AppliedHumanReviewDecision(BaseModel):
+    decision_id: str
+    review_id: str | None = None
+    decision_type: str
+    reviewer_id: str | None = None
+    decided_at: str | None = None
+    applied_at: str
+    target_type: str
+    target_ids: list[str] = Field(default_factory=list)
+    reason: str | None = None
+    notes: str | None = None
+    confidence: float | None = None
+    audit_ids: list[str] = Field(default_factory=list)
+    apply_status: str = "applied"
+
+
+class RejectedHumanReviewDecision(BaseModel):
+    decision_id: str | None = None
+    review_id: str | None = None
+    decision_type: str | None = None
+    target_type: str | None = None
+    target_ids: list[str] = Field(default_factory=list)
+    rejection_reason: str
+    apply_status: str = "rejected"
+    raw_decision: dict = Field(default_factory=dict)
+
+
+class HumanReviewAuditEntry(BaseModel):
+    audit_id: str
+    decision_id: str | None = None
+    review_id: str | None = None
+    reviewer_id: str | None = None
+    decided_at: str | None = None
+    applied_at: str
+    decision_type: str
+    target_type: str
+    target_ids: list[str] = Field(default_factory=list)
+    field_name: str | None = None
+    before_value: float | str | bool | dict | list | None = None
+    after_value: float | str | bool | dict | list | None = None
+    apply_status: str
+    rejection_reason: str | None = None
+    reason: str | None = None
+    notes: str | None = None
+    provenance: dict = Field(default_factory=dict)
+
+
+class HumanReviewApplicationSummary(BaseModel):
+    records_before_review: int = 0
+    records_after_review: int = 0
+    records_excluded_by_review: int = 0
+    records_corrected_by_review: int = 0
+    clusters_modified_by_review: int = 0
+    validation_results_modified_by_review: int = 0
+    sources_modified_by_review: int = 0
+    anomalies_resolved_by_review: int = 0
+    decisions_provided_count: int = 0
+    decisions_applied_count: int = 0
+    decisions_rejected_count: int = 0
+    audit_entry_count: int = 0
 
 
 class Conflict(BaseModel):
@@ -648,12 +1446,38 @@ class HumanReviewItem(BaseModel):
     modified_values: dict = Field(default_factory=dict)
     decision_applied: bool = False
     decision_warnings: list[str] = Field(default_factory=list)
+    anomaly_id: str | None = None
+    record_id: str | None = None
+    event_cluster_id: str | None = None
+    validation_result_id: str | None = None
+    source_ids: list[str] = Field(default_factory=list)
+    source_urls: list[str] = Field(default_factory=list)
+    severity: str | None = None
+    evidence_summary: str | None = None
+    suggested_action: str | None = None
+    decision_options: list[str] = Field(default_factory=list)
 
 
 class FinalDataPackage(BaseModel):
-    final_dataset: list[HantavirusRecord]
+    final_dataset: list[PublicHealthRecord]
+    final_dataset_post_review: list[PublicHealthRecord] = Field(default_factory=list)
+    records_excluded_by_human_review: list[PublicHealthRecord] = Field(default_factory=list)
     source_registry: list[SourceRegistryEntry]
     linked_events: list[LinkedEvent]
+    event_clusters: list[EventCluster] = Field(default_factory=list)
+    duplicate_clusters: list[EventCluster] = Field(default_factory=list)
+    validation_cases: list[ValidationCase] = Field(default_factory=list)
+    validation_comparisons: list[ValidationComparison] = Field(default_factory=list)
+    validation_results: list[ValidationResult] = Field(default_factory=list)
+    validation_summary: dict = Field(default_factory=dict)
+    trusted_source_validation_summary: dict = Field(default_factory=dict)
+    cross_source_validation_summary: dict = Field(default_factory=dict)
+    anomaly_results: list[AnomalyResult] = Field(default_factory=list)
+    anomaly_summary: dict = Field(default_factory=dict)
+    applied_human_review_decisions: list[AppliedHumanReviewDecision] = Field(default_factory=list)
+    rejected_human_review_decisions: list[RejectedHumanReviewDecision] = Field(default_factory=list)
+    human_review_audit_trail: list[HumanReviewAuditEntry] = Field(default_factory=list)
+    human_review_application_summary: dict = Field(default_factory=dict)
     conflicts: list[Conflict]
     human_review_items: list[HumanReviewItem]
     excluded_sources: list[SourceRegistryEntry]
@@ -699,9 +1523,16 @@ class LLMExtractedRecord(BaseModel):
     cases_suspected: float | None = None
     cases_unspecified: float | None = None
     deaths: float | None = None
+    hospitalizations: float | None = None
+    icu_admissions: float | None = None
+    tests_positive: float | None = None
+    tests_total: float | None = None
+    positivity_rate: float | None = None
+    incidence_rate: float | None = None
     case_definition: str | None = None
     extraction_notes: str | None = None
     statistical_count_type: str | None = None
+    count_semantics: str | None = None
     reporting_period: str | None = None
     as_of_date: str | None = None
     aggregation_level: str | None = None

@@ -10,8 +10,10 @@ from .nodes import (
     document_quality_check,
     evidence_chunking_and_data_presence_flagging,
     final_data_package_builder,
-    hantavirus_profile_and_schema_setup,
     human_review,
+    disease_intelligence_builder,
+    executable_source_planning,
+    profile_and_schema_setup,
     quality_gate_routing,
     query_strategy_builder,
     record_linking,
@@ -39,7 +41,9 @@ def build_graph():
     builder = StateGraph(DataCollectionState)
 
     builder.add_node("task_intake_and_scope_planning", task_intake_and_scope_planning)
-    builder.add_node("hantavirus_profile_and_schema_setup", hantavirus_profile_and_schema_setup)
+    builder.add_node("disease_intelligence_builder", disease_intelligence_builder)
+    builder.add_node("profile_and_schema_setup", profile_and_schema_setup)
+    builder.add_node("executable_source_planning", executable_source_planning)
     builder.add_node("query_strategy_builder", query_strategy_builder)
     builder.add_node("source_discovery", source_discovery)
     builder.add_node("source_dedup_and_registry", source_dedup_and_registry)
@@ -58,8 +62,10 @@ def build_graph():
     builder.add_node("final_data_package_builder", final_data_package_builder)
 
     builder.add_edge(START, "task_intake_and_scope_planning")
-    builder.add_edge("task_intake_and_scope_planning", "hantavirus_profile_and_schema_setup")
-    builder.add_edge("hantavirus_profile_and_schema_setup", "query_strategy_builder")
+    builder.add_edge("task_intake_and_scope_planning", "disease_intelligence_builder")
+    builder.add_edge("disease_intelligence_builder", "profile_and_schema_setup")
+    builder.add_edge("profile_and_schema_setup", "executable_source_planning")
+    builder.add_edge("executable_source_planning", "query_strategy_builder")
     builder.add_edge("query_strategy_builder", "source_discovery")
     builder.add_edge("source_discovery", "source_dedup_and_registry")
     builder.add_edge("source_dedup_and_registry", "source_screening")

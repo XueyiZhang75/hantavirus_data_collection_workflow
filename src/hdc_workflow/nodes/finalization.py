@@ -12,13 +12,21 @@ from __future__ import annotations
 
 from ..config import load_final_package_policy
 from ..models import (
+    AnomalyResult,
+    AppliedHumanReviewDecision,
     Conflict,
+    EventCluster,
     FinalDataPackage,
     FinalPackagePolicy,
-    HantavirusRecord,
+    HumanReviewAuditEntry,
     HumanReviewItem,
     LinkedEvent,
+    PublicHealthRecord,
+    RejectedHumanReviewDecision,
     SourceRegistryEntry,
+    ValidationCase,
+    ValidationComparison,
+    ValidationResult,
 )
 from ..state import DataCollectionState, append_trace
 
@@ -151,12 +159,51 @@ def _build_provenance_manifest(state: DataCollectionState) -> dict:
         "validated_record_count": len(_safe_list(state, "validated_records")),
         "normalized_record_count": len(normalized),
         "linked_event_count": len(_safe_list(state, "linked_events")),
+        "event_cluster_count": len(_safe_list(state, "event_clusters")),
+        "duplicate_cluster_count": len(_safe_list(state, "duplicate_clusters")),
+        "validation_case_count": len(_safe_list(state, "validation_cases")),
+        "validation_comparison_count": len(_safe_list(state, "validation_comparisons")),
+        "validation_result_count": len(_safe_list(state, "validation_results")),
+        "anomaly_result_count": len(_safe_list(state, "anomaly_results")),
+        "applied_human_review_decision_count": len(
+            _safe_list(state, "applied_human_review_decisions")
+        ),
+        "rejected_human_review_decision_count": len(
+            _safe_list(state, "rejected_human_review_decisions")
+        ),
+        "human_review_audit_entry_count": len(
+            _safe_list(state, "human_review_audit_trail")
+        ),
+        "final_dataset_post_review_count": len(
+            _safe_list(state, "final_dataset_post_review")
+        ),
         "conflict_count": len(conflicts),
         "human_review_item_count": len(_safe_list(state, "human_review_queue")),
         "records_with_source_url_count": _count(normalized, "source_url"),
         "records_with_evidence_quote_count": _count(normalized, "evidence_quote"),
         "records_with_supporting_chunk_id_count": _count(normalized, "supporting_chunk_id"),
         "records_with_linked_event_id_count": _count(normalized, "linked_event_id"),
+        "records_with_event_cluster_id_count": _count(normalized, "event_cluster_id"),
+        "countable_record_count": sum(
+            1 for r in normalized if isinstance(r, dict) and r.get("countable") is True
+        ),
+        "non_countable_duplicate_count": sum(
+            1
+            for r in normalized
+            if isinstance(r, dict)
+            and r.get("event_member_status") == "non_countable_duplicate"
+        ),
+        "generic_record_count": sum(
+            1
+            for r in normalized
+            if isinstance(r, dict)
+            and r.get("record_schema") == "generic_public_health_record"
+        ),
+        "legacy_hantavirus_record_count": sum(
+            1
+            for r in normalized
+            if isinstance(r, dict) and r.get("disease") == "Hantavirus disease"
+        ),
         "conflicts_with_record_ids_count": sum(
             1
             for c in conflicts
@@ -192,8 +239,9 @@ def _build_package_metadata(
 ) -> dict:
     spec = state.get("collection_spec") or {}
     llm_summary = state.get("llm_extraction_summary") or {}
+    search_summary = state.get("source_search_execution_summary") or {}
     return {
-        "package_name": "hantavirus_data_collection_final_package",
+        "package_name": "data_collection_workflow_final_package",
         "package_version": policy.package_version,
         "package_builder": policy.package_builder,
         "generated_at": _fixed_generated_at(policy),
@@ -206,7 +254,10 @@ def _build_package_metadata(
         "llm_used": llm_used,
         "llm_provider": llm_summary.get("llm_provider") if isinstance(llm_summary, dict) else None,
         "llm_model": llm_summary.get("llm_model") if isinstance(llm_summary, dict) else None,
-        "web_search_used": False,
+        "web_search_used": bool(
+            isinstance(search_summary, dict)
+            and (search_summary.get("executed_query_count") or 0) > 0
+        ),
         "baseline_comparison_included": False,
         "evaluation_metrics_included": False,
     }
@@ -220,8 +271,25 @@ def _build_export_manifest(
         "exportable_sections": list(policy.exportable_sections),
         "section_counts": {
             "final_dataset": len(package.final_dataset),
+            "final_dataset_post_review": len(package.final_dataset_post_review),
+            "records_excluded_by_human_review": len(
+                package.records_excluded_by_human_review
+            ),
             "source_registry": len(package.source_registry),
             "linked_events": len(package.linked_events),
+            "event_clusters": len(package.event_clusters),
+            "duplicate_clusters": len(package.duplicate_clusters),
+            "validation_cases": len(package.validation_cases),
+            "validation_comparisons": len(package.validation_comparisons),
+            "validation_results": len(package.validation_results),
+            "anomaly_results": len(package.anomaly_results),
+            "applied_human_review_decisions": len(
+                package.applied_human_review_decisions
+            ),
+            "rejected_human_review_decisions": len(
+                package.rejected_human_review_decisions
+            ),
+            "human_review_audit_trail": len(package.human_review_audit_trail),
             "conflicts": len(package.conflicts),
             "human_review_items": len(package.human_review_items),
             "excluded_sources": len(package.excluded_sources),
@@ -237,17 +305,100 @@ def _build_finalization_summary(
     contains_fixture: bool,
 ) -> dict:
     package_dict = package.model_dump()
+    disease_counts: dict[str, int] = {}
+    source_type_counts: dict[str, int] = {}
+    extraction_method_counts: dict[str, int] = {}
+    for record in package_dict.get("final_dataset") or []:
+        disease = str(record.get("disease") or "unknown")
+        source_type = str(record.get("source_type") or "unknown")
+        method = str(record.get("extraction_method") or "unknown")
+        disease_counts[disease] = disease_counts.get(disease, 0) + 1
+        source_type_counts[source_type] = source_type_counts.get(source_type, 0) + 1
+        extraction_method_counts[method] = extraction_method_counts.get(method, 0) + 1
     return {
         "final_dataset_count": len(package.final_dataset),
+        "final_dataset_post_review_count": len(package.final_dataset_post_review),
+        "records_excluded_by_human_review_count": len(
+            package.records_excluded_by_human_review
+        ),
+        "generic_record_count": sum(
+            1
+            for record in package_dict.get("final_dataset") or []
+            if record.get("record_schema") == "generic_public_health_record"
+        ),
+        "legacy_hantavirus_record_count": sum(
+            1
+            for record in package_dict.get("final_dataset") or []
+            if record.get("disease") == "Hantavirus disease"
+        ),
+        "disease_counts": disease_counts,
+        "source_type_counts": source_type_counts,
+        "extraction_method_counts": extraction_method_counts,
         "source_registry_count": len(package.source_registry),
         "excluded_source_count": len(package.excluded_sources),
         "linked_event_count": len(package.linked_events),
+        "event_cluster_count": len(package.event_clusters),
+        "duplicate_cluster_count": len(package.duplicate_clusters),
+        "validation_case_count": len(package.validation_cases),
+        "validation_comparison_count": len(package.validation_comparisons),
+        "validation_result_count": len(package.validation_results),
+        "anomaly_result_count": len(package.anomaly_results),
+        "applied_human_review_decision_count": len(
+            package.applied_human_review_decisions
+        ),
+        "rejected_human_review_decision_count": len(
+            package.rejected_human_review_decisions
+        ),
+        "human_review_audit_entry_count": len(package.human_review_audit_trail),
+        "countable_record_count": sum(
+            1
+            for record in package_dict.get("final_dataset") or []
+            if record.get("countable") is True
+        ),
+        "non_countable_duplicate_count": sum(
+            1
+            for record in package_dict.get("final_dataset") or []
+            if record.get("event_member_status") == "non_countable_duplicate"
+        ),
         "conflict_count": len(package.conflicts),
         "human_review_item_count": len(package.human_review_items),
         "collection_trace_count": len(package.collection_trace),
         "workflow_summary_count": len(workflow_summaries),
         "contains_synthetic_fixture_data": contains_fixture,
         "final_package_keys": sorted(package_dict.keys()),
+}
+
+
+def _default_post_review_records(records: list[dict]) -> list[dict]:
+    out: list[dict] = []
+    for record in records:
+        row = dict(record)
+        row.setdefault("review_status", "unreviewed")
+        row.setdefault("review_decision_ids", [])
+        row.setdefault("record_excluded_by_human_review", False)
+        row.setdefault("final_dataset_included", True)
+        row.setdefault("human_review_applied", False)
+        row.setdefault("human_review_audit_ids", [])
+        row.setdefault("anomaly_status", None)
+        row.setdefault("anomaly_ids", [])
+        out.append(row)
+    return out
+
+
+def _default_human_review_application_summary(records: list[dict]) -> dict:
+    return {
+        "records_before_review": len(records),
+        "records_after_review": len(records),
+        "records_excluded_by_review": 0,
+        "records_corrected_by_review": 0,
+        "clusters_modified_by_review": 0,
+        "validation_results_modified_by_review": 0,
+        "sources_modified_by_review": 0,
+        "anomalies_resolved_by_review": 0,
+        "decisions_provided_count": 0,
+        "decisions_applied_count": 0,
+        "decisions_rejected_count": 0,
+        "audit_entry_count": 0,
     }
 
 
@@ -262,12 +413,31 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
     policy = FinalPackagePolicy(**load_final_package_policy())
 
     normalized_records = _safe_list(state, "normalized_records")
+    post_review_records = _safe_list(state, "final_dataset_post_review")
+    if not post_review_records:
+        post_review_records = _default_post_review_records(normalized_records)
+    records_excluded_by_review = _safe_list(state, "records_excluded_by_human_review")
     source_registry = _safe_list(state, "source_registry")
     linked_events = _safe_list(state, "linked_events")
+    event_clusters = _safe_list(state, "event_clusters")
+    duplicate_clusters = _safe_list(state, "duplicate_clusters")
+    validation_cases = _safe_list(state, "validation_cases")
+    validation_comparisons = _safe_list(state, "validation_comparisons")
+    validation_results = _safe_list(state, "validation_results")
+    anomaly_results = _safe_list(state, "anomaly_results")
+    applied_decisions = _safe_list(state, "applied_human_review_decisions")
+    rejected_decisions = _safe_list(state, "rejected_human_review_decisions")
+    audit_trail = _safe_list(state, "human_review_audit_trail")
     conflicts = _safe_list(state, "conflicts")
     human_review_queue = _safe_list(state, "human_review_queue")
 
-    final_dataset = [HantavirusRecord(**r) for r in normalized_records]
+    final_dataset = [PublicHealthRecord(**r) for r in normalized_records]
+    final_dataset_post_review = [
+        PublicHealthRecord(**r) for r in post_review_records
+    ]
+    records_excluded_models = [
+        PublicHealthRecord(**r) for r in records_excluded_by_review
+    ]
     registry_models = [SourceRegistryEntry(**e) for e in source_registry]
     excluded_sources = [
         e
@@ -280,6 +450,25 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
     included_registry = [e for e in registry_models if e not in excluded_sources]
 
     linked_event_models = [LinkedEvent(**le) for le in linked_events]
+    event_cluster_models = [EventCluster(**cluster) for cluster in event_clusters]
+    duplicate_cluster_models = [
+        EventCluster(**cluster) for cluster in duplicate_clusters
+    ]
+    validation_case_models = [ValidationCase(**item) for item in validation_cases]
+    validation_comparison_models = [
+        ValidationComparison(**item) for item in validation_comparisons
+    ]
+    validation_result_models = [
+        ValidationResult(**item) for item in validation_results
+    ]
+    anomaly_result_models = [AnomalyResult(**item) for item in anomaly_results]
+    applied_decision_models = [
+        AppliedHumanReviewDecision(**item) for item in applied_decisions
+    ]
+    rejected_decision_models = [
+        RejectedHumanReviewDecision(**item) for item in rejected_decisions
+    ]
+    audit_models = [HumanReviewAuditEntry(**item) for item in audit_trail]
     conflict_models = [Conflict(**c) for c in conflicts]
     human_review_items = [HumanReviewItem(**item) for item in human_review_queue]
 
@@ -288,6 +477,9 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
     data_dictionary = _build_data_dictionary(state, policy)
     provenance_manifest = _build_provenance_manifest(state)
     llm_used = _detect_llm_used(state)
+    human_review_application_summary = state.get(
+        "human_review_application_summary"
+    ) or _default_human_review_application_summary(normalized_records)
 
     # Append trace before building the package so package.collection_trace
     # includes this very event and stays length-aligned with state trace.
@@ -300,6 +492,13 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
             "source_registry_size": len(included_registry),
             "excluded_source_count": len(excluded_sources),
             "linked_event_count": len(linked_event_models),
+            "event_cluster_count": len(event_cluster_models),
+            "duplicate_cluster_count": len(duplicate_cluster_models),
+            "validation_result_count": len(validation_result_models),
+            "anomaly_result_count": len(anomaly_result_models),
+            "applied_human_review_decision_count": len(applied_decision_models),
+            "rejected_human_review_decision_count": len(rejected_decision_models),
+            "human_review_audit_entry_count": len(audit_models),
             "conflict_count": len(conflict_models),
             "human_review_item_count": len(human_review_items),
             "contains_synthetic_fixture_data": contains_fixture,
@@ -313,8 +512,33 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
 
     package = FinalDataPackage(
         final_dataset=final_dataset,
+        final_dataset_post_review=final_dataset_post_review,
+        records_excluded_by_human_review=records_excluded_models,
         source_registry=included_registry,
         linked_events=linked_event_models,
+        event_clusters=event_cluster_models,
+        duplicate_clusters=duplicate_cluster_models,
+        validation_cases=validation_case_models,
+        validation_comparisons=validation_comparison_models,
+        validation_results=validation_result_models,
+        validation_summary=state.get("validation_summary") or {},
+        trusted_source_validation_summary=state.get(
+            "trusted_source_validation_summary"
+        )
+        or {},
+        cross_source_validation_summary=state.get(
+            "cross_source_validation_summary"
+        )
+        or {},
+        anomaly_results=anomaly_result_models,
+        anomaly_summary=state.get("anomaly_summary") or {},
+        applied_human_review_decisions=applied_decision_models,
+        rejected_human_review_decisions=rejected_decision_models,
+        human_review_audit_trail=audit_models,
+        human_review_application_summary=state.get(
+            "human_review_application_summary"
+        )
+        or human_review_application_summary,
         conflicts=conflict_models,
         human_review_items=human_review_items,
         excluded_sources=excluded_sources,
@@ -340,5 +564,12 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
     return {
         "final_data_package": package.model_dump(),
         "finalization_summary": finalization_summary,
+        "final_dataset_post_review": [
+            record.model_dump() for record in final_dataset_post_review
+        ],
+        "records_excluded_by_human_review": [
+            record.model_dump() for record in records_excluded_models
+        ],
+        "human_review_application_summary": human_review_application_summary,
         "collection_trace": trace,
     }

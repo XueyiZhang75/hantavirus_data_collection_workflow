@@ -44,6 +44,18 @@ def llm_source_critic_enabled() -> bool:
     return _env_flag("HDC_ENABLE_LLM_SOURCE_CRITIC")
 
 
+def llm_source_credibility_enabled() -> bool:
+    """True only if HDC_ENABLE_LLM_SOURCE_CREDIBILITY is explicitly true."""
+
+    return _env_flag("HDC_ENABLE_LLM_SOURCE_CREDIBILITY")
+
+
+def llm_disease_intelligence_enabled() -> bool:
+    """True only if HDC_ENABLE_LLM_DISEASE_INTELLIGENCE is explicitly true."""
+
+    return _env_flag("HDC_ENABLE_LLM_DISEASE_INTELLIGENCE")
+
+
 def llm_fallback_to_rule_based() -> bool:
     """True unless HDC_LLM_FALLBACK_TO_RULE_BASED is explicitly "false"."""
 

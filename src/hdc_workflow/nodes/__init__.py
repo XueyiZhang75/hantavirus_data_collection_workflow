@@ -1,8 +1,11 @@
 """LangGraph node implementations for the hantavirus data collection workflow."""
 
 from .task_scope import (
+    disease_intelligence_builder,
     task_intake_and_scope_planning,
+    profile_and_schema_setup,
     hantavirus_profile_and_schema_setup,
+    executable_source_planning,
     query_strategy_builder,
 )
 from .source_discovery import (
@@ -33,7 +36,10 @@ from .finalization import final_data_package_builder
 
 __all__ = [
     "task_intake_and_scope_planning",
+    "disease_intelligence_builder",
+    "profile_and_schema_setup",
     "hantavirus_profile_and_schema_setup",
+    "executable_source_planning",
     "query_strategy_builder",
     "source_discovery",
     "source_dedup_and_registry",

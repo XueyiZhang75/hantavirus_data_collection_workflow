@@ -9,9 +9,12 @@ variable so tests stay offline-safe.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 from collections import Counter
 from datetime import datetime, timezone
+from html.parser import HTMLParser
+from pathlib import Path
 from urllib.parse import urlsplit
 
 import re
@@ -35,6 +38,19 @@ from ..models import (
 from ..state import DataCollectionState, append_trace
 
 _OFFLINE_FIXED_TIMESTAMP = "2026-05-25T00:00:00Z"
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+_SEARCH_DERIVED_DISCOVERY_METHODS = {"fixture_search_result", "live_search_result"}
+_SEARCH_DERIVED_FETCH_FINAL_ROLES = {
+    "collection",
+    "validation",
+    "collection_support",
+    "context",
+}
+_SEARCH_DERIVED_BLOCKED_FINAL_ROLES = {
+    "excluded",
+    "search_endpoint",
+    "needs_human_review",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -52,6 +68,82 @@ def _fixture_documents_enabled() -> bool:
     """True only if HDC_USE_FIXTURE_DOCUMENTS is set to "true" (case-insensitive)."""
 
     return (os.environ.get("HDC_USE_FIXTURE_DOCUMENTS") or "").strip().lower() == "true"
+
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = os.environ.get(name)
+    if raw is None or not str(raw).strip():
+        return default
+    return str(raw).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = (os.environ.get(name) or "").strip()
+    if not raw:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        return default
+    return value if value > 0 else default
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = (os.environ.get(name) or "").strip()
+    if not raw:
+        return default
+    try:
+        value = float(raw)
+    except ValueError:
+        return default
+    return value if value >= 0 else default
+
+
+def _env_csv(name: str, default: list[str] | None = None) -> list[str]:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return list(default or [])
+    values = [part.strip() for part in raw.split(",") if part.strip()]
+    return values or list(default or [])
+
+
+def _fetch_config_from_env(policy: ContentFetchPolicy) -> dict:
+    request_cfg = policy.request or {}
+    return {
+        "fetch_search_derived_sources": _env_bool(
+            "HDC_FETCH_SEARCH_DERIVED_SOURCES", False
+        ),
+        "max_search_derived_sources": _env_int(
+            "HDC_FETCH_MAX_SEARCH_DERIVED_SOURCES", 2
+        ),
+        "max_total_sources": _env_int("HDC_FETCH_MAX_TOTAL_SOURCES", 10),
+        "min_credibility_score": _env_float(
+            "HDC_FETCH_MIN_CREDIBILITY_SCORE", 0.55
+        ),
+        "allowed_final_roles": _env_csv(
+            "HDC_FETCH_ALLOWED_FINAL_ROLES",
+            sorted(_SEARCH_DERIVED_FETCH_FINAL_ROLES),
+        ),
+        "allow_needs_review": _env_bool("HDC_FETCH_ALLOW_NEEDS_REVIEW", False),
+        "domain_allowlist": _env_csv("HDC_FETCH_DOMAIN_ALLOWLIST", []),
+        "domain_blocklist": _env_csv("HDC_FETCH_DOMAIN_BLOCKLIST", []),
+        "max_bytes": _env_int(
+            "HDC_FETCH_MAX_BYTES",
+            int(request_cfg.get("max_response_bytes") or 5_000_000),
+        ),
+        "user_agent": (
+            os.environ.get("HDC_FETCH_USER_AGENT")
+            or request_cfg.get("user_agent")
+            or "data-collection-workflow/0.1"
+        ),
+        "parse_pdf_text": _env_bool("HDC_FETCH_PARSE_PDF_TEXT", True),
+        "parse_tables": _env_bool("HDC_FETCH_PARSE_TABLES", True),
+        "store_raw_text": _env_bool("HDC_FETCH_STORE_RAW_TEXT", False),
+        "content_fixture_map_path": (
+            os.environ.get("HDC_CONTENT_FIXTURE_MAP_PATH") or ""
+        ).strip()
+        or None,
+    }
 
 
 def _parse_source_id_allowlist() -> set[str] | None:
@@ -75,6 +167,50 @@ def _load_fixture_document_map() -> dict[str, FixtureDocument]:
     return result
 
 
+def _load_content_fixture_map(path_value: str | None) -> list[dict]:
+    if not path_value:
+        return []
+    path = _resolve_project_path(path_value)
+    if not path.exists():
+        raise FileNotFoundError(f"HDC_CONTENT_FIXTURE_MAP_PATH points to a missing file: {path}")
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    fixtures = data.get("fixtures") if isinstance(data, dict) else None
+    if not isinstance(fixtures, list):
+        raise ValueError(f"Content fixture map must contain a fixtures list: {path}")
+    result: list[dict] = []
+    for item in fixtures:
+        if not isinstance(item, dict):
+            continue
+        fixture_path = item.get("fixture_path")
+        if not fixture_path:
+            continue
+        normalized = dict(item)
+        normalized["fixture_path"] = str(_resolve_project_path(fixture_path))
+        result.append(normalized)
+    return result
+
+
+def _fixture_for_request(
+    request: ContentFetchRequest,
+    source_entry: dict,
+    fixture_map: list[dict],
+) -> dict | None:
+    if not fixture_map:
+        return None
+    canonical_url = request.canonical_url or request.url
+    domain = _domain_for_entry(source_entry)
+    for item in fixture_map:
+        if item.get("source_id") and item.get("source_id") == request.source_id:
+            return item
+        if item.get("canonical_url") and item.get("canonical_url") == canonical_url:
+            return item
+        if item.get("url") and item.get("url") == request.url:
+            return item
+        if item.get("domain") and _domain_matches(domain, [item.get("domain")]):
+            return item
+    return None
+
+
 def _now_fixed_or_utc(live: bool) -> str:
     if not live:
         return _OFFLINE_FIXED_TIMESTAMP
@@ -85,6 +221,13 @@ def _hash_text(text: str | None) -> str | None:
     if not text:
         return None
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _resolve_project_path(value: str | Path) -> Path:
+    path = Path(value).expanduser()
+    if not path.is_absolute():
+        path = _PROJECT_ROOT / path
+    return path
 
 
 def _url_scheme(url: str) -> str:
@@ -106,6 +249,23 @@ def _domain_for_entry(entry: dict) -> str:
     if netloc.startswith("www."):
         netloc = netloc[4:]
     return netloc
+
+
+def _domain_matches(domain: str, patterns: list[str]) -> bool:
+    if not patterns:
+        return False
+    normalized_domain = (domain or "").lower()
+    if normalized_domain.startswith("www."):
+        normalized_domain = normalized_domain[4:]
+    for pattern in patterns:
+        value = str(pattern or "").strip().lower()
+        if not value:
+            continue
+        if value.startswith("www."):
+            value = value[4:]
+        if normalized_domain == value or normalized_domain.endswith("." + value):
+            return True
+    return False
 
 
 def _domain_matches_reserved(domain: str, reserved_domains: list[str]) -> bool:
@@ -164,6 +324,35 @@ def _routing_flags(obj: dict) -> list[str]:
     return flags
 
 
+def _is_search_derived_entry(entry: dict) -> bool:
+    return entry.get("discovery_method") in _SEARCH_DERIVED_DISCOVERY_METHODS
+
+
+def _source_provenance(source_entry: dict) -> dict:
+    return {
+        "discovery_method": source_entry.get("discovery_method"),
+        "search_provider": source_entry.get("search_provider"),
+        "query_id": source_entry.get("query_id"),
+        "query_used": source_entry.get("query_used"),
+        "planned_query_id": source_entry.get("planned_query_id"),
+        "provider_channel": source_entry.get("provider_channel"),
+        "role_hint": source_entry.get("role_hint"),
+        "retrieved_at": source_entry.get("retrieved_at"),
+        "source_role_final": source_entry.get("source_role_final"),
+        "credibility_score": source_entry.get("credibility_score"),
+        "credibility_level": source_entry.get("credibility_level"),
+        "source_credibility_risk_flags": list(
+            source_entry.get("risk_flags")
+            or source_entry.get("credibility_flags")
+            or []
+        ),
+        "search_rank": source_entry.get("search_rank"),
+        "search_result_id": source_entry.get("search_result_id"),
+        "result_source": source_entry.get("result_source"),
+        "query_type": source_entry.get("query_type"),
+    }
+
+
 def _is_context_only_entry(entry: dict, role_policy: dict | None = None) -> bool:
     source_id = entry.get("source_id")
     if source_id in _context_only_source_ids(role_policy):
@@ -186,6 +375,8 @@ def _source_metadata(source_entry: dict) -> dict:
         "notes": source_entry.get("notes"),
         "routing_flags": list(source_entry.get("routing_flags") or []),
         "requires_human_review": source_entry.get("requires_human_review"),
+        "human_review_recommended": source_entry.get("human_review_recommended"),
+        **_source_provenance(source_entry),
     }
 
 
@@ -213,6 +404,7 @@ def _classify_skip_reason(
     allowlist: set[str] | None = None,
     collection_mode: str = "standard",
     role_policy: dict | None = None,
+    fetch_config: dict | None = None,
 ) -> str | None:
     """Return a skip reason or None if the entry should be fetched.
 
@@ -229,12 +421,58 @@ def _classify_skip_reason(
         return "not_in_source_id_allowlist"
     if _is_validation_reserved_entry(entry, collection_mode, role_policy):
         return "validation_reserved"
+    url = entry.get("canonical_url") or entry.get("url") or ""
+    scheme = _url_scheme(url)
+    if _is_search_derived_entry(entry):
+        cfg = fetch_config or {}
+        if not bool(cfg.get("fetch_search_derived_sources", False)):
+            return "search_derived_fetch_disabled"
+        final_role = str(entry.get("source_role_final") or "").strip()
+        if final_role in _SEARCH_DERIVED_BLOCKED_FINAL_ROLES:
+            if final_role == "needs_human_review":
+                return "needs_review_not_allowed"
+            return f"final_role_{final_role}"
+        allowed_roles = set(cfg.get("allowed_final_roles") or [])
+        if final_role and allowed_roles and final_role not in allowed_roles:
+            return "final_role_not_allowed"
+        if not entry.get("source_type"):
+            return "missing_source_type"
+        if scheme not in {"http", "https"}:
+            return "unsupported_url_scheme"
+        score = entry.get("credibility_score")
+        threshold = float(cfg.get("min_credibility_score", 0.55))
+        if score is None:
+            return "missing_credibility_score"
+        try:
+            score_value = float(score)
+        except (TypeError, ValueError):
+            return "invalid_credibility_score"
+        if score_value < threshold:
+            return "credibility_score_below_threshold"
+        level = str(entry.get("credibility_level") or "").strip().lower()
+        allow_needs_review = bool(cfg.get("allow_needs_review", False))
+        if (
+            level not in {"high", "medium"}
+            or entry.get("human_review_recommended")
+            or entry.get("requires_human_review")
+        ) and not allow_needs_review:
+            return "needs_review_not_allowed"
+        if not entry.get("ready_for_content_fetch"):
+            return "not_ready_for_content_fetch"
+        final_decision = entry.get("final_screening_decision")
+        if final_decision not in policy.fetchable_final_decisions:
+            return "final_screening_decision_not_fetchable"
+        domain = _domain_for_entry(entry)
+        if _domain_matches(domain, list(cfg.get("domain_blocklist") or [])):
+            return "domain_blocklisted"
+        allowlist_domains = list(cfg.get("domain_allowlist") or [])
+        if allowlist_domains and not _domain_matches(domain, allowlist_domains):
+            return "domain_not_allowlisted"
+        return None
     if entry.get("requires_human_review"):
         return "human_review"
     if _is_search_endpoint(entry, policy):
         return "search_endpoint"
-    url = entry.get("canonical_url") or entry.get("url") or ""
-    scheme = _url_scheme(url)
     if scheme in {s.lower() for s in policy.blocked_url_schemes}:
         return "blocked_scheme"
     if scheme not in {s.lower() for s in policy.allowed_url_schemes}:
@@ -251,20 +489,79 @@ def _build_fetch_requests(
     state: DataCollectionState,
     policy: ContentFetchPolicy,
     live: bool,
+    fetch_config: dict,
     allowlist: set[str] | None = None,
     collection_mode: str = "standard",
     role_policy: dict | None = None,
-) -> tuple[list[ContentFetchRequest], dict[str, int]]:
+) -> tuple[list[ContentFetchRequest], dict[str, int], list[dict]]:
     registry = list(state.get("source_registry") or [])
     skip_counts: Counter = Counter()
     accepted: list[ContentFetchRequest] = []
+    selection_manifest: list[dict] = []
+    selected_search_derived_count = 0
 
     for entry in registry:
+        is_search_derived = _is_search_derived_entry(entry)
         skip_reason = _classify_skip_reason(
-            entry, policy, allowlist, collection_mode, role_policy
+            entry,
+            policy,
+            allowlist,
+            collection_mode,
+            role_policy,
+            fetch_config,
         )
         if skip_reason is not None:
             skip_counts[skip_reason] += 1
+            selection_manifest.append(
+                {
+                    "source_id": entry.get("source_id"),
+                    "canonical_url": entry.get("canonical_url") or entry.get("url"),
+                    "domain": _domain_for_entry(entry),
+                    "discovery_method": entry.get("discovery_method"),
+                    "source_role_final": entry.get("source_role_final"),
+                    "credibility_score": entry.get("credibility_score"),
+                    "credibility_level": entry.get("credibility_level"),
+                    "selected_for_fetch": False,
+                    "skip_reason": skip_reason,
+                }
+            )
+            continue
+        if is_search_derived:
+            max_search = int(fetch_config.get("max_search_derived_sources") or 2)
+            if selected_search_derived_count >= max_search:
+                skip_reason = "max_search_derived_sources_reached"
+                skip_counts[skip_reason] += 1
+                selection_manifest.append(
+                    {
+                        "source_id": entry.get("source_id"),
+                        "canonical_url": entry.get("canonical_url") or entry.get("url"),
+                        "domain": _domain_for_entry(entry),
+                        "discovery_method": entry.get("discovery_method"),
+                        "source_role_final": entry.get("source_role_final"),
+                        "credibility_score": entry.get("credibility_score"),
+                        "credibility_level": entry.get("credibility_level"),
+                        "selected_for_fetch": False,
+                        "skip_reason": skip_reason,
+                    }
+                )
+                continue
+        max_total = int(fetch_config.get("max_total_sources") or 10)
+        if len(accepted) >= max_total:
+            skip_reason = "max_total_sources_reached"
+            skip_counts[skip_reason] += 1
+            selection_manifest.append(
+                {
+                    "source_id": entry.get("source_id"),
+                    "canonical_url": entry.get("canonical_url") or entry.get("url"),
+                    "domain": _domain_for_entry(entry),
+                    "discovery_method": entry.get("discovery_method"),
+                    "source_role_final": entry.get("source_role_final"),
+                    "credibility_score": entry.get("credibility_score"),
+                    "credibility_level": entry.get("credibility_level"),
+                    "selected_for_fetch": False,
+                    "skip_reason": skip_reason,
+                }
+            )
             continue
 
         final_decision = entry.get("final_screening_decision") or ""
@@ -280,15 +577,31 @@ def _build_fetch_requests(
                 publisher=entry.get("publisher"),
                 source_type=entry.get("source_type"),
                 source_role=entry.get("source_role"),
+                **_source_provenance(entry),
                 final_screening_decision=final_decision,
                 fetch_purpose=fetch_purpose,
                 priority=entry.get("priority"),
                 live_fetch_enabled=live,
             )
         )
+        if is_search_derived:
+            selected_search_derived_count += 1
+        selection_manifest.append(
+            {
+                "source_id": entry.get("source_id"),
+                "canonical_url": entry.get("canonical_url") or entry.get("url"),
+                "domain": _domain_for_entry(entry),
+                "discovery_method": entry.get("discovery_method"),
+                "source_role_final": entry.get("source_role_final"),
+                "credibility_score": entry.get("credibility_score"),
+                "credibility_level": entry.get("credibility_level"),
+                "selected_for_fetch": True,
+                "skip_reason": None,
+            }
+        )
 
     accepted.sort(key=lambda r: (r.priority is None, r.priority or 0, r.source_id))
-    return accepted, dict(skip_counts)
+    return accepted, dict(skip_counts), selection_manifest
 
 
 # ---------------------------------------------------------------------------
@@ -352,6 +665,7 @@ def _make_fixture_document(
         publisher=source_entry.get("publisher"),
         source_type=source_entry.get("source_type"),
         source_role=source_entry.get("source_role"),
+        **_source_provenance(source_entry),
         final_screening_decision=request.final_screening_decision,
         fetch_purpose=request.fetch_purpose,
         fetch_status="fixture_loaded",
@@ -359,6 +673,9 @@ def _make_fixture_document(
         http_status_code=None,
         content_type=None,
         fetched_at=_OFFLINE_FIXED_TIMESTAMP,
+        parser_used="fixture_document_loader",
+        text_char_count=len(clean_text or ""),
+        table_count=len(fixture.tables or []),
         content_hash=_hash_text(clean_text),
         is_live_fetched=False,
         is_offline_stub=False,
@@ -392,6 +709,7 @@ def _make_offline_stub_document(
         publisher=source_entry.get("publisher"),
         source_type=source_entry.get("source_type"),
         source_role=source_entry.get("source_role"),
+        **_source_provenance(source_entry),
         final_screening_decision=request.final_screening_decision,
         fetch_purpose=request.fetch_purpose,
         fetch_status="offline_stub",
@@ -399,6 +717,9 @@ def _make_offline_stub_document(
         http_status_code=None,
         content_type=None,
         fetched_at=_OFFLINE_FIXED_TIMESTAMP,
+        parser_used="offline_metadata_stub",
+        text_char_count=len(clean_text or ""),
+        table_count=0,
         content_hash=_hash_text(clean_text),
         is_live_fetched=False,
         is_offline_stub=True,
@@ -416,39 +737,227 @@ def _looks_like_pdf(url: str, content_type: str | None) -> bool:
     return (url or "").lower().split("?")[0].endswith(".pdf")
 
 
-def _html_to_clean_text(html_bytes: bytes) -> tuple[str | None, str | None, list[dict]]:
-    """Return (clean_text, title, tables) from HTML bytes."""
+class _VisibleHTMLTextParser(HTMLParser):
+    """Small stdlib parser for visible text, titles, meta dates, and tables."""
 
+    _SKIP_TAGS = {"script", "style", "nav", "footer", "noscript"}
+
+    def __init__(self, *, parse_tables: bool = True) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parse_tables = parse_tables
+        self._skip_depth = 0
+        self._tag_stack: list[str] = []
+        self._current_text: list[str] = []
+        self.title_parts: list[str] = []
+        self.headings: list[str] = []
+        self.text_parts: list[str] = []
+        self.meta_description: str | None = None
+        self.published_date: str | None = None
+        self.tables: list[dict] = []
+        self._in_table = False
+        self._table_rows: list[list[str]] = []
+        self._current_row: list[str] | None = None
+        self._current_cell: list[str] | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        tag = tag.lower()
+        self._tag_stack.append(tag)
+        attr_map = {key.lower(): value for key, value in attrs if key}
+        if tag in self._SKIP_TAGS:
+            self._skip_depth += 1
+            return
+        if tag == "meta":
+            name = (attr_map.get("name") or attr_map.get("property") or "").lower()
+            content = (attr_map.get("content") or "").strip()
+            if not content:
+                return
+            if name in {"description", "og:description"} and not self.meta_description:
+                self.meta_description = content
+            if name in {
+                "date",
+                "dc.date",
+                "article:published_time",
+                "pubdate",
+                "publishdate",
+                "published_date",
+            } and not self.published_date:
+                self.published_date = content[:10]
+        if not self.parse_tables:
+            return
+        if tag == "table":
+            self._in_table = True
+            self._table_rows = []
+        elif self._in_table and tag == "tr":
+            self._current_row = []
+        elif self._in_table and tag in {"td", "th"}:
+            self._current_cell = []
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        if tag in self._SKIP_TAGS and self._skip_depth > 0:
+            self._skip_depth -= 1
+        if not self._tag_stack:
+            return
+        if self.parse_tables and self._in_table and tag in {"td", "th"}:
+            if self._current_cell is not None and self._current_row is not None:
+                cell = _normalize_whitespace(" ".join(self._current_cell))
+                self._current_row.append(cell)
+            self._current_cell = None
+        elif self.parse_tables and self._in_table and tag == "tr":
+            if self._current_row:
+                self._table_rows.append(self._current_row)
+            self._current_row = None
+        elif self.parse_tables and self._in_table and tag == "table":
+            if self._table_rows:
+                self.tables.append(
+                    {"table_index": len(self.tables), "rows": list(self._table_rows)}
+                )
+            self._table_rows = []
+            self._in_table = False
+        while self._tag_stack:
+            popped = self._tag_stack.pop()
+            if popped == tag:
+                break
+
+    def handle_data(self, data: str) -> None:
+        if self._skip_depth > 0:
+            return
+        text = _normalize_whitespace(data)
+        if not text:
+            return
+        current_tag = self._tag_stack[-1] if self._tag_stack else ""
+        if current_tag == "title":
+            self.title_parts.append(text)
+        if current_tag in {"h1", "h2", "h3", "h4", "h5", "h6"}:
+            self.headings.append(text)
+        if self.parse_tables and self._in_table and self._current_cell is not None:
+            self._current_cell.append(text)
+        self.text_parts.append(text)
+
+
+def _decode_body(body: bytes) -> str:
+    return body.decode("utf-8", errors="replace")
+
+
+def _parse_pdf_content(body: bytes, *, parse_pdf_text: bool) -> dict:
+    if not parse_pdf_text:
+        return {
+            "document_type": "pdf",
+            "clean_text": None,
+            "tables": [],
+            "parse_status": "parse_deferred",
+            "parser_used": "pdf_parse_deferred",
+            "title": None,
+            "published_date": None,
+            "content_type": "application/pdf",
+            "parse_error": "pdf_text_parsing_disabled",
+        }
     try:
-        from bs4 import BeautifulSoup
-    except ImportError:
-        return None, None, []
+        from io import BytesIO
+        from pypdf import PdfReader  # type: ignore
+    except Exception as exc:  # noqa: BLE001 - optional dependency.
+        return {
+            "document_type": "pdf",
+            "clean_text": None,
+            "tables": [],
+            "parse_status": "parse_deferred",
+            "parser_used": "pdf_parse_deferred",
+            "title": None,
+            "published_date": None,
+            "content_type": "application/pdf",
+            "parse_error": f"pypdf_unavailable:{type(exc).__name__}",
+        }
+    try:
+        reader = PdfReader(BytesIO(body))
+        pages = []
+        for page in reader.pages:
+            pages.append(page.extract_text() or "")
+        clean_text = "\n".join(part.strip() for part in pages if part.strip()) or None
+    except Exception as exc:  # noqa: BLE001 - malformed PDFs should not crash.
+        return {
+            "document_type": "pdf",
+            "clean_text": None,
+            "tables": [],
+            "parse_status": "parse_failed",
+            "parser_used": "pdf_parse_failed",
+            "title": None,
+            "published_date": None,
+            "content_type": "application/pdf",
+            "parse_error": f"pypdf_parse_failed:{type(exc).__name__}",
+        }
+    return {
+        "document_type": "pdf",
+        "clean_text": clean_text,
+        "tables": [],
+        "parse_status": "parsed_pdf" if clean_text else "parse_failed",
+        "parser_used": "pdf_pypdf_parser" if clean_text else "pdf_parse_failed",
+        "title": None,
+        "published_date": None,
+        "content_type": "application/pdf",
+        "parse_error": None if clean_text else "pdf_no_extractable_text",
+    }
 
-    soup = BeautifulSoup(html_bytes, "html.parser")
 
-    for tag_name in ("script", "style", "nav", "footer", "noscript"):
-        for tag in soup.find_all(tag_name):
-            tag.decompose()
+def _parse_document_content(
+    body: bytes,
+    *,
+    url: str,
+    content_type: str | None,
+    parse_pdf_text: bool,
+    parse_tables: bool,
+) -> dict:
+    """Parse fetched bytes into auditable clean text and parse metadata."""
 
-    title = None
-    if soup.title and soup.title.string:
-        title = soup.title.string.strip()
-
-    text = soup.get_text(separator="\n", strip=True)
-    clean_lines = [line for line in (l.strip() for l in text.splitlines()) if line]
-    clean_text = "\n".join(clean_lines) or None
-
-    tables: list[dict] = []
-    for i, table in enumerate(soup.find_all("table")):
-        rows: list[list[str]] = []
-        for tr in table.find_all("tr"):
-            cells = [c.get_text(strip=True) for c in tr.find_all(["th", "td"])]
-            if cells:
-                rows.append(cells)
-        if rows:
-            tables.append({"table_index": i, "rows": rows})
-
-    return clean_text, title, tables
+    normalized_content_type = content_type or ""
+    if _looks_like_pdf(url, normalized_content_type):
+        result = _parse_pdf_content(body, parse_pdf_text=parse_pdf_text)
+    elif "html" in normalized_content_type.lower() or body.lstrip().startswith(b"<"):
+        parser = _VisibleHTMLTextParser(parse_tables=parse_tables)
+        parser.feed(_decode_body(body))
+        title = _normalize_whitespace(" ".join(parser.title_parts)) or None
+        clean_parts = []
+        if parser.meta_description:
+            clean_parts.append(parser.meta_description)
+        clean_parts.extend(parser.headings)
+        clean_parts.extend(parser.text_parts)
+        clean_text = "\n".join(
+            line for line in (_normalize_whitespace(part) for part in clean_parts) if line
+        )
+        result = {
+            "document_type": "html",
+            "clean_text": clean_text or None,
+            "tables": parser.tables if parse_tables else [],
+            "parse_status": "parsed_html",
+            "parser_used": "html_stdlib_parser",
+            "title": title,
+            "published_date": parser.published_date,
+            "content_type": normalized_content_type or "text/html",
+            "parse_error": None,
+        }
+    else:
+        clean_text = _decode_body(body)
+        lowered = normalized_content_type.lower()
+        parser_used = "text_parser"
+        if "json" in lowered:
+            parser_used = "json_text_parser"
+        elif "csv" in lowered:
+            parser_used = "csv_text_parser"
+        result = {
+            "document_type": "text",
+            "clean_text": clean_text,
+            "tables": [],
+            "parse_status": "parsed_text",
+            "parser_used": parser_used,
+            "title": None,
+            "published_date": None,
+            "content_type": normalized_content_type or "text/plain",
+            "parse_error": None,
+        }
+    clean_text = result.get("clean_text") or ""
+    tables = result.get("tables") or []
+    result["text_char_count"] = len(clean_text)
+    result["table_count"] = len(tables)
+    return result
 
 
 def _fetch_live_document(
@@ -580,6 +1089,209 @@ def _fetch_live_document(
     )
 
 
+def _base_document_kwargs(
+    request: ContentFetchRequest,
+    source_entry: dict,
+    *,
+    live: bool,
+    fetched_at: str,
+) -> dict:
+    return {
+        "source_id": request.source_id,
+        "url": request.url,
+        "canonical_url": request.canonical_url,
+        "title": source_entry.get("title"),
+        "published_date": source_entry.get("published_date"),
+        "publisher": source_entry.get("publisher"),
+        "source_type": source_entry.get("source_type"),
+        "source_role": source_entry.get("source_role"),
+        **_source_provenance(source_entry),
+        "final_screening_decision": request.final_screening_decision,
+        "fetch_purpose": request.fetch_purpose,
+        "is_live_fetched": live,
+        "is_offline_stub": False,
+        "fetched_at": fetched_at,
+        "metadata": {
+            "live_fetch_enabled": live,
+            **_source_metadata(source_entry),
+        },
+    }
+
+
+def _make_parsed_document(
+    request: ContentFetchRequest,
+    source_entry: dict,
+    *,
+    body: bytes,
+    content_type: str | None,
+    http_status_code: int | None,
+    fetch_status: str,
+    fetched_at: str,
+    live: bool,
+    fetch_config: dict,
+    extra_metadata: dict | None = None,
+) -> Document:
+    parsed = _parse_document_content(
+        body,
+        url=request.url,
+        content_type=content_type,
+        parse_pdf_text=bool(fetch_config.get("parse_pdf_text", True)),
+        parse_tables=bool(fetch_config.get("parse_tables", True)),
+    )
+    clean_text = parsed.get("clean_text")
+    metadata = {
+        **_source_metadata(source_entry),
+        "parse_error": parsed.get("parse_error"),
+        "raw_text_stored": bool(fetch_config.get("store_raw_text", False)),
+    }
+    if extra_metadata:
+        metadata.update(extra_metadata)
+    if bool(fetch_config.get("store_raw_text", False)) and clean_text:
+        metadata["raw_text"] = clean_text
+    base_kwargs = _base_document_kwargs(
+        request,
+        source_entry,
+        live=live,
+        fetched_at=fetched_at,
+    )
+    base_kwargs["metadata"] = metadata
+    base_kwargs["title"] = parsed.get("title") or source_entry.get("title")
+    base_kwargs["published_date"] = (
+        parsed.get("published_date") or source_entry.get("published_date")
+    )
+    return Document(
+        **base_kwargs,
+        document_type=parsed.get("document_type"),
+        clean_text=clean_text,
+        tables=list(parsed.get("tables") or []),
+        parse_status=parsed.get("parse_status") or "parse_failed",
+        quality_status=None,
+        quality_issues=[],
+        fetch_status=fetch_status,
+        fetch_error=parsed.get("parse_error"),
+        http_status_code=http_status_code,
+        content_type=parsed.get("content_type") or content_type,
+        parser_used=parsed.get("parser_used"),
+        text_char_count=parsed.get("text_char_count"),
+        table_count=parsed.get("table_count"),
+        content_hash=_hash_text(clean_text),
+        is_fixture_document=bool(
+            extra_metadata and extra_metadata.get("local_content_fixture")
+        ),
+        fixture_id=(extra_metadata or {}).get("fixture_id"),
+        fixture_notes=(extra_metadata or {}).get("fixture_notes"),
+    )
+
+
+def _fetch_fixture_content_document(
+    request: ContentFetchRequest,
+    source_entry: dict,
+    fixture_entry: dict,
+    fetch_config: dict,
+) -> Document:
+    fixture_path = Path(fixture_entry["fixture_path"])
+    body = fixture_path.read_bytes()
+    max_bytes = int(fetch_config.get("max_bytes") or len(body))
+    return _make_parsed_document(
+        request,
+        source_entry,
+        body=body[:max_bytes],
+        content_type=fixture_entry.get("content_type") or "text/html; charset=utf-8",
+        http_status_code=int(fixture_entry.get("http_status_code") or 200),
+        fetch_status="fixture_content_loaded",
+        fetched_at=_OFFLINE_FIXED_TIMESTAMP,
+        live=False,
+        fetch_config=fetch_config,
+        extra_metadata={
+            "local_content_fixture": True,
+            "synthetic_fixture": True,
+            "not_real_public_health_data": True,
+            "fixture_id": fixture_entry.get("fixture_id") or fixture_path.stem,
+            "fixture_path": str(fixture_path),
+            "fixture_notes": fixture_entry.get("notes"),
+        },
+    )
+
+
+def _fetch_live_document(
+    request: ContentFetchRequest,
+    source_entry: dict,
+    policy: ContentFetchPolicy,
+    fetch_config: dict,
+) -> Document:
+    """Perform a live HTTP fetch and parse through the generalized parser."""
+
+    import requests  # local import; offline path never touches the network
+
+    request_cfg = policy.request or {}
+    timeout = float(
+        os.environ.get("HDC_FETCH_TIMEOUT_SECONDS")
+        or request_cfg.get("timeout_seconds")
+        or 15
+    )
+    max_bytes = int(fetch_config.get("max_bytes") or 5_000_000)
+    user_agent = fetch_config.get("user_agent") or request_cfg.get(
+        "user_agent", "data-collection-workflow/0.1"
+    )
+    headers = {"User-Agent": user_agent}
+    fetched_at = _now_fixed_or_utc(live=True)
+
+    try:
+        response = requests.get(
+            request.url,
+            timeout=timeout,
+            headers=headers,
+            stream=True,
+        )
+        http_status = response.status_code
+        content_type = response.headers.get("Content-Type")
+        chunks: list[bytes] = []
+        total = 0
+        for chunk in response.iter_content(chunk_size=65536):
+            if not chunk:
+                continue
+            remaining = max_bytes - total
+            if remaining <= 0:
+                break
+            chunks.append(chunk[:remaining])
+            total += len(chunks[-1])
+        body = b"".join(chunks)
+    except Exception as exc:  # pragma: no cover - manual live-fetch only
+        return Document(
+            **_base_document_kwargs(
+                request,
+                source_entry,
+                live=True,
+                fetched_at=fetched_at,
+            ),
+            document_type=None,
+            clean_text=None,
+            tables=[],
+            parse_status="fetch_failed",
+            fetch_status="fetch_failed",
+            fetch_error=str(exc),
+            http_status_code=None,
+            content_type=None,
+            parser_used=None,
+            text_char_count=0,
+            table_count=0,
+            content_hash=None,
+        )
+
+    fetch_status = "fetched" if http_status < 400 else "fetch_failed"
+    return _make_parsed_document(
+        request,
+        source_entry,
+        body=body,
+        content_type=content_type,
+        http_status_code=http_status,
+        fetch_status=fetch_status,
+        fetched_at=fetched_at,
+        live=True,
+        fetch_config=fetch_config,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Nodes
 # ---------------------------------------------------------------------------
@@ -595,14 +1307,18 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
     role_policy = load_source_role_policy()
     collection_mode = get_collection_mode(role_policy)
     live = _live_fetch_enabled()
+    fetch_config = _fetch_config_from_env(policy)
     fixture_enabled = _fixture_documents_enabled()
     fixture_map: dict[str, FixtureDocument] = (
         _load_fixture_document_map() if fixture_enabled else {}
     )
+    content_fixture_map = _load_content_fixture_map(
+        fetch_config.get("content_fixture_map_path")
+    )
     allowlist = _parse_source_id_allowlist()
 
-    fetch_requests, skip_counts = _build_fetch_requests(
-        state, policy, live, allowlist, collection_mode, role_policy
+    fetch_requests, skip_counts, selection_manifest = _build_fetch_requests(
+        state, policy, live, fetch_config, allowlist, collection_mode, role_policy
     )
 
     registry = list(state.get("source_registry") or [])
@@ -613,11 +1329,19 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
     for request in fetch_requests:
         source_entry = registry_by_id.get(request.source_id) or {}
         fixture = fixture_map.get(request.source_id) if fixture_enabled else None
+        content_fixture = _fixture_for_request(
+            request, source_entry, content_fixture_map
+        )
         if fixture is not None:
             doc = _make_fixture_document(request, source_entry, fixture)
             fixture_loaded_source_ids.append(request.source_id)
+        elif content_fixture is not None:
+            doc = _fetch_fixture_content_document(
+                request, source_entry, content_fixture, fetch_config
+            )
+            fixture_loaded_source_ids.append(request.source_id)
         elif live:
-            doc = _fetch_live_document(request, source_entry, policy)
+            doc = _fetch_live_document(request, source_entry, policy, fetch_config)
         else:
             doc = _make_offline_stub_document(request, source_entry)
         documents.append(doc)
@@ -627,9 +1351,42 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
 
     fetch_status_counts = dict(Counter(d.fetch_status or "unknown" for d in documents))
     document_type_counts = dict(Counter(d.document_type or "unknown" for d in documents))
+    parser_status_counts = dict(Counter(d.parse_status or "unknown" for d in documents))
+    parser_used_counts = dict(Counter(d.parser_used or "unknown" for d in documents))
+    content_type_counts = dict(Counter(d.content_type or "unknown" for d in documents))
+    total_table_count = sum(int(d.table_count or len(d.tables or [])) for d in documents)
+    total_text_char_count = sum(int(d.text_char_count or len(d.clean_text or "")) for d in documents)
     fetch_purpose_counts = dict(
         Counter(r.fetch_purpose or "unknown" for r in fetch_requests)
     )
+    search_derived_registry = [e for e in registry if _is_search_derived_entry(e)]
+    selected_search_derived_ids = [
+        r.source_id for r in fetch_requests
+        if r.discovery_method in _SEARCH_DERIVED_DISCOVERY_METHODS
+    ]
+    skipped_search_derived_by_reason = {
+        reason: count
+        for reason, count in skip_counts.items()
+        if reason
+        in {
+            "search_derived_fetch_disabled",
+            "final_role_excluded",
+            "final_role_search_endpoint",
+            "needs_review_not_allowed",
+            "final_role_not_allowed",
+            "missing_source_type",
+            "unsupported_url_scheme",
+            "missing_credibility_score",
+            "invalid_credibility_score",
+            "credibility_score_below_threshold",
+            "not_ready_for_content_fetch",
+            "final_screening_decision_not_fetchable",
+            "domain_blocklisted",
+            "domain_not_allowlisted",
+            "max_search_derived_sources_reached",
+            "max_total_sources_reached",
+        }
+    }
     skipped_validation_reserved_ids = [
         e.get("source_id")
         for e in registry
@@ -654,10 +1411,33 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
         "collection_mode": collection_mode,
         "live_fetch_enabled": live,
         "fixture_documents_enabled": fixture_enabled,
+        "content_fixture_map_enabled": bool(content_fixture_map),
         "fixture_document_count": len(fixture_loaded_source_ids),
         "fixture_source_ids": list(fixture_loaded_source_ids),
         "source_id_allowlist_enabled": allowlist is not None,
         "source_id_allowlist": sorted(allowlist) if allowlist else [],
+        "search_derived_fetch_enabled": bool(
+            fetch_config.get("fetch_search_derived_sources")
+        ),
+        "search_derived_input_count": len(search_derived_registry),
+        "selected_search_derived_fetch_count": len(selected_search_derived_ids),
+        "selected_search_derived_source_ids": selected_search_derived_ids,
+        "skipped_search_derived_fetch_disabled_count": skip_counts.get(
+            "search_derived_fetch_disabled", 0
+        ),
+        "skipped_search_derived_fetch_limit_count": skip_counts.get(
+            "max_search_derived_sources_reached", 0
+        ),
+        "skipped_search_derived_by_reason_counts": skipped_search_derived_by_reason,
+        "max_search_derived_sources": fetch_config.get(
+            "max_search_derived_sources"
+        ),
+        "max_total_sources": fetch_config.get("max_total_sources"),
+        "min_credibility_score": fetch_config.get("min_credibility_score"),
+        "allowed_final_roles": list(fetch_config.get("allowed_final_roles") or []),
+        "allow_needs_review": bool(fetch_config.get("allow_needs_review")),
+        "domain_allowlist": list(fetch_config.get("domain_allowlist") or []),
+        "domain_blocklist": list(fetch_config.get("domain_blocklist") or []),
         "skipped_not_in_allowlist_count": skip_counts.get("not_in_source_id_allowlist", 0),
         "skipped_validation_reserved_count": skip_counts.get(
             "validation_reserved", 0
@@ -673,6 +1453,11 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
         "document_count": len(documents),
         "fetch_status_counts": fetch_status_counts,
         "document_type_counts": document_type_counts,
+        "parser_status_counts": parser_status_counts,
+        "parser_used_counts": parser_used_counts,
+        "content_type_counts": content_type_counts,
+        "total_table_count": total_table_count,
+        "total_text_char_count": total_text_char_count,
         "fetch_purpose_counts": fetch_purpose_counts,
         "skipped_deferred_count": skip_counts.get("deferred", 0)
         + skip_counts.get("not_fetchable", 0),
@@ -691,6 +1476,61 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
             "Fixture documents are synthetic and not real public health data."
         ),
     }
+    parse_summary = {
+        "document_count": len(documents),
+        "parser_status_counts": parser_status_counts,
+        "parser_used_counts": parser_used_counts,
+        "content_type_counts": content_type_counts,
+        "parsed_document_count": sum(
+            count
+            for status, count in parser_status_counts.items()
+            if str(status).startswith("parsed")
+        ),
+        "parse_deferred_count": parser_status_counts.get("parse_deferred", 0)
+        + parser_status_counts.get("pdf_parsing_deferred", 0),
+        "parse_failed_count": parser_status_counts.get("parse_failed", 0)
+        + parser_status_counts.get("fetch_failed", 0),
+        "total_text_char_count": total_text_char_count,
+        "total_table_count": total_table_count,
+        "documents": [
+            {
+                "source_id": d.source_id,
+                "canonical_url": d.canonical_url,
+                "discovery_method": d.discovery_method,
+                "source_role_final": d.source_role_final,
+                "credibility_score": d.credibility_score,
+                "credibility_level": d.credibility_level,
+                "fetch_status": d.fetch_status,
+                "parse_status": d.parse_status,
+                "parser_used": d.parser_used,
+                "content_type": d.content_type,
+                "title": d.title,
+                "published_date": d.published_date,
+                "text_char_count": d.text_char_count,
+                "table_count": d.table_count,
+            }
+            for d in documents
+        ],
+    }
+    fetch_manifest = []
+    document_by_source_id = {d.source_id: d for d in documents}
+    for item in selection_manifest:
+        source_id = item.get("source_id")
+        doc = document_by_source_id.get(source_id)
+        enriched = dict(item)
+        if doc is not None:
+            enriched.update(
+                {
+                    "fetch_status": doc.fetch_status,
+                    "parse_status": doc.parse_status,
+                    "parser_used": doc.parser_used,
+                    "content_type": doc.content_type,
+                    "http_status_code": doc.http_status_code,
+                    "text_char_count": doc.text_char_count,
+                    "table_count": doc.table_count,
+                }
+            )
+        fetch_manifest.append(enriched)
 
     trace = append_trace(
         state,
@@ -707,6 +1547,8 @@ def content_fetch_and_parse(state: DataCollectionState) -> dict:
         "content_fetch_requests": request_dicts,
         "documents": document_dicts,
         "content_fetch_summary": summary,
+        "document_parse_summary": parse_summary,
+        "fetch_manifest": fetch_manifest,
         "fixture_document_summary": fixture_summary,
         "collection_trace": trace,
     }
@@ -746,10 +1588,10 @@ def document_quality_check(state: DataCollectionState) -> dict:
             if "not_real_source_content" not in issues:
                 issues.append("not_real_source_content")
             offline_stub += 1
-        elif parse_status == "pdf_parsing_deferred":
+        elif parse_status in {"pdf_parsing_deferred", "parse_deferred"}:
             quality_status = "parse_deferred"
-            if "pdf_parsing_not_implemented" not in issues:
-                issues.append("pdf_parsing_not_implemented")
+            if "pdf_parsing_deferred" not in issues:
+                issues.append("pdf_parsing_deferred")
             parse_deferred += 1
         elif text_len >= min_usable:
             quality_status = "usable"
@@ -768,6 +1610,8 @@ def document_quality_check(state: DataCollectionState) -> dict:
 
         new_doc["quality_status"] = quality_status
         new_doc["quality_issues"] = issues
+        new_doc["text_char_count"] = len(clean_text)
+        new_doc["table_count"] = len(doc.get("tables") or [])
         updated.append(new_doc)
         quality_counter[quality_status] += 1
 
@@ -813,8 +1657,8 @@ def _document_is_chunkable(
 ) -> tuple[bool, str]:
     if doc.get("is_offline_stub"):
         return False, "offline_stub"
-    if doc.get("parse_status") == "pdf_parsing_deferred":
-        return False, "pdf_parsing_deferred"
+    if doc.get("parse_status") in {"pdf_parsing_deferred", "parse_deferred"}:
+        return False, "parse_deferred"
     quality_status = doc.get("quality_status")
     if quality_status in policy.excluded_quality_statuses:
         return False, quality_status or "excluded_quality_status"
@@ -997,6 +1841,16 @@ def _make_evidence_chunk(
         publisher=doc.get("publisher"),
         source_type=doc.get("source_type"),
         source_role=doc.get("source_role"),
+        source_role_final=doc.get("source_role_final"),
+        credibility_score=doc.get("credibility_score"),
+        credibility_level=doc.get("credibility_level"),
+        discovery_method=doc.get("discovery_method"),
+        search_provider=doc.get("search_provider"),
+        query_id=doc.get("query_id"),
+        query_used=doc.get("query_used"),
+        planned_query_id=doc.get("planned_query_id"),
+        provider_channel=doc.get("provider_channel"),
+        role_hint=doc.get("role_hint"),
         quality_status=doc.get("quality_status"),
         chunk_index=chunk_index,
         chunk_kind=chunk_kind,

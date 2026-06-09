@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hdc_workflow"
 version = "0.1.0"
-description = "LangGraph-based data collection workflow for a hantavirus public health case study (Step 1 scaffolding)."
+description = "LangGraph-based data collection workflow with configurable disease profiles, source search, validation, review, and export UX."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Hantavirus Data Collection Project" }]
@@ -29,11 +29,14 @@ dev = [
     "langgraph-cli[inmem]",
 ]
 
+[project.scripts]
+data-collection-workflow = "hdc_workflow.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-"hdc_workflow" = ["resources/*.json"]
+"hdc_workflow" = ["resources/*.json", "resources/**/*.json", "resources/**/*.csv", "resources/**/*.html"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

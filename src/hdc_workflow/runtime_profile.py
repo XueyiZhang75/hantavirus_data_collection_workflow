@@ -22,6 +22,19 @@ SOURCE_ROLE_POLICY_OVERLAY_PATH = (
     LIVE_CASE_DIR / "new_mexico_hps_source_role_policy_overlay.json"
 )
 GROUND_TRUTH_RECORDS_PATH = LIVE_CASE_DIR / "new_mexico_hps_ground_truth_records.csv"
+DEFAULT_SEARCH_FIXTURE_PATH = (
+    Path(__file__).resolve().parent
+    / "resources"
+    / "search_fixtures"
+    / "example_search_results.json"
+)
+DEFAULT_SEARCH_PROVIDER_CHANNEL_ALLOWLIST = [
+    "web_search",
+    "official_site_search",
+    "news_search",
+    "literature_api",
+    "database_search",
+]
 
 COLLECTION_SOURCE_IDS = [
     "src_nmdoh_hps_2024_first_case",
@@ -48,6 +61,42 @@ DEFAULT_USER_REQUEST = (
     "source types, and evidence quotes, then route uncertain results to human "
     "review."
 )
+DEFAULT_TARGET_FIELDS = [
+    "disease",
+    "virus_or_syndrome",
+    "country",
+    "subnational_location",
+    "date_reported",
+    "event_start_date",
+    "event_end_date",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "case_definition",
+    "source_url",
+    "source_type",
+    "evidence_quote",
+]
+DEFAULT_SOURCE_PREFERENCES = [
+    "official_public_health_agency",
+    "international_organization_report",
+    "peer_reviewed_literature",
+    "structured_database",
+    "news_and_situation_report",
+]
+DEFAULT_STRUCTURED_TASK = {
+    "disease": "hantavirus",
+    "location": "New Mexico",
+    "start_date": "2020",
+    "end_date": "2026",
+    "target_fields": list(DEFAULT_TARGET_FIELDS),
+    "source_preferences": list(DEFAULT_SOURCE_PREFERENCES),
+    "collection_mode": "masked_validation",
+    "user_request": DEFAULT_USER_REQUEST,
+    "run_label": LIVE_CASE_STUDY_ID,
+}
 DEFAULT_PROVIDER = "anthropic"
 DEFAULT_MODEL = "claude-sonnet-4-6"
 DEFAULT_OUTPUT_ROOT = PROJECT_ROOT / "outputs"
@@ -61,12 +110,18 @@ ENV_KEYS = [
     "HDC_SOURCE_ROLE_POLICY_OVERLAY_PATH",
     "HDC_USE_FIXTURE_DOCUMENTS",
     "HDC_ENABLE_LIVE_FETCH",
+    "HDC_ENABLE_LLM_DISEASE_INTELLIGENCE",
+    "HDC_DISEASE_INTELLIGENCE_FORCE_LLM",
+    "HDC_DISEASE_INTELLIGENCE_FALLBACK_TO_CURATED",
     "HDC_ENABLE_LLM_SOURCE_PLANNING",
     "HDC_ENABLE_LLM_SOURCE_CRITIC",
+    "HDC_ENABLE_LLM_SOURCE_CREDIBILITY",
     "HDC_ENABLE_LLM_EXTRACTION",
     "HDC_LLM_SOURCE_CRITIC_SOURCE_ID_ALLOWLIST",
     "HDC_LLM_SOURCE_CRITIC_MAX_SOURCES",
     "HDC_LLM_SOURCE_CRITIC_REVIEW_BLOCKS_FETCH",
+    "HDC_LLM_SOURCE_CREDIBILITY_MAX_SOURCES",
+    "HDC_LLM_SOURCE_CREDIBILITY_SOURCE_ID_ALLOWLIST",
     "HDC_LLM_PROVIDER",
     "HDC_LLM_MODEL",
     "HDC_LLM_MAX_CHUNKS",
@@ -74,6 +129,38 @@ ENV_KEYS = [
     "HDC_LLM_FALLBACK_TO_RULE_BASED",
     "HDC_SOURCE_ID_ALLOWLIST",
     "HDC_FETCH_TIMEOUT_SECONDS",
+    "HDC_FETCH_SEARCH_DERIVED_SOURCES",
+    "HDC_FETCH_MAX_SEARCH_DERIVED_SOURCES",
+    "HDC_FETCH_MAX_TOTAL_SOURCES",
+    "HDC_FETCH_MIN_CREDIBILITY_SCORE",
+    "HDC_FETCH_ALLOWED_FINAL_ROLES",
+    "HDC_FETCH_ALLOW_NEEDS_REVIEW",
+    "HDC_FETCH_DOMAIN_ALLOWLIST",
+    "HDC_FETCH_DOMAIN_BLOCKLIST",
+    "HDC_FETCH_MAX_BYTES",
+    "HDC_FETCH_USER_AGENT",
+    "HDC_FETCH_PARSE_PDF_TEXT",
+    "HDC_FETCH_PARSE_TABLES",
+    "HDC_FETCH_STORE_RAW_TEXT",
+    "HDC_CONTENT_FIXTURE_MAP_PATH",
+    "HDC_ENABLE_LIVE_SEARCH",
+    "HDC_SEARCH_MODE",
+    "HDC_SEARCH_PROVIDER",
+    "HDC_SEARCH_FIXTURE_PATH",
+    "HDC_SEARCH_MAX_QUERIES",
+    "HDC_SEARCH_MAX_RESULTS_PER_QUERY",
+    "HDC_SEARCH_MAX_TOTAL_RESULTS",
+    "HDC_SEARCH_TIMEOUT_SECONDS",
+    "HDC_SEARCH_COMBINE_WITH_SEED_CATALOG",
+    "HDC_SEARCH_CACHE_ENABLED",
+    "HDC_SEARCH_PROVIDER_CHANNEL_ALLOWLIST",
+    "HDC_HUMAN_REVIEW_DECISIONS_PATH",
+    "HDC_HUMAN_REVIEW_APPLY_DECISIONS",
+    "HDC_HUMAN_REVIEW_REQUIRE_REVIEWER_ID",
+    "HDC_ANOMALY_MAX_CASES_THRESHOLD",
+    "HDC_ANOMALY_MAX_DEATHS_THRESHOLD",
+    "HDC_ANOMALY_SPIKE_MULTIPLIER",
+    "HDC_ANOMALY_MIN_PRIOR_RECORDS",
 ]
 
 
@@ -86,21 +173,64 @@ def workflow_run_env(
     live_fetch: bool = True,
     llm_source_planning: bool = True,
     llm_source_critic: bool = True,
+    llm_source_credibility: bool = False,
     llm_extraction: bool = True,
+    llm_disease_intelligence: bool = False,
+    disease_intelligence_force_llm: bool = False,
+    disease_intelligence_fallback_to_curated: bool = True,
     provider: str | None = None,
     model: str | None = None,
     timeout_seconds: float = 30.0,
     llm_max_chunks: int = 8,
     llm_source_critic_max_sources: int | None = 6,
     llm_source_critic_review_blocks_fetch: bool = False,
+    llm_source_credibility_max_sources: int | None = None,
+    llm_source_credibility_source_id_allowlist: list[str] | None = None,
     llm_max_tokens: int = 4096,
     fallback_to_rule_based: bool = False,
     source_id_allowlist: list[str] | None = None,
+    source_id_allowlist_enabled: bool = True,
     llm_source_critic_source_id_allowlist: list[str] | None = None,
+    live_search: bool = False,
+    search_mode: str = "disabled",
+    search_provider: str = "tavily",
+    search_fixture_path: str | Path | None = None,
+    search_max_queries: int = 3,
+    search_max_results_per_query: int = 5,
+    search_max_total_results: int = 15,
+    search_timeout_seconds: float = 15.0,
+    search_combine_with_seed_catalog: bool = True,
+    search_cache_enabled: bool = True,
+    search_provider_channel_allowlist: list[str] | None = None,
+    fetch_search_derived_sources: bool = False,
+    fetch_max_search_derived_sources: int = 2,
+    fetch_max_total_sources: int = 10,
+    fetch_min_credibility_score: float = 0.55,
+    fetch_allowed_final_roles: list[str] | None = None,
+    fetch_allow_needs_review: bool = False,
+    fetch_domain_allowlist: list[str] | None = None,
+    fetch_domain_blocklist: list[str] | None = None,
+    fetch_max_bytes: int = 1_000_000,
+    fetch_parse_pdf_text: bool = True,
+    fetch_parse_tables: bool = True,
+    fetch_store_raw_text: bool = False,
+    fetch_user_agent: str = "data-collection-workflow/0.1",
+    content_fixture_map_path: str | Path | None = None,
+    human_review_decisions_path: str | Path | None = None,
+    human_review_apply_decisions: bool = False,
+    human_review_require_reviewer_id: bool = True,
+    anomaly_max_cases_threshold: float = 1_000_000,
+    anomaly_max_deaths_threshold: float = 100_000,
+    anomaly_spike_multiplier: float = 10,
+    anomaly_min_prior_records: int = 1,
 ) -> dict[str, str]:
     """Return the environment for a configured HDC workflow run."""
 
-    workflow_source_ids = source_id_allowlist or CASE_SOURCE_IDS
+    workflow_source_ids = (
+        source_id_allowlist or CASE_SOURCE_IDS
+        if source_id_allowlist_enabled
+        else []
+    )
     critic_source_ids = llm_source_critic_source_id_allowlist or workflow_source_ids
     seed_overlay = seed_source_overlay_path or SEED_SOURCE_OVERLAY_PATH
     role_overlay = source_role_policy_overlay_path or SOURCE_ROLE_POLICY_OVERLAY_PATH
@@ -110,11 +240,48 @@ def workflow_run_env(
         "HDC_SOURCE_ROLE_POLICY_OVERLAY_PATH": str(role_overlay),
         "HDC_USE_FIXTURE_DOCUMENTS": "true" if use_fixture_documents else "false",
         "HDC_ENABLE_LIVE_FETCH": "true" if live_fetch else "false",
+        "HDC_ENABLE_LLM_DISEASE_INTELLIGENCE": (
+            "true" if llm_disease_intelligence else "false"
+        ),
+        "HDC_DISEASE_INTELLIGENCE_FORCE_LLM": (
+            "true" if disease_intelligence_force_llm else "false"
+        ),
+        "HDC_DISEASE_INTELLIGENCE_FALLBACK_TO_CURATED": (
+            "true" if disease_intelligence_fallback_to_curated else "false"
+        ),
         "HDC_ENABLE_LLM_SOURCE_PLANNING": "true" if llm_source_planning else "false",
         "HDC_ENABLE_LLM_SOURCE_CRITIC": "true" if llm_source_critic else "false",
+        "HDC_ENABLE_LLM_SOURCE_CREDIBILITY": (
+            "true" if llm_source_credibility else "false"
+        ),
         "HDC_ENABLE_LLM_EXTRACTION": "true" if llm_extraction else "false",
         "HDC_SOURCE_ID_ALLOWLIST": ",".join(workflow_source_ids),
         "HDC_FETCH_TIMEOUT_SECONDS": str(timeout_seconds),
+        "HDC_FETCH_SEARCH_DERIVED_SOURCES": (
+            "true" if fetch_search_derived_sources else "false"
+        ),
+        "HDC_FETCH_MAX_SEARCH_DERIVED_SOURCES": str(
+            fetch_max_search_derived_sources
+        ),
+        "HDC_FETCH_MAX_TOTAL_SOURCES": str(fetch_max_total_sources),
+        "HDC_FETCH_MIN_CREDIBILITY_SCORE": str(fetch_min_credibility_score),
+        "HDC_FETCH_ALLOWED_FINAL_ROLES": ",".join(
+            fetch_allowed_final_roles
+            or ["collection", "validation", "collection_support", "context"]
+        ),
+        "HDC_FETCH_ALLOW_NEEDS_REVIEW": (
+            "true" if fetch_allow_needs_review else "false"
+        ),
+        "HDC_FETCH_DOMAIN_ALLOWLIST": ",".join(fetch_domain_allowlist or []),
+        "HDC_FETCH_DOMAIN_BLOCKLIST": ",".join(fetch_domain_blocklist or []),
+        "HDC_FETCH_MAX_BYTES": str(fetch_max_bytes),
+        "HDC_FETCH_PARSE_PDF_TEXT": "true" if fetch_parse_pdf_text else "false",
+        "HDC_FETCH_PARSE_TABLES": "true" if fetch_parse_tables else "false",
+        "HDC_FETCH_STORE_RAW_TEXT": "true" if fetch_store_raw_text else "false",
+        "HDC_FETCH_USER_AGENT": fetch_user_agent,
+        "HDC_CONTENT_FIXTURE_MAP_PATH": (
+            str(content_fixture_map_path) if content_fixture_map_path else ""
+        ),
         "HDC_LLM_MAX_CHUNKS": str(llm_max_chunks),
         "HDC_LLM_MAX_TOKENS": str(llm_max_tokens),
         "HDC_LLM_SOURCE_CRITIC_SOURCE_ID_ALLOWLIST": ",".join(critic_source_ids),
@@ -124,10 +291,49 @@ def workflow_run_env(
         "HDC_LLM_FALLBACK_TO_RULE_BASED": (
             "true" if fallback_to_rule_based else "false"
         ),
+        "HDC_ENABLE_LIVE_SEARCH": "true" if live_search else "false",
+        "HDC_SEARCH_MODE": search_mode,
+        "HDC_SEARCH_PROVIDER": search_provider,
+        "HDC_SEARCH_FIXTURE_PATH": str(
+            search_fixture_path or DEFAULT_SEARCH_FIXTURE_PATH
+        ),
+        "HDC_SEARCH_MAX_QUERIES": str(search_max_queries),
+        "HDC_SEARCH_MAX_RESULTS_PER_QUERY": str(search_max_results_per_query),
+        "HDC_SEARCH_MAX_TOTAL_RESULTS": str(search_max_total_results),
+        "HDC_SEARCH_TIMEOUT_SECONDS": str(search_timeout_seconds),
+        "HDC_SEARCH_COMBINE_WITH_SEED_CATALOG": (
+            "true" if search_combine_with_seed_catalog else "false"
+        ),
+        "HDC_SEARCH_CACHE_ENABLED": "true" if search_cache_enabled else "false",
+        "HDC_SEARCH_PROVIDER_CHANNEL_ALLOWLIST": ",".join(
+            search_provider_channel_allowlist
+            or DEFAULT_SEARCH_PROVIDER_CHANNEL_ALLOWLIST
+        ),
+        "HDC_HUMAN_REVIEW_DECISIONS_PATH": (
+            str(human_review_decisions_path) if human_review_decisions_path else ""
+        ),
+        "HDC_HUMAN_REVIEW_APPLY_DECISIONS": (
+            "true" if human_review_apply_decisions else "false"
+        ),
+        "HDC_HUMAN_REVIEW_REQUIRE_REVIEWER_ID": (
+            "true" if human_review_require_reviewer_id else "false"
+        ),
+        "HDC_ANOMALY_MAX_CASES_THRESHOLD": str(anomaly_max_cases_threshold),
+        "HDC_ANOMALY_MAX_DEATHS_THRESHOLD": str(anomaly_max_deaths_threshold),
+        "HDC_ANOMALY_SPIKE_MULTIPLIER": str(anomaly_spike_multiplier),
+        "HDC_ANOMALY_MIN_PRIOR_RECORDS": str(anomaly_min_prior_records),
     }
     if llm_source_critic_max_sources is not None:
         env["HDC_LLM_SOURCE_CRITIC_MAX_SOURCES"] = str(
             llm_source_critic_max_sources
+        )
+    if llm_source_credibility_max_sources is not None:
+        env["HDC_LLM_SOURCE_CREDIBILITY_MAX_SOURCES"] = str(
+            llm_source_credibility_max_sources
+        )
+    if llm_source_credibility_source_id_allowlist:
+        env["HDC_LLM_SOURCE_CREDIBILITY_SOURCE_ID_ALLOWLIST"] = ",".join(
+            llm_source_credibility_source_id_allowlist
         )
     resolved_provider = provider or os.environ.get("HDC_LLM_PROVIDER") or DEFAULT_PROVIDER
     resolved_model = model or os.environ.get("HDC_LLM_MODEL") or DEFAULT_MODEL
@@ -160,6 +366,7 @@ def default_workflow_run_config() -> dict:
             "use_fixture_documents": False,
         },
         "user_request": DEFAULT_USER_REQUEST,
+        "structured_task": deepcopy(DEFAULT_STRUCTURED_TASK),
         "studio": {
             "port": None,
             "no_reload": True,
@@ -167,6 +374,42 @@ def default_workflow_run_config() -> dict:
         "live_web": {
             "enabled": True,
             "timeout_seconds": 30,
+        },
+        "source_search": {
+            "enabled": False,
+            "mode": "disabled",
+            "provider": "tavily",
+            "fixture_path": str(DEFAULT_SEARCH_FIXTURE_PATH.relative_to(PROJECT_ROOT)),
+            "max_queries": 3,
+            "max_results_per_query": 5,
+            "max_total_results": 15,
+            "timeout_seconds": 15,
+            "combine_with_seed_catalog": True,
+            "cache_enabled": True,
+            "provider_channel_allowlist": list(
+                DEFAULT_SEARCH_PROVIDER_CHANNEL_ALLOWLIST
+            ),
+        },
+        "content_fetch": {
+            "fetch_search_derived_sources": False,
+            "max_search_derived_sources": 2,
+            "max_total_sources": 10,
+            "min_credibility_score": 0.55,
+            "allowed_final_roles": [
+                "collection",
+                "validation",
+                "collection_support",
+                "context",
+            ],
+            "allow_needs_review": False,
+            "domain_allowlist": [],
+            "domain_blocklist": [],
+            "max_bytes": 1_000_000,
+            "parse_pdf_text": True,
+            "parse_tables": True,
+            "store_raw_text": False,
+            "user_agent": "data-collection-workflow/0.1",
+            "content_fixture_map_path": None,
         },
         "llm": {
             "provider": DEFAULT_PROVIDER,
@@ -181,8 +424,31 @@ def default_workflow_run_config() -> dict:
                 "max_sources": 6,
                 "review_blocks_fetch": False,
             },
+            "source_credibility": {
+                "enabled": False,
+                "max_sources": 6,
+                "source_id_allowlist": [],
+            },
+        },
+        "disease_intelligence": {
+            "llm_enabled": False,
+            "force_llm": False,
+            "fallback_to_curated": True,
+        },
+        "anomaly_detection": {
+            "enabled": True,
+            "max_cases_threshold": 1000000,
+            "max_deaths_threshold": 100000,
+            "spike_multiplier": 10,
+            "min_prior_records": 1,
+        },
+        "human_review": {
+            "decisions_path": None,
+            "apply_decisions": False,
+            "require_reviewer_id": True,
         },
         "source_sets": {
+            "source_id_allowlist_enabled": True,
             "collection_source_ids": list(COLLECTION_SOURCE_IDS),
             "context_source_ids": list(CONTEXT_SOURCE_IDS),
             "validation_reserved_source_ids": list(VALIDATION_SOURCE_IDS),
@@ -305,8 +571,23 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
     workflow = config.get("workflow") or {}
     live_web = config.get("live_web") or {}
     llm = config.get("llm") or {}
+    disease_intelligence = config.get("disease_intelligence") or {}
+    source_search = config.get("source_search") or {}
+    content_fetch = config.get("content_fetch") or {}
+    human_review = config.get("human_review") or {}
+    anomaly_detection = config.get("anomaly_detection") or {}
     source_critic = llm.get("source_critic") or {}
+    source_credibility = llm.get("source_credibility") or {}
     source_sets = config.get("source_sets") or {}
+    search_enabled = bool(source_search.get("enabled", False))
+    search_mode = str(source_search.get("mode") or "disabled").strip().lower()
+    if not search_enabled:
+        search_mode = "disabled"
+    live_search_enabled = (
+        search_enabled
+        and search_mode == "live"
+        and bool(source_search.get("live_search_enabled", True))
+    )
     return workflow_run_env(
         collection_mode=workflow.get("collection_mode", "masked_validation"),
         seed_source_overlay_path=_resolve_project_path(
@@ -320,7 +601,17 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         live_fetch=bool(live_web.get("enabled", True)),
         llm_source_planning=bool(llm.get("source_planning_enabled", True)),
         llm_source_critic=bool(llm.get("source_critic_enabled", True)),
+        llm_source_credibility=bool(source_credibility.get("enabled", False)),
         llm_extraction=bool(llm.get("structured_extraction_enabled", True)),
+        llm_disease_intelligence=bool(
+            disease_intelligence.get("llm_enabled", False)
+        ),
+        disease_intelligence_force_llm=bool(
+            disease_intelligence.get("force_llm", False)
+        ),
+        disease_intelligence_fallback_to_curated=bool(
+            disease_intelligence.get("fallback_to_curated", True)
+        ),
         provider=llm.get("provider"),
         model=llm.get("model"),
         timeout_seconds=float(live_web.get("timeout_seconds", 30)),
@@ -329,15 +620,118 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         llm_source_critic_review_blocks_fetch=bool(
             source_critic.get("review_blocks_fetch", False)
         ),
+        llm_source_credibility_max_sources=source_credibility.get("max_sources"),
+        llm_source_credibility_source_id_allowlist=source_credibility.get(
+            "source_id_allowlist"
+        ),
         llm_max_tokens=int(llm.get("max_tokens", 4096)),
         fallback_to_rule_based=bool(llm.get("fallback_to_rule_based", False)),
         source_id_allowlist=source_sets.get("workflow_source_ids") or CASE_SOURCE_IDS,
+        source_id_allowlist_enabled=bool(
+            source_sets.get("source_id_allowlist_enabled", True)
+        ),
         llm_source_critic_source_id_allowlist=source_sets.get(
             "llm_source_critic_source_ids"
         )
         or source_sets.get("workflow_source_ids")
         or CASE_SOURCE_IDS,
+        live_search=live_search_enabled,
+        search_mode=search_mode,
+        search_provider=str(source_search.get("provider") or "tavily"),
+        search_fixture_path=_resolve_project_path(
+            source_search.get("fixture_path"),
+            DEFAULT_SEARCH_FIXTURE_PATH,
+        ),
+        search_max_queries=int(source_search.get("max_queries", 3)),
+        search_max_results_per_query=int(
+            source_search.get("max_results_per_query", 5)
+        ),
+        search_max_total_results=int(source_search.get("max_total_results", 15)),
+        search_timeout_seconds=float(source_search.get("timeout_seconds", 15)),
+        search_combine_with_seed_catalog=bool(
+            source_search.get("combine_with_seed_catalog", True)
+        ),
+        search_cache_enabled=bool(source_search.get("cache_enabled", True)),
+        search_provider_channel_allowlist=source_search.get(
+            "provider_channel_allowlist"
+        )
+        or DEFAULT_SEARCH_PROVIDER_CHANNEL_ALLOWLIST,
+        fetch_search_derived_sources=bool(
+            content_fetch.get("fetch_search_derived_sources", False)
+        ),
+        fetch_max_search_derived_sources=int(
+            content_fetch.get("max_search_derived_sources", 2)
+        ),
+        fetch_max_total_sources=int(content_fetch.get("max_total_sources", 10)),
+        fetch_min_credibility_score=float(
+            content_fetch.get("min_credibility_score", 0.55)
+        ),
+        fetch_allowed_final_roles=content_fetch.get("allowed_final_roles")
+        or ["collection", "validation", "collection_support", "context"],
+        fetch_allow_needs_review=bool(content_fetch.get("allow_needs_review", False)),
+        fetch_domain_allowlist=content_fetch.get("domain_allowlist") or [],
+        fetch_domain_blocklist=content_fetch.get("domain_blocklist") or [],
+        fetch_max_bytes=int(content_fetch.get("max_bytes", 1_000_000)),
+        fetch_parse_pdf_text=bool(content_fetch.get("parse_pdf_text", True)),
+        fetch_parse_tables=bool(content_fetch.get("parse_tables", True)),
+        fetch_store_raw_text=bool(content_fetch.get("store_raw_text", False)),
+        fetch_user_agent=str(
+            content_fetch.get("user_agent") or "data-collection-workflow/0.1"
+        ),
+        content_fixture_map_path=_resolve_project_path(
+            content_fetch.get("content_fixture_map_path"),
+            PROJECT_ROOT,
+        )
+        if content_fetch.get("content_fixture_map_path")
+        else None,
+        human_review_decisions_path=_resolve_project_path(
+            human_review.get("decisions_path")
+            or config.get("human_review_decisions_path"),
+            PROJECT_ROOT,
+        )
+        if (human_review.get("decisions_path") or config.get("human_review_decisions_path"))
+        else None,
+        human_review_apply_decisions=bool(
+            human_review.get("apply_decisions", False)
+        ),
+        human_review_require_reviewer_id=bool(
+            human_review.get("require_reviewer_id", True)
+        ),
+        anomaly_max_cases_threshold=float(
+            anomaly_detection.get("max_cases_threshold", 1_000_000)
+        ),
+        anomaly_max_deaths_threshold=float(
+            anomaly_detection.get("max_deaths_threshold", 100_000)
+        ),
+        anomaly_spike_multiplier=float(
+            anomaly_detection.get("spike_multiplier", 10)
+        ),
+        anomaly_min_prior_records=int(
+            anomaly_detection.get("min_prior_records", 1)
+        ),
     )
+
+
+def structured_task_from_config(config: dict) -> dict:
+    """Return the structured task payload for graph initial state."""
+
+    raw = deepcopy(config.get("structured_task") or {})
+    if not isinstance(raw, dict):
+        raise ValueError("workflow structured_task must be a JSON object.")
+
+    raw.setdefault("user_request", config.get("user_request") or DEFAULT_USER_REQUEST)
+    raw.setdefault("run_label", config.get("profile_name") or LIVE_CASE_STUDY_ID)
+
+    workflow = config.get("workflow") or {}
+    collection_mode = workflow.get("collection_mode")
+    if collection_mode:
+        raw.setdefault("collection_mode", collection_mode)
+
+    return {
+        key: value
+        for key, value in raw.items()
+        if value not in (None, "", [], {})
+    }
 
 
 def workflow_run_config_with_overrides(
@@ -384,20 +778,8 @@ def workflow_run_config_with_overrides(
         updated["output"]["session_id"] = session_id
     if user_request:
         updated["user_request"] = user_request
+        updated.setdefault("structured_task", {})["user_request"] = user_request
     return updated
-
-
-def workflow_initial_state_from_config(
-    config: dict,
-    *,
-    include_empty_fields: bool = True,
-) -> dict:
-    """Build the Studio input payload from the centralized config."""
-
-    return studio_initial_state(
-        config.get("user_request") or DEFAULT_USER_REQUEST,
-        include_empty_fields=include_empty_fields,
-    )
 
 
 def workflow_session_id(now: datetime | None = None) -> str:
@@ -502,52 +884,95 @@ def workflow_initial_state_from_config(
 ) -> dict:
     """Build the LangGraph Studio input payload from a runtime profile."""
 
-    return studio_initial_state(
+    state = studio_initial_state(
         config.get("user_request") or DEFAULT_USER_REQUEST,
+        structured_task=structured_task_from_config(config),
         include_empty_fields=include_empty_fields,
     )
+    human_review = config.get("human_review") or {}
+    decisions_path = human_review.get("decisions_path") or config.get(
+        "human_review_decisions_path"
+    )
+    if decisions_path:
+        state["human_review_decisions_path"] = str(
+            _resolve_project_path(decisions_path, PROJECT_ROOT)
+        )
+    return state
 
 
 def studio_initial_state(
     user_request: str | None = None,
     *,
+    structured_task: dict | None = None,
     include_empty_fields: bool = True,
 ) -> dict:
     """Build the state payload a user can submit in LangGraph Studio."""
 
     state = {"user_request": user_request or DEFAULT_USER_REQUEST}
+    if structured_task is not None:
+        state["structured_task"] = deepcopy(structured_task)
     if not include_empty_fields:
         return state
     state.update(
         {
             "source_candidates": [],
+            "source_search_results": [],
+            "source_search_execution_summary": None,
             "source_discovery_summary": None,
             "source_registry": [],
             "source_registry_summary": None,
             "source_screening_summary": None,
             "source_critic_summary": None,
             "source_routing_summary": None,
+            "source_credibility_assessments": [],
+            "source_credibility_summary": None,
             "documents": [],
             "evidence_chunks": [],
             "raw_records": [],
             "validated_records": [],
             "normalized_records": [],
             "linked_events": [],
+            "event_clusters": [],
+            "duplicate_clusters": [],
+            "validation_records": [],
+            "validation_cases": [],
+            "validation_comparisons": [],
+            "validation_results": [],
+            "validation_summary": None,
+            "trusted_source_validation_summary": None,
+            "cross_source_validation_summary": None,
+            "anomaly_results": [],
+            "anomaly_summary": None,
+            "anomaly_review_items": [],
             "conflicts": [],
             "human_review_queue": [],
             "human_review_decisions": [],
+            "human_review_decisions_path": None,
+            "applied_human_review_decisions": [],
+            "rejected_human_review_decisions": [],
+            "human_review_audit_trail": [],
+            "human_review_application_summary": None,
+            "final_dataset_post_review": [],
+            "records_excluded_by_human_review": [],
             "collection_trace": [],
             "collection_spec": None,
+            "task_intake_summary": None,
+            "disease_intelligence": None,
+            "disease_intelligence_summary": None,
             "disease_profile": None,
             "collection_schema": None,
             "source_strategy": None,
             "screening_criteria": None,
+            "profile_schema_summary": None,
             "search_queries": None,
             "search_query_inventory": [],
             "agentic_source_plan": None,
+            "executable_source_plan_summary": None,
             "source_planning_agent_summary": None,
             "content_fetch_requests": [],
             "content_fetch_summary": None,
+            "document_parse_summary": None,
+            "fetch_manifest": [],
             "fixture_document_summary": None,
             "document_quality_summary": None,
             "structured_extraction_summary": None,
@@ -555,6 +980,8 @@ def studio_initial_state(
             "schema_validation_summary": None,
             "record_normalization_summary": None,
             "record_linking_summary": None,
+            "event_clustering_summary": None,
+            "duplicate_detection_summary": None,
             "cross_source_consistency_summary": None,
             "human_review_summary": None,
             "final_data_package": None,

@@ -15,6 +15,7 @@ from __future__ import annotations
 from collections import Counter
 
 from ..config import load_human_review_policy
+from ..human_review_application import apply_human_review_decisions
 from ..models import (
     HumanReviewDecision,
     HumanReviewItem,
@@ -376,6 +377,18 @@ def human_review(state: DataCollectionState) -> dict:
         "fixture_origin_review_count": fixture_origin_review_count,
     }
 
+    application_state = dict(state)
+    application_state["human_review_queue"] = processed
+    application_output = apply_human_review_decisions(application_state)
+    app_summary = application_output.get("human_review_application_summary") or {}
+    summary["human_review_application_summary"] = app_summary
+    summary["decision_application_applied_count"] = app_summary.get(
+        "decisions_applied_count", 0
+    )
+    summary["decision_application_rejected_count"] = app_summary.get(
+        "decisions_rejected_count", 0
+    )
+
     trace = append_trace(
         state,
         node_name="human_review",
@@ -389,5 +402,6 @@ def human_review(state: DataCollectionState) -> dict:
     return {
         "human_review_queue": processed,
         "human_review_summary": summary,
+        **application_output,
         "collection_trace": trace,
     }
