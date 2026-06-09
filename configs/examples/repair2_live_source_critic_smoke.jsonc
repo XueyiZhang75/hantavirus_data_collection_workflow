@@ -1,0 +1,93 @@
+{
+  "profile_name": "repair2_live_source_critic_smoke",
+  "description": "Bounded live-search smoke for the source critic integration. Requires TAVILY_API_KEY and the configured LLM provider key.",
+  "workflow": {
+    "graph_name": "hantavirus_data_collection_workflow",
+    "collection_mode": "standard",
+    "use_fixture_documents": false
+  },
+  "user_request": "Collect hantavirus data for Shanghai from 2024 to 2026.",
+  "structured_task": {
+    "disease": "hantavirus",
+    "location": "Shanghai",
+    "start_date": "2024",
+    "end_date": "2026",
+    "target_fields": [
+      "cases",
+      "deaths",
+      "dates",
+      "locations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "source_preferences": [
+      "official_public_health_agency",
+      "structured_database",
+      "news_and_situation_report"
+    ],
+    "collection_mode": "standard",
+    "user_request": "Collect hantavirus data for Shanghai from 2024 to 2026.",
+    "run_label": "repair2_live_source_critic_smoke"
+  },
+  "live_web": {
+    "enabled": true,
+    "timeout_seconds": 20
+  },
+  "source_search": {
+    "enabled": true,
+    "mode": "live",
+    "provider": "tavily",
+    "max_queries": 1,
+    "max_results_per_query": 3,
+    "max_total_results": 3,
+    "timeout_seconds": 15,
+    "combine_with_seed_catalog": false,
+    "cache_enabled": true,
+    "provider_channel_allowlist": [
+      "web_search",
+      "official_site_search",
+      "news_search"
+    ]
+  },
+  "content_fetch": {
+    "fetch_search_derived_sources": true,
+    "max_search_derived_sources": 2,
+    "max_total_sources": 2,
+    "min_credibility_score": 0.0,
+    "allowed_final_roles": [
+      "collection",
+      "collection_support",
+      "context"
+    ],
+    "allow_needs_review": false,
+    "domain_allowlist": [],
+    "domain_blocklist": [],
+    "max_bytes": 1000000,
+    "parse_pdf_text": true,
+    "parse_tables": true,
+    "store_raw_text": false,
+    "user_agent": "data-collection-workflow/0.1"
+  },
+  "llm": {
+    "source_planning_enabled": false,
+    "source_critic_enabled": true,
+    "structured_extraction_enabled": false,
+    "max_chunks": 1,
+    "max_tokens": 2048,
+    "fallback_to_rule_based": false,
+    "source_critic": {
+      "max_sources": 2,
+      "review_blocks_fetch": true
+    }
+  },
+  "source_sets": {
+    "source_id_allowlist_enabled": false,
+    "workflow_source_ids": [],
+    "llm_source_critic_source_ids": []
+  },
+  "output": {
+    "sessionized": true,
+    "session_id": "repair2_live_source_critic_smoke"
+  }
+}

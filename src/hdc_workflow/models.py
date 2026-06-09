@@ -209,6 +209,11 @@ class PlannedSearchQuery(BaseModel):
     disease_terms_used: list[str] = Field(default_factory=list)
     location_terms_used: list[str] = Field(default_factory=list)
     time_terms_used: list[str] = Field(default_factory=list)
+    query_language: str | None = None
+    jurisdiction_hint: str | None = None
+    official_domain_hint: str | None = None
+    localized_source_hint: bool = False
+    source_priority_reason: str | None = None
     rationale: str
     execution_status: ExecutableSourcePlanExecutionStatus = "planned_not_executed"
 
@@ -268,6 +273,12 @@ class SourceCredibilityAssessment(BaseModel):
     authority_score: float
     local_relevance_score: float
     disease_relevance_score: float
+    source_disease_relevance_status: str | None = None
+    source_disease_relevance_score: float | None = None
+    source_target_disease_terms_found: list[str] = Field(default_factory=list)
+    source_incompatible_disease_terms_found: list[str] = Field(default_factory=list)
+    source_disease_relevance_reason: str | None = None
+    source_disease_relevance_data_signal_count: int | None = None
     timeliness_score: float
     geographic_granularity_score: float
     data_granularity_score: float
@@ -350,6 +361,12 @@ class SourceCandidate(BaseModel):
     result_source: str | None = None
     query_type: str | None = None
     additional_query_ids: list[str] = Field(default_factory=list)
+    source_disease_relevance_status: str | None = None
+    source_disease_relevance_score: float | None = None
+    source_target_disease_terms_found: list[str] = Field(default_factory=list)
+    source_incompatible_disease_terms_found: list[str] = Field(default_factory=list)
+    source_disease_relevance_reason: str | None = None
+    source_disease_relevance_data_signal_count: int | None = None
 
 
 class SourceRegistryEntry(BaseModel):
@@ -399,8 +416,12 @@ class SourceRegistryEntry(BaseModel):
     requires_human_review: bool = False
     routing_flags: list[str] = Field(default_factory=list)
     llm_source_critic_enabled: bool = False
+    llm_source_critic_attempted: bool = False
+    llm_source_critic_assessed: bool = False
+    llm_source_critic_status: str | None = None
     llm_source_critic_failed: bool = False
     llm_source_critic_error: str | None = None
+    llm_source_critic_error_type: str | None = None
     llm_proposed_source_role: str | None = None
     llm_proposed_screening_decision: str | None = None
     llm_credibility_level: str | None = None
@@ -412,8 +433,18 @@ class SourceRegistryEntry(BaseModel):
     llm_validation_candidate_risk: bool = False
     llm_needs_human_review: bool = False
     llm_human_review_reason: str | None = None
+    llm_source_critic_decision: str | None = None
     llm_source_critic_confidence: float | None = None
+    llm_source_critic_reason: str | None = None
+    llm_source_critic_risk_flags: list[str] = Field(default_factory=list)
+    llm_source_critic_recommended_role: str | None = None
+    llm_source_critic_fetch_recommendation: str | None = None
+    llm_source_critic_review_required: bool = False
+    llm_source_critic_block_fetch: bool = False
+    llm_source_critic_warnings: list[str] = Field(default_factory=list)
     llm_reasoning_summary: str | None = None
+    blocked_from_fetch: bool = False
+    blocked_from_fetch_reason: str | None = None
     credibility_score: float | None = None
     credibility_level: str | None = None
     credibility_rubric_version: str | None = None
@@ -425,6 +456,12 @@ class SourceRegistryEntry(BaseModel):
     authority_score: float | None = None
     local_relevance_score: float | None = None
     disease_relevance_score: float | None = None
+    source_disease_relevance_status: str | None = None
+    source_disease_relevance_score: float | None = None
+    source_target_disease_terms_found: list[str] = Field(default_factory=list)
+    source_incompatible_disease_terms_found: list[str] = Field(default_factory=list)
+    source_disease_relevance_reason: str | None = None
+    source_disease_relevance_data_signal_count: int | None = None
     timeliness_score: float | None = None
     geographic_granularity_score: float | None = None
     data_granularity_score: float | None = None
@@ -547,6 +584,12 @@ class ContentFetchRequest(BaseModel):
     credibility_score: float | None = None
     credibility_level: str | None = None
     source_credibility_risk_flags: list[str] = Field(default_factory=list)
+    source_disease_relevance_status: str | None = None
+    source_disease_relevance_score: float | None = None
+    source_target_disease_terms_found: list[str] = Field(default_factory=list)
+    source_incompatible_disease_terms_found: list[str] = Field(default_factory=list)
+    source_disease_relevance_reason: str | None = None
+    source_disease_relevance_data_signal_count: int | None = None
     final_screening_decision: str
     fetch_purpose: str
     priority: int | None = None
@@ -783,6 +826,13 @@ class Document(BaseModel):
     is_fixture_document: bool = False
     fixture_id: str | None = None
     fixture_notes: str | None = None
+    document_disease_relevance_status: str | None = None
+    document_disease_relevance_score: float | None = None
+    document_target_disease_terms_found: list[str] = Field(default_factory=list)
+    document_incompatible_disease_terms_found: list[str] = Field(default_factory=list)
+    document_disease_relevance_reason: str | None = None
+    document_disease_relevance_data_signal_count: int | None = None
+    not_extractable_for_task_disease: bool = False
 
 
 class EvidenceChunk(BaseModel):
@@ -820,6 +870,13 @@ class EvidenceChunk(BaseModel):
     char_end: int | None = None
     context_types: list[str] = Field(default_factory=list)
     presence_reason: str | None = None
+    disease_relevance_status: str | None = None
+    disease_relevance_score: float | None = None
+    target_disease_terms_found: list[str] = Field(default_factory=list)
+    incompatible_disease_terms_found: list[str] = Field(default_factory=list)
+    disease_relevance_reason: str | None = None
+    disease_relevance_data_signal_count: int | None = None
+    extraction_eligible_for_task_disease: bool | None = None
 
 
 class HantavirusRecord(BaseModel):
@@ -894,6 +951,11 @@ class HantavirusRecord(BaseModel):
     population_scope: str | None = None
     source_section: str | None = None
     semantic_warnings: list[str] = Field(default_factory=list)
+    record_disease_compatibility_status: str | None = None
+    record_disease_compatibility_reason: str | None = None
+    record_target_disease_terms_found: list[str] = Field(default_factory=list)
+    record_incompatible_disease_terms_found: list[str] = Field(default_factory=list)
+    record_disease_compatibility_reject: bool = False
 
     @model_validator(mode="after")
     def _non_negative_counts(self) -> "HantavirusRecord":
@@ -984,6 +1046,12 @@ class PublicHealthRecord(HantavirusRecord):
     review_decision_ids: list[str] = Field(default_factory=list)
     record_excluded_by_human_review: bool = False
     final_dataset_included: bool | None = None
+    record_final_inclusion_status: str | None = None
+    quality_gate_reasons: list[str] = Field(default_factory=list)
+    quality_gate_blocking_flags: list[str] = Field(default_factory=list)
+    quarantine_reason: str | None = None
+    quality_gate_method: str | None = None
+    quality_gate_warnings: list[str] = Field(default_factory=list)
     human_review_applied: bool = False
     human_review_audit_ids: list[str] = Field(default_factory=list)
     anomaly_status: str | None = None
@@ -1460,7 +1528,13 @@ class HumanReviewItem(BaseModel):
 
 class FinalDataPackage(BaseModel):
     final_dataset: list[PublicHealthRecord]
+    final_dataset_pre_quality_gate: list[PublicHealthRecord] = Field(default_factory=list)
     final_dataset_post_review: list[PublicHealthRecord] = Field(default_factory=list)
+    quarantined_records: list[PublicHealthRecord] = Field(default_factory=list)
+    pending_review_records: list[PublicHealthRecord] = Field(default_factory=list)
+    record_inclusion_decisions: list[dict] = Field(default_factory=list)
+    run_quality_summary: dict = Field(default_factory=dict)
+    final_dataset_quality_summary: dict = Field(default_factory=dict)
     records_excluded_by_human_review: list[PublicHealthRecord] = Field(default_factory=list)
     source_registry: list[SourceRegistryEntry]
     linked_events: list[LinkedEvent]

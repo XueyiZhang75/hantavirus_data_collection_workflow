@@ -34,6 +34,19 @@ from ..config import (
     load_llm_structured_extraction_policy,
     load_structured_extraction_policy,
 )
+from ..disease_relevance import (
+    AMBIGUOUS_DISEASE,
+    COMPATIBLE,
+    INCOMPATIBLE_DISEASE,
+    INSUFFICIENT_TEXT,
+    TARGET_DISEASE_MATCH,
+    assessment_fields,
+    assess_chunk_disease_relevance,
+    assess_record_disease_compatibility,
+    build_disease_relevance_context,
+    record_compatibility_fields,
+    update_disease_relevance_summary,
+)
 from ..models import (
     HantavirusRecord,
     HumanReviewItem,
@@ -126,12 +139,14 @@ def _build_extraction_context(
     structured_task = state.get("structured_task") or {}
     collection_spec = state.get("collection_spec") or {}
     disease_intelligence = state.get("disease_intelligence") or {}
-
-    disease_standard_name = _canonical_disease_name(
+    explicit_disease_value = (
         disease_intelligence.get("disease_standard_name")
         or structured_task.get("disease")
         or collection_spec.get("disease")
-        or policy.default_disease
+    )
+
+    disease_standard_name = _canonical_disease_name(
+        explicit_disease_value or policy.default_disease
     ) or policy.default_disease
 
     terms: list[str] = []
@@ -177,6 +192,30 @@ def _build_extraction_context(
     ]
 
     return {
+        "structured_task": {
+            "disease": disease_standard_name if explicit_disease_value else None,
+            "location": structured_task.get("location"),
+            "start_date": structured_task.get("start_date"),
+            "end_date": structured_task.get("end_date"),
+        },
+        "collection_spec": {
+            "disease": disease_standard_name if explicit_disease_value else None,
+            "geography": structured_task.get("location")
+            or collection_spec.get("geography"),
+            "time_window": collection_spec.get("time_window")
+            or structured_task.get("start_date")
+            or structured_task.get("end_date"),
+            "target_population": collection_spec.get("target_population")
+            or "humans",
+        },
+        "disease_intelligence": {
+            "disease_standard_name": (
+                disease_standard_name if explicit_disease_value else None
+            ),
+            "aliases": disease_terms,
+            "pathogen_terms": pathogen_terms,
+            "syndrome_terms": disease_terms,
+        },
         "disease_standard_name": disease_standard_name,
         "disease_terms": disease_terms,
         "pathogen_terms": pathogen_terms,
@@ -871,6 +910,11 @@ def _chunk_is_extractable(
     if conditions.get("requires_contains_target_data", True):
         if not chunk.get("contains_target_data"):
             return False
+    if chunk.get("extraction_eligible_for_task_disease") is False:
+        return False
+    disease_status = chunk.get("disease_relevance_status")
+    if disease_status and disease_status != TARGET_DISEASE_MATCH:
+        return False
     allowed_purposes = conditions.get("allowed_fetch_purposes") or []
     if allowed_purposes and chunk.get("fetch_purpose") not in allowed_purposes:
         return False
@@ -1019,6 +1063,16 @@ def _build_record_from_chunk(
             semantic_warnings.append("missing_date_for_count_bearing_record")
         if not (cleaned.get("country") or cleaned.get("subnational_location") or cleaned.get("geographic_scope")):
             semantic_warnings.append("missing_location_for_count_bearing_record")
+    compatibility = assess_record_disease_compatibility(
+        {
+            **cleaned,
+            "disease": cleaned.get("disease") or policy.default_disease,
+            "evidence_quote": text,
+            "source_title": chunk.get("title"),
+            "source_url": chunk.get("source_url"),
+        },
+        _as_disease_relevance_context(context),
+    )
 
     return PublicHealthRecord(
         record_id=record_id,
@@ -1082,6 +1136,7 @@ def _build_record_from_chunk(
         source_section=cleaned.get("source_section"),
         semantic_warnings=semantic_warnings,
         extraction_warnings=semantic_warnings,
+        **record_compatibility_fields(compatibility),
         record_schema="generic_public_health_record",
         legacy_record_type=(
             "HantavirusRecord" if ((context or {}).get("is_hantavirus") is True) else None
@@ -1257,6 +1312,11 @@ def _chunk_allowed_for_llm(
 ) -> bool:
     if not chunk.get("contains_target_data"):
         return False
+    if chunk.get("extraction_eligible_for_task_disease") is False:
+        return False
+    disease_status = chunk.get("disease_relevance_status")
+    if disease_status and disease_status != TARGET_DISEASE_MATCH:
+        return False
     if chunk.get("fetch_purpose") not in llm_policy.allowed_fetch_purposes:
         return False
     if (chunk.get("chunk_kind") or "text") not in llm_policy.allowed_chunk_kinds:
@@ -1265,6 +1325,41 @@ def _chunk_allowed_for_llm(
     if not text.strip():
         return False
     return True
+
+
+def _as_disease_relevance_context(context: dict | None) -> dict:
+    if not context:
+        return build_disease_relevance_context(None)
+    if "target_disease_terms" in context or "guard_enabled" in context:
+        return context
+    return build_disease_relevance_context(context)
+
+
+def _assess_chunk_for_extraction(chunk: dict, context: dict | None) -> dict:
+    if chunk.get("disease_relevance_status"):
+        return {
+            "status": chunk.get("disease_relevance_status"),
+            "score": chunk.get("disease_relevance_score"),
+            "target_disease_terms_found": list(
+                chunk.get("target_disease_terms_found") or []
+            ),
+            "incompatible_disease_terms_found": list(
+                chunk.get("incompatible_disease_terms_found") or []
+            ),
+            "reason": chunk.get("disease_relevance_reason"),
+            "data_signal_count": chunk.get("disease_relevance_data_signal_count", 0),
+        }
+    return assess_chunk_disease_relevance(chunk, _as_disease_relevance_context(context))
+
+
+def _chunk_blocked_by_disease_gate(
+    chunk: dict,
+    context: dict | None,
+) -> tuple[bool, dict]:
+    assessment = _assess_chunk_for_extraction(chunk, context)
+    if chunk.get("extraction_eligible_for_task_disease") is False:
+        return True, assessment
+    return assessment.get("status") != TARGET_DISEASE_MATCH, assessment
 
 
 def _has_any_llm_content_signal(record_data: dict) -> bool:
@@ -1326,6 +1421,16 @@ def _build_record_from_llm_output(
         if not field_values.get(f)
         or (isinstance(field_values.get(f), str) and not str(field_values[f]).strip())
     ]
+    compatibility = assess_record_disease_compatibility(
+        {
+            **cleaned,
+            "disease": disease,
+            "evidence_quote": text,
+            "source_title": chunk.get("title"),
+            "source_url": chunk.get("source_url"),
+        },
+        _as_disease_relevance_context(context),
+    )
 
     return PublicHealthRecord(
         record_id=record_id,
@@ -1394,6 +1499,7 @@ def _build_record_from_llm_output(
         source_section=cleaned.get("source_section"),
         semantic_warnings=list(cleaned.get("semantic_warnings") or []),
         extraction_warnings=list(cleaned.get("semantic_warnings") or []),
+        **record_compatibility_fields(compatibility),
         record_schema="generic_public_health_record",
         legacy_record_type=(
             "HantavirusRecord" if ((context or {}).get("is_hantavirus") is True) else None
@@ -1417,6 +1523,8 @@ def _rule_based_extract_records_from_chunks(
     skipped_count = 0
     skipped_context_only_chunk_count = 0
     skipped_context_only_source_ids: set[str] = set()
+    skipped_disease_mismatch_chunk_count = 0
+    skipped_disease_mismatch_source_ids: set[str] = set()
     field_counters: Counter = Counter()
     role_policy = load_source_role_policy()
 
@@ -1428,6 +1536,15 @@ def _rule_based_extract_records_from_chunks(
             skipped_context_only_chunk_count += 1
             if chunk.get("source_id"):
                 skipped_context_only_source_ids.add(chunk.get("source_id"))
+            continue
+        disease_blocked, disease_assessment = _chunk_blocked_by_disease_gate(
+            chunk, context
+        )
+        if disease_blocked:
+            skipped_count += 1
+            skipped_disease_mismatch_chunk_count += 1
+            if chunk.get("source_id"):
+                skipped_disease_mismatch_source_ids.add(chunk.get("source_id"))
             continue
         if chunk.get("contains_target_data"):
             target_data_count += 1
@@ -1463,6 +1580,10 @@ def _rule_based_extract_records_from_chunks(
         "skipped_chunk_count": skipped_count,
         "skipped_context_only_chunk_count": skipped_context_only_chunk_count,
         "skipped_context_only_source_ids": sorted(skipped_context_only_source_ids),
+        "skipped_disease_mismatch_chunk_count": skipped_disease_mismatch_chunk_count,
+        "skipped_disease_mismatch_source_ids": sorted(
+            skipped_disease_mismatch_source_ids
+        ),
         "field_detection_counts": {
             f: field_counters.get(f, 0) for f in _FIELD_DETECTION_KEYS
         },
@@ -1495,6 +1616,8 @@ def _llm_extract_records_from_chunks(
     llm_skipped_due_to_chunk_cap_count = 0
     skipped_context_only_chunk_count = 0
     skipped_context_only_source_ids: set[str] = set()
+    skipped_disease_mismatch_chunk_count = 0
+    skipped_disease_mismatch_source_ids: set[str] = set()
     role_policy = load_source_role_policy()
 
     for chunk in evidence_chunks:
@@ -1502,6 +1625,14 @@ def _llm_extract_records_from_chunks(
             skipped_context_only_chunk_count += 1
             if chunk.get("source_id"):
                 skipped_context_only_source_ids.add(chunk.get("source_id"))
+            continue
+        disease_blocked, disease_assessment = _chunk_blocked_by_disease_gate(
+            chunk, context
+        )
+        if disease_blocked:
+            skipped_disease_mismatch_chunk_count += 1
+            if chunk.get("source_id"):
+                skipped_disease_mismatch_source_ids.add(chunk.get("source_id"))
             continue
         if chunk.get("contains_target_data"):
             target_data_count += 1
@@ -1579,6 +1710,10 @@ def _llm_extract_records_from_chunks(
         "llm_skipped_due_to_chunk_cap_count": llm_skipped_due_to_chunk_cap_count,
         "skipped_context_only_chunk_count": skipped_context_only_chunk_count,
         "skipped_context_only_source_ids": sorted(skipped_context_only_source_ids),
+        "skipped_disease_mismatch_chunk_count": skipped_disease_mismatch_chunk_count,
+        "skipped_disease_mismatch_source_ids": sorted(
+            skipped_disease_mismatch_source_ids
+        ),
     }
     return records, stats
 
@@ -1643,6 +1778,13 @@ def structured_extraction(state: DataCollectionState) -> dict:
                 "skipped_context_only_source_ids"
             )
             or [],
+            "skipped_disease_mismatch_chunk_count": llm_stats.get(
+                "skipped_disease_mismatch_chunk_count", 0
+            ),
+            "skipped_disease_mismatch_source_ids": llm_stats.get(
+                "skipped_disease_mismatch_source_ids"
+            )
+            or [],
             "llm_max_chunks": llm_stats.get("llm_max_chunks"),
             "llm_skipped_due_to_chunk_cap_count": llm_stats.get(
                 "llm_skipped_due_to_chunk_cap_count", 0
@@ -1668,6 +1810,13 @@ def structured_extraction(state: DataCollectionState) -> dict:
             ),
             "skipped_context_only_source_ids": llm_stats.get(
                 "skipped_context_only_source_ids"
+            )
+            or [],
+            "skipped_disease_mismatch_chunk_count": llm_stats.get(
+                "skipped_disease_mismatch_chunk_count", 0
+            ),
+            "skipped_disease_mismatch_source_ids": llm_stats.get(
+                "skipped_disease_mismatch_source_ids"
             )
             or [],
             "fallback_to_rule_based": fallback_to_rule_based,
@@ -1696,6 +1845,13 @@ def structured_extraction(state: DataCollectionState) -> dict:
                 "skipped_context_only_source_ids"
             )
             or [],
+            "skipped_disease_mismatch_chunk_count": det_stats.get(
+                "skipped_disease_mismatch_chunk_count", 0
+            ),
+            "skipped_disease_mismatch_source_ids": det_stats.get(
+                "skipped_disease_mismatch_source_ids"
+            )
+            or [],
             "extraction_mode": "deterministic_rule_based",
             "llm_enabled": False,
             "llm_call_count": 0,
@@ -1719,6 +1875,13 @@ def structured_extraction(state: DataCollectionState) -> dict:
             "llm_error_messages": [],
             "rule_based_fallback_record_count": 0,
             "fallback_to_rule_based": fallback_to_rule_based,
+            "skipped_disease_mismatch_chunk_count": det_stats.get(
+                "skipped_disease_mismatch_chunk_count", 0
+            ),
+            "skipped_disease_mismatch_source_ids": det_stats.get(
+                "skipped_disease_mismatch_source_ids"
+            )
+            or [],
             "llm_max_chunks": _parse_llm_max_chunks(),
             "llm_skipped_due_to_chunk_cap_count": 0,
         }
@@ -1778,6 +1941,12 @@ def structured_extraction(state: DataCollectionState) -> dict:
         "raw_records": raw_record_dicts,
         "structured_extraction_summary": summary,
         "llm_extraction_summary": llm_summary,
+        "disease_relevance_summary": update_disease_relevance_summary(
+            {**state, "raw_records": raw_record_dicts},
+            skipped_disease_mismatch_chunk_count=summary.get(
+                "skipped_disease_mismatch_chunk_count", 0
+            ),
+        ),
         "collection_trace": trace,
     }
 
@@ -1787,6 +1956,7 @@ def schema_validation_and_repair(state: DataCollectionState) -> dict:
 
     policy = StructuredExtractionPolicy(**load_structured_extraction_policy())
     raw_records = list(state.get("raw_records") or [])
+    disease_context = build_disease_relevance_context(state)
     existing_queue = list(state.get("human_review_queue") or [])
     existing_review_ids = {item.get("review_id") for item in existing_queue}
 
@@ -1804,9 +1974,40 @@ def schema_validation_and_repair(state: DataCollectionState) -> dict:
     extraction_method_counter: Counter = Counter()
     generic_record_count = 0
     legacy_hantavirus_record_count = 0
+    disease_mismatch_rejected_count = 0
+    disease_uncertain_review_count = 0
 
     for record in raw_records:
         validated_record, _result = _validate_record(record, policy)
+        compatibility = assess_record_disease_compatibility(
+            validated_record,
+            disease_context,
+        )
+        validated_record.update(record_compatibility_fields(compatibility))
+        compatibility_status = compatibility.get("status")
+        if compatibility.get("reject_record"):
+            validated_record["schema_status"] = "rejected"
+            validated_record["requires_human_review"] = False
+            errors = list(validated_record.get("validation_errors") or [])
+            if "disease_mismatch" not in errors:
+                errors.append("disease_mismatch")
+            error = f"disease_mismatch: {compatibility.get('reason')}"
+            if error not in errors:
+                errors.append(error)
+            validated_record["validation_errors"] = errors
+            disease_mismatch_rejected_count += 1
+        elif compatibility_status in {AMBIGUOUS_DISEASE, INSUFFICIENT_TEXT}:
+            if validated_record.get("schema_status") != "rejected":
+                validated_record["schema_status"] = "needs_review"
+                validated_record["requires_human_review"] = True
+                errors = list(validated_record.get("validation_errors") or [])
+                if "disease_relevance_uncertain" not in errors:
+                    errors.append("disease_relevance_uncertain")
+                error = f"disease_relevance_uncertain: {compatibility.get('reason')}"
+                if error not in errors:
+                    errors.append(error)
+                validated_record["validation_errors"] = errors
+                disease_uncertain_review_count += 1
         status = validated_record.get("schema_status") or "rejected"
         status_counter[status] += 1
         prov_counter[validated_record.get("provenance_status") or "unknown"] += 1
@@ -1872,6 +2073,8 @@ def schema_validation_and_repair(state: DataCollectionState) -> dict:
         "review_required_record_count": needs_review_count,
         "unsupported_target_field_count": 0,
         "warnings": {},
+        "disease_mismatch_rejected_record_count": disease_mismatch_rejected_count,
+        "disease_uncertain_review_record_count": disease_uncertain_review_count,
     }
 
     trace = append_trace(
@@ -1889,5 +2092,10 @@ def schema_validation_and_repair(state: DataCollectionState) -> dict:
         "rejected_records": rejected,
         "human_review_queue": human_review_queue,
         "schema_validation_summary": summary,
+        "disease_relevance_summary": update_disease_relevance_summary(
+            {**state, "validated_records": validated, "rejected_records": rejected},
+            disease_mismatch_rejected_record_count=disease_mismatch_rejected_count,
+            disease_uncertain_review_record_count=disease_uncertain_review_count,
+        ),
         "collection_trace": trace,
     }

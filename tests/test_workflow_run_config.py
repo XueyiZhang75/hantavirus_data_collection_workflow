@@ -37,6 +37,7 @@ def test_default_workflow_run_config_drives_env_and_studio_input():
     assert config["llm"]["structured_extraction_enabled"] is True
     assert config["output"]["sessionized"] is True
     assert config["output"]["auto_build_console"] is True
+    assert config["validation"]["allow_incompatible_validation_records"] is False
 
     env = workflow_run_env_from_config(config)
     assert env["HDC_COLLECTION_MODE"] == "masked_validation"
@@ -46,6 +47,7 @@ def test_default_workflow_run_config_drives_env_and_studio_input():
     assert env["HDC_ENABLE_LLM_SOURCE_PLANNING"] == "true"
     assert env["HDC_ENABLE_LLM_SOURCE_CRITIC"] == "true"
     assert env["HDC_ENABLE_LLM_EXTRACTION"] == "true"
+    assert env["HDC_ALLOW_INCOMPATIBLE_VALIDATION_RECORDS"] == "false"
     assert env["HDC_LLM_PROVIDER"] == "anthropic"
     assert env["HDC_LLM_MODEL"] == "claude-sonnet-4-6"
     assert env["HDC_SOURCE_ID_ALLOWLIST"].split(",") == config["source_sets"][
@@ -77,6 +79,13 @@ def test_default_workflow_run_config_drives_env_and_studio_input():
         / "sessions"
         / "test_session"
     )
+
+    validation_override = dict(config)
+    validation_override["validation"] = {
+        "allow_incompatible_validation_records": True,
+    }
+    env_override = workflow_run_env_from_config(validation_override)
+    assert env_override["HDC_ALLOW_INCOMPATIBLE_VALIDATION_RECORDS"] == "true"
 
 
 def test_jsonc_loader_preserves_urls_and_strips_comments(tmp_path):

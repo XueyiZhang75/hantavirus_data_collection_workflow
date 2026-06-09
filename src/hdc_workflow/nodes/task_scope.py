@@ -14,6 +14,10 @@ from ..config import (
     load_hantavirus_profile,
     load_source_strategy,
 )
+from ..localized_source_planning import (
+    build_localized_source_planning_hints,
+    public_summary as localized_source_planning_public_summary,
+)
 from ..models import (
     CollectionSchema,
     CollectionSpec,
@@ -971,10 +975,11 @@ def _source_plan_objectives(
     disease_name: str,
     geography: str | None,
     time_window: str | None,
+    localized_hints: dict | None = None,
 ) -> list[dict]:
     location = geography or "the requested geography"
     period = time_window or "the requested time window"
-    return [
+    objectives = [
         {
             "objective_id": "obj_collection_001",
             "objective": (
@@ -1016,6 +1021,51 @@ def _source_plan_objectives(
             "priority": 4,
         },
     ]
+    if localized_hints and localized_hints.get("enabled"):
+        objectives.insert(
+            0,
+            {
+                "objective_id": "obj_localized_official_001",
+                "objective": (
+                    "Prioritize localized Shanghai / China official public-health "
+                    "sources and Chinese HFRS terminology before broad web or news "
+                    "queries."
+                ),
+                "source_role_hint": "collection",
+                "rationale": (
+                    "HFRS/hantavirus reporting in China may appear in Chinese "
+                    "official notifiable infectious disease sources."
+                ),
+                "priority": 1,
+            },
+        )
+    return objectives
+
+
+def _apply_localized_category_hints(
+    categories: list[dict],
+    localized_hints: dict | None,
+) -> list[dict]:
+    if not localized_hints or not localized_hints.get("enabled"):
+        return categories
+    updated = []
+    for category in categories:
+        category_copy = dict(category)
+        if category_copy.get("source_type") == "official_public_health_agency":
+            category_copy["risk_notes"] = _unique_preserve_order(
+                [
+                    *(category_copy.get("risk_notes") or []),
+                    "localized_official_sources_prioritized_for_shanghai_china",
+                    "chinese_hfrs_terms_required_for_source_discovery",
+                ]
+            )
+            category_copy["why_relevant"] = (
+                f"{category_copy.get('why_relevant') or ''} "
+                "For Shanghai/HFRS tasks, local and national Chinese official "
+                "public-health sources are the highest-priority collection sources."
+            ).strip()
+        updated.append(category_copy)
+    return updated
 
 
 def _planned_source_categories(
@@ -1073,14 +1123,60 @@ def _planned_query_text(
     return f'"{term}" outbreak report cases deaths{location_suffix}{time_suffix}'.strip()
 
 
+def _localized_planned_query_dicts(
+    localized_hints: dict | None,
+    *,
+    start_index: int = 1,
+) -> list[dict]:
+    if not localized_hints or not localized_hints.get("enabled"):
+        return []
+    query_dicts: list[dict] = []
+    for spec in localized_hints.get("planned_query_specs") or []:
+        if not isinstance(spec, dict):
+            continue
+        query = str(spec.get("query") or "").strip()
+        if not query:
+            continue
+        query_dicts.append(
+            {
+                "query_id": f"q_exec_{start_index + len(query_dicts):03d}",
+                "query": query,
+                "query_type": spec.get("query_type") or "general_web",
+                "provider_channel": spec.get("provider_channel") or "web_search",
+                "source_type": spec.get("source_type")
+                or "official_public_health_agency",
+                "role_hint": spec.get("role_hint") or "collection",
+                "priority": int(spec.get("priority") or 1),
+                "expected_fields": list(
+                    spec.get("expected_fields") or _expected_fields_default()
+                ),
+                "disease_terms_used": _as_str_list(spec.get("disease_terms_used")),
+                "location_terms_used": _as_str_list(spec.get("location_terms_used")),
+                "time_terms_used": _as_str_list(spec.get("time_terms_used")),
+                "query_language": spec.get("query_language"),
+                "jurisdiction_hint": spec.get("jurisdiction_hint"),
+                "official_domain_hint": spec.get("official_domain_hint"),
+                "localized_source_hint": bool(spec.get("localized_source_hint")),
+                "source_priority_reason": spec.get("source_priority_reason"),
+                "rationale": spec.get("rationale")
+                or "Localized official source planning query.",
+                "execution_status": "planned_not_executed",
+            }
+        )
+    return query_dicts
+
+
 def _planned_queries(
     categories: list[dict],
     disease_terms: list[str],
     location_terms: list[str],
     time_terms: list[str],
+    localized_hints: dict | None = None,
 ) -> list[dict]:
-    queries = []
+    queries = _localized_planned_query_dicts(localized_hints)
     seen: set[str] = set()
+    for query in queries:
+        seen.add(str(query.get("query") or ""))
     primary_terms = disease_terms[:3] or [_DEFAULT_DISEASE]
     for category in categories:
         source_type = category["source_type"]
@@ -1104,6 +1200,11 @@ def _planned_queries(
                     "disease_terms_used": [term],
                     "location_terms_used": list(location_terms),
                     "time_terms_used": list(time_terms),
+                    "query_language": "en",
+                    "jurisdiction_hint": None,
+                    "official_domain_hint": None,
+                    "localized_source_hint": False,
+                    "source_priority_reason": None,
                     "rationale": (
                         "Executable search query planned for later source "
                         f"discovery against {source_type}; not executed in Stage 4."
@@ -1148,6 +1249,7 @@ def _deterministic_executable_source_plan(
     strategy: SourceStrategy,
     schema_dict: dict | None,
     disease_intelligence: dict,
+    localized_hints: dict | None = None,
     generation_method: str = "deterministic_executable_source_plan",
     llm_enabled: bool = False,
     extra_warnings: list[str] | None = None,
@@ -1164,13 +1266,24 @@ def _deterministic_executable_source_plan(
     disease_terms = _source_plan_disease_terms(profile, disease_intelligence)
     location_terms = _source_plan_location_terms(geography)
     time_terms = _source_plan_time_terms(time_window)
-    categories = _planned_source_categories(strategy, target_fields)
+    categories = _apply_localized_category_hints(
+        _planned_source_categories(strategy, target_fields),
+        localized_hints,
+    )
     planned_queries = _planned_queries(
         categories,
         disease_terms,
         location_terms,
         time_terms,
+        localized_hints,
     )
+    warnings = [
+        "source_plan_created_not_executed_stage4",
+        "source_discovery_execution_not_implemented_stage4",
+        *(extra_warnings or []),
+    ]
+    if localized_hints and localized_hints.get("enabled"):
+        warnings.append("localized_source_planning_hints_applied")
     plan = ExecutableSourcePlan(
         plan_id=(
             "exec_source_plan_"
@@ -1184,17 +1297,12 @@ def _deterministic_executable_source_plan(
         generation_method=generation_method,
         llm_enabled=llm_enabled,
         execution_status="planned_not_executed",
-        warnings=_unique_preserve_order(
-            [
-                "source_plan_created_not_executed_stage4",
-                "source_discovery_execution_not_implemented_stage4",
-                *(extra_warnings or []),
-            ]
-        ),
+        warnings=_unique_preserve_order(warnings),
         source_discovery_objectives=_source_plan_objectives(
             disease_name,
             geography,
             time_window,
+            localized_hints,
         ),
         planned_source_categories=categories,
         planned_queries=planned_queries,
@@ -1240,6 +1348,51 @@ def _sanitize_executable_source_plan(plan: ExecutableSourcePlan) -> ExecutableSo
         query["query"] = sanitized
     plan_dict["warnings"] = _unique_preserve_order(warnings)
     return ExecutableSourcePlan(**plan_dict)
+
+
+def _is_localized_planned_query(query: dict) -> bool:
+    if bool(query.get("localized_source_hint")):
+        return True
+    rationale = str(query.get("rationale") or "").lower()
+    if "localized official source planning" in rationale:
+        return True
+    query_text = str(query.get("query") or "")
+    return any(
+        token in query_text
+        for token in (
+            "肾综合征出血热",
+            "汉坦病毒",
+            "流行性出血热",
+            "wsjkw.sh.gov.cn",
+            "shcdc.sh.cn",
+        )
+    )
+
+
+def _prepend_missing_localized_queries(
+    base_queries: list[dict],
+    current_queries: list[dict],
+) -> list[dict]:
+    current = [dict(query) for query in current_queries if isinstance(query, dict)]
+    localized = [
+        dict(query) for query in base_queries if isinstance(query, dict)
+        and _is_localized_planned_query(query)
+    ]
+    if not localized:
+        return current
+
+    seen = {
+        _sanitize_planned_query_text(str(query.get("query") or "")).casefold()
+        for query in current
+    }
+    additions = []
+    for query in localized:
+        key = _sanitize_planned_query_text(str(query.get("query") or "")).casefold()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        additions.append(query)
+    return [*additions, *current]
 
 
 def _build_executable_source_plan_prompt(
@@ -1328,7 +1481,10 @@ def _merge_llm_executable_plan(
     merged["planned_source_categories"] = (
         merged.get("planned_source_categories") or base["planned_source_categories"]
     )
-    merged["planned_queries"] = merged.get("planned_queries") or base["planned_queries"]
+    merged["planned_queries"] = _prepend_missing_localized_queries(
+        base.get("planned_queries") or [],
+        merged.get("planned_queries") or base["planned_queries"],
+    )
     merged["source_planning_risks"] = (
         merged.get("source_planning_risks") or base["source_planning_risks"]
     )
@@ -1336,6 +1492,14 @@ def _merge_llm_executable_plan(
         [
             "source_plan_created_not_executed_stage4",
             "source_discovery_execution_not_implemented_stage4",
+            *(
+                ["localized_source_planning_hints_preserved_after_llm_plan"]
+                if any(
+                    _is_localized_planned_query(query)
+                    for query in base.get("planned_queries") or []
+                )
+                else []
+            ),
             *(_as_str_list(merged.get("warnings"))),
         ]
     )
@@ -1367,6 +1531,42 @@ def _executable_source_plan_summary(plan: ExecutableSourcePlan) -> dict:
         ),
         "warnings": list(plan.warnings),
     }
+
+
+def _localized_source_planning_summary(
+    plan: ExecutableSourcePlan,
+    localized_hints: dict | None,
+) -> dict:
+    summary = localized_source_planning_public_summary(localized_hints)
+    plan_queries = [
+        query.model_dump()
+        for query in plan.planned_queries
+        if _is_localized_planned_query(query.model_dump())
+    ]
+    official_domains = _unique_preserve_order(
+        [
+            str(query.get("official_domain_hint") or "")
+            for query in plan_queries
+            if query.get("official_domain_hint")
+        ]
+        + _as_str_list(summary.get("official_domain_hints"))
+    )
+    summary.update(
+        {
+            "localized_query_count": len(plan_queries),
+            "official_domain_hint_count": len(official_domains),
+            "official_domain_hints": official_domains,
+            "planned_query_ids": [
+                str(query.get("query_id") or "") for query in plan_queries
+            ],
+            "example_queries": [
+                str(query.get("query") or "") for query in plan_queries[:5]
+            ],
+        }
+    )
+    if plan_queries and not summary.get("enabled"):
+        summary["enabled"] = True
+    return summary
 
 
 def _source_planning_agent_summary(
@@ -1411,6 +1611,12 @@ def executable_source_planning(state: DataCollectionState) -> dict:
     profile = DiseaseProfile(**profile_dict)
     strategy = SourceStrategy(**strategy_dict)
     planning_enabled = llm_clients.llm_source_planning_enabled()
+    localized_hints = build_localized_source_planning_hints(
+        structured_task=state.get("structured_task") or {},
+        collection_spec=spec_dict,
+        disease_intelligence=disease_intelligence,
+        preferred_source_categories=spec_dict.get("source_priority"),
+    )
 
     deterministic_plan = _deterministic_executable_source_plan(
         spec=spec_dict,
@@ -1418,6 +1624,7 @@ def executable_source_planning(state: DataCollectionState) -> dict:
         strategy=strategy,
         schema_dict=schema_dict,
         disease_intelligence=disease_intelligence,
+        localized_hints=localized_hints,
         llm_enabled=False,
     )
     plan = deterministic_plan
@@ -1453,6 +1660,7 @@ def executable_source_planning(state: DataCollectionState) -> dict:
                 strategy=strategy,
                 schema_dict=schema_dict,
                 disease_intelligence=disease_intelligence,
+                localized_hints=localized_hints,
                 generation_method=fallback_method,
                 llm_enabled=True,
                 extra_warnings=[
@@ -1463,6 +1671,8 @@ def executable_source_planning(state: DataCollectionState) -> dict:
             status = "failed_deterministic_fallback"
 
     plan_summary = _executable_source_plan_summary(plan)
+    localized_summary = _localized_source_planning_summary(plan, localized_hints)
+    plan_summary["localized_source_planning"] = localized_summary
     source_planning_summary = _source_planning_agent_summary(
         plan=plan,
         planning_enabled=planning_enabled,
@@ -1470,6 +1680,7 @@ def executable_source_planning(state: DataCollectionState) -> dict:
         failure_type=failure_type,
         failure_message=failure_message,
     )
+    source_planning_summary["localized_source_planning_summary"] = localized_summary
     trace = append_trace(
         state,
         node_name="executable_source_planning",
@@ -1482,6 +1693,7 @@ def executable_source_planning(state: DataCollectionState) -> dict:
     return {
         "agentic_source_plan": plan.model_dump(),
         "executable_source_plan_summary": plan_summary,
+        "localized_source_planning_summary": localized_summary,
         "source_planning_agent_summary": source_planning_summary,
         "collection_trace": trace,
     }
@@ -1605,6 +1817,11 @@ def _append_executable_plan_queries(
                 "disease_terms_used": list(planned_query.disease_terms_used),
                 "location_terms_used": list(planned_query.location_terms_used),
                 "time_terms_used": list(planned_query.time_terms_used),
+                "query_language": planned_query.query_language,
+                "jurisdiction_hint": planned_query.jurisdiction_hint,
+                "official_domain_hint": planned_query.official_domain_hint,
+                "localized_source_hint": planned_query.localized_source_hint,
+                "source_priority_reason": planned_query.source_priority_reason,
             }
         )
     return added_count
@@ -1804,6 +2021,16 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
             "query_strategy_consumed_executable_plan": bool(agentic_source_plan),
         }
     )
+    localized_summary = state.get("localized_source_planning_summary") or (
+        (state.get("executable_source_plan_summary") or {}).get(
+            "localized_source_planning"
+        )
+        or {}
+    )
+    if localized_summary:
+        source_planning_agent_summary[
+            "localized_source_planning_summary"
+        ] = localized_summary
 
     # Group into the backward-compatible SearchQuerySet structure.
     official_source_queries = [
@@ -1850,12 +2077,14 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
             "geography": geography,
             "time_window": time_window,
             "executable_source_plan_present": bool(agentic_source_plan),
+            "localized_source_planning_summary": localized_summary,
             **source_planning_agent_summary,
         },
     )
     return {
         "search_queries": query_set.model_dump(),
         "search_query_inventory": inventory_dicts,
+        "localized_source_planning_summary": localized_summary,
         "source_planning_agent_summary": source_planning_agent_summary,
         "collection_trace": trace,
     }

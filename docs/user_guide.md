@@ -255,6 +255,10 @@ Important session files:
 - `diagnostics/source_search_execution_summary.json`: search execution summary.
 - `diagnostics/live_fetch_summary.json`: fetch and parse summary.
 - `diagnostics/llm_stage_summary.json`: LLM stage status and call counts.
+- `diagnostics/disease_relevance_summary.json`: source, document, chunk, and record disease-match guardrail summary.
+- `diagnostics/validation_source_compatibility_summary.json`: held-out validation source compatibility status for this task.
+- `validation/ground_truth_records.csv`: active held-out validation records used by this run.
+- `validation/inactive_validation_records.csv`: loaded validation records disabled because they do not match this task.
 - `diagnostics/anomaly_results.json`: anomaly review candidates.
 - `diagnostics/human_review_audit_trail.json`: review decision audit trail.
 - `workflow_console/hdc_workflow_console.html`: visual run console.

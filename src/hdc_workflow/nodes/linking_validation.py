@@ -13,6 +13,11 @@ from collections import Counter
 from ..config import load_cross_source_consistency_policy, load_record_linking_policy
 from ..anomaly_detection import detect_anomalies
 from ..human_review_application import has_human_review_decision_input
+from ..validation_source_compatibility import (
+    INCOMPATIBLE_DISABLED_STATUS,
+    NO_COMPATIBLE_STATUS,
+    resolve_task_compatible_validation_records,
+)
 from ..models import (
     Conflict,
     CrossSourceConsistencyPolicy,
@@ -2315,7 +2320,41 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
     normalized_records = list(state.get("normalized_records") or [])
     linked_events = list(state.get("linked_events") or [])
     event_clusters = list(state.get("event_clusters") or [])
-    validation_records = list(state.get("validation_records") or [])
+    raw_validation_records = list(state.get("validation_records") or [])
+    if state.get("validation_source_compatibility_summary") is not None:
+        active_validation_records = list(state.get("active_validation_records") or [])
+        inactive_validation_records = list(
+            state.get("inactive_validation_records") or []
+        )
+        validation_source_compatibility_summary = dict(
+            state.get("validation_source_compatibility_summary") or {}
+        )
+    else:
+        resolved_validation = resolve_task_compatible_validation_records(
+            validation_records=raw_validation_records,
+            state_or_task_context=state,
+        )
+        active_validation_records = list(
+            resolved_validation.get("active_validation_records") or []
+        )
+        inactive_validation_records = list(
+            resolved_validation.get("inactive_validation_records") or []
+        )
+        validation_source_compatibility_summary = dict(
+            resolved_validation.get("validation_source_compatibility_summary") or {}
+        )
+    validation_records = list(active_validation_records)
+    validation_compatibility_status = (
+        validation_source_compatibility_summary.get("compatibility_status")
+    )
+    no_task_compatible_validation = (
+        not validation_records
+        and validation_compatibility_status
+        in {
+            NO_COMPATIBLE_STATUS,
+            INCOMPATIBLE_DISABLED_STATUS,
+        }
+    )
     existing_conflicts = list(state.get("conflicts") or [])
     existing_queue = list(state.get("human_review_queue") or [])
     existing_review_ids = {item.get("review_id") for item in existing_queue}
@@ -2718,23 +2757,26 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
                             existing_review_ids.add(review_item.review_id)
 
     elif countable_collection_records and not validation_records:
-        for left in countable_collection_records:
-            _add_validation_result(
-                validation_builder,
-                validation_type="held_out_source_comparison",
-                validation_unit="record",
-                compared_field="validation_counterpart",
-                left_records=[left],
-                left_event_cluster_ids=[left.get("event_cluster_id")]
-                if left.get("event_cluster_id")
-                else [],
-                comparability_status="insufficient_information",
-                match_status="missing_validation",
-                validation_status="missing_counterpart",
-                reason="no held-out validation records were available",
-                confidence=0.70,
-                warnings=["missing_validation"],
-            )
+        if no_task_compatible_validation:
+            pass
+        else:
+            for left in countable_collection_records:
+                _add_validation_result(
+                    validation_builder,
+                    validation_type="held_out_source_comparison",
+                    validation_unit="record",
+                    compared_field="validation_counterpart",
+                    left_records=[left],
+                    left_event_cluster_ids=[left.get("event_cluster_id")]
+                    if left.get("event_cluster_id")
+                    else [],
+                    comparability_status="insufficient_information",
+                    match_status="missing_validation",
+                    validation_status="missing_counterpart",
+                    reason="no held-out validation records were available",
+                    confidence=0.70,
+                    warnings=["missing_validation"],
+                )
     elif validation_records and not countable_collection_records:
         for right in validation_records:
             result = _add_validation_result(
@@ -2901,6 +2943,38 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
     validation_summary, trusted_source_validation_summary, cross_source_validation_summary = (
         _summarize_validation_results(validation_builder["results"])
     )
+    validation_summary.update(
+        {
+            "validation_source_compatibility_status": validation_compatibility_status,
+            "active_validation_record_count": len(active_validation_records),
+            "inactive_validation_record_count": len(inactive_validation_records),
+            "validation_record_count": len(active_validation_records),
+            "raw_validation_record_count": len(raw_validation_records),
+            "validation_source_compatibility_warnings": (
+                validation_source_compatibility_summary.get("warnings") or []
+            ),
+        }
+    )
+    trusted_status = (
+        validation_compatibility_status
+        if no_task_compatible_validation
+        else "completed"
+    )
+    trusted_source_validation_summary.update(
+        {
+            "status": trusted_status,
+            "validation_source_compatibility_status": validation_compatibility_status,
+            "active_validation_record_count": len(active_validation_records),
+            "inactive_validation_record_count": len(inactive_validation_records),
+            "validation_record_count": len(active_validation_records),
+            "raw_validation_record_count": len(raw_validation_records),
+        }
+    )
+    cross_source_validation_summary.update(
+        {
+            "validation_source_compatibility_status": validation_compatibility_status,
+        }
+    )
     summary.update(
         {
             "validation_result_count": validation_summary["validation_result_count"],
@@ -2910,6 +2984,10 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
             "cross_source_validation_result_count": cross_source_validation_summary[
                 "cross_source_validation_result_count"
             ],
+            "validation_source_compatibility_status": validation_compatibility_status,
+            "active_validation_record_count": len(active_validation_records),
+            "inactive_validation_record_count": len(inactive_validation_records),
+            "raw_validation_record_count": len(raw_validation_records),
         }
     )
 
@@ -2930,6 +3008,10 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
         "validation_cases": validation_builder["cases"],
         "validation_comparisons": validation_builder["comparisons"],
         "validation_results": validation_builder["results"],
+        "validation_records": raw_validation_records,
+        "active_validation_records": active_validation_records,
+        "inactive_validation_records": inactive_validation_records,
+        "validation_source_compatibility_summary": validation_source_compatibility_summary,
         "validation_summary": validation_summary,
         "trusted_source_validation_summary": trusted_source_validation_summary,
         "cross_source_validation_summary": cross_source_validation_summary,

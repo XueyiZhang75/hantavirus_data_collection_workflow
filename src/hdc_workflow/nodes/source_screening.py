@@ -66,6 +66,48 @@ def _llm_source_critic_review_blocks_fetch() -> bool:
     return value != "false"
 
 
+_SOURCE_CRITIC_SEARCH_DISCOVERY_METHODS = {
+    "live_search_result",
+    "fixture_search_result",
+}
+_SOURCE_CRITIC_BLOCK_DECISIONS = {
+    "not_task_relevant",
+    "exclude_from_task",
+    "no_extractable_data",
+}
+_SOURCE_CRITIC_CONTEXT_DECISIONS = {
+    "no_extractable_data",
+    "suitable_for_context",
+    "collection_support_only",
+}
+_SOURCE_CRITIC_BLOCK_FETCH_RECOMMENDATIONS = {
+    "block_fetch",
+    "fetch_only_after_human_review",
+    "context_fetch_only",
+}
+_SOURCE_CRITIC_HARD_BLOCK_FLAGS = {
+    "critical_disease_mismatch",
+    "disease_mismatch",
+    "source_not_about_task",
+    "outside_task_scope",
+}
+_SOURCE_CRITIC_ALLOWED_ROLES = {
+    "collection",
+    "validation",
+    "context",
+    "collection_support",
+    "search_endpoint",
+    "excluded",
+    "needs_human_review",
+}
+_SOURCE_CRITIC_DECISION_ALIASES = {
+    "exclude": "not_task_relevant",
+    "excluded": "not_task_relevant",
+    "not_relevant": "not_task_relevant",
+    "context_only": "no_extractable_data",
+}
+
+
 def _text_blob(entry: dict) -> str:
     """Combine relevant metadata fields into a single lowercase text blob."""
 
@@ -321,20 +363,293 @@ def _append_flag(flags: list[str], flag: str) -> list[str]:
     return flags
 
 
+def _as_str_list(value) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        values = value
+    else:
+        values = [value]
+    return [str(item).strip() for item in values if str(item).strip()]
+
+
+def _as_confidence(value) -> float | None:
+    if value is None:
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    return max(0.0, min(1.0, numeric))
+
+
+def _source_critic_role(value: str | None, *, default: str = "needs_human_review") -> str:
+    role = str(value or "").strip().lower()
+    return role if role in _SOURCE_CRITIC_ALLOWED_ROLES else default
+
+
+def _source_critic_decision_from_legacy(assessment: dict) -> str:
+    proposed_decision = str(
+        assessment.get("proposed_screening_decision") or ""
+    ).strip().lower()
+    proposed_role = str(assessment.get("proposed_source_role") or "").strip().lower()
+    if proposed_decision in {"exclude", "excluded"}:
+        return "not_task_relevant"
+    if bool(assessment.get("validation_candidate_risk", False)):
+        return "suitable_for_validation"
+    if bool(assessment.get("context_only_risk", False)) or proposed_role in {
+        "context",
+        "collection_support",
+    }:
+        return "suitable_for_context"
+    if bool(assessment.get("needs_human_review", False)):
+        return "needs_human_review"
+    return "suitable_for_collection"
+
+
+def _normalize_source_critic_assessment(assessment: dict, source_id: str) -> dict:
+    decision = str(
+        assessment.get("critic_decision")
+        or assessment.get("source_critic_decision")
+        or _source_critic_decision_from_legacy(assessment)
+    ).strip().lower()
+    decision = _SOURCE_CRITIC_DECISION_ALIASES.get(decision, decision)
+    risk_flags = _as_str_list(assessment.get("risk_flags"))
+    if bool(assessment.get("semantic_leakage_risk", False)):
+        risk_flags.append("semantic_leakage_risk")
+    if bool(assessment.get("context_only_risk", False)):
+        risk_flags.append("only_background_or_context")
+    if bool(assessment.get("validation_candidate_risk", False)):
+        risk_flags.append("validation_candidate_risk")
+    risk_flags = list(dict.fromkeys(risk_flags))
+
+    reason = str(
+        assessment.get("reasoning_summary")
+        or assessment.get("reason")
+        or assessment.get("credibility_reason")
+        or assessment.get("human_review_reason")
+        or ""
+    ).strip()
+    recommended_role = _source_critic_role(
+        assessment.get("recommended_role")
+        or assessment.get("proposed_source_role")
+        or ("context" if decision in _SOURCE_CRITIC_CONTEXT_DECISIONS else None),
+        default="needs_human_review",
+    )
+    fetch_recommendation = str(
+        assessment.get("fetch_recommendation") or ""
+    ).strip().lower()
+    if not fetch_recommendation:
+        if decision in {"not_task_relevant", "exclude_from_task"}:
+            fetch_recommendation = "block_fetch"
+        elif decision in _SOURCE_CRITIC_CONTEXT_DECISIONS:
+            fetch_recommendation = "context_fetch_only"
+        elif bool(assessment.get("needs_human_review", False)):
+            fetch_recommendation = "fetch_only_after_human_review"
+        else:
+            fetch_recommendation = "allow_fetch"
+    review_required = bool(
+        assessment.get("review_required", False)
+        or assessment.get("needs_human_review", False)
+        or fetch_recommendation == "fetch_only_after_human_review"
+    )
+    return {
+        **assessment,
+        "source_id": str(assessment.get("source_id") or source_id or ""),
+        "critic_decision": decision,
+        "risk_flags": risk_flags,
+        "recommended_role": recommended_role,
+        "fetch_recommendation": fetch_recommendation,
+        "review_required": review_required,
+        "confidence": _as_confidence(assessment.get("confidence")),
+        "reasoning_summary": reason,
+        "warnings": _as_str_list(assessment.get("warnings")),
+    }
+
+
+def _source_critic_fetch_policy(
+    assessment: dict,
+    *,
+    review_blocks_fetch: bool,
+) -> dict:
+    decision = str(assessment.get("critic_decision") or "").strip().lower()
+    fetch_recommendation = str(
+        assessment.get("fetch_recommendation") or ""
+    ).strip().lower()
+    risk_flags = set(_as_str_list(assessment.get("risk_flags")))
+    hard_block = (
+        decision in {"not_task_relevant", "exclude_from_task"}
+        or fetch_recommendation == "block_fetch"
+        or bool(risk_flags & _SOURCE_CRITIC_HARD_BLOCK_FLAGS)
+    )
+    policy_block = (
+        hard_block
+        or decision in _SOURCE_CRITIC_BLOCK_DECISIONS
+        or fetch_recommendation in _SOURCE_CRITIC_BLOCK_FETCH_RECOMMENDATIONS
+    )
+    should_block = policy_block and (review_blocks_fetch or hard_block)
+    context_only = (
+        decision in _SOURCE_CRITIC_CONTEXT_DECISIONS
+        or fetch_recommendation == "context_fetch_only"
+    )
+    review_required = bool(assessment.get("review_required", False)) or (
+        should_block and not hard_block
+    )
+    if hard_block:
+        final_decision = "exclude"
+        final_role = "excluded"
+        status = "excluded"
+    elif should_block and context_only:
+        final_decision = "include_for_context_fetch"
+        final_role = _source_critic_role(
+            assessment.get("recommended_role"), default="context"
+        )
+        if final_role not in {"context", "collection_support"}:
+            final_role = "context"
+        status = "ready_for_context_fetch"
+    elif should_block or review_required:
+        final_decision = "needs_human_review"
+        final_role = "needs_human_review"
+        status = "needs_human_review"
+    else:
+        final_decision = None
+        final_role = _source_critic_role(
+            assessment.get("recommended_role"), default=""
+        )
+        status = None
+    return {
+        "should_block_fetch": should_block,
+        "hard_block": hard_block,
+        "context_only": context_only,
+        "review_required": review_required,
+        "final_decision": final_decision,
+        "final_role": final_role,
+        "status": status,
+    }
+
+
+def _is_search_endpoint_for_source_critic(entry: dict) -> bool:
+    role_values = {
+        str(entry.get("source_role") or "").lower(),
+        str(entry.get("source_role_final") or "").lower(),
+        str(entry.get("role_hint") or "").lower(),
+    }
+    if role_values & {"search_endpoint", "placeholder_source"}:
+        return True
+    text = _source_content_text(entry)
+    url = str(entry.get("canonical_url") or entry.get("url") or "").lower()
+    return (
+        "pubmed" in text
+        or "openalex" in text
+        or "europe pmc" in text
+        or "/search" in url
+        or "search?" in url
+        or "search=" in url
+    )
+
+
+def _source_critic_sort_key(entry: dict) -> tuple[int, int, int, str]:
+    discovery_method = str(entry.get("discovery_method") or "")
+    if discovery_method == "live_search_result":
+        discovery_bucket = 0
+    elif discovery_method == "fixture_search_result":
+        discovery_bucket = 1
+    else:
+        discovery_bucket = 2
+    search_rank = entry.get("search_rank")
+    try:
+        search_rank_int = int(search_rank)
+    except (TypeError, ValueError):
+        search_rank_int = 999_999
+    priority = entry.get("priority")
+    try:
+        priority_int = int(priority)
+    except (TypeError, ValueError):
+        priority_int = 999_999
+    return (
+        discovery_bucket,
+        search_rank_int,
+        priority_int,
+        str(entry.get("source_id") or ""),
+    )
+
+
+def _select_llm_source_critic_candidates(
+    registry: list[dict],
+    *,
+    allowlist: set[str] | None,
+    max_sources: int | None,
+) -> tuple[set[str], dict[str, str], dict]:
+    explicit_allowlist_used = allowlist is not None
+    skipped_reasons: dict[str, str] = {}
+    eligible: list[dict] = []
+
+    for entry in registry:
+        source_id = str(entry.get("source_id") or "")
+        if not source_id:
+            continue
+        if explicit_allowlist_used and source_id not in allowlist:
+            skipped_reasons[source_id] = "source_not_in_explicit_critic_allowlist"
+            continue
+        if not explicit_allowlist_used and _is_search_endpoint_for_source_critic(entry):
+            skipped_reasons[source_id] = "search_endpoint_or_placeholder_not_critic_candidate"
+            continue
+        eligible.append(entry)
+
+    selected_entries = sorted(eligible, key=_source_critic_sort_key)
+    if max_sources is not None:
+        selected_entries = selected_entries[:max_sources]
+    selected_ids = {str(entry.get("source_id") or "") for entry in selected_entries}
+    for entry in eligible:
+        source_id = str(entry.get("source_id") or "")
+        if source_id and source_id not in selected_ids:
+            skipped_reasons[source_id] = "not_selected_by_source_critic_limit"
+
+    skipped_reason_counts = Counter(skipped_reasons.values())
+    summary = {
+        "selection_mode": "explicit_allowlist"
+        if explicit_allowlist_used
+        else "auto_priority",
+        "explicit_allowlist_used": explicit_allowlist_used,
+        "max_sources": max_sources,
+        "eligible_candidate_count": len(eligible),
+        "selected_candidate_count": len(selected_ids),
+        "skipped_candidate_count": len(skipped_reasons),
+        "selected_source_ids": [str(entry.get("source_id") or "") for entry in selected_entries],
+        "skipped_reason_counts": dict(skipped_reason_counts),
+    }
+    return selected_ids, skipped_reasons, summary
+
+
 def _apply_llm_source_critic_assessment(
     entry: dict,
     assessment: dict,
+    *,
+    review_blocks_fetch: bool,
 ) -> dict:
     updated = dict(entry)
+    source_id = str(updated.get("source_id") or "")
+    assessment = _normalize_source_critic_assessment(assessment, source_id)
+    fetch_policy = _source_critic_fetch_policy(
+        assessment,
+        review_blocks_fetch=review_blocks_fetch,
+    )
     routing_flags = list(updated.get("routing_flags") or [])
     critic_flags = list(updated.get("critic_flags") or [])
 
     semantic_leakage_risk = bool(assessment.get("semantic_leakage_risk", False))
-    needs_human_review = bool(assessment.get("needs_human_review", False))
+    needs_human_review = bool(
+        assessment.get("needs_human_review", False)
+        or assessment.get("review_required", False)
+    )
     context_only_risk = bool(assessment.get("context_only_risk", False))
     validation_candidate_risk = bool(
         assessment.get("validation_candidate_risk", False)
     )
+    risk_flags = _as_str_list(assessment.get("risk_flags"))
+    for risk_flag in risk_flags:
+        _append_flag(routing_flags, f"llm_source_critic:{risk_flag}")
+        _append_flag(critic_flags, f"llm_source_critic:{risk_flag}")
 
     if semantic_leakage_risk:
         _append_flag(routing_flags, "llm_semantic_leakage_risk")
@@ -348,28 +663,63 @@ def _apply_llm_source_critic_assessment(
     if needs_human_review:
         _append_flag(routing_flags, "llm_human_review_recommended")
         _append_flag(critic_flags, "llm_human_review_recommended")
-        if _llm_source_critic_review_blocks_fetch():
-            reason = (
-                assessment.get("human_review_reason")
-                or "LLM source critic recommended human review."
-            )
-            updated.update(
-                {
-                    "final_screening_decision": "needs_human_review",
-                    "final_screening_reason": _append_note(
-                        updated.get("final_screening_reason"), str(reason)
-                    ),
-                    "ready_for_content_fetch": False,
-                    "requires_human_review": True,
-                    "status": "needs_human_review",
-                }
-            )
+
+    if fetch_policy["should_block_fetch"]:
+        _append_flag(routing_flags, "llm_source_critic_block_fetch")
+        _append_flag(critic_flags, "llm_source_critic_block_fetch")
+        reason = (
+            assessment.get("reasoning_summary")
+            or assessment.get("human_review_reason")
+            or "LLM source critic blocked content fetch."
+        )
+        updated.update(
+            {
+                "final_screening_decision": fetch_policy["final_decision"],
+                "final_screening_reason": _append_note(
+                    updated.get("final_screening_reason"), str(reason)
+                ),
+                "ready_for_content_fetch": False,
+                "requires_human_review": bool(fetch_policy["review_required"]),
+                "status": fetch_policy["status"],
+                "source_role_final": fetch_policy["final_role"],
+                "blocked_from_fetch": True,
+                "blocked_from_fetch_reason": (
+                    "llm_source_critic_block_fetch: " + str(reason)
+                ),
+            }
+        )
+    elif needs_human_review and review_blocks_fetch:
+        reason = (
+            assessment.get("human_review_reason")
+            or assessment.get("reasoning_summary")
+            or "LLM source critic recommended human review."
+        )
+        updated.update(
+            {
+                "final_screening_decision": "needs_human_review",
+                "final_screening_reason": _append_note(
+                    updated.get("final_screening_reason"), str(reason)
+                ),
+                "ready_for_content_fetch": False,
+                "requires_human_review": True,
+                "status": "needs_human_review",
+                "source_role_final": "needs_human_review",
+                "blocked_from_fetch": True,
+                "blocked_from_fetch_reason": (
+                    "llm_source_critic_block_fetch: " + str(reason)
+                ),
+            }
+        )
 
     updated.update(
         {
             "llm_source_critic_enabled": True,
+            "llm_source_critic_attempted": True,
+            "llm_source_critic_assessed": True,
+            "llm_source_critic_status": "assessed",
             "llm_source_critic_failed": False,
             "llm_source_critic_error": None,
+            "llm_source_critic_error_type": None,
             "llm_proposed_source_role": assessment.get("proposed_source_role"),
             "llm_proposed_screening_decision": assessment.get(
                 "proposed_screening_decision"
@@ -387,10 +737,31 @@ def _apply_llm_source_critic_assessment(
             "llm_validation_candidate_risk": validation_candidate_risk,
             "llm_needs_human_review": needs_human_review,
             "llm_human_review_reason": assessment.get("human_review_reason"),
+            "llm_source_critic_decision": assessment.get("critic_decision"),
             "llm_source_critic_confidence": assessment.get("confidence"),
+            "llm_source_critic_reason": assessment.get("reasoning_summary"),
+            "llm_source_critic_risk_flags": risk_flags,
+            "llm_source_critic_recommended_role": assessment.get(
+                "recommended_role"
+            ),
+            "llm_source_critic_fetch_recommendation": assessment.get(
+                "fetch_recommendation"
+            ),
+            "llm_source_critic_review_required": bool(
+                fetch_policy["review_required"]
+            ),
+            "llm_source_critic_block_fetch": bool(
+                fetch_policy["should_block_fetch"]
+            ),
+            "llm_source_critic_warnings": _as_str_list(
+                assessment.get("warnings")
+            ),
             "llm_reasoning_summary": assessment.get("reasoning_summary"),
             "routing_flags": routing_flags,
             "critic_flags": critic_flags,
+            "blocked_from_fetch": bool(
+                updated.get("blocked_from_fetch", False)
+            ),
         }
     )
     return updated
@@ -403,11 +774,94 @@ def _apply_llm_source_critic_failure(entry: dict, exc: Exception) -> dict:
     updated.update(
         {
             "llm_source_critic_enabled": True,
+            "llm_source_critic_attempted": True,
+            "llm_source_critic_assessed": False,
+            "llm_source_critic_status": "failed",
             "llm_source_critic_failed": True,
             "llm_source_critic_error": f"{type(exc).__name__}: {exc}",
+            "llm_source_critic_error_type": type(exc).__name__,
             "routing_flags": flags,
         }
     )
+    return updated
+
+
+def _mark_llm_source_critic_skipped(entry: dict, reason: str) -> dict:
+    warnings = list(entry.get("llm_source_critic_warnings") or [])
+    if reason not in warnings:
+        warnings.append(reason)
+    updated = dict(entry)
+    updated.update(
+        {
+            "llm_source_critic_enabled": True,
+            "llm_source_critic_attempted": False,
+            "llm_source_critic_assessed": False,
+            "llm_source_critic_status": "skipped",
+            "llm_source_critic_failed": False,
+            "llm_source_critic_error": None,
+            "llm_source_critic_error_type": None,
+            "llm_source_critic_warnings": warnings,
+        }
+    )
+    return updated
+
+
+def _mark_llm_source_critic_disabled(entry: dict) -> dict:
+    updated = dict(entry)
+    updated.update(
+        {
+            "llm_source_critic_enabled": False,
+            "llm_source_critic_attempted": False,
+            "llm_source_critic_assessed": False,
+            "llm_source_critic_status": "disabled",
+            "llm_source_critic_failed": False,
+            "llm_source_critic_error": None,
+            "llm_source_critic_error_type": None,
+        }
+    )
+    return updated
+
+
+def _reapply_source_critic_fetch_block(entry: dict) -> dict:
+    if not entry.get("llm_source_critic_block_fetch"):
+        return entry
+    updated = dict(entry)
+    role = _source_critic_role(
+        updated.get("source_role_final")
+        or updated.get("llm_source_critic_recommended_role"),
+        default="needs_human_review",
+    )
+    decision = str(updated.get("llm_source_critic_decision") or "").lower()
+    fetch_recommendation = str(
+        updated.get("llm_source_critic_fetch_recommendation") or ""
+    ).lower()
+    hard_exclude = (
+        role == "excluded"
+        or decision in {"not_task_relevant", "exclude_from_task"}
+        or fetch_recommendation == "block_fetch"
+    )
+    if hard_exclude:
+        updated["source_role_final"] = "excluded"
+        updated["final_screening_decision"] = "exclude"
+        updated["status"] = "excluded"
+    elif role in {"context", "collection_support"}:
+        updated["source_role_final"] = role
+        updated["final_screening_decision"] = "include_for_context_fetch"
+        updated["status"] = "ready_for_context_fetch"
+    else:
+        updated["source_role_final"] = "needs_human_review"
+        updated["final_screening_decision"] = "needs_human_review"
+        updated["status"] = "needs_human_review"
+    updated["ready_for_content_fetch"] = False
+    updated["blocked_from_fetch"] = True
+    updated["blocked_from_fetch_reason"] = updated.get(
+        "blocked_from_fetch_reason"
+    ) or (
+        "llm_source_critic_block_fetch: "
+        + str(updated.get("llm_source_critic_reason") or "blocked by critic")
+    )
+    if updated.get("llm_source_critic_review_required"):
+        updated["requires_human_review"] = True
     return updated
 
 
@@ -926,6 +1380,44 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
     llm_human_review_recommended_count = 0
     credibility_level_counter: Counter = Counter()
     low_credibility_source_count = 0
+    llm_critic_decision_counter: Counter = Counter()
+    llm_fetch_recommendation_counter: Counter = Counter()
+    llm_risk_flag_counter: Counter = Counter()
+    llm_skipped_reason_counter: Counter = Counter()
+    llm_blocked_fetch_count = 0
+    llm_review_required_count = 0
+    llm_allowed_fetch_count = 0
+    llm_context_only_count = 0
+    llm_blocked_source_ids: list[str] = []
+    llm_selected_source_ids: list[str] = []
+    source_critic_results: list[dict] = []
+
+    if llm_source_critic_enabled:
+        (
+            llm_selected_source_id_set,
+            llm_candidate_skip_reasons,
+            source_critic_selection_summary,
+        ) = _select_llm_source_critic_candidates(
+            registry,
+            allowlist=llm_source_critic_allowlist,
+            max_sources=llm_source_critic_max_sources,
+        )
+        llm_selected_source_ids = list(
+            source_critic_selection_summary.get("selected_source_ids") or []
+        )
+    else:
+        llm_selected_source_id_set = set()
+        llm_candidate_skip_reasons = {}
+        source_critic_selection_summary = {
+            "selection_mode": "disabled",
+            "explicit_allowlist_used": False,
+            "max_sources": llm_source_critic_max_sources,
+            "eligible_candidate_count": 0,
+            "selected_candidate_count": 0,
+            "skipped_candidate_count": 0,
+            "selected_source_ids": [],
+            "skipped_reason_counts": {},
+        }
 
     new_review_items: list[HumanReviewItem] = []
 
@@ -952,23 +1444,15 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         )
         if llm_source_critic_enabled:
             source_id = new_entry.get("source_id") or ""
-            should_skip_llm = False
-            if (
-                llm_source_critic_allowlist is not None
-                and source_id not in llm_source_critic_allowlist
-            ):
-                should_skip_llm = True
-            if (
-                not should_skip_llm
-                and llm_source_critic_max_sources is not None
-                and llm_attempted_source_count >= llm_source_critic_max_sources
-            ):
-                should_skip_llm = True
-
-            if should_skip_llm:
+            if source_id not in llm_selected_source_id_set:
+                skip_reason = llm_candidate_skip_reasons.get(
+                    source_id, "not_selected_by_source_critic_policy"
+                )
                 llm_skipped_source_count += 1
+                llm_skipped_reason_counter[skip_reason] += 1
                 if source_id:
                     llm_skipped_source_ids.append(source_id)
+                new_entry = _mark_llm_source_critic_skipped(new_entry, skip_reason)
             else:
                 llm_attempted_source_count += 1
                 try:
@@ -984,11 +1468,15 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
                     if assessment.get("needs_human_review"):
                         llm_human_review_recommended_count += 1
                     new_entry = _apply_llm_source_critic_assessment(
-                        new_entry, assessment
+                        new_entry,
+                        assessment,
+                        review_blocks_fetch=llm_review_blocks_fetch,
                     )
                 except Exception as exc:  # noqa: BLE001 - advisory fallback
                     llm_source_critic_failure_count += 1
                     new_entry = _apply_llm_source_critic_failure(new_entry, exc)
+        else:
+            new_entry = _mark_llm_source_critic_disabled(new_entry)
 
         if _is_validation_reserved_source(new_entry, role_policy, collection_mode):
             new_entry = _apply_validation_reserved_override(new_entry, role_policy)
@@ -1002,6 +1490,7 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
             state,
             credibility_runtime,
         )
+        new_entry = _reapply_source_critic_fetch_block(new_entry)
         credibility_assessments.append(credibility_assessment)
         validated = SourceRegistryEntry(**new_entry).model_dump()
         updated.append(validated)
@@ -1029,6 +1518,81 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         if credibility_level == "low":
             low_credibility_source_count += 1
 
+        llm_status = validated.get("llm_source_critic_status")
+        if llm_status == "assessed":
+            llm_decision = (
+                validated.get("llm_source_critic_decision") or "unknown"
+            )
+            llm_fetch_recommendation = (
+                validated.get("llm_source_critic_fetch_recommendation")
+                or "unknown"
+            )
+            llm_critic_decision_counter[llm_decision] += 1
+            llm_fetch_recommendation_counter[llm_fetch_recommendation] += 1
+            for risk_flag in validated.get("llm_source_critic_risk_flags") or []:
+                llm_risk_flag_counter[risk_flag] += 1
+            if validated.get("llm_source_critic_block_fetch"):
+                llm_blocked_fetch_count += 1
+                llm_blocked_source_ids.append(validated.get("source_id", ""))
+            elif llm_fetch_recommendation == "allow_fetch":
+                llm_allowed_fetch_count += 1
+            if validated.get("llm_source_critic_review_required"):
+                llm_review_required_count += 1
+            if (
+                llm_fetch_recommendation == "context_fetch_only"
+                or validated.get("llm_source_critic_decision")
+                in _SOURCE_CRITIC_CONTEXT_DECISIONS
+            ):
+                llm_context_only_count += 1
+
+        source_critic_results.append(
+            {
+                "source_id": validated.get("source_id"),
+                "source_url": validated.get("canonical_url"),
+                "llm_source_critic_enabled": validated.get(
+                    "llm_source_critic_enabled"
+                ),
+                "llm_source_critic_attempted": validated.get(
+                    "llm_source_critic_attempted"
+                ),
+                "llm_source_critic_assessed": validated.get(
+                    "llm_source_critic_assessed"
+                ),
+                "llm_source_critic_status": llm_status,
+                "llm_source_critic_decision": validated.get(
+                    "llm_source_critic_decision"
+                ),
+                "llm_source_critic_confidence": validated.get(
+                    "llm_source_critic_confidence"
+                ),
+                "llm_source_critic_reason": validated.get(
+                    "llm_source_critic_reason"
+                ),
+                "llm_source_critic_risk_flags": validated.get(
+                    "llm_source_critic_risk_flags"
+                )
+                or [],
+                "llm_source_critic_recommended_role": validated.get(
+                    "llm_source_critic_recommended_role"
+                ),
+                "llm_source_critic_fetch_recommendation": validated.get(
+                    "llm_source_critic_fetch_recommendation"
+                ),
+                "llm_source_critic_review_required": validated.get(
+                    "llm_source_critic_review_required"
+                ),
+                "llm_source_critic_block_fetch": validated.get(
+                    "llm_source_critic_block_fetch"
+                ),
+                "blocked_from_fetch": validated.get("blocked_from_fetch"),
+                "blocked_from_fetch_reason": validated.get(
+                    "blocked_from_fetch_reason"
+                ),
+                "reason": validated.get("llm_source_critic_reason")
+                or validated.get("blocked_from_fetch_reason"),
+            }
+        )
+
         if validated.get("human_review_recommended"):
             review_id = f"review_source_credibility_{validated.get('source_id', '')}"
             if review_id and review_id not in existing_review_ids:
@@ -1041,6 +1605,46 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
                         or validated.get("final_score_explanation")
                         or "Source credibility assessment recommended human review.",
                         status="pending",
+                    )
+                )
+                existing_review_ids.add(review_id)
+
+        if validated.get("llm_source_critic_block_fetch"):
+            review_id = f"review_source_critic_{validated.get('source_id', '')}"
+            if review_id and review_id not in existing_review_ids:
+                new_review_items.append(
+                    HumanReviewItem(
+                        review_id=review_id,
+                        item_type="source_critic_blocked_source",
+                        related_ids=[validated.get("source_id", "")],
+                        reason=validated.get("blocked_from_fetch_reason")
+                        or validated.get("llm_source_critic_reason")
+                        or "LLM source critic blocked content fetch.",
+                        status="pending",
+                        priority=1,
+                        review_packet={
+                            "source_id": validated.get("source_id"),
+                            "source_url": validated.get("canonical_url"),
+                            "title": validated.get("title"),
+                            "llm_source_critic_decision": validated.get(
+                                "llm_source_critic_decision"
+                            ),
+                            "llm_source_critic_risk_flags": validated.get(
+                                "llm_source_critic_risk_flags"
+                            )
+                            or [],
+                            "llm_source_critic_fetch_recommendation": validated.get(
+                                "llm_source_critic_fetch_recommendation"
+                            ),
+                            "blocked_from_fetch_reason": validated.get(
+                                "blocked_from_fetch_reason"
+                            ),
+                        },
+                        source_ids=[validated.get("source_id", "")],
+                        source_urls=[validated.get("canonical_url", "")],
+                        severity="high"
+                        if validated.get("source_role_final") == "excluded"
+                        else "medium",
                     )
                 )
                 existing_review_ids.add(review_id)
@@ -1072,11 +1676,26 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "input_registry_count": len(registry),
         "critic_reviewed_count": len(updated),
         "critic_decision_counts": dict(critic_decision_counter),
+        "decision_counts": dict(llm_critic_decision_counter),
+        "fetch_recommendation_counts": dict(llm_fetch_recommendation_counter),
+        "risk_flag_counts": dict(llm_risk_flag_counter),
         "agreement_count": agreement_count,
         "disagreement_count": disagreement_count,
         "critic_flag_counts": dict(critic_flag_counter),
         "collection_mode": collection_mode,
+        "source_critic_selection_summary": source_critic_selection_summary,
         "llm_source_critic_enabled": llm_source_critic_enabled,
+        "attempted_source_count": llm_attempted_source_count,
+        "assessed_source_count": llm_assessed_source_count,
+        "skipped_source_count": llm_skipped_source_count,
+        "failed_source_count": llm_source_critic_failure_count,
+        "blocked_fetch_count": llm_blocked_fetch_count,
+        "needs_review_count": llm_review_required_count,
+        "allowed_fetch_count": llm_allowed_fetch_count,
+        "context_only_count": llm_context_only_count,
+        "selected_source_ids": list(llm_selected_source_ids),
+        "blocked_source_ids": list(llm_blocked_source_ids),
+        "skipped_reason_counts": dict(llm_skipped_reason_counter),
         "llm_source_critic_attempted_source_count": llm_attempted_source_count,
         "llm_assessed_source_count": llm_assessed_source_count,
         "llm_skipped_source_count": llm_skipped_source_count,
@@ -1094,6 +1713,15 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "llm_source_critic_failure_count": llm_source_critic_failure_count,
         "llm_semantic_leakage_count": llm_semantic_leakage_count,
         "llm_human_review_recommended_count": llm_human_review_recommended_count,
+        "llm_source_critic_blocked_fetch_count": llm_blocked_fetch_count,
+        "llm_source_critic_review_required_count": llm_review_required_count,
+        "llm_source_critic_allowed_fetch_count": llm_allowed_fetch_count,
+        "llm_source_critic_context_only_count": llm_context_only_count,
+        "llm_source_critic_decision_counts": dict(llm_critic_decision_counter),
+        "llm_source_critic_fetch_recommendation_counts": dict(
+            llm_fetch_recommendation_counter
+        ),
+        "llm_source_critic_risk_flag_counts": dict(llm_risk_flag_counter),
         "credibility_rubric_version": SOURCE_CREDIBILITY_RUBRIC_VERSION,
         "credibility_level_counts": dict(credibility_level_counter),
         "low_credibility_source_count": low_credibility_source_count,
@@ -1120,6 +1748,10 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "context_only_source_count": len(context_only_source_ids),
         "context_only_source_ids": list(context_only_source_ids),
         "llm_source_critic_enabled": llm_source_critic_enabled,
+        "source_critic_selection_summary": source_critic_selection_summary,
+        "source_critic_blocked_fetch_count": llm_blocked_fetch_count,
+        "source_critic_blocked_source_ids": list(llm_blocked_source_ids),
+        "source_critic_review_required_count": llm_review_required_count,
         "llm_source_critic_attempted_source_count": llm_attempted_source_count,
         "llm_assessed_source_count": llm_assessed_source_count,
         "llm_skipped_source_count": llm_skipped_source_count,
@@ -1150,6 +1782,7 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "source_registry": updated,
         "human_review_queue": human_review_queue,
         "source_critic_summary": critic_summary,
+        "source_critic_results": source_critic_results,
         "source_routing_summary": routing_summary,
         "source_credibility_assessments": credibility_assessments,
         "source_credibility_summary": credibility_summary,

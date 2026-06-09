@@ -14,6 +14,13 @@ import re
 from urllib.parse import urlsplit
 
 from . import llm_clients
+from .disease_relevance import (
+    UNRELATED_DISEASE,
+    AMBIGUOUS_DISEASE,
+    assessment_fields,
+    assess_source_disease_relevance,
+    build_disease_relevance_context,
+)
 from .models import LLMSourceCredibilitySuggestion, SourceCredibilityAssessment
 from .state import DataCollectionState
 
@@ -265,23 +272,26 @@ def _disease_relevance_score(
     spec: dict,
     disease_intelligence: dict,
 ) -> tuple[float, list[str]]:
-    source_text = _text(entry, include_query=False)
-    query_text = str(entry.get("query_used") or "").lower()
-    disease = str(spec.get("disease") or disease_intelligence.get("disease_standard_name") or "").lower()
-    terms = [term.lower() for term in _disease_terms(spec, disease_intelligence)]
-    risk_flags: list[str] = []
-
-    for family, unrelated_terms in _UNRELATED_DISEASE_TERMS.items():
-        if family in disease and _contains_any(source_text, unrelated_terms):
-            risk_flags.append("unrelated_disease_signal_in_source_metadata")
-            if not _contains_any(source_text, terms):
-                return 0.05, risk_flags
-
-    if terms and _contains_any(source_text, terms):
-        return 0.95, ["source_metadata_matches_requested_disease", *risk_flags]
-    if terms and _contains_any(query_text, terms):
-        return 0.62, ["disease_match_from_planned_query", *risk_flags]
-    return 0.10, ["disease_relevance_unclear", *risk_flags]
+    context = build_disease_relevance_context(
+        {
+            "collection_spec": spec,
+            "disease_intelligence": disease_intelligence,
+        }
+    )
+    assessment = assess_source_disease_relevance(entry, context)
+    status = assessment.get("status")
+    flags: list[str] = [f"source_disease_relevance:{status}"]
+    if status == UNRELATED_DISEASE:
+        flags.append("unrelated_disease_signal_in_source_metadata")
+    elif status == AMBIGUOUS_DISEASE:
+        flags.append("ambiguous_disease_signal_in_source_metadata")
+    elif status == "target_disease_match":
+        flags.append("source_metadata_matches_requested_disease")
+    elif status == "related_context_only":
+        flags.append("source_metadata_matches_requested_disease_context_only")
+    else:
+        flags.append("disease_relevance_unclear")
+    return float(assessment.get("score") or 0.0), flags
 
 
 def _timeliness_score(entry: dict, spec: dict) -> tuple[float, list[str]]:
@@ -512,6 +522,8 @@ def _role_recommendation(entry: dict, components: dict, risk_flags: list[str]) -
     role_hint = str(entry.get("role_hint") or "").strip()
     text = _text(entry, include_query=False)
 
+    if "unrelated_disease_signal_in_source_metadata" in risk_flags:
+        return "excluded", "Source metadata names an incompatible disease for the active task."
     if internal_role == "validation_reserved":
         return "validation", "Source is reserved by source-role policy for validation."
     if role_hint == "validation":
@@ -704,6 +716,11 @@ def apply_source_credibility_assessment(
     """Return an entry enriched with Stage 6 source credibility fields."""
 
     components, risk_flags, warnings = _score_components(entry, state)
+    source_disease_assessment = assess_source_disease_relevance(
+        entry,
+        build_disease_relevance_context(state),
+    )
+    source_disease_fields = assessment_fields(source_disease_assessment, "source")
     score = _weighted_score(components)
     recommendation, role_reason = _role_recommendation(entry, components, risk_flags)
     human_review, human_reason, final_role = _human_review(
@@ -738,6 +755,7 @@ def apply_source_credibility_assessment(
         "credibility_score": score,
         "credibility_level": level,
         **components,
+        **source_disease_fields,
         "final_score_explanation": explanation,
         "role_assignment_reason": role_reason,
         "risk_flags": risk_flags,
@@ -768,6 +786,22 @@ def apply_source_credibility_assessment(
             "credibility_reason": validated.get("final_score_explanation"),
         }
     )
+    if validated.get("source_disease_relevance_status") == UNRELATED_DISEASE:
+        flags = list(updated.get("routing_flags") or [])
+        if "disease_mismatch_excluded_from_collection" not in flags:
+            flags.append("disease_mismatch_excluded_from_collection")
+        updated["routing_flags"] = flags
+        updated["source_role_final"] = "excluded"
+        updated["credibility_level"] = "excluded"
+        validated["source_role_final"] = "excluded"
+        validated["credibility_level"] = "excluded"
+        updated["ready_for_content_fetch"] = False
+        updated["final_screening_decision"] = "exclude"
+        updated["status"] = "excluded"
+        updated["final_screening_reason"] = (
+            "Source excluded because source metadata names an incompatible "
+            "disease for the active task."
+        )
     if validated.get("human_review_recommended"):
         flags = list(updated.get("routing_flags") or [])
         if "source_credibility_human_review_recommended" not in flags:
@@ -790,12 +824,16 @@ def build_source_credibility_summary(
     role_counter: Counter = Counter()
     discovery_counter: Counter = Counter()
     risk_counter: Counter = Counter()
+    disease_status_counter: Counter = Counter()
     for assessment in assessments:
         level_counter[assessment.get("credibility_level") or "unknown"] += 1
         role_counter[assessment.get("source_role_final") or "unknown"] += 1
         discovery_counter[assessment.get("discovery_method") or "unknown"] += 1
         for flag in assessment.get("risk_flags") or []:
             risk_counter[flag] += 1
+        disease_status_counter[
+            assessment.get("source_disease_relevance_status") or "unknown"
+        ] += 1
     return {
         "assessed_source_count": len(assessments),
         "high_credibility_count": level_counter.get("high", 0),
@@ -817,5 +855,6 @@ def build_source_credibility_summary(
         "llm_failure_count": runtime.failure_count,
         "llm_skipped_count": runtime.skipped_count,
         "risk_flag_counts": dict(risk_counter),
+        "source_disease_relevance_status_counts": dict(disease_status_counter),
         "warnings": runtime.warning_list(),
     }

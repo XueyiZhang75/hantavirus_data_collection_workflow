@@ -154,6 +154,7 @@ ENV_KEYS = [
     "HDC_SEARCH_COMBINE_WITH_SEED_CATALOG",
     "HDC_SEARCH_CACHE_ENABLED",
     "HDC_SEARCH_PROVIDER_CHANNEL_ALLOWLIST",
+    "HDC_ALLOW_INCOMPATIBLE_VALIDATION_RECORDS",
     "HDC_HUMAN_REVIEW_DECISIONS_PATH",
     "HDC_HUMAN_REVIEW_APPLY_DECISIONS",
     "HDC_HUMAN_REVIEW_REQUIRE_REVIEWER_ID",
@@ -183,7 +184,7 @@ def workflow_run_env(
     timeout_seconds: float = 30.0,
     llm_max_chunks: int = 8,
     llm_source_critic_max_sources: int | None = 6,
-    llm_source_critic_review_blocks_fetch: bool = False,
+    llm_source_critic_review_blocks_fetch: bool = True,
     llm_source_credibility_max_sources: int | None = None,
     llm_source_credibility_source_id_allowlist: list[str] | None = None,
     llm_max_tokens: int = 4096,
@@ -219,6 +220,7 @@ def workflow_run_env(
     human_review_decisions_path: str | Path | None = None,
     human_review_apply_decisions: bool = False,
     human_review_require_reviewer_id: bool = True,
+    allow_incompatible_validation_records: bool = False,
     anomaly_max_cases_threshold: float = 1_000_000,
     anomaly_max_deaths_threshold: float = 100_000,
     anomaly_spike_multiplier: float = 10,
@@ -231,7 +233,7 @@ def workflow_run_env(
         if source_id_allowlist_enabled
         else []
     )
-    critic_source_ids = llm_source_critic_source_id_allowlist or workflow_source_ids
+    critic_source_ids = list(llm_source_critic_source_id_allowlist or [])
     seed_overlay = seed_source_overlay_path or SEED_SOURCE_OVERLAY_PATH
     role_overlay = source_role_policy_overlay_path or SOURCE_ROLE_POLICY_OVERLAY_PATH
     env = {
@@ -308,6 +310,9 @@ def workflow_run_env(
         "HDC_SEARCH_PROVIDER_CHANNEL_ALLOWLIST": ",".join(
             search_provider_channel_allowlist
             or DEFAULT_SEARCH_PROVIDER_CHANNEL_ALLOWLIST
+        ),
+        "HDC_ALLOW_INCOMPATIBLE_VALIDATION_RECORDS": (
+            "true" if allow_incompatible_validation_records else "false"
         ),
         "HDC_HUMAN_REVIEW_DECISIONS_PATH": (
             str(human_review_decisions_path) if human_review_decisions_path else ""
@@ -422,7 +427,7 @@ def default_workflow_run_config() -> dict:
             "fallback_to_rule_based": False,
             "source_critic": {
                 "max_sources": 6,
-                "review_blocks_fetch": False,
+                "review_blocks_fetch": True,
             },
             "source_credibility": {
                 "enabled": False,
@@ -447,13 +452,16 @@ def default_workflow_run_config() -> dict:
             "apply_decisions": False,
             "require_reviewer_id": True,
         },
+        "validation": {
+            "allow_incompatible_validation_records": False,
+        },
         "source_sets": {
             "source_id_allowlist_enabled": True,
             "collection_source_ids": list(COLLECTION_SOURCE_IDS),
             "context_source_ids": list(CONTEXT_SOURCE_IDS),
             "validation_reserved_source_ids": list(VALIDATION_SOURCE_IDS),
             "workflow_source_ids": list(CASE_SOURCE_IDS),
-            "llm_source_critic_source_ids": list(CASE_SOURCE_IDS),
+            "llm_source_critic_source_ids": [],
         },
         "output": {
             "run_output_root": str(DEFAULT_OUTPUT_ROOT.relative_to(PROJECT_ROOT)),
@@ -575,6 +583,7 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
     source_search = config.get("source_search") or {}
     content_fetch = config.get("content_fetch") or {}
     human_review = config.get("human_review") or {}
+    validation = config.get("validation") or {}
     anomaly_detection = config.get("anomaly_detection") or {}
     source_critic = llm.get("source_critic") or {}
     source_credibility = llm.get("source_credibility") or {}
@@ -618,7 +627,7 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         llm_max_chunks=int(llm.get("max_chunks", 8)),
         llm_source_critic_max_sources=source_critic.get("max_sources", 6),
         llm_source_critic_review_blocks_fetch=bool(
-            source_critic.get("review_blocks_fetch", False)
+            source_critic.get("review_blocks_fetch", True)
         ),
         llm_source_credibility_max_sources=source_credibility.get("max_sources"),
         llm_source_credibility_source_id_allowlist=source_credibility.get(
@@ -632,9 +641,7 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         ),
         llm_source_critic_source_id_allowlist=source_sets.get(
             "llm_source_critic_source_ids"
-        )
-        or source_sets.get("workflow_source_ids")
-        or CASE_SOURCE_IDS,
+        ),
         live_search=live_search_enabled,
         search_mode=search_mode,
         search_provider=str(source_search.get("provider") or "tavily"),
@@ -696,6 +703,9 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         ),
         human_review_require_reviewer_id=bool(
             human_review.get("require_reviewer_id", True)
+        ),
+        allow_incompatible_validation_records=bool(
+            validation.get("allow_incompatible_validation_records", False)
         ),
         anomaly_max_cases_threshold=float(
             anomaly_detection.get("max_cases_threshold", 1_000_000)
@@ -935,6 +945,9 @@ def studio_initial_state(
             "event_clusters": [],
             "duplicate_clusters": [],
             "validation_records": [],
+            "active_validation_records": [],
+            "inactive_validation_records": [],
+            "validation_source_compatibility_summary": None,
             "validation_cases": [],
             "validation_comparisons": [],
             "validation_results": [],

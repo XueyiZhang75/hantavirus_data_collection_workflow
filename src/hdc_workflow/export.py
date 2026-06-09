@@ -85,10 +85,26 @@ def export_final_data_package(
     files["final_package_json"] = str(
         write_json(package, out_dir / "final_package.json")
     )
+    files["final_dataset_json"] = str(
+        write_json(package.get("final_dataset") or [], out_dir / "final_dataset.json")
+    )
     files["final_dataset_csv"] = str(
         write_csv_rows(
             package.get("final_dataset") or [],
             out_dir / "final_dataset.csv",
+            field_order=policy.final_dataset_field_order,
+        )
+    )
+    files["final_dataset_pre_quality_gate_json"] = str(
+        write_json(
+            package.get("final_dataset_pre_quality_gate") or [],
+            out_dir / "final_dataset_pre_quality_gate.json",
+        )
+    )
+    files["final_dataset_pre_quality_gate_csv"] = str(
+        write_csv_rows(
+            package.get("final_dataset_pre_quality_gate") or [],
+            out_dir / "final_dataset_pre_quality_gate.csv",
             field_order=policy.final_dataset_field_order,
         )
     )
@@ -103,6 +119,38 @@ def export_final_data_package(
             package.get("final_dataset_post_review") or [],
             out_dir / "final_dataset_post_review.csv",
             field_order=policy.final_dataset_field_order,
+        )
+    )
+    files["quarantined_records_json"] = str(
+        write_json(
+            package.get("quarantined_records") or [],
+            out_dir / "quarantined_records.json",
+        )
+    )
+    files["quarantined_records_csv"] = str(
+        write_csv_rows(
+            package.get("quarantined_records") or [],
+            out_dir / "quarantined_records.csv",
+            field_order=policy.final_dataset_field_order,
+        )
+    )
+    files["pending_review_records_json"] = str(
+        write_json(
+            package.get("pending_review_records") or [],
+            out_dir / "pending_review_records.json",
+        )
+    )
+    files["pending_review_records_csv"] = str(
+        write_csv_rows(
+            package.get("pending_review_records") or [],
+            out_dir / "pending_review_records.csv",
+            field_order=policy.final_dataset_field_order,
+        )
+    )
+    files["record_inclusion_decisions_json"] = str(
+        write_json(
+            package.get("record_inclusion_decisions") or [],
+            out_dir / "record_inclusion_decisions.json",
         )
     )
     files["records_excluded_by_human_review_json"] = str(
@@ -222,8 +270,20 @@ def export_final_data_package(
         "files": files,
         "section_counts": {
             "final_dataset": len(package.get("final_dataset") or []),
+            "final_dataset_pre_quality_gate": len(
+                package.get("final_dataset_pre_quality_gate") or []
+            ),
             "final_dataset_post_review": len(
                 package.get("final_dataset_post_review") or []
+            ),
+            "quarantined_records": len(package.get("quarantined_records") or []),
+            "pending_review_records": len(package.get("pending_review_records") or []),
+            "record_inclusion_decisions": len(
+                package.get("record_inclusion_decisions") or []
+            ),
+            "run_quality_summary": 1 if package.get("run_quality_summary") else 0,
+            "final_dataset_quality_summary": (
+                1 if package.get("final_dataset_quality_summary") else 0
             ),
             "records_excluded_by_human_review": len(
                 package.get("records_excluded_by_human_review") or []

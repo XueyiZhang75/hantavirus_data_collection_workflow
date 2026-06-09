@@ -14,6 +14,13 @@ from pathlib import Path
 from typing import Iterable
 
 from .models import HumanReviewItem
+from .validation_source_compatibility import (
+    DISABLED_STATUS,
+    EMPTY_STATUS,
+    INCOMPATIBLE_DISABLED_STATUS,
+    MISSING_STATUS,
+    NO_COMPATIBLE_STATUS,
+)
 
 
 EVALUATION_FIELDNAMES = [
@@ -137,25 +144,46 @@ def build_evaluation_report(
     reserved_source_ids: set[str] | None = None,
     conflicts: list[dict] | None = None,
     human_review_items: list[dict] | None = None,
+    validation_source_compatibility_summary: dict | None = None,
 ) -> tuple[list[dict], dict]:
     """Build row-level masked-validation evaluation rows and a summary."""
 
-    collection_groups = _group_records(collection_records)
-    validation_groups = _group_records(validation_records)
-    all_keys = sorted(set(collection_groups) | set(validation_groups))
-
-    rows: list[dict] = []
-    for index, key in enumerate(all_keys, start=1):
-        collection_group = collection_groups.get(key, [])
-        validation_group = validation_groups.get(key, [])
-        row = _build_evaluation_row(
-            index=index,
-            key=key,
-            collection_group=collection_group,
-            validation_group=validation_group,
-            reserved_source_ids=reserved_source_ids,
+    compatibility_status = None
+    if validation_source_compatibility_summary:
+        compatibility_status = validation_source_compatibility_summary.get(
+            "compatibility_status"
         )
-        rows.append(row)
+    no_task_compatible_validation = (
+        not validation_records
+        and compatibility_status
+        in {
+            NO_COMPATIBLE_STATUS,
+            INCOMPATIBLE_DISABLED_STATUS,
+            MISSING_STATUS,
+            EMPTY_STATUS,
+            DISABLED_STATUS,
+        }
+    )
+
+    if no_task_compatible_validation:
+        rows: list[dict] = []
+    else:
+        collection_groups = _group_records(collection_records)
+        validation_groups = _group_records(validation_records)
+        all_keys = sorted(set(collection_groups) | set(validation_groups))
+
+        rows = []
+        for index, key in enumerate(all_keys, start=1):
+            collection_group = collection_groups.get(key, [])
+            validation_group = validation_groups.get(key, [])
+            row = _build_evaluation_row(
+                index=index,
+                key=key,
+                collection_group=collection_group,
+                validation_group=validation_group,
+                reserved_source_ids=reserved_source_ids,
+            )
+            rows.append(row)
 
     reserved_ids = sorted(reserved_source_ids) if reserved_source_ids else []
     leaked_ids = sorted(
@@ -216,6 +244,34 @@ def build_evaluation_report(
             "Missing collection records can occur when held-out validation sources contain the only extractable data.",
         ],
     }
+    if validation_source_compatibility_summary:
+        summary.update(
+            {
+                "validation_source_compatibility_status": compatibility_status,
+                "active_validation_record_count": (
+                    validation_source_compatibility_summary.get(
+                        "active_validation_record_count", 0
+                    )
+                ),
+                "inactive_validation_record_count": (
+                    validation_source_compatibility_summary.get(
+                        "inactive_validation_record_count", 0
+                    )
+                ),
+                "raw_validation_record_count": (
+                    validation_source_compatibility_summary.get(
+                        "validation_record_count", 0
+                    )
+                ),
+                "validation_source_compatibility_warnings": (
+                    validation_source_compatibility_summary.get("warnings") or []
+                ),
+            }
+        )
+    if no_task_compatible_validation:
+        summary["workflow_limitations"].append(
+            "No task-compatible held-out validation source was configured/found."
+        )
     return rows, summary
 
 
@@ -622,6 +678,8 @@ def _build_readable_markdown(rows: list[dict], summary: dict) -> str:
     provenance_counts = summary.get("provenance_completeness_status_counts") or {}
     reserved_ids = summary.get("reserved_source_ids") or []
     review_rows = [row for row in rows if _truthy(row.get("human_review_flag"))]
+    compatibility_status = summary.get("validation_source_compatibility_status")
+    compatibility_warnings = summary.get("validation_source_compatibility_warnings") or []
 
     lines = [
         "# Masked Validation Evaluation Report",
@@ -636,6 +694,16 @@ def _build_readable_markdown(rows: list[dict], summary: dict) -> str:
         "",
         f"- Collection record count: {summary.get('collection_record_count', 0)}",
         f"- Validation record count: {summary.get('validation_record_count', 0)}",
+        (
+            "- Validation source compatibility status: "
+            f"{compatibility_status or 'not_checked'}"
+        ),
+        (
+            "- Active / inactive / raw validation records: "
+            f"{summary.get('active_validation_record_count', summary.get('validation_record_count', 0))} / "
+            f"{summary.get('inactive_validation_record_count', 0)} / "
+            f"{summary.get('raw_validation_record_count', summary.get('validation_record_count', 0))}"
+        ),
         f"- Evaluation row count: {summary.get('evaluation_row_count', 0)}",
         (
             "- Rows with collection evidence: "
@@ -661,6 +729,10 @@ def _build_readable_markdown(rows: list[dict], summary: dict) -> str:
         (
             "- Reserved sources were blocked from collection and used only for "
             "validation comparison."
+        ),
+        (
+            "- Validation compatibility warnings: "
+            + ("; ".join(str(item) for item in compatibility_warnings) if compatibility_warnings else "none")
         ),
         "",
         "## Evaluation Status Counts",

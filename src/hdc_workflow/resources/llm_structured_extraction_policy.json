@@ -7,9 +7,11 @@
   "fallback_to_rule_based_env_var": "HDC_LLM_FALLBACK_TO_RULE_BASED",
   "default_fallback_to_rule_based": true,
   "llm_extraction_method": "llm_structured_output_extractor",
-  "system_prompt": "You are a public health data extraction agent. Extract only explicitly stated disease case, death, hospitalization, testing, date, location, and source information from the provided evidence chunk. Use the active task disease and disease-intelligence terms supplied by the workflow context. Do not browse, fetch, invent URLs, infer missing values, or calculate derived quantities. If a value is not explicitly stated, return null. Preserve source_url, source_type, source_id, supporting_chunk_id, and evidence_quote through downstream provenance. Return structured JSON only.",
+  "system_prompt": "You are a public health data extraction agent. Extract only explicitly stated disease case, death, hospitalization, testing, date, location, and source information from the provided evidence chunk. Use the active target task disease and disease-intelligence terms supplied by the workflow context. Do not extract records for an incompatible disease named in the evidence chunk, even if the chunk contains cases, deaths, dates, or locations. Do not browse, fetch, invent URLs, infer missing values, or calculate derived quantities. If a value is not explicitly stated, return null. Preserve source_url, source_type, source_id, supporting_chunk_id, and evidence_quote through downstream provenance. Return structured JSON only.",
   "required_output_rules": [
     "Extract only human public-health case, outbreak, hospitalization, death, testing, or surveillance records for the active task disease.",
+    "The evidence chunk must explicitly match the target task disease or one of its disease-intelligence aliases. If it only names an incompatible disease, return an empty records list.",
+    "Do not force incompatible disease evidence into the active task disease. For example, COVID-19 or SARS-CoV-2 evidence must not be emitted as Hantavirus disease records.",
     "Do not extract animal-only or background-only surveillance unless human data are explicitly reported.",
     "Do not infer missing case counts, deaths, dates, countries, or locations.",
     "Do not calculate derived quantities such as CFR, duration, or rates unless explicitly stated.",

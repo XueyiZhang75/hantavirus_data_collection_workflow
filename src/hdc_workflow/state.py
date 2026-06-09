@@ -23,6 +23,7 @@ class DataCollectionState(TypedDict, total=False):
     search_query_inventory: list[dict]
     agentic_source_plan: dict | None
     executable_source_plan_summary: dict | None
+    localized_source_planning_summary: dict | None
     source_planning_agent_summary: dict | None
     source_candidates: list[dict]
     source_search_results: list[dict]
@@ -32,9 +33,11 @@ class DataCollectionState(TypedDict, total=False):
     source_registry_summary: dict | None
     source_screening_summary: dict | None
     source_critic_summary: dict | None
+    source_critic_results: list[dict]
     source_routing_summary: dict | None
     source_credibility_assessments: list[dict]
     source_credibility_summary: dict | None
+    disease_relevance_summary: dict | None
     content_fetch_requests: list[dict]
     content_fetch_summary: dict | None
     document_parse_summary: dict | None
@@ -60,6 +63,9 @@ class DataCollectionState(TypedDict, total=False):
     event_clustering_summary: dict | None
     duplicate_detection_summary: dict | None
     validation_records: list[dict]
+    active_validation_records: list[dict]
+    inactive_validation_records: list[dict]
+    validation_source_compatibility_summary: dict | None
     validation_cases: list[dict]
     validation_comparisons: list[dict]
     validation_results: list[dict]
@@ -78,6 +84,12 @@ class DataCollectionState(TypedDict, total=False):
     rejected_human_review_decisions: list[dict]
     human_review_audit_trail: list[dict]
     human_review_application_summary: dict | None
+    final_dataset_pre_quality_gate: list[dict]
+    quarantined_records: list[dict]
+    pending_review_records: list[dict]
+    record_inclusion_decisions: list[dict]
+    run_quality_summary: dict | None
+    final_dataset_quality_summary: dict | None
     final_dataset_post_review: list[dict]
     records_excluded_by_human_review: list[dict]
     human_review_summary: dict | None

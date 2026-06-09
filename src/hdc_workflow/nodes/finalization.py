@@ -28,6 +28,7 @@ from ..models import (
     ValidationComparison,
     ValidationResult,
 )
+from ..run_quality_gates import apply_run_quality_gates
 from ..state import DataCollectionState, append_trace
 
 
@@ -271,7 +272,17 @@ def _build_export_manifest(
         "exportable_sections": list(policy.exportable_sections),
         "section_counts": {
             "final_dataset": len(package.final_dataset),
+            "final_dataset_pre_quality_gate": len(
+                package.final_dataset_pre_quality_gate
+            ),
             "final_dataset_post_review": len(package.final_dataset_post_review),
+            "quarantined_records": len(package.quarantined_records),
+            "pending_review_records": len(package.pending_review_records),
+            "record_inclusion_decisions": len(package.record_inclusion_decisions),
+            "run_quality_summary": 1 if package.run_quality_summary else 0,
+            "final_dataset_quality_summary": (
+                1 if package.final_dataset_quality_summary else 0
+            ),
             "records_excluded_by_human_review": len(
                 package.records_excluded_by_human_review
             ),
@@ -317,7 +328,14 @@ def _build_finalization_summary(
         extraction_method_counts[method] = extraction_method_counts.get(method, 0) + 1
     return {
         "final_dataset_count": len(package.final_dataset),
+        "final_dataset_pre_quality_gate_count": len(
+            package.final_dataset_pre_quality_gate
+        ),
         "final_dataset_post_review_count": len(package.final_dataset_post_review),
+        "quarantined_record_count": len(package.quarantined_records),
+        "pending_review_record_count": len(package.pending_review_records),
+        "run_quality_status": package.run_quality_summary.get("run_quality_status"),
+        "final_dataset_mode": package.run_quality_summary.get("final_dataset_mode"),
         "records_excluded_by_human_review_count": len(
             package.records_excluded_by_human_review
         ),
@@ -414,9 +432,30 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
 
     normalized_records = _safe_list(state, "normalized_records")
     post_review_records = _safe_list(state, "final_dataset_post_review")
-    if not post_review_records:
-        post_review_records = _default_post_review_records(normalized_records)
     records_excluded_by_review = _safe_list(state, "records_excluded_by_human_review")
+    quality_state = dict(state)
+    quality_state.update(
+        {
+            "normalized_records": normalized_records,
+            "final_dataset_post_review": post_review_records,
+            "records_excluded_by_human_review": records_excluded_by_review,
+        }
+    )
+    quality_result = apply_run_quality_gates(quality_state)
+    pre_quality_records = _safe_list(
+        quality_result, "final_dataset_pre_quality_gate"
+    )
+    accepted_records = _safe_list(quality_result, "final_dataset")
+    post_review_records = _safe_list(quality_result, "final_dataset_post_review")
+    quarantined_records = _safe_list(quality_result, "quarantined_records")
+    pending_review_records = _safe_list(quality_result, "pending_review_records")
+    record_inclusion_decisions = _safe_list(
+        quality_result, "record_inclusion_decisions"
+    )
+    run_quality_summary = quality_result.get("run_quality_summary") or {}
+    final_dataset_quality_summary = (
+        quality_result.get("final_dataset_quality_summary") or {}
+    )
     source_registry = _safe_list(state, "source_registry")
     linked_events = _safe_list(state, "linked_events")
     event_clusters = _safe_list(state, "event_clusters")
@@ -431,9 +470,18 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
     conflicts = _safe_list(state, "conflicts")
     human_review_queue = _safe_list(state, "human_review_queue")
 
-    final_dataset = [PublicHealthRecord(**r) for r in normalized_records]
+    final_dataset_pre_quality_gate = [
+        PublicHealthRecord(**r) for r in pre_quality_records
+    ]
+    final_dataset = [PublicHealthRecord(**r) for r in accepted_records]
     final_dataset_post_review = [
         PublicHealthRecord(**r) for r in post_review_records
+    ]
+    quarantined_record_models = [
+        PublicHealthRecord(**r) for r in quarantined_records
+    ]
+    pending_review_record_models = [
+        PublicHealthRecord(**r) for r in pending_review_records
     ]
     records_excluded_models = [
         PublicHealthRecord(**r) for r in records_excluded_by_review
@@ -473,7 +521,14 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
     human_review_items = [HumanReviewItem(**item) for item in human_review_queue]
 
     contains_fixture, fixture_notice = _detect_synthetic_fixture_data(state, policy)
-    workflow_summaries = _collect_workflow_summaries(state, policy)
+    summary_state = dict(state)
+    summary_state.update(
+        {
+            "run_quality_summary": run_quality_summary,
+            "final_dataset_quality_summary": final_dataset_quality_summary,
+        }
+    )
+    workflow_summaries = _collect_workflow_summaries(summary_state, policy)
     data_dictionary = _build_data_dictionary(state, policy)
     provenance_manifest = _build_provenance_manifest(state)
     llm_used = _detect_llm_used(state)
@@ -489,6 +544,12 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
         message="Assembled hardened FinalDataPackage from current state.",
         metadata={
             "final_dataset_size": len(final_dataset),
+            "final_dataset_pre_quality_gate_size": len(
+                final_dataset_pre_quality_gate
+            ),
+            "quarantined_record_count": len(quarantined_record_models),
+            "pending_review_record_count": len(pending_review_record_models),
+            "run_quality_status": run_quality_summary.get("run_quality_status"),
             "source_registry_size": len(included_registry),
             "excluded_source_count": len(excluded_sources),
             "linked_event_count": len(linked_event_models),
@@ -512,7 +573,13 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
 
     package = FinalDataPackage(
         final_dataset=final_dataset,
+        final_dataset_pre_quality_gate=final_dataset_pre_quality_gate,
         final_dataset_post_review=final_dataset_post_review,
+        quarantined_records=quarantined_record_models,
+        pending_review_records=pending_review_record_models,
+        record_inclusion_decisions=record_inclusion_decisions,
+        run_quality_summary=run_quality_summary,
+        final_dataset_quality_summary=final_dataset_quality_summary,
         records_excluded_by_human_review=records_excluded_models,
         source_registry=included_registry,
         linked_events=linked_event_models,
@@ -564,12 +631,31 @@ def final_data_package_builder(state: DataCollectionState) -> dict:
     return {
         "final_data_package": package.model_dump(),
         "finalization_summary": finalization_summary,
+        "final_dataset_pre_quality_gate": [
+            record.model_dump() for record in final_dataset_pre_quality_gate
+        ],
+        "quarantined_records": [
+            record.model_dump() for record in quarantined_record_models
+        ],
+        "pending_review_records": [
+            record.model_dump() for record in pending_review_record_models
+        ],
+        "record_inclusion_decisions": list(record_inclusion_decisions),
+        "run_quality_summary": run_quality_summary,
+        "final_dataset_quality_summary": final_dataset_quality_summary,
         "final_dataset_post_review": [
             record.model_dump() for record in final_dataset_post_review
         ],
         "records_excluded_by_human_review": [
             record.model_dump() for record in records_excluded_models
         ],
+        "applied_human_review_decisions": [
+            decision.model_dump() for decision in applied_decision_models
+        ],
+        "rejected_human_review_decisions": [
+            decision.model_dump() for decision in rejected_decision_models
+        ],
+        "human_review_audit_trail": [entry.model_dump() for entry in audit_models],
         "human_review_application_summary": human_review_application_summary,
         "collection_trace": trace,
     }

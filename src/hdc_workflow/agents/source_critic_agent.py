@@ -50,9 +50,41 @@ def _confidence(value) -> float:
     return max(0.0, min(1.0, numeric))
 
 
+_CRITIC_DECISION_ALIASES = {
+    "exclude": "not_task_relevant",
+    "excluded": "not_task_relevant",
+    "not_relevant": "not_task_relevant",
+    "context_only": "no_extractable_data",
+}
+
+
 def _normalize_assessment(raw: dict, source_entry: dict) -> dict:
     if not isinstance(raw, dict):
         raise ValueError(f"Expected source critic JSON object, got {type(raw)!r}.")
+
+    critic_decision = str(raw.get("critic_decision") or "").strip().lower()
+    if not critic_decision:
+        if bool(raw.get("validation_candidate_risk", False)):
+            critic_decision = "suitable_for_validation"
+        elif bool(raw.get("context_only_risk", False)):
+            critic_decision = "suitable_for_context"
+        elif str(raw.get("proposed_screening_decision") or "").lower() == "exclude":
+            critic_decision = "not_task_relevant"
+        else:
+            critic_decision = "suitable_for_collection"
+    critic_decision = _CRITIC_DECISION_ALIASES.get(
+        critic_decision, critic_decision
+    )
+    recommended_role = str(
+        raw.get("recommended_role") or raw.get("proposed_source_role") or ""
+    ).strip()
+    fetch_recommendation = str(
+        raw.get("fetch_recommendation") or "allow_fetch"
+    ).strip()
+    review_required = bool(
+        raw.get("review_required", False)
+        or raw.get("needs_human_review", False)
+    )
 
     return {
         "source_id": str(raw.get("source_id") or source_entry.get("source_id") or ""),
@@ -75,6 +107,12 @@ def _normalize_assessment(raw: dict, source_entry: dict) -> dict:
         "human_review_reason": str(raw.get("human_review_reason") or "").strip(),
         "confidence": _confidence(raw.get("confidence")),
         "reasoning_summary": str(raw.get("reasoning_summary") or "").strip(),
+        "critic_decision": critic_decision,
+        "risk_flags": _as_str_list(raw.get("risk_flags")),
+        "recommended_role": recommended_role,
+        "fetch_recommendation": fetch_recommendation,
+        "review_required": review_required,
+        "warnings": _as_str_list(raw.get("warnings")),
     }
 
 

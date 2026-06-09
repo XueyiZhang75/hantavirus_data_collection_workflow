@@ -26,6 +26,16 @@ from ..config import (
     load_hantavirus_fixture_documents,
     load_source_role_policy,
 )
+from ..disease_relevance import (
+    TARGET_DISEASE_MATCH,
+    UNRELATED_DISEASE,
+    AMBIGUOUS_DISEASE,
+    assessment_fields,
+    assess_chunk_disease_relevance,
+    assess_document_disease_relevance,
+    build_disease_relevance_context,
+    update_disease_relevance_summary,
+)
 from ..models import (
     ContentFetchPolicy,
     ContentFetchRequest,
@@ -350,6 +360,24 @@ def _source_provenance(source_entry: dict) -> dict:
         "search_result_id": source_entry.get("search_result_id"),
         "result_source": source_entry.get("result_source"),
         "query_type": source_entry.get("query_type"),
+        "source_disease_relevance_status": source_entry.get(
+            "source_disease_relevance_status"
+        ),
+        "source_disease_relevance_score": source_entry.get(
+            "source_disease_relevance_score"
+        ),
+        "source_target_disease_terms_found": list(
+            source_entry.get("source_target_disease_terms_found") or []
+        ),
+        "source_incompatible_disease_terms_found": list(
+            source_entry.get("source_incompatible_disease_terms_found") or []
+        ),
+        "source_disease_relevance_reason": source_entry.get(
+            "source_disease_relevance_reason"
+        ),
+        "source_disease_relevance_data_signal_count": source_entry.get(
+            "source_disease_relevance_data_signal_count"
+        ),
     }
 
 
@@ -421,6 +449,8 @@ def _classify_skip_reason(
         return "not_in_source_id_allowlist"
     if _is_validation_reserved_entry(entry, collection_mode, role_policy):
         return "validation_reserved"
+    if entry.get("source_disease_relevance_status") == UNRELATED_DISEASE:
+        return "disease_mismatch_source"
     url = entry.get("canonical_url") or entry.get("url") or ""
     scheme = _url_scheme(url)
     if _is_search_derived_entry(entry):
@@ -1566,7 +1596,10 @@ def document_quality_check(state: DataCollectionState) -> dict:
 
     updated: list[dict] = []
     quality_counter: Counter = Counter()
+    disease_status_counter: Counter = Counter()
     usable = partial = offline_stub = parse_deferred = unusable = 0
+    not_task_relevant = 0
+    context = build_disease_relevance_context(state)
 
     for doc in documents:
         new_doc = dict(doc)
@@ -1608,6 +1641,26 @@ def document_quality_check(state: DataCollectionState) -> dict:
         if is_fixture and "synthetic_fixture_document" not in issues:
             issues.append("synthetic_fixture_document")
 
+        disease_assessment = assess_document_disease_relevance(new_doc, context)
+        new_doc.update(assessment_fields(disease_assessment, "document"))
+        disease_status = disease_assessment.get("status") or "unknown"
+        disease_status_counter[disease_status] += 1
+        if (
+            quality_status in {"usable", "partial"}
+            and disease_status == UNRELATED_DISEASE
+        ):
+            if quality_status == "usable":
+                usable = max(0, usable - 1)
+            elif quality_status == "partial":
+                partial = max(0, partial - 1)
+            quality_status = "not_task_relevant"
+            not_task_relevant += 1
+            if "disease_mismatch_not_task_relevant" not in issues:
+                issues.append("disease_mismatch_not_task_relevant")
+            new_doc["not_extractable_for_task_disease"] = True
+        else:
+            new_doc["not_extractable_for_task_disease"] = False
+
         new_doc["quality_status"] = quality_status
         new_doc["quality_issues"] = issues
         new_doc["text_char_count"] = len(clean_text)
@@ -1623,6 +1676,8 @@ def document_quality_check(state: DataCollectionState) -> dict:
         "offline_stub_count": offline_stub,
         "parse_deferred_count": parse_deferred,
         "unusable_count": unusable,
+        "not_task_relevant_count": not_task_relevant,
+        "disease_relevance_status_counts": dict(disease_status_counter),
     }
 
     trace = append_trace(
@@ -1638,6 +1693,9 @@ def document_quality_check(state: DataCollectionState) -> dict:
     return {
         "documents": updated,
         "document_quality_summary": summary,
+        "disease_relevance_summary": update_disease_relevance_summary(
+            {**state, "documents": updated}
+        ),
         "collection_trace": trace,
     }
 
@@ -1662,6 +1720,10 @@ def _document_is_chunkable(
     quality_status = doc.get("quality_status")
     if quality_status in policy.excluded_quality_statuses:
         return False, quality_status or "excluded_quality_status"
+    if quality_status == "not_task_relevant" or doc.get(
+        "not_extractable_for_task_disease"
+    ):
+        return False, "not_task_relevant"
     clean_text = doc.get("clean_text") or ""
     if not clean_text.strip():
         return False, "missing_clean_text"
@@ -1820,6 +1882,8 @@ def _make_evidence_chunk(
     context_types: list[str],
     confidence: float,
     presence_reason: str,
+    disease_assessment: dict | None = None,
+    extraction_eligible_for_task_disease: bool | None = None,
 ) -> EvidenceChunk:
     source_id = doc.get("source_id") or ""
     chunk_id = f"chunk_{source_id}_{chunk_index:03d}"
@@ -1858,6 +1922,8 @@ def _make_evidence_chunk(
         char_end=char_end,
         context_types=list(context_types),
         presence_reason=presence_reason,
+        **assessment_fields(disease_assessment or {}, ""),
+        extraction_eligible_for_task_disease=extraction_eligible_for_task_disease,
     )
 
 
@@ -1883,6 +1949,10 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
     context_only_document_ids: set[str] = set()
     context_only_chunk_count = 0
     context_only_target_data_suppressed_count = 0
+    disease_status_counter: Counter = Counter()
+    disease_mismatch_chunk_count = 0
+    disease_mismatch_source_ids: set[str] = set()
+    context = build_disease_relevance_context(state)
 
     table_cfg = policy.table_chunking or {}
     table_enabled = bool(table_cfg.get("enabled", False))
@@ -1919,6 +1989,28 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
                 contains, data_types, context_types, confidence, reason_text = (
                     _flag_data_presence(tc["text"], doc, policy)
                 )
+            disease_assessment = assess_chunk_disease_relevance(
+                {**doc, "text": tc["text"], "title": doc.get("title")},
+                context,
+            )
+            disease_status = disease_assessment.get("status") or "unknown"
+            disease_status_counter[disease_status] += 1
+            extraction_eligible = bool(
+                contains and disease_status == TARGET_DISEASE_MATCH
+            )
+            if contains and disease_status != TARGET_DISEASE_MATCH:
+                contains = False
+                data_types = []
+                if "disease_mismatch_context" not in context_types:
+                    context_types.append("disease_mismatch_context")
+                confidence = min(float(confidence or 0.0), 0.40)
+                reason_text = (
+                    "disease relevance gate suppressed extraction: "
+                    f"{disease_assessment.get('reason')}"
+                )
+                disease_mismatch_chunk_count += 1
+                if doc.get("source_id"):
+                    disease_mismatch_source_ids.add(doc.get("source_id"))
             chunk = _make_evidence_chunk(
                 doc=doc,
                 chunk_index=chunk_index,
@@ -1932,6 +2024,8 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
                 context_types=context_types,
                 confidence=confidence,
                 presence_reason=reason_text,
+                disease_assessment=disease_assessment,
+                extraction_eligible_for_task_disease=extraction_eligible,
             )
             evidence_chunks.append(chunk)
             text_chunk_count += 1
@@ -1970,6 +2064,28 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
                         contains, data_types, context_types, confidence, reason_text = (
                             _flag_data_presence(tc["text"], doc, policy)
                         )
+                    disease_assessment = assess_chunk_disease_relevance(
+                        {**doc, "text": tc["text"], "title": doc.get("title")},
+                        context,
+                    )
+                    disease_status = disease_assessment.get("status") or "unknown"
+                    disease_status_counter[disease_status] += 1
+                    extraction_eligible = bool(
+                        contains and disease_status == TARGET_DISEASE_MATCH
+                    )
+                    if contains and disease_status != TARGET_DISEASE_MATCH:
+                        contains = False
+                        data_types = []
+                        if "disease_mismatch_context" not in context_types:
+                            context_types.append("disease_mismatch_context")
+                        confidence = min(float(confidence or 0.0), 0.40)
+                        reason_text = (
+                            "disease relevance gate suppressed extraction: "
+                            f"{disease_assessment.get('reason')}"
+                        )
+                        disease_mismatch_chunk_count += 1
+                        if doc.get("source_id"):
+                            disease_mismatch_source_ids.add(doc.get("source_id"))
                     chunk = _make_evidence_chunk(
                         doc=doc,
                         chunk_index=chunk_index,
@@ -1983,6 +2099,8 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
                         context_types=context_types,
                         confidence=confidence,
                         presence_reason=reason_text,
+                        disease_assessment=disease_assessment,
+                        extraction_eligible_for_task_disease=extraction_eligible,
                     )
                     evidence_chunks.append(chunk)
                     table_chunk_count += 1
@@ -2012,6 +2130,9 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
         "context_only_document_count": len(context_only_document_ids),
         "context_only_source_ids": sorted(context_only_document_ids),
         "context_only_chunk_count": context_only_chunk_count,
+        "disease_relevance_status_counts": dict(disease_status_counter),
+        "disease_mismatch_chunk_count": disease_mismatch_chunk_count,
+        "disease_mismatch_source_ids": sorted(disease_mismatch_source_ids),
     }
     presence_summary = {
         "total_chunk_count": text_chunk_count + table_chunk_count,
@@ -2027,6 +2148,9 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
         "data_type_counts": dict(data_type_counter),
         "context_type_counts": dict(context_type_counter),
         "fetch_purpose_counts": dict(fetch_purpose_counter),
+        "disease_relevance_status_counts": dict(disease_status_counter),
+        "disease_mismatch_chunk_count": disease_mismatch_chunk_count,
+        "disease_mismatch_source_ids": sorted(disease_mismatch_source_ids),
     }
 
     trace = append_trace(
@@ -2043,5 +2167,9 @@ def evidence_chunking_and_data_presence_flagging(state: DataCollectionState) -> 
         "evidence_chunks": chunk_dicts,
         "evidence_chunking_summary": chunking_summary,
         "data_presence_summary": presence_summary,
+        "disease_relevance_summary": update_disease_relevance_summary(
+            {**state, "evidence_chunks": chunk_dicts},
+            disease_mismatch_chunk_count=disease_mismatch_chunk_count,
+        ),
         "collection_trace": trace,
     }

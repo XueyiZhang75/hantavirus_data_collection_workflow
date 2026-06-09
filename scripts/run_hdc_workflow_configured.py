@@ -13,6 +13,9 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _SRC = _PROJECT_ROOT / "src"
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
+_SCRIPTS = _PROJECT_ROOT / "scripts"
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
 
 from hdc_workflow.evaluation_report_builder import (  # noqa: E402
     build_evaluation_report,
@@ -24,6 +27,9 @@ from hdc_workflow.evaluation_report_builder import (  # noqa: E402
 from hdc_workflow.export import export_final_data_package, write_json  # noqa: E402
 from hdc_workflow.graph import build_graph  # noqa: E402
 from hdc_workflow.search_providers import search_api_key_present  # noqa: E402
+from hdc_workflow.validation_source_compatibility import (  # noqa: E402
+    resolve_task_compatible_validation_records,
+)
 from hdc_workflow.workflow_run_config import (  # noqa: E402
     COLLECTION_SOURCE_IDS,
     CONTEXT_SOURCE_IDS,
@@ -42,7 +48,10 @@ from hdc_workflow.workflow_run_config import (  # noqa: E402
     workflow_run_env_from_config,
 )
 
-from build_workflow_run_console import build_report as build_workflow_console  # noqa: E402
+from build_workflow_run_console import (  # noqa: E402
+    build_report as build_workflow_console,
+    user_facing_run_status,
+)
 
 _TOP_LEVEL_REPORT_PATH = (
     _PROJECT_ROOT / "outputs" / "workflow_runs" / "latest_workflow_run_report_chinese.md"
@@ -341,10 +350,25 @@ def _llm_stage_summary(result: dict, provider: str, model: str) -> dict:
         "source_critic": {
             "enabled": bool(critic.get("llm_source_critic_enabled")),
             "attempted_source_count": critic.get(
-                "llm_source_critic_attempted_source_count", 0
+                "attempted_source_count",
+                critic.get("llm_source_critic_attempted_source_count", 0),
             ),
-            "assessed_source_count": critic.get("llm_assessed_source_count", 0),
-            "skipped_source_count": critic.get("llm_skipped_source_count", 0),
+            "assessed_source_count": critic.get(
+                "assessed_source_count", critic.get("llm_assessed_source_count", 0)
+            ),
+            "skipped_source_count": critic.get(
+                "skipped_source_count", critic.get("llm_skipped_source_count", 0)
+            ),
+            "blocked_fetch_count": critic.get("blocked_fetch_count", 0),
+            "needs_review_count": critic.get("needs_review_count", 0),
+            "allowed_fetch_count": critic.get("allowed_fetch_count", 0),
+            "context_only_count": critic.get("context_only_count", 0),
+            "decision_counts": critic.get("decision_counts") or {},
+            "fetch_recommendation_counts": (
+                critic.get("fetch_recommendation_counts") or {}
+            ),
+            "risk_flag_counts": critic.get("risk_flag_counts") or {},
+            "selection": critic.get("source_critic_selection_summary") or {},
             "allowlist_enabled": critic.get(
                 "llm_source_critic_allowlist_enabled", False
             ),
@@ -386,9 +410,38 @@ def _write_validation_outputs(
     output_dir: Path,
     validation_records: list[dict],
     registry: list[dict],
+    *,
+    inactive_validation_records: list[dict] | None = None,
+    validation_source_compatibility_summary: dict | None = None,
+    raw_validation_records: list[dict] | None = None,
 ) -> dict:
     validation_dir = output_dir / "validation"
-    write_csv_records(validation_dir / "ground_truth_records.csv", validation_records)
+    all_validation_records = (
+        list(validation_records)
+        + list(inactive_validation_records or [])
+        + list(raw_validation_records or [])
+    )
+    validation_fieldnames = sorted(
+        {key for record in all_validation_records for key in record.keys()}
+    )
+    write_csv_records(
+        validation_dir / "ground_truth_records.csv",
+        validation_records,
+        fieldnames=validation_fieldnames or None,
+    )
+    write_csv_records(
+        validation_dir / "inactive_validation_records.csv",
+        list(inactive_validation_records or []),
+        fieldnames=validation_fieldnames or None,
+    )
+    write_json(
+        list(inactive_validation_records or []),
+        validation_dir / "inactive_validation_records.json",
+    )
+    write_json(
+        validation_source_compatibility_summary or {},
+        validation_dir / "validation_source_compatibility_summary.json",
+    )
     validation_ids = {
         row.get("source_id") for row in validation_records if row.get("source_id")
     }
@@ -402,6 +455,21 @@ def _write_validation_outputs(
             validation_dir / "validation_source_registry.json"
         ),
         "validation_source_registry_count": len(validation_registry),
+        "active_validation_record_count": len(validation_records),
+        "inactive_validation_record_count": len(inactive_validation_records or []),
+        "raw_validation_record_count": len(raw_validation_records or []),
+        "validation_source_compatibility_status": (
+            validation_source_compatibility_summary or {}
+        ).get("compatibility_status"),
+        "inactive_validation_records_csv": str(
+            validation_dir / "inactive_validation_records.csv"
+        ),
+        "inactive_validation_records_json": str(
+            validation_dir / "inactive_validation_records.json"
+        ),
+        "validation_source_compatibility_summary_json": str(
+            validation_dir / "validation_source_compatibility_summary.json"
+        ),
     }
 
 
@@ -563,6 +631,49 @@ def _write_report(
     source_search = result.get("source_search_execution_summary") or {}
     source_discovery = result.get("source_discovery_summary") or {}
     source_credibility = result.get("source_credibility_summary") or {}
+    disease_relevance = result.get("disease_relevance_summary") or {}
+    run_quality = result.get("run_quality_summary") or final_package.get(
+        "run_quality_summary"
+    ) or {}
+    final_dataset_quality = result.get(
+        "final_dataset_quality_summary"
+    ) or final_package.get("final_dataset_quality_summary") or {}
+    final_dataset_pre_quality_gate = list(
+        result.get("final_dataset_pre_quality_gate")
+        or final_package.get("final_dataset_pre_quality_gate")
+        or []
+    )
+    quarantined_records = list(
+        result.get("quarantined_records")
+        or final_package.get("quarantined_records")
+        or []
+    )
+    pending_review_records = list(
+        result.get("pending_review_records")
+        or final_package.get("pending_review_records")
+        or []
+    )
+    accepted_records = list(final_package.get("final_dataset") or [])
+    accepted_record_count = len(accepted_records)
+    pre_quality_record_count = len(final_dataset_pre_quality_gate)
+    quarantined_record_count = len(quarantined_records)
+    pending_review_record_count = len(pending_review_records)
+    post_review_record_count = len(final_dataset_post_review)
+    run_status_text = user_facing_run_status(run_quality)
+    recommended_user_message = run_quality.get("recommended_user_message")
+    validation_compatibility_status = validation_manifest.get(
+        "validation_source_compatibility_status"
+    )
+    validation_limited = bool(
+        run_quality.get("validation_limited")
+        or run_quality.get("no_compatible_validation_source")
+        or validation_compatibility_status
+        in {
+            "incompatible_validation_source_disabled",
+            "no_task_compatible_validation_source",
+            "missing_validation_source",
+        }
+    )
 
     node_lines = [
         f"{idx}. `{event.get('node_name')}` - {_preview(event.get('message'), 120)}"
@@ -572,7 +683,7 @@ def _write_report(
         node_lines = ["- no trace events"]
 
     lines = [
-        "# HDC Workflow Run Report",
+        "# data collection workflow Run Report",
         "",
         "## 1. 输入任务",
         "",
@@ -595,8 +706,59 @@ def _write_report(
         f"- Source credibility assessed sources: `{source_credibility.get('assessed_source_count', 0)}`",
         f"- Source credibility role counts: `{source_credibility.get('role_counts') or {}}`",
         f"- Source discovery method: `{source_discovery.get('discovery_method')}`",
+        f"- Disease relevance target: `{disease_relevance.get('target_disease') or 'n/a'}`",
+        f"- Disease relevance source status counts: `{disease_relevance.get('source_status_counts') or {}}`",
+        f"- Disease relevance chunk status counts: `{disease_relevance.get('chunk_status_counts') or {}}`",
+        f"- Disease relevance record status counts: `{disease_relevance.get('record_compatibility_status_counts') or {}}`",
+        f"- Rejected incompatible record count: `{disease_relevance.get('rejected_incompatible_record_count', 0)}`",
         f"- Final route: `{route}`",
         "",
+        "## 2.5 Run quality status",
+        "",
+        f"- User-facing run status: `{run_status_text}`",
+        "- Technical execution status: `completed`",
+        f"- Run quality status: `{run_quality.get('run_quality_status') or 'n/a'}`",
+        f"- Final dataset mode: `{run_quality.get('final_dataset_mode') or 'n/a'}`",
+        f"- Accepted final dataset count: `{accepted_record_count}`",
+        f"- Pre-quality-gate record count: `{pre_quality_record_count}`",
+        f"- Quarantined record count: `{quarantined_record_count}`",
+        f"- Pending review record count: `{pending_review_record_count}`",
+        f"- Final dataset post-review count: `{post_review_record_count}`",
+        f"- Recommended user message: `{recommended_user_message or 'n/a'}`",
+        "",
+        *(
+            [
+                (
+                    "workflow technically completed, but no quality-gated accepted "
+                    "records were produced."
+                ),
+                (
+                    "本次 workflow 技术上完成，但没有产生通过质量门的 accepted "
+                    "records。"
+                ),
+                "",
+            ]
+            if accepted_record_count == 0
+            else [
+                "Workflow technically completed and produced quality-gated accepted records.",
+                "",
+            ]
+        ),
+        *(
+            [
+                (
+                    "Held-out validation was limited because no task-compatible "
+                    "validation source was available."
+                ),
+                (
+                    "未找到与本次任务兼容的 held-out validation source；这不是自动失败，"
+                    "但 validation 有局限。"
+                ),
+                "",
+            ]
+            if validation_limited
+            else []
+        ),
         "## 3. Workflow 运行过程",
         "",
         (
@@ -694,11 +856,19 @@ def _write_report(
             f"- Attempted source count: `{llm_summary['source_critic'].get('attempted_source_count')}`",
             f"- Assessed source count: `{llm_summary['source_critic'].get('assessed_source_count')}`",
             f"- Skipped source count: `{llm_summary['source_critic'].get('skipped_source_count')}`",
+            f"- Blocked fetch count: `{llm_summary['source_critic'].get('blocked_fetch_count')}`",
+            f"- Allowed fetch count: `{llm_summary['source_critic'].get('allowed_fetch_count')}`",
+            f"- Context-only count: `{llm_summary['source_critic'].get('context_only_count')}`",
+            f"- Needs review count: `{llm_summary['source_critic'].get('needs_review_count')}`",
             f"- Max sources: `{llm_summary['source_critic'].get('max_sources')}`",
             f"- Review blocks fetch: `{llm_summary['source_critic'].get('review_blocks_fetch')}`",
             f"- Failure count: `{llm_summary['source_critic'].get('failure_count')}`",
             f"- Semantic leakage count: `{llm_summary['source_critic'].get('semantic_leakage_count')}`",
             f"- Human review recommended count: `{llm_summary['source_critic'].get('human_review_recommended_count')}`",
+            f"- Critic decision counts: `{_format_counts(llm_summary['source_critic'].get('decision_counts'))}`",
+            f"- Fetch recommendation counts: `{_format_counts(llm_summary['source_critic'].get('fetch_recommendation_counts'))}`",
+            f"- Risk flag counts: `{_format_counts(llm_summary['source_critic'].get('risk_flag_counts'))}`",
+            f"- Selected source IDs: `{', '.join(llm_summary['source_critic'].get('selection', {}).get('selected_source_ids') or [])}`",
             "",
             "### 6.3 Optional LLM Source Credibility Advisory",
             "",
@@ -722,13 +892,31 @@ def _write_report(
             "## 7. 最终抽取 records",
             "",
             f"- Normalized record count: `{len(records)}`",
-            f"- Source counts: `{_format_counts(_count_by(records, 'source_id'))}`",
+            f"- Run quality status: `{run_quality.get('run_quality_status') or 'n/a'}`",
+            f"- Final dataset mode: `{run_quality.get('final_dataset_mode') or 'n/a'}`",
+            f"- Quality-gated accepted final dataset count: `{accepted_record_count}`",
+            f"- Pre-quality-gate record count: `{pre_quality_record_count}`",
+            f"- Quarantined record count: `{quarantined_record_count}`",
+            f"- Pending review record count: `{pending_review_record_count}`",
+            f"- Final dataset post-review count: `{post_review_record_count}`",
+            f"- Record inclusion status counts: `{final_dataset_quality.get('record_final_inclusion_status_counts') or {}}`",
+            f"- Run quality warnings: `{run_quality.get('warnings') or []}`",
+            f"- Accepted source counts: `{_format_counts(_count_by(accepted_records, 'source_id'))}`",
             "",
+            *(
+                [
+                    "No quality-gated records are available to list.",
+                    "Candidate records, if any, are recorded in the pre-quality, quarantined, and pending-review artifacts.",
+                    "",
+                ]
+                if accepted_record_count == 0
+                else []
+            ),
             "| Record ID | Date / period | Location | Cases | Deaths | Source | LLM used |",
             "|---|---|---|---|---|---|---|",
         ]
     )
-    for record in records[:12]:
+    for record in accepted_records[:12]:
         date_value = record.get("reporting_period") or record.get("date_reported") or record.get("date_anchor")
         location = record.get("subnational_location") or record.get("geographic_scope") or record.get("country")
         lines.append(
@@ -752,6 +940,16 @@ def _write_report(
             "",
             "## 8. Validation 对比",
             "",
+            (
+                "- Validation source compatibility status: "
+                f"`{validation_manifest.get('validation_source_compatibility_status')}`"
+            ),
+            (
+                "- Active / inactive / raw validation records: "
+                f"`{validation_manifest.get('active_validation_record_count', 0)}` / "
+                f"`{validation_manifest.get('inactive_validation_record_count', 0)}` / "
+                f"`{validation_manifest.get('raw_validation_record_count', 0)}`"
+            ),
             f"- Validation record count: `{evaluation_summary.get('validation_record_count', 0)}`",
             f"- Evaluation row count: `{evaluation_summary.get('evaluation_row_count', 0)}`",
             f"- Evaluation rows flagged for human review: `{evaluation_summary.get('human_review_flagged_row_count', 0)}`",
@@ -825,23 +1023,48 @@ def _write_report(
             "",
             f"- Run output directory: `{output_dir}`",
             f"- Collection final dataset: `{collection_manifest['files'].get('final_dataset_csv')}`",
+            f"- Collection pre-quality-gate records: `{collection_manifest['files'].get('final_dataset_pre_quality_gate_csv')}`",
+            f"- Collection quarantined records: `{collection_manifest['files'].get('quarantined_records_csv')}`",
+            f"- Collection pending review records: `{collection_manifest['files'].get('pending_review_records_csv')}`",
+            f"- Collection record inclusion decisions: `{collection_manifest['files'].get('record_inclusion_decisions_json')}`",
             f"- Collection final dataset post-review: `{collection_manifest['files'].get('final_dataset_post_review_csv')}`",
             f"- Collection anomaly results: `{collection_manifest['files'].get('anomaly_results_json')}`",
             f"- Collection human review audit trail: `{collection_manifest['files'].get('human_review_audit_trail_json')}`",
             f"- Collection source registry: `{collection_manifest['files'].get('source_registry_json')}`",
             f"- Validation ground truth: `{validation_manifest.get('ground_truth_records_csv')}`",
+            (
+                "- Inactive validation records: "
+                f"`{validation_manifest.get('inactive_validation_records_csv')}`"
+            ),
+            (
+                "- Validation compatibility summary: "
+                f"`{validation_manifest.get('validation_source_compatibility_summary_json')}`"
+            ),
             f"- Evaluation report CSV: `{evaluation_outputs.get('evaluation_report_csv')}`",
             f"- Human-readable report: `{path}`",
             "",
             "## 11. 当前结论",
             "",
             (
-                "This workflow run executes the HDC workflow end to end: a user "
-                "request enters the LangGraph state, the graph fetches controlled "
-                "real web sources, calls all three LLM stages, separates collection "
-                "and validation sources, extracts structured records, compares "
-                "against held-out validation evidence, and flags unresolved "
-                "validation rows for human review."
+                "This workflow run executed the configured data collection workflow "
+                "through the exported graph and artifact pipeline. The user-facing "
+                f"run status is: {run_status_text}"
+            ),
+            *(
+                [
+                    (
+                        "The run completed technically, but it should not be read as "
+                        "a successful data collection result because no quality-gated "
+                        "accepted records were produced."
+                    )
+                ]
+                if accepted_record_count == 0
+                else [
+                    (
+                        "The run completed technically and produced quality-gated "
+                        "accepted records in the final dataset."
+                    )
+                ]
             ),
             "",
             f"- Package metadata says LLM used: `{metadata.get('llm_used')}`",
@@ -862,25 +1085,80 @@ def run_workflow(args: argparse.Namespace) -> dict:
     output_dir = workflow_output_dir_from_config(config)
     env_updates = workflow_run_env_from_config(config)
     output_config = config.get("output") or {}
-    validation_records = read_csv_records(validation_records_path_from_config(config))
+    workflow_config = config.get("workflow") or {}
+    validation_records_requested_path = workflow_config.get(
+        "validation_ground_truth_records_path"
+    )
+    validation_records_explicit = validation_records_requested_path not in {
+        None,
+        "",
+    }
+    validation_records_path = validation_records_path_from_config(config)
+    validation_records = (
+        read_csv_records(validation_records_path)
+        if validation_records_path.exists()
+        else []
+    )
+    validation_config = config.get("validation") or {}
+    allow_incompatible_validation_records = validation_config.get(
+        "allow_incompatible_validation_records"
+    )
+    initial_state = workflow_initial_state_from_config(config)
+    resolved_validation = resolve_task_compatible_validation_records(
+        validation_records=validation_records,
+        state_or_task_context=initial_state,
+        validation_records_path=validation_records_path,
+        validation_records_path_requested=validation_records_requested_path,
+        validation_records_explicit=validation_records_explicit,
+        validation_records_defaulted=not validation_records_explicit,
+        allow_incompatible_validation_records=allow_incompatible_validation_records,
+    )
 
     with temporary_workflow_env(env_updates):
-        initial_state = workflow_initial_state_from_config(config)
         initial_state["validation_records"] = validation_records
+        initial_state["active_validation_records"] = resolved_validation[
+            "active_validation_records"
+        ]
+        initial_state["inactive_validation_records"] = resolved_validation[
+            "inactive_validation_records"
+        ]
+        initial_state["validation_source_compatibility_summary"] = (
+            resolved_validation["validation_source_compatibility_summary"]
+        )
         result = build_graph().invoke(initial_state)
 
     package = dict(result.get("final_data_package") or {})
     registry = list(result.get("source_registry") or package.get("source_registry") or [])
+    active_validation_records = list(
+        result.get("active_validation_records")
+        if "active_validation_records" in result
+        else resolved_validation["active_validation_records"]
+    )
+    inactive_validation_records = list(
+        result.get("inactive_validation_records")
+        if "inactive_validation_records" in result
+        else resolved_validation["inactive_validation_records"]
+    )
+    validation_source_compatibility_summary = dict(
+        result.get("validation_source_compatibility_summary")
+        or resolved_validation["validation_source_compatibility_summary"]
+    )
     validation_manifest = _write_validation_outputs(
-        output_dir, validation_records, registry
+        output_dir,
+        active_validation_records,
+        registry,
+        inactive_validation_records=inactive_validation_records,
+        validation_source_compatibility_summary=validation_source_compatibility_summary,
+        raw_validation_records=validation_records,
     )
     evaluation_rows, evaluation_summary = build_evaluation_report(
         collection_records=package.get("final_dataset") or [],
-        validation_records=validation_records,
+        validation_records=active_validation_records,
         collection_source_registry=package.get("source_registry") or [],
         reserved_source_ids=set(VALIDATION_SOURCE_IDS),
         conflicts=package.get("conflicts") or [],
         human_review_items=package.get("human_review_items") or [],
+        validation_source_compatibility_summary=validation_source_compatibility_summary,
     )
     evaluation_summary.update(
         {
@@ -1007,6 +1285,18 @@ def run_workflow(args: argparse.Namespace) -> dict:
         diagnostics_dir / "validation_results.json",
     )
     write_json(
+        active_validation_records,
+        diagnostics_dir / "active_validation_records.json",
+    )
+    write_json(
+        inactive_validation_records,
+        diagnostics_dir / "inactive_validation_records.json",
+    )
+    write_json(
+        validation_source_compatibility_summary,
+        diagnostics_dir / "validation_source_compatibility_summary.json",
+    )
+    write_json(
         result.get("validation_summary") or {},
         diagnostics_dir / "validation_summary.json",
     )
@@ -1048,6 +1338,38 @@ def run_workflow(args: argparse.Namespace) -> dict:
         diagnostics_dir / "human_review_application_summary.json",
     )
     write_json(
+        result.get("run_quality_summary") or package.get("run_quality_summary") or {},
+        diagnostics_dir / "run_quality_summary.json",
+    )
+    write_json(
+        result.get("final_dataset_quality_summary")
+        or package.get("final_dataset_quality_summary")
+        or {},
+        diagnostics_dir / "final_dataset_quality_summary.json",
+    )
+    write_json(
+        result.get("record_inclusion_decisions")
+        or package.get("record_inclusion_decisions")
+        or [],
+        diagnostics_dir / "record_inclusion_decisions.json",
+    )
+    write_json(
+        result.get("final_dataset_pre_quality_gate")
+        or package.get("final_dataset_pre_quality_gate")
+        or [],
+        diagnostics_dir / "final_dataset_pre_quality_gate.json",
+    )
+    write_json(
+        result.get("quarantined_records") or package.get("quarantined_records") or [],
+        diagnostics_dir / "quarantined_records.json",
+    )
+    write_json(
+        result.get("pending_review_records")
+        or package.get("pending_review_records")
+        or [],
+        diagnostics_dir / "pending_review_records.json",
+    )
+    write_json(
         result.get("final_dataset_post_review") or [],
         diagnostics_dir / "final_dataset_post_review.json",
     )
@@ -1075,6 +1397,22 @@ def run_workflow(args: argparse.Namespace) -> dict:
         result.get("duplicate_detection_summary") or {},
         diagnostics_dir / "duplicate_detection_summary.json",
     )
+    write_json(
+        result.get("disease_relevance_summary") or {},
+        diagnostics_dir / "disease_relevance_summary.json",
+    )
+    write_json(
+        result.get("localized_source_planning_summary") or {},
+        diagnostics_dir / "localized_source_planning_summary.json",
+    )
+    write_json(
+        result.get("source_critic_summary") or {},
+        diagnostics_dir / "source_critic_summary.json",
+    )
+    write_json(
+        result.get("source_critic_results") or [],
+        diagnostics_dir / "source_critic_results.json",
+    )
     write_json(result.get("collection_trace") or [], diagnostics_dir / "collection_trace.json")
     write_json(
         {
@@ -1085,6 +1423,9 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "profile_schema_summary": result.get("profile_schema_summary"),
             "executable_source_plan_summary": result.get(
                 "executable_source_plan_summary"
+            ),
+            "localized_source_planning_summary": result.get(
+                "localized_source_planning_summary"
             ),
             "source_planning_agent_summary": result.get("source_planning_agent_summary"),
             "source_search_execution_summary": result.get(
@@ -1110,6 +1451,9 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "event_clustering_summary": result.get("event_clustering_summary"),
             "duplicate_detection_summary": result.get("duplicate_detection_summary"),
             "validation_summary": result.get("validation_summary"),
+            "validation_source_compatibility_summary": (
+                validation_source_compatibility_summary
+            ),
             "trusted_source_validation_summary": result.get(
                 "trusted_source_validation_summary"
             ),
@@ -1124,6 +1468,13 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "human_review_application_summary": result.get(
                 "human_review_application_summary"
             ),
+            "run_quality_summary": result.get("run_quality_summary")
+            or package.get("run_quality_summary"),
+            "final_dataset_quality_summary": result.get(
+                "final_dataset_quality_summary"
+            )
+            or package.get("final_dataset_quality_summary"),
+            "disease_relevance_summary": result.get("disease_relevance_summary"),
             "finalization_summary": result.get("finalization_summary"),
         },
         diagnostics_dir / "workflow_summaries.json",
@@ -1149,6 +1500,20 @@ def run_workflow(args: argparse.Namespace) -> dict:
     _TOP_LEVEL_REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     if bool(output_config.get("write_latest_alias", True)):
         _TOP_LEVEL_REPORT_PATH.write_text(report, encoding="utf-8")
+
+    run_quality_summary = result.get("run_quality_summary") or package.get(
+        "run_quality_summary"
+    ) or {}
+    final_dataset_quality_summary = result.get(
+        "final_dataset_quality_summary"
+    ) or package.get("final_dataset_quality_summary") or {}
+    final_dataset = list(package.get("final_dataset") or [])
+    final_dataset_pre_quality_gate = list(
+        package.get("final_dataset_pre_quality_gate") or []
+    )
+    quarantined_records = list(package.get("quarantined_records") or [])
+    pending_review_records = list(package.get("pending_review_records") or [])
+    final_dataset_post_review = list(result.get("final_dataset_post_review") or [])
 
     summary = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -1180,6 +1545,12 @@ def run_workflow(args: argparse.Namespace) -> dict:
         "document_count": live_summary.get("document_count", 0),
         "normalized_record_count": len(result.get("normalized_records") or []),
         "evaluation_row_count": evaluation_summary.get("evaluation_row_count", 0),
+        "validation_source_compatibility_status": (
+            validation_source_compatibility_summary.get("compatibility_status")
+        ),
+        "active_validation_record_count": len(active_validation_records),
+        "inactive_validation_record_count": len(inactive_validation_records),
+        "raw_validation_record_count": len(validation_records),
         "validation_result_count": (result.get("validation_summary") or {}).get(
             "validation_result_count", 0
         ),
@@ -1201,15 +1572,36 @@ def run_workflow(args: argparse.Namespace) -> dict:
         "human_review_audit_entry_count": len(
             result.get("human_review_audit_trail") or []
         ),
-        "final_dataset_post_review_count": len(
-            result.get("final_dataset_post_review") or []
+        "run_quality_status": run_quality_summary.get("run_quality_status"),
+        "run_quality_summary": run_quality_summary,
+        "final_dataset_quality_summary": final_dataset_quality_summary,
+        "user_facing_run_status": user_facing_run_status(run_quality_summary),
+        "recommended_user_message": run_quality_summary.get(
+            "recommended_user_message"
         ),
+        "accepted_record_count": len(final_dataset),
+        "final_dataset_count": len(final_dataset),
+        "pre_quality_record_count": len(final_dataset_pre_quality_gate),
+        "final_dataset_pre_quality_gate_count": len(final_dataset_pre_quality_gate),
+        "quarantined_record_count": len(quarantined_records),
+        "pending_review_record_count": len(pending_review_records),
+        "post_review_record_count": len(final_dataset_post_review),
+        "final_dataset_post_review_count": len(final_dataset_post_review),
         "llm_stage_summary": llm_summary,
         "source_search_execution_summary": result.get(
             "source_search_execution_summary"
         )
         or {},
+        "localized_source_planning_summary": result.get(
+            "localized_source_planning_summary"
+        )
+        or {},
+        "source_critic_summary": result.get("source_critic_summary") or {},
         "source_credibility_summary": result.get("source_credibility_summary") or {},
+        "disease_relevance_summary": result.get("disease_relevance_summary") or {},
+        "validation_source_compatibility_summary": (
+            validation_source_compatibility_summary
+        ),
         "artifact_paths": {
             "run_report": str(report_path),
             "stable_run_report": str(_TOP_LEVEL_REPORT_PATH)
@@ -1228,6 +1620,15 @@ def run_workflow(args: argparse.Namespace) -> dict:
             ),
             "source_discovery_summary": str(
                 diagnostics_dir / "source_discovery_summary.json"
+            ),
+            "localized_source_planning_summary": str(
+                diagnostics_dir / "localized_source_planning_summary.json"
+            ),
+            "source_critic_summary": str(
+                diagnostics_dir / "source_critic_summary.json"
+            ),
+            "source_critic_results": str(
+                diagnostics_dir / "source_critic_results.json"
             ),
             "source_credibility_summary": str(
                 diagnostics_dir / "source_credibility_summary.json"
@@ -1248,6 +1649,15 @@ def run_workflow(args: argparse.Namespace) -> dict:
                 diagnostics_dir / "validation_comparisons.json"
             ),
             "validation_results": str(diagnostics_dir / "validation_results.json"),
+            "active_validation_records": str(
+                diagnostics_dir / "active_validation_records.json"
+            ),
+            "inactive_validation_records": str(
+                diagnostics_dir / "inactive_validation_records.json"
+            ),
+            "validation_source_compatibility_summary": str(
+                diagnostics_dir / "validation_source_compatibility_summary.json"
+            ),
             "validation_summary": str(diagnostics_dir / "validation_summary.json"),
             "trusted_source_validation_summary": str(
                 diagnostics_dir / "trusted_source_validation_summary.json"
@@ -1273,11 +1683,28 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "human_review_application_summary": str(
                 diagnostics_dir / "human_review_application_summary.json"
             ),
+            "run_quality_summary": str(diagnostics_dir / "run_quality_summary.json"),
+            "final_dataset_quality_summary": str(
+                diagnostics_dir / "final_dataset_quality_summary.json"
+            ),
+            "record_inclusion_decisions": str(
+                diagnostics_dir / "record_inclusion_decisions.json"
+            ),
+            "final_dataset_pre_quality_gate": str(
+                diagnostics_dir / "final_dataset_pre_quality_gate.json"
+            ),
+            "quarantined_records": str(diagnostics_dir / "quarantined_records.json"),
+            "pending_review_records": str(
+                diagnostics_dir / "pending_review_records.json"
+            ),
             "final_dataset_post_review": str(
                 diagnostics_dir / "final_dataset_post_review.json"
             ),
             "records_excluded_by_human_review": str(
                 diagnostics_dir / "records_excluded_by_human_review.json"
+            ),
+            "disease_relevance_summary": str(
+                diagnostics_dir / "disease_relevance_summary.json"
             ),
         },
     }
@@ -1390,6 +1817,10 @@ def main() -> int:
         source_search.get("candidate_from_search_count"),
     )
     print(f"normalized_record_count: {summary.get('normalized_record_count')}")
+    print(f"run_quality_status: {summary.get('run_quality_status')}")
+    print(f"final_dataset_count: {summary.get('final_dataset_count')}")
+    print(f"quarantined_record_count: {summary.get('quarantined_record_count')}")
+    print(f"pending_review_record_count: {summary.get('pending_review_record_count')}")
     print(f"evaluation_row_count: {summary.get('evaluation_row_count')}")
     print(f"human_review_item_count: {summary.get('human_review_item_count')}")
     print(

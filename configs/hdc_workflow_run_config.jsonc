@@ -164,7 +164,7 @@
       "max_sources": 6,
 
       // Whether LLM critic can block fetch. false = LLM 只 advisory，最终安全边界由 deterministic policy 控制；true = critic 可阻止有风险 source 抓取。
-      "review_blocks_fetch": false
+      "review_blocks_fetch": true
     },
 
     "source_credibility": {
@@ -189,6 +189,13 @@
 
     // fallback_to_curated. true = if LLM disease intelligence fails, use curated/generic deterministic fallback and record a warning.
     "fallback_to_curated": true
+  },
+
+  "validation": {
+    // Task-compatible validation guardrail.
+    // false = held-out ground truth is used only when disease/location/time match the active task.
+    // true = force-load explicitly configured incompatible validation records for diagnostic experiments only.
+    "allow_incompatible_validation_records": false
   },
 
   "source_sets": {
@@ -226,14 +233,7 @@
     ],
 
     // Source IDs visible to LLM source critic. 可小于 workflow_source_ids，用来控制 critic 成本；不应包含 workflow 外 source。
-    "llm_source_critic_source_ids": [
-      "src_nmdoh_hps_2024_first_case",
-      "src_nmdoh_hps_2025_first_case_death",
-      "src_nmdoh_hps_2026_first_case_prior_year_summary",
-      "src_nmdoh_hps_overview_1975_2025",
-      "src_cdc_hantavirus_reported_cases_through_2023",
-      "src_nmdoh_hps_cases_by_county_1975_2025_pdf"
-    ]
+    "llm_source_critic_source_ids": []
   },
 
   "output": {

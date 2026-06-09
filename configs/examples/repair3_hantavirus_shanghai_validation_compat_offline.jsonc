@@ -1,0 +1,99 @@
+{
+  "profile_name": "repair3_hantavirus_shanghai_validation_compat_offline",
+  "description": "Offline smoke profile for task-compatible validation source gating.",
+  "workflow": {
+    "collection_mode": "standard",
+    "use_fixture_documents": false
+  },
+  "user_request": "Collect hantavirus cases, deaths, dates, locations, source URLs, source types, and evidence quotes for Shanghai from 2024 to 2026.",
+  "structured_task": {
+    "disease": "hantavirus",
+    "location": "Shanghai",
+    "start_date": "2024",
+    "end_date": "2026",
+    "target_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "cases_unspecified",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "source_preferences": [
+      "official_public_health_agency",
+      "international_organization_report",
+      "structured_database",
+      "peer_reviewed_literature",
+      "news_and_situation_report"
+    ],
+    "collection_mode": "standard",
+    "user_request": "Collect hantavirus cases, deaths, dates, locations, source URLs, source types, and evidence quotes for Shanghai from 2024 to 2026.",
+    "run_label": "repair3_hantavirus_shanghai_validation_compat_offline"
+  },
+  "live_web": {
+    "enabled": false,
+    "timeout_seconds": 15
+  },
+  "source_search": {
+    "enabled": false,
+    "mode": "disabled",
+    "provider": "tavily",
+    "fixture_path": "src/hdc_workflow/resources/search_fixtures/example_search_results.json",
+    "max_queries": 3,
+    "max_results_per_query": 5,
+    "max_total_results": 15,
+    "timeout_seconds": 15,
+    "combine_with_seed_catalog": false,
+    "cache_enabled": true,
+    "provider_channel_allowlist": [
+      "web_search",
+      "official_site_search",
+      "news_search",
+      "literature_api",
+      "database_search"
+    ]
+  },
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "source_planning_enabled": false,
+    "source_critic_enabled": false,
+    "structured_extraction_enabled": false,
+    "max_chunks": 8,
+    "max_tokens": 4096,
+    "fallback_to_rule_based": true,
+    "source_critic": {
+      "max_sources": 6,
+      "review_blocks_fetch": false
+    },
+    "source_credibility": {
+      "enabled": false,
+      "max_sources": 6,
+      "source_id_allowlist": []
+    }
+  },
+  "disease_intelligence": {
+    "llm_enabled": false,
+    "force_llm": false,
+    "fallback_to_curated": true
+  },
+  "validation": {
+    "allow_incompatible_validation_records": false
+  },
+  "source_sets": {
+    "source_id_allowlist_enabled": true,
+    "workflow_source_ids": []
+  },
+  "output": {
+    "run_output_root": "outputs",
+    "sessionized": true,
+    "session_id": "repair3_hantavirus_shanghai_validation_compat_offline",
+    "auto_build_console": true,
+    "console_output_root": "outputs/workflow_console",
+    "write_latest_alias": false
+  }
+}

@@ -117,6 +117,9 @@ def _initial_state() -> dict:
         "linked_events": [],
         "event_clusters": [],
         "duplicate_clusters": [],
+        "active_validation_records": [],
+        "inactive_validation_records": [],
+        "validation_source_compatibility_summary": None,
         "validation_cases": [],
         "validation_comparisons": [],
         "validation_results": [],
@@ -156,6 +159,159 @@ def _read_json_file(path: Path) -> dict | list | None:
 
 def _summary_value(summaries: dict, key: str):
     return (summaries or {}).get(key)
+
+
+_UNAVAILABLE = "collection_spec unavailable in artifacts"
+
+
+def _dict_or_empty(value) -> dict:
+    return value if isinstance(value, dict) else {}
+
+
+def _list_or_empty(value) -> list:
+    return value if isinstance(value, list) else []
+
+
+def _diagnostic_summary(
+    diagnostics_dir: Path,
+    workflow_summaries: dict,
+    key: str,
+) -> dict:
+    value = _read_json_file(diagnostics_dir / f"{key}.json")
+    if not isinstance(value, dict):
+        value = _summary_value(workflow_summaries, key)
+    return _sanitize_workflow_artifact(value or {})
+
+
+def _collection_spec_from_artifacts(
+    workflow_summaries: dict,
+    run_summary: dict,
+    package: dict,
+) -> dict:
+    task_intake = _dict_or_empty(_summary_value(workflow_summaries, "task_intake_summary"))
+    spec = _dict_or_empty(task_intake.get("collection_spec"))
+    if spec:
+        return {
+            "task_type": spec.get("task_type")
+            or "public_health_case_and_outbreak_collection",
+            "disease": spec.get("disease") or _UNAVAILABLE,
+            "target_population": spec.get("target_population") or "human",
+            "geography": spec.get("geography")
+            or spec.get("location")
+            or _UNAVAILABLE,
+            "start_date": spec.get("start_date") or _UNAVAILABLE,
+            "end_date": spec.get("end_date") or _UNAVAILABLE,
+            "time_window": spec.get("time_window")
+            or _time_window(spec.get("start_date"), spec.get("end_date")),
+            "user_request": spec.get("user_request")
+            or run_summary.get("user_request")
+            or _UNAVAILABLE,
+            "run_label": spec.get("run_label")
+            or run_summary.get("session_id")
+            or _UNAVAILABLE,
+            "collection_spec_status": "available",
+        }
+
+    if any(task_intake.get(key) for key in ("disease", "location", "start_date", "end_date")):
+        return {
+            "task_type": task_intake.get("task_type")
+            or "public_health_case_and_outbreak_collection",
+            "disease": task_intake.get("disease") or _UNAVAILABLE,
+            "target_population": task_intake.get("target_population") or "human",
+            "geography": task_intake.get("location")
+            or task_intake.get("geography")
+            or _UNAVAILABLE,
+            "start_date": task_intake.get("start_date") or _UNAVAILABLE,
+            "end_date": task_intake.get("end_date") or _UNAVAILABLE,
+            "time_window": task_intake.get("time_window")
+            or _time_window(task_intake.get("start_date"), task_intake.get("end_date")),
+            "user_request": run_summary.get("user_request")
+            or task_intake.get("user_request")
+            or _UNAVAILABLE,
+            "run_label": task_intake.get("run_label")
+            or run_summary.get("session_id")
+            or _UNAVAILABLE,
+            "collection_spec_status": "derived_from_task_intake_summary",
+        }
+
+    metadata = _dict_or_empty(package.get("package_metadata"))
+    if metadata.get("disease") or metadata.get("geography"):
+        return {
+            "task_type": "public_health_case_and_outbreak_collection",
+            "disease": _UNAVAILABLE,
+            "target_population": "human",
+            "geography": _UNAVAILABLE,
+            "start_date": _UNAVAILABLE,
+            "end_date": _UNAVAILABLE,
+            "time_window": _UNAVAILABLE,
+            "user_request": run_summary.get("user_request") or _UNAVAILABLE,
+            "run_label": run_summary.get("session_id") or _UNAVAILABLE,
+            "collection_spec_status": "unavailable",
+        }
+
+    return {
+        "task_type": "public_health_case_and_outbreak_collection",
+        "disease": _UNAVAILABLE,
+        "target_population": "human",
+        "geography": _UNAVAILABLE,
+        "start_date": _UNAVAILABLE,
+        "end_date": _UNAVAILABLE,
+        "time_window": _UNAVAILABLE,
+        "user_request": run_summary.get("user_request") or _UNAVAILABLE,
+        "run_label": run_summary.get("session_id") or _UNAVAILABLE,
+        "collection_spec_status": "unavailable",
+    }
+
+
+def _time_window(start_date, end_date) -> str:
+    if start_date and end_date:
+        return f"{start_date}-{end_date}"
+    return _UNAVAILABLE
+
+
+def user_facing_run_status(run_quality_summary: dict | None) -> str:
+    summary = run_quality_summary or {}
+    status = summary.get("run_quality_status")
+    mapping = {
+        "passed": "PASSED: accepted quality-gated records produced.",
+        "passed_with_review": (
+            "PASSED WITH REVIEW: accepted records produced, but review or "
+            "warnings exist."
+        ),
+        "partial_with_quarantined_records": (
+            "PARTIAL: accepted records produced, but some records were quarantined."
+        ),
+        "no_records_extracted": (
+            "COMPLETED WITH NO RECORDS: workflow completed but no records were extracted."
+        ),
+        "no_task_relevant_records": (
+            "COMPLETED WITH NO TASK-RELEVANT RECORDS: no accepted records passed "
+            "the disease/task relevance gates."
+        ),
+        "failed_quality_gate": (
+            "FAILED QUALITY GATE: records were produced but none passed final "
+            "quality gates."
+        ),
+        "failed_source_relevance": (
+            "FAILED SOURCE RELEVANCE: workflow completed but source relevance "
+            "gates blocked accepted records."
+        ),
+        "failed_extraction_relevance": (
+            "FAILED EXTRACTION RELEVANCE: workflow completed but extracted "
+            "records did not pass task relevance gates."
+        ),
+        "validation_limited_no_compatible_source": (
+            "VALIDATION LIMITED: no task-compatible held-out validation source "
+            "was available."
+        ),
+    }
+    text = mapping.get(str(status), f"STATUS: {status or 'unknown'}")
+    if summary.get("validation_limited"):
+        text += (
+            " Held-out validation was limited because no task-compatible "
+            "validation source was available."
+        )
+    return text
 
 
 def _sanitize_workflow_artifact(value):
@@ -266,17 +422,10 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         llm_stage_summary = {}
     llm_stage_summary = _sanitize_workflow_artifact(llm_stage_summary)
 
-    source_credibility_summary = _read_json_file(
-        diagnostics_dir / "source_credibility_summary.json"
-    )
-    if not isinstance(source_credibility_summary, dict):
-        source_credibility_summary = (
-            workflow_summaries.get("source_credibility_summary")
-            if isinstance(workflow_summaries, dict)
-            else {}
-        )
-    source_credibility_summary = _sanitize_workflow_artifact(
-        source_credibility_summary or {}
+    source_credibility_summary = _diagnostic_summary(
+        diagnostics_dir,
+        workflow_summaries,
+        "source_credibility_summary",
     )
 
     source_credibility_assessments = _read_json_file(
@@ -288,13 +437,35 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         source_credibility_assessments
     )
 
+    disease_relevance_summary = _diagnostic_summary(
+        diagnostics_dir,
+        workflow_summaries,
+        "disease_relevance_summary",
+    )
+
     run_summary = _read_json_file(summary_path)
     if not isinstance(run_summary, dict):
         run_summary = {}
     run_summary = _sanitize_workflow_artifact(run_summary)
 
-    records = list(package.get("final_dataset") or [])
+    records = _list_or_empty(package.get("final_dataset"))
+    final_dataset_pre_quality_gate = list(
+        package.get("final_dataset_pre_quality_gate") or []
+    )
     final_dataset_post_review = list(package.get("final_dataset_post_review") or [])
+    quarantined_records = list(package.get("quarantined_records") or [])
+    pending_review_records = list(package.get("pending_review_records") or [])
+    record_inclusion_decisions = list(package.get("record_inclusion_decisions") or [])
+    run_quality_summary = (
+        package.get("run_quality_summary")
+        or _summary_value(workflow_summaries, "run_quality_summary")
+        or {}
+    )
+    final_dataset_quality_summary = (
+        package.get("final_dataset_quality_summary")
+        or _summary_value(workflow_summaries, "final_dataset_quality_summary")
+        or {}
+    )
     anomaly_results = list(package.get("anomaly_results") or [])
     human_review_application_summary = (
         package.get("human_review_application_summary")
@@ -312,21 +483,40 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         package.get("records_excluded_by_human_review") or []
     )
     review_items = list(package.get("human_review_items") or [])
-    collection_spec = {
-        "task_type": "public_health_case_and_outbreak_collection",
-        "disease": "Hantavirus disease",
-        "target_population": "human",
-        "geography": "New Mexico, United States",
-        "time_window": "2020-2026",
-        "user_request": run_summary.get("user_request")
-        or (
-            "Collect data on hantavirus from 2020 to 2026. For this workflow "
-            "run, use the New Mexico HPS source set, keep collection sources "
-            "and validation sources separated, extract cases, deaths, dates, "
-            "locations, source URLs, source types, and evidence quotes, then "
-            "route uncertain results to human review."
-        ),
-    }
+    collection_spec = _collection_spec_from_artifacts(
+        workflow_summaries,
+        run_summary,
+        package,
+    )
+    normalized_records = _read_json_file(diagnostics_dir / "normalized_records.json")
+    if not isinstance(normalized_records, list):
+        normalized_records = final_dataset_pre_quality_gate or records
+    raw_records = _read_json_file(diagnostics_dir / "raw_records.json")
+    if not isinstance(raw_records, list):
+        raw_records = normalized_records
+    validated_records = _read_json_file(diagnostics_dir / "validated_records.json")
+    if not isinstance(validated_records, list):
+        validated_records = normalized_records
+    source_search_summary = _diagnostic_summary(
+        diagnostics_dir,
+        workflow_summaries,
+        "source_search_execution_summary",
+    )
+    localized_source_planning_summary = _diagnostic_summary(
+        diagnostics_dir,
+        workflow_summaries,
+        "localized_source_planning_summary",
+    )
+    source_critic_summary = _diagnostic_summary(
+        diagnostics_dir,
+        workflow_summaries,
+        "source_critic_summary",
+    )
+    validation_source_compatibility_summary = _diagnostic_summary(
+        diagnostics_dir,
+        workflow_summaries,
+        "validation_source_compatibility_summary",
+    )
 
     return {
         "user_request": collection_spec["user_request"],
@@ -337,21 +527,24 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         "source_registry": package.get("source_registry") or [],
         "documents": live_fetch_summary.get("documents") or [],
         "evidence_chunks": _evidence_chunks_from_records(records),
-        "raw_records": records,
-        "validated_records": records,
+        "raw_records": raw_records,
+        "validated_records": validated_records,
         "rejected_records": [],
-        "normalized_records": records,
+        "normalized_records": normalized_records,
         "linked_events": package.get("linked_events") or [],
         "event_clusters": package.get("event_clusters") or [],
         "duplicate_clusters": package.get("duplicate_clusters") or [],
         "validation_cases": package.get("validation_cases") or [],
         "validation_comparisons": package.get("validation_comparisons") or [],
         "validation_results": package.get("validation_results") or [],
+        "active_validation_records": [],
+        "inactive_validation_records": [],
         "anomaly_results": anomaly_results,
         "anomaly_summary": package.get("anomaly_summary")
         or _summary_value(workflow_summaries, "anomaly_summary"),
         "validation_summary": package.get("validation_summary")
         or _summary_value(workflow_summaries, "validation_summary"),
+        "validation_source_compatibility_summary": validation_source_compatibility_summary,
         "trusted_source_validation_summary": package.get(
             "trusted_source_validation_summary"
         )
@@ -367,6 +560,12 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         "human_review_audit_trail": human_review_audit_trail,
         "human_review_application_summary": human_review_application_summary,
         "final_dataset_post_review": final_dataset_post_review,
+        "final_dataset_pre_quality_gate": final_dataset_pre_quality_gate,
+        "quarantined_records": quarantined_records,
+        "pending_review_records": pending_review_records,
+        "record_inclusion_decisions": record_inclusion_decisions,
+        "run_quality_summary": run_quality_summary,
+        "final_dataset_quality_summary": final_dataset_quality_summary,
         "records_excluded_by_human_review": records_excluded_by_human_review,
         "final_data_package": package,
         "current_route": run_summary.get("current_route")
@@ -374,21 +573,18 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         "executable_source_plan_summary": _summary_value(
             workflow_summaries, "executable_source_plan_summary"
         ),
+        "localized_source_planning_summary": localized_source_planning_summary,
         "source_planning_agent_summary": _summary_value(
             workflow_summaries, "source_planning_agent_summary"
         ),
-        "source_search_execution_summary": _summary_value(
-            workflow_summaries, "source_search_execution_summary"
-        ),
+        "source_search_execution_summary": source_search_summary,
         "source_discovery_summary": _summary_value(
             workflow_summaries, "source_discovery_summary"
         ),
         "source_screening_summary": _summary_value(
             workflow_summaries, "source_screening_summary"
         ),
-        "source_critic_summary": _summary_value(
-            workflow_summaries, "source_critic_summary"
-        ),
+        "source_critic_summary": source_critic_summary,
         "source_routing_summary": _summary_value(
             workflow_summaries, "source_routing_summary"
         ),
@@ -397,6 +593,10 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         )
         or source_credibility_summary,
         "source_credibility_assessments": source_credibility_assessments,
+        "disease_relevance_summary": _summary_value(
+            workflow_summaries, "disease_relevance_summary"
+        )
+        or disease_relevance_summary,
         "content_fetch_summary": _summary_value(
             workflow_summaries, "content_fetch_summary"
         ),
@@ -442,6 +642,14 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         "human_review_summary": _summary_value(
             workflow_summaries, "human_review_summary"
         ),
+        "run_quality_summary": _summary_value(
+            workflow_summaries, "run_quality_summary"
+        )
+        or run_quality_summary,
+        "final_dataset_quality_summary": _summary_value(
+            workflow_summaries, "final_dataset_quality_summary"
+        )
+        or final_dataset_quality_summary,
         "finalization_summary": _summary_value(
             workflow_summaries, "finalization_summary"
         ),
@@ -450,6 +658,9 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
             "document_parse_summary": document_parse_summary,
             "fetch_manifest": fetch_manifest,
             "llm_stage_summary": llm_stage_summary,
+            "disease_relevance_summary": disease_relevance_summary,
+            "run_quality_summary": run_quality_summary,
+            "final_dataset_quality_summary": final_dataset_quality_summary,
             "run_summary": run_summary,
         },
     }
@@ -734,12 +945,16 @@ def _stage_payload(result: dict) -> list[dict]:
             "state_writes": [
                 "agentic_source_plan",
                 "executable_source_plan_summary",
+                "localized_source_planning_summary",
                 "source_planning_agent_summary",
             ],
             "trace": trace.get("executable_source_planning", {}),
             "show": {
                 "executable_source_plan_summary": result.get(
                     "executable_source_plan_summary"
+                ),
+                "localized_source_planning_summary": result.get(
+                    "localized_source_planning_summary"
                 ),
                 "planned_query_sample": _sample(
                     (result.get("agentic_source_plan") or {}).get("planned_queries"),
@@ -816,7 +1031,7 @@ def _stage_payload(result: dict) -> list[dict]:
                 "fetch_manifest": _sample(result.get("fetch_manifest"), 8),
                 "documents_sample": _sample(result.get("documents"), 5),
             },
-            "takeaway": "真实产品运行中，这个节点实际访问 allowlist 中的 NMDOH/CDC URL，并记录 fetch status、HTTP status、content type 和 parse status。",
+            "takeaway": "真实产品运行中，这个节点访问当前配置允许的 source URL，并记录 fetch status、HTTP status、content type 和 parse status。",
         },
         {
             "node": "evidence_chunking_and_data_presence_flagging",
@@ -980,6 +1195,7 @@ def _report_payload(result: dict) -> dict:
     conflicts = result.get("conflicts") or []
     review_items = result.get("human_review_queue") or []
     package = result.get("final_data_package") or {}
+    collection_spec = result.get("collection_spec") or {}
     workflow_result = result.get("workflow_run_result") or {}
     live_fetch_summary = workflow_result.get("live_fetch_summary") or {}
     document_parse_summary = (
@@ -992,12 +1208,29 @@ def _report_payload(result: dict) -> dict:
     )
     llm_replay_summary = workflow_result.get("llm_replay_summary") or {}
     source_search_summary = result.get("source_search_execution_summary") or {}
+    localized_source_planning_summary = (
+        result.get("localized_source_planning_summary") or {}
+    )
+    source_critic_summary = result.get("source_critic_summary") or {}
     source_credibility_summary = result.get("source_credibility_summary") or {}
+    disease_relevance_summary = result.get("disease_relevance_summary") or {}
+    validation_source_compatibility_summary = (
+        result.get("validation_source_compatibility_summary") or {}
+    )
     anomaly_results = result.get("anomaly_results") or []
     applied_decisions = result.get("applied_human_review_decisions") or []
     rejected_decisions = result.get("rejected_human_review_decisions") or []
     audit_trail = result.get("human_review_audit_trail") or []
     final_dataset_post_review = result.get("final_dataset_post_review") or []
+    final_dataset_pre_quality_gate = result.get("final_dataset_pre_quality_gate") or []
+    quarantined_records = result.get("quarantined_records") or []
+    pending_review_records = result.get("pending_review_records") or []
+    record_inclusion_decisions = result.get("record_inclusion_decisions") or []
+    run_quality_summary = result.get("run_quality_summary") or {}
+    final_dataset_quality_summary = result.get("final_dataset_quality_summary") or {}
+    accepted_records = package.get("final_dataset") or []
+    user_status = user_facing_run_status(run_quality_summary)
+    recommended_user_message = run_quality_summary.get("recommended_user_message")
 
     evidence_links = []
     chunk_by_id = {chunk.get("chunk_id"): chunk for chunk in chunks}
@@ -1042,14 +1275,35 @@ def _report_payload(result: dict) -> dict:
             "search_derived_candidates": source_search_summary.get(
                 "candidate_from_search_count"
             ),
-            "truth_label": "Workflow run based on live NMDOH/CDC webpage fetch, source-role masking, Anthropic LLM extraction, validation comparison, and human-review routing.",
+            "truth_label": (
+                f"Current session task: {collection_spec.get('disease')} / "
+                f"{collection_spec.get('geography')} / "
+                f"{collection_spec.get('time_window')}. {user_status}"
+            ),
         },
+        "task": {
+            "collection_spec": collection_spec,
+            "disease": collection_spec.get("disease"),
+            "location": collection_spec.get("geography"),
+            "start_date": collection_spec.get("start_date"),
+            "end_date": collection_spec.get("end_date"),
+            "time_window": collection_spec.get("time_window"),
+            "user_request": collection_spec.get("user_request"),
+            "run_label": collection_spec.get("run_label"),
+            "collection_spec_status": collection_spec.get("collection_spec_status"),
+        },
+        "user_facing_run_status": user_status,
+        "recommended_user_message": recommended_user_message,
         "counts": {
             "trace_nodes": len(result.get("collection_trace") or []),
             "sources": len(result.get("source_registry") or []),
             "documents": len(result.get("documents") or []),
             "evidence_chunks": len(chunks),
             "records": len(records),
+            "accepted_records": len(accepted_records),
+            "pre_quality_records": len(final_dataset_pre_quality_gate),
+            "quarantined_records": len(quarantined_records),
+            "pending_review_records": len(pending_review_records),
             "linked_events": len(result.get("linked_events") or []),
             "event_clusters": len(result.get("event_clusters") or []),
             "duplicate_clusters": len(result.get("duplicate_clusters") or []),
@@ -1061,13 +1315,30 @@ def _report_payload(result: dict) -> dict:
             "rejected_review_decisions": len(rejected_decisions),
             "review_audit_entries": len(audit_trail),
             "final_dataset_post_review": len(final_dataset_post_review),
+            "rejected_incompatible_records": disease_relevance_summary.get(
+                "rejected_incompatible_record_count", 0
+            ),
         },
         "route": result.get("current_route"),
+        "source_search": source_search_summary,
+        "localized_source_planning": localized_source_planning_summary,
+        "source_critic": source_critic_summary,
         "source_credibility": {
             "summary": source_credibility_summary,
             "assessment_sample": _sample(
                 result.get("source_credibility_assessments"), 6
             ),
+        },
+        "disease_relevance": disease_relevance_summary,
+        "run_quality": {
+            "summary": run_quality_summary,
+            "final_dataset_quality_summary": final_dataset_quality_summary,
+            "record_inclusion_decisions_sample": _sample(
+                record_inclusion_decisions, 10
+            ),
+            "quarantined_records_sample": _sample(quarantined_records, 8),
+            "pending_review_records_sample": _sample(pending_review_records, 8),
+            "pre_quality_records_sample": _sample(final_dataset_pre_quality_gate, 8),
         },
         "fetch_parse": {
             "live_fetch_summary": live_fetch_summary,
@@ -1076,6 +1347,7 @@ def _report_payload(result: dict) -> dict:
         },
         "stages": _stage_payload(result),
         "validation": {
+            "validation_source_compatibility_summary": validation_source_compatibility_summary,
             "validation_summary": result.get("validation_summary") or {},
             "trusted_source_validation_summary": result.get(
                 "trusted_source_validation_summary"
@@ -1114,6 +1386,20 @@ def _report_payload(result: dict) -> dict:
             "synthetic_notice": package.get("synthetic_fixture_notice"),
             "live_fetch_enabled": live_fetch_summary.get("live_fetch_enabled"),
             "llm_call_succeeded": llm_replay_summary.get("llm_call_succeeded"),
+        },
+        "key_artifact_paths": {
+            "collection/final_dataset.csv": "collection/final_dataset.csv",
+            "collection/final_dataset_pre_quality_gate.csv": "collection/final_dataset_pre_quality_gate.csv",
+            "collection/quarantined_records.csv": "collection/quarantined_records.csv",
+            "collection/pending_review_records.csv": "collection/pending_review_records.csv",
+            "collection/final_dataset_post_review.csv": "collection/final_dataset_post_review.csv",
+            "collection/record_inclusion_decisions.json": "collection/record_inclusion_decisions.json",
+            "diagnostics/run_quality_summary.json": "diagnostics/run_quality_summary.json",
+            "diagnostics/final_dataset_quality_summary.json": "diagnostics/final_dataset_quality_summary.json",
+            "diagnostics/source_critic_summary.json": "diagnostics/source_critic_summary.json",
+            "diagnostics/disease_relevance_summary.json": "diagnostics/disease_relevance_summary.json",
+            "diagnostics/validation_source_compatibility_summary.json": "diagnostics/validation_source_compatibility_summary.json",
+            "diagnostics/workflow_summaries.json": "diagnostics/workflow_summaries.json",
         },
     }
 
@@ -1418,16 +1704,21 @@ def _build_html(result: dict) -> str:
       <div>
         <h2>Workflow run controls</h2>
         <div class="mode">
-          <div class="mode-item true"><strong>Live web collection</strong><span>由 <code>configs/hdc_workflow_run_config.jsonc</code> 控制真实 NMDOH/CDC 网页抓取。</span></div>
-          <div class="mode-item true"><strong>All three LLM stages</strong><span>同一份 config 控制 provider/model，以及 source planning、source critic 和 structured extraction。</span></div>
-          <div class="mode-item true"><strong>Workflow inspection</strong><span>通过节点 trace 查看串行 state pipeline 和条件路由。</span></div>
+          <div class="mode-item true"><strong>Configured run</strong><span>Runtime mode, live search/fetch, and LLM stages are read from current session artifacts.</span></div>
+          <div class="mode-item true"><strong>PublicHealthRecord output</strong><span>Structured extraction produces generic public-health records; accepted output is quality-gated.</span></div>
+          <div class="mode-item true"><strong>Workflow inspection</strong><span>Node trace, state artifacts, and conditional routing are inspectable for this run.</span></div>
         </div>
-        <p class="note" style="margin-top:12px;">现场演示顺序是：配置 API，输入任务，运行真实网页 collection，查看 workflow 节点，调用 LLM extraction，最后打开 records、validation comparison 和 human review outputs。</p>
+        <p class="note" style="margin-top:12px;">This console is rebuilt from the selected run folder and should describe the current task, counts, validation compatibility, and run-quality result.</p>
       </div>
     </section>
 
     <section class="band">
-      <h2>2. How the workflow run is inspected</h2>
+      <h2>2. Run quality gate and current task</h2>
+      <div id="statusPanel"></div>
+    </section>
+
+    <section class="band">
+      <h2>3. How the workflow run is inspected</h2>
       <div class="official">
         <article>
           <h3>Runnable workflow</h3>
@@ -1475,7 +1766,37 @@ def _build_html(result: dict) -> str:
     </section>
 
     <section class="band">
-      <h2>5. 证据链：文本证据如何变成结构化 records</h2>
+      <h2>5. Final dataset views</h2>
+      <div id="datasetViews"></div>
+    </section>
+
+    <section class="band">
+      <h2>6. Source critic and fetch blocking</h2>
+      <div id="sourceCriticPanel"></div>
+    </section>
+
+    <section class="band">
+      <h2>7. Disease relevance gates</h2>
+      <div id="diseaseRelevancePanel"></div>
+    </section>
+
+    <section class="band">
+      <h2>8. Validation source compatibility</h2>
+      <div id="validationCompatibilityPanel"></div>
+    </section>
+
+    <section class="band">
+      <h2>9. Localized source planning</h2>
+      <div id="localizedPlanningPanel"></div>
+    </section>
+
+    <section class="band">
+      <h2>10. Artifact paths</h2>
+      <div id="artifactPanel"></div>
+    </section>
+
+    <section class="band">
+      <h2>11. 证据链：文本证据如何变成结构化 records</h2>
       <div class="evidence-grid" id="evidenceGrid"></div>
     </section>
 
@@ -1495,18 +1816,18 @@ def _build_html(result: dict) -> str:
         <div>
           <h3>操作流程</h3>
           <ol>
-            <li>打开 workflow runtime profile：<code>configs/hdc_workflow_run_config.jsonc</code></li>
-            <li>输入任务：采集 New Mexico 2024-2026 HPS case/death data，并保留 validation source 做 held-out comparison。</li>
+            <li>Open or generate a runtime profile for the intended disease, location, and time window.</li>
+            <li>Submit the task request shown in this session's task panel.</li>
             <li>启动 Studio：<code>python scripts/start_hdc_workflow_studio.py</code></li>
             <li>查看 workflow 节点顺序：主流程是串行 state pipeline，<code>quality_gate_routing</code> 是关键条件分支。</li>
             <li>同配置导出可读报告和本页 console：<code>python scripts/run_hdc_workflow_configured.py</code></li>
-            <li>打开输出：<code>final_dataset.csv</code>、<code>normalized_records.csv</code>、<code>evaluation_report.csv</code>。</li>
+            <li>Open the dataset views and diagnostics listed above.</li>
           </ol>
         </div>
         <div>
           <h3>现场说明</h3>
-          <p>本环节展示产品如何从用户任务进入真实网页抓取，再进入 LLM extraction 和 validation comparison。workflow 主体是串行执行；当质量门发现冲突、不可比或缺失 validation 时，条件边会路由到 human-in-the-loop。</p>
-          <p class="muted">当前成功产品运行：live collection 产生 5 条 collection records；LLM extraction 成功产生 2 条 normalized records；2025 annual case count 与 held-out validation source 匹配，death count 不可比，2026 first case 缺少 validation record。</p>
+          <p>This view separates technical completion from accepted data success. A run can complete while producing zero accepted quality-gated records, and that status is shown explicitly above.</p>
+          <p class="muted">Regenerate this console after each run so status, counts, validation compatibility, and artifact links match the selected session.</p>
         </div>
       </div>
     </section>
@@ -1526,9 +1847,76 @@ def _build_html(result: dict) -> str:
       return esc(JSON.stringify(value, null, 2));
     }}
     function highlight(text) {{
-      return esc(text)
-        .replace(/(7|3|1)(?= cases| case| deaths| death)/g, "<mark>$1</mark>")
-        .replace(/(New Mexico|Santa Fe County|2025|2026)/g, "<mark>$1</mark>");
+      const escaped = esc(text);
+      function escapeRegExpTerm(value) {{
+        const slash = String.fromCharCode(92);
+        const specials = [slash, ".", "*", "+", "?", "^", "$", "{{", "}}", "(", ")", "|", "[", "]"];
+        let out = String(value);
+        specials.forEach(ch => {{
+          out = out.split(ch).join(slash + ch);
+        }});
+        return out;
+      }}
+      const terms = [RUN.task?.location, RUN.task?.disease, RUN.task?.start_date, RUN.task?.end_date]
+        .filter(Boolean)
+        .map(escapeRegExpTerm);
+      if (!terms.length) return escaped;
+      return escaped.replace(new RegExp(`(${{terms.join("|")}})`, "gi"), "<mark>$1</mark>");
+    }}
+    function renderStatusPanel() {{
+      const task = RUN.task || {{}};
+      const quality = RUN.run_quality?.summary || {{}};
+      document.getElementById("statusPanel").innerHTML = `
+        <div class="grid-2">
+          <article class="note">
+            <h3>${{esc(RUN.user_facing_run_status)}}</h3>
+            <p>${{esc(RUN.recommended_user_message || quality.recommended_user_message || "")}}</p>
+            <p><strong>run_quality_status:</strong> <code>${{esc(quality.run_quality_status)}}</code></p>
+            <p><strong>final_dataset_mode:</strong> <code>${{esc(quality.final_dataset_mode)}}</code></p>
+          </article>
+          <article class="artifact">
+            <h4>Current task</h4>
+            <pre>${{pretty(task)}}</pre>
+          </article>
+        </div>
+      `;
+    }}
+    function renderDatasetViews() {{
+      const counts = RUN.counts || {{}};
+      const quality = RUN.run_quality?.summary || {{}};
+      const datasetCounts = [
+        ["Accepted final_dataset", counts.accepted_records],
+        ["Pre-quality-gate records", counts.pre_quality_records],
+        ["Quarantined records", counts.quarantined_records],
+        ["Pending-review records", counts.pending_review_records],
+        ["Post-review records", counts.final_dataset_post_review],
+        ["Normalized records", counts.records],
+      ];
+      document.getElementById("datasetViews").innerHTML = `
+        <div class="metrics">
+          ${{datasetCounts.map(([label, value]) => `<div class="metric"><span>${{esc(label)}}</span><strong>${{esc(value)}}</strong></div>`).join("")}}
+        </div>
+        <div class="artifact-grid" style="margin-top:12px;">
+          <div class="artifact"><h4>Run quality summary</h4><pre>${{pretty(quality)}}</pre></div>
+          <div class="artifact"><h4>Final dataset quality summary</h4><pre>${{pretty(RUN.run_quality?.final_dataset_quality_summary || {{}})}}</pre></div>
+          <div class="artifact"><h4>Quarantined records sample</h4><pre>${{pretty(RUN.run_quality?.quarantined_records_sample || [])}}</pre></div>
+          <div class="artifact"><h4>Record inclusion decisions sample</h4><pre>${{pretty(RUN.run_quality?.record_inclusion_decisions_sample || [])}}</pre></div>
+        </div>
+      `;
+    }}
+    function renderSummaryPanel(id, value) {{
+      document.getElementById(id).innerHTML = `<pre>${{pretty(value || {{}})}}</pre>`;
+    }}
+    function renderArtifactPanel() {{
+      const paths = RUN.key_artifact_paths || {{}};
+      document.getElementById("artifactPanel").innerHTML = `
+        <table>
+          <thead><tr><th>Artifact</th><th>Relative path</th></tr></thead>
+          <tbody>
+            ${{Object.entries(paths).map(([label, value]) => `<tr><td>${{esc(label)}}</td><td><code>${{esc(value)}}</code></td></tr>`).join("")}}
+          </tbody>
+        </table>
+      `;
     }}
     function renderMetrics() {{
       const labels = [
@@ -1536,7 +1924,11 @@ def _build_html(result: dict) -> str:
         ["sources", "Sources"],
         ["documents", "Documents"],
         ["evidence_chunks", "Evidence chunks"],
-        ["records", "Records"],
+        ["accepted_records", "Accepted records"],
+        ["records", "Normalized records"],
+        ["pre_quality_records", "Pre-quality records"],
+        ["quarantined_records", "Quarantined"],
+        ["pending_review_records", "Pending review"],
         ["linked_events", "Linked events"],
         ["event_clusters", "Event clusters"],
         ["duplicate_clusters", "Duplicate clusters"],
@@ -1546,10 +1938,13 @@ def _build_html(result: dict) -> str:
         ["human_review_items", "Review items"],
         ["applied_review_decisions", "Applied review decisions"],
         ["final_dataset_post_review", "Post-review records"],
+        ["rejected_incompatible_records", "Disease-mismatch rejected records"],
       ];
       document.getElementById("metrics").innerHTML = labels.map(([key, label]) => `
         <div class="metric"><span>${{label}}</span><strong>${{esc(RUN.counts[key])}}</strong></div>
-      `).join("") + `<div class="metric"><span>Route</span><strong>${{esc(RUN.route)}}</strong></div>`;
+      `).join("")
+        + `<div class="metric"><span>Run quality</span><strong>${{esc(RUN.run_quality?.summary?.run_quality_status)}}</strong></div>`
+        + `<div class="metric"><span>Route</span><strong>${{esc(RUN.route)}}</strong></div>`;
     }}
     function renderStageList() {{
       document.getElementById("stageList").innerHTML = RUN.stages.map((stage, idx) => `
@@ -1600,6 +1995,15 @@ def _build_html(result: dict) -> str:
       document.getElementById("tabTrace").style.display = state.tab === "trace" ? "" : "none";
     }}
     function renderEvidence() {{
+      if (!RUN.evidence_links.length) {{
+        document.getElementById("evidenceGrid").innerHTML = `
+          <article class="note">
+            <h3>No accepted evidence-linked records in this run.</h3>
+            <p>The workflow may still have completed technically. Check the run quality gate, quarantined records, source critic, and disease relevance panels above.</p>
+          </article>
+        `;
+        return;
+      }}
       document.getElementById("evidenceGrid").innerHTML = RUN.evidence_links.map(item => `
         <article class="evidence-card">
           <h3>${{esc(item.publisher)}} · ${{esc(item.source_id)}}</h3>
@@ -1651,6 +2055,13 @@ def _build_html(result: dict) -> str:
         </article>
       `;
     }}
+    renderStatusPanel();
+    renderDatasetViews();
+    renderSummaryPanel("sourceCriticPanel", RUN.source_critic);
+    renderSummaryPanel("diseaseRelevancePanel", RUN.disease_relevance);
+    renderSummaryPanel("validationCompatibilityPanel", RUN.validation?.validation_source_compatibility_summary || {{}});
+    renderSummaryPanel("localizedPlanningPanel", RUN.localized_source_planning);
+    renderArtifactPanel();
     renderMetrics();
     renderStageList();
     renderStageDetail();
@@ -1916,7 +2327,7 @@ def _build_static_html(result: dict) -> str:
         <span class="pill">Human review</span><span class="arrow">→</span>
         <span class="pill">Final package</span>
       </div>
-      <p class="muted">technical workshop 主线使用真实 NMDOH/CDC 网页 collection 和 Anthropic LLM extraction；节点视图用于解释 state 如何沿串行 workflow 累积，以及质量门如何把不可比或冲突结果送入人工审核。</p>
+      <p class="muted">technical workshop 主线使用当前配置的真实网页 collection 和可选 LLM extraction；节点视图用于解释 state 如何沿串行 workflow 累积，以及质量门如何把不可比或冲突结果送入人工审核。</p>
     </section>
 
     <section class="band">
@@ -2015,48 +2426,125 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
     summary_path = output_dir / "hdc_workflow_console_summary.json"
 
     html_path.write_text(_build_html(result), encoding="utf-8")
+    report_payload = _report_payload(result)
     workflow_run_result = result.get("workflow_run_result") or {}
     llm_stage_summary = workflow_run_result.get("llm_stage_summary") or {}
     structured_llm = llm_stage_summary.get("structured_extraction") or {}
     source_planning = llm_stage_summary.get("source_planning") or {}
     source_critic = llm_stage_summary.get("source_critic") or {}
     legacy_llm_replay = workflow_run_result.get("llm_replay_summary") or {}
-    live_fetch_summary = workflow_run_result.get("live_fetch_summary", {})
+    live_fetch_summary = (
+        report_payload.get("fetch_parse", {}).get("live_fetch_summary")
+        or workflow_run_result.get("live_fetch_summary", {})
+        or {}
+    )
     document_parse_summary = (
-        result.get("document_parse_summary")
+        report_payload.get("fetch_parse", {}).get("document_parse_summary")
+        or result.get("document_parse_summary")
         or workflow_run_result.get("document_parse_summary")
         or {}
     )
     fetch_manifest = (
-        result.get("fetch_manifest") or workflow_run_result.get("fetch_manifest") or []
+        report_payload.get("fetch_parse", {}).get("fetch_manifest_sample")
+        or result.get("fetch_manifest")
+        or workflow_run_result.get("fetch_manifest")
+        or []
     )
     live_fetch_enabled = live_fetch_summary.get("live_fetch_enabled")
     if live_fetch_enabled is None and data_source == "workflow_run_artifacts":
         live_fetch_enabled = bool(result.get("documents"))
-    source_credibility_summary = result.get("source_credibility_summary") or {}
+    counts = report_payload.get("counts") or {}
+    task = report_payload.get("task") or {}
+    collection_spec = task.get("collection_spec") or {}
+    source_search_summary = report_payload.get("source_search") or {}
+    localized_source_planning_summary = (
+        report_payload.get("localized_source_planning") or {}
+    )
+    source_critic_summary = report_payload.get("source_critic") or {}
+    source_credibility_summary = (
+        report_payload.get("source_credibility", {}).get("summary") or {}
+    )
+    disease_relevance_summary = report_payload.get("disease_relevance") or {}
+    validation_source_compatibility_summary = (
+        report_payload.get("validation", {}).get(
+            "validation_source_compatibility_summary"
+        )
+        or {}
+    )
+    run_quality_summary = report_payload.get("run_quality", {}).get("summary") or {}
+    final_dataset_quality_summary = (
+        report_payload.get("run_quality", {}).get("final_dataset_quality_summary")
+        or {}
+    )
+    key_artifact_paths = report_payload.get("key_artifact_paths") or {}
     summary = {
         "html_path": str(html_path),
         "summary_path": str(summary_path),
         "run_output_dir": str(run_output_dir or _latest_session_dir(_DEFAULT_WORKFLOW_RUN_ROOT)),
         "data_source": data_source,
+        "session_id": workflow_run_result.get("session_id")
+        or Path(run_output_dir).name
+        if run_output_dir
+        else None,
+        "task_disease": task.get("disease"),
+        "task_location": task.get("location"),
+        "task_start_date": task.get("start_date"),
+        "task_end_date": task.get("end_date"),
+        "task_time_window": task.get("time_window"),
+        "task_user_request": task.get("user_request"),
+        "collection_spec": collection_spec,
+        "collection_spec_status": task.get("collection_spec_status"),
+        "user_facing_run_status": report_payload.get("user_facing_run_status"),
+        "recommended_user_message": report_payload.get("recommended_user_message"),
         "counts": {
-            "trace_nodes": len(result.get("collection_trace") or []),
+            "trace_nodes": counts.get("trace_nodes", len(result.get("collection_trace") or [])),
             "source_registry": _count(result, "source_registry"),
-            "documents": _count(result, "documents"),
-            "evidence_chunks": _count(result, "evidence_chunks"),
-            "normalized_records": _count(result, "normalized_records"),
-            "linked_events": _count(result, "linked_events"),
-            "event_clusters": _count(result, "event_clusters"),
-            "duplicate_clusters": _count(result, "duplicate_clusters"),
-            "validation_results": _count(result, "validation_results"),
-            "conflicts": _count(result, "conflicts"),
-            "human_review_items": _count(result, "human_review_queue"),
+            "documents": counts.get("documents", _count(result, "documents")),
+            "evidence_chunks": counts.get(
+                "evidence_chunks", _count(result, "evidence_chunks")
+            ),
+            "normalized_records": counts.get(
+                "records", _count(result, "normalized_records")
+            ),
+            "accepted_records": counts.get("accepted_records", 0),
+            "pre_quality_records": counts.get("pre_quality_records", 0),
+            "quarantined_records": counts.get("quarantined_records", 0),
+            "pending_review_records": counts.get("pending_review_records", 0),
+            "final_dataset_post_review": counts.get("final_dataset_post_review", 0),
+            "linked_events": counts.get("linked_events", _count(result, "linked_events")),
+            "event_clusters": counts.get("event_clusters", _count(result, "event_clusters")),
+            "duplicate_clusters": counts.get(
+                "duplicate_clusters", _count(result, "duplicate_clusters")
+            ),
+            "validation_results": counts.get(
+                "validation_results", _count(result, "validation_results")
+            ),
+            "conflicts": counts.get("conflicts", _count(result, "conflicts")),
+            "human_review_items": counts.get(
+                "human_review_items", _count(result, "human_review_queue")
+            ),
+            "rejected_incompatible_records": disease_relevance_summary.get(
+                "rejected_incompatible_record_count", 0
+            ),
         },
+        "accepted_record_count": counts.get("accepted_records", 0),
+        "pre_quality_record_count": counts.get("pre_quality_records", 0),
+        "quarantined_record_count": counts.get("quarantined_records", 0),
+        "pending_review_record_count": counts.get("pending_review_records", 0),
+        "post_review_record_count": counts.get("final_dataset_post_review", 0),
         "current_route": result.get("current_route"),
         "contains_synthetic_data": _contains_synthetic_data(
             result.get("final_data_package") or {}
         ),
         "live_fetch_enabled": live_fetch_enabled,
+        "live_search_enabled": bool(
+            source_search_summary.get("live_search_enabled")
+            if "live_search_enabled" in source_search_summary
+            else source_search_summary.get("search_enabled")
+        ),
+        "source_search_execution_summary": source_search_summary,
+        "localized_source_planning_summary": localized_source_planning_summary,
+        "source_critic_summary": source_critic_summary,
         "selected_search_derived_fetch_count": live_fetch_summary.get(
             "selected_search_derived_fetch_count"
         ),
@@ -2073,6 +2561,9 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
         "llm_source_critic_assessed_source_count": source_critic.get(
             "assessed_source_count"
         ),
+        "llm_source_critic_blocked_fetch_count": source_critic.get(
+            "blocked_fetch_count", 0
+        ),
         "llm_call_succeeded": bool(
             structured_llm.get("success_count")
             or legacy_llm_replay.get("llm_call_succeeded")
@@ -2088,6 +2579,14 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
         "source_credibility_needs_review_count": source_credibility_summary.get(
             "needs_review_count"
         ),
+        "disease_relevance_summary": disease_relevance_summary,
+        "validation_source_compatibility_summary": (
+            validation_source_compatibility_summary
+        ),
+        "run_quality_status": run_quality_summary.get("run_quality_status"),
+        "run_quality_summary": run_quality_summary,
+        "final_dataset_quality_summary": final_dataset_quality_summary,
+        "key_artifact_paths": key_artifact_paths,
     }
     summary_path.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"

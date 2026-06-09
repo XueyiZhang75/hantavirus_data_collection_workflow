@@ -12,6 +12,14 @@ import re
 from collections import Counter
 
 from ..config import load_record_normalization_policy
+from ..disease_relevance import (
+    AMBIGUOUS_DISEASE,
+    INSUFFICIENT_TEXT,
+    assess_record_disease_compatibility,
+    build_disease_relevance_context,
+    record_compatibility_fields,
+    update_disease_relevance_summary,
+)
 from ..models import (
     HantavirusRecord,
     HumanReviewItem,
@@ -649,10 +657,12 @@ def record_normalization(state: DataCollectionState) -> dict:
 
     policy = RecordNormalizationPolicy(**load_record_normalization_policy())
     validated_records = list(state.get("validated_records") or [])
+    disease_context = build_disease_relevance_context(state)
     existing_queue = list(state.get("human_review_queue") or [])
     existing_review_ids = {item.get("review_id") for item in existing_queue}
 
     normalized_records: list[dict] = []
+    disease_mismatch_records: list[dict] = []
     new_review_items: list[HumanReviewItem] = []
 
     status_counter: Counter = Counter()
@@ -669,6 +679,8 @@ def record_normalization(state: DataCollectionState) -> dict:
     extraction_method_counter: Counter = Counter()
     generic_record_count = 0
     legacy_hantavirus_record_count = 0
+    disease_mismatch_quarantined_record_count = 0
+    disease_uncertain_review_record_count = 0
 
     country_action_set = {
         "normalized_country_alias",
@@ -681,7 +693,45 @@ def record_normalization(state: DataCollectionState) -> dict:
     source_type_warning_set = {"missing_source_type", "unrecognized_source_type"}
 
     for record in validated_records:
-        normalized, result = _normalize_record(record, policy)
+        compatibility = assess_record_disease_compatibility(
+            record,
+            disease_context,
+        )
+        compatibility_fields = record_compatibility_fields(compatibility)
+        if compatibility.get("reject_record"):
+            quarantined = dict(record)
+            quarantined.update(compatibility_fields)
+            quarantined["normalization_status"] = "quarantined_disease_mismatch"
+            warnings = list(quarantined.get("normalization_warnings") or [])
+            if "disease_mismatch_quarantined_before_normalization" not in warnings:
+                warnings.append("disease_mismatch_quarantined_before_normalization")
+            quarantined["normalization_warnings"] = warnings
+            disease_mismatch_records.append(quarantined)
+            disease_mismatch_quarantined_record_count += 1
+            review_id = f"review_disease_mismatch_{record.get('record_id', '')}"
+            if review_id and review_id not in existing_review_ids:
+                new_review_items.append(
+                    HumanReviewItem(
+                        review_id=review_id,
+                        item_type="record_disease_relevance",
+                        related_ids=[record.get("record_id", "")],
+                        reason=compatibility.get("reason")
+                        or "Record disease compatibility failed before normalization.",
+                        status="pending",
+                    )
+                )
+                existing_review_ids.add(review_id)
+            continue
+        record_for_normalization = dict(record)
+        record_for_normalization.update(compatibility_fields)
+        if compatibility.get("status") in {AMBIGUOUS_DISEASE, INSUFFICIENT_TEXT}:
+            warnings = list(record_for_normalization.get("normalization_warnings") or [])
+            if "disease_relevance_uncertain_before_normalization" not in warnings:
+                warnings.append("disease_relevance_uncertain_before_normalization")
+            record_for_normalization["normalization_warnings"] = warnings
+            record_for_normalization["requires_human_review"] = True
+            disease_uncertain_review_record_count += 1
+        normalized, result = _normalize_record(record_for_normalization, policy)
         normalized_records.append(normalized)
         disease_counter[normalized.get("disease") or "unknown"] += 1
         source_type_counter[normalized.get("source_type") or "unknown"] += 1
@@ -755,6 +805,10 @@ def record_normalization(state: DataCollectionState) -> dict:
         "review_required_record_count": needs_review_count,
         "unsupported_target_field_count": 0,
         "warnings": dict(warning_counter),
+        "disease_mismatch_quarantined_record_count": (
+            disease_mismatch_quarantined_record_count
+        ),
+        "disease_uncertain_review_record_count": disease_uncertain_review_record_count,
     }
 
     trace = append_trace(
@@ -768,7 +822,19 @@ def record_normalization(state: DataCollectionState) -> dict:
     )
     return {
         "normalized_records": normalized_records,
+        "disease_mismatch_records": disease_mismatch_records,
         "human_review_queue": human_review_queue,
         "record_normalization_summary": summary,
+        "disease_relevance_summary": update_disease_relevance_summary(
+            {
+                **state,
+                "normalized_records": normalized_records,
+                "rejected_records": list(state.get("rejected_records") or [])
+                + disease_mismatch_records,
+            },
+            disease_mismatch_quarantined_record_count=(
+                disease_mismatch_quarantined_record_count
+            ),
+        ),
         "collection_trace": trace,
     }
