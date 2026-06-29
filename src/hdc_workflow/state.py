@@ -18,25 +18,42 @@ class DataCollectionState(TypedDict, total=False):
     collection_schema: dict | None
     source_strategy: dict | None
     screening_criteria: dict | None
+    task_acceptance_contract: dict | None
+    task_evidence_contract: dict | None
     profile_schema_summary: dict | None
     search_queries: dict | None
     search_query_inventory: list[dict]
+    evidence_strategy_plan: dict | None
     agentic_source_plan: dict | None
     executable_source_plan_summary: dict | None
     localized_source_planning_summary: dict | None
     source_planning_agent_summary: dict | None
     source_candidates: list[dict]
+    official_coverage_candidates: list[dict]
     source_search_results: list[dict]
     source_search_execution_summary: dict | None
     source_discovery_summary: dict | None
+    iterative_source_discovery_summary: dict | None
+    search_iteration_plans: list[dict]
+    search_iteration_observations: list[dict]
+    search_refinement_decisions: list[dict]
+    iterative_search_queries: list[dict]
     source_registry: list[dict]
     source_registry_summary: dict | None
     source_screening_summary: dict | None
+    source_triage_results: list[dict]
     source_critic_summary: dict | None
     source_critic_results: list[dict]
     source_routing_summary: dict | None
     source_credibility_assessments: list[dict]
     source_credibility_summary: dict | None
+    source_identity_assessments: list[dict]
+    source_identity_summary: dict | None
+    source_coverage_requirements: list[dict]
+    source_coverage_audit: dict | None
+    target_official_fetch_plan: list[dict]
+    must_fetch_sources: list[dict]
+    fetch_failures_blocking: list[dict]
     disease_relevance_summary: dict | None
     content_fetch_requests: list[dict]
     content_fetch_summary: dict | None
@@ -48,9 +65,16 @@ class DataCollectionState(TypedDict, total=False):
     evidence_chunks: list[dict]
     evidence_chunking_summary: dict | None
     data_presence_summary: dict | None
+    chunk_relevance_assessments: list[dict]
     raw_records: list[dict]
     structured_extraction_summary: dict | None
     llm_extraction_summary: dict | None
+    record_task_fit_assessments: list[dict]
+    metric_extraction_plan: dict | None
+    metric_row_extraction_audit: list[dict]
+    official_extraction_queue: list[dict]
+    official_extraction_failures: list[dict]
+    extraction_budget_by_source: dict | None
     validated_records: list[dict]
     rejected_records: list[dict]
     schema_validation_summary: dict | None
@@ -72,12 +96,17 @@ class DataCollectionState(TypedDict, total=False):
     validation_summary: dict | None
     trusted_source_validation_summary: dict | None
     cross_source_validation_summary: dict | None
+    claims: list[dict]
+    claim_comparisons: list[dict]
+    corroborated_events: list[dict]
+    corroboration_summary: dict | None
     anomaly_results: list[dict]
     anomaly_summary: dict | None
     anomaly_review_items: list[dict]
     conflicts: list[dict]
     cross_source_consistency_summary: dict | None
     human_review_queue: list[dict]
+    human_review_enabled: bool | None
     human_review_decisions: list[dict]
     human_review_decisions_path: str | None
     applied_human_review_decisions: list[dict]
@@ -87,9 +116,25 @@ class DataCollectionState(TypedDict, total=False):
     final_dataset_pre_quality_gate: list[dict]
     quarantined_records: list[dict]
     pending_review_records: list[dict]
+    non_primary_observations: list[dict]
+    final_case_dataset: list[dict]
+    probable_case_dataset: list[dict]
+    suspected_case_dataset: list[dict]
+    unspecified_case_dataset: list[dict]
+    death_dataset: list[dict]
+    hospitalization_dataset: list[dict]
+    zero_case_statements: list[dict]
+    exposure_monitoring_records: list[dict]
+    surveillance_summary_records: list[dict]
+    outbreak_summary_records: list[dict]
+    context_records: list[dict]
+    unclassified_observation_records: list[dict]
+    observation_type_dataset_summary: dict | None
     record_inclusion_decisions: list[dict]
     run_quality_summary: dict | None
     final_dataset_quality_summary: dict | None
+    direct_collection_summary: dict | None
+    collection_decision_summary: dict | None
     final_dataset_post_review: list[dict]
     records_excluded_by_human_review: list[dict]
     human_review_summary: dict | None

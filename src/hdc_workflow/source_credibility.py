@@ -80,12 +80,18 @@ class SourceCredibilityRuntime:
     assessed_count: int = 0
     failure_count: int = 0
     skipped_count: int = 0
+    skipped_reason_counts: Counter | None = None
     warnings: list[str] | None = None
 
     def warning_list(self) -> list[str]:
         if self.warnings is None:
             self.warnings = []
         return self.warnings
+
+    def skipped_reasons(self) -> Counter:
+        if self.skipped_reason_counts is None:
+            self.skipped_reason_counts = Counter()
+        return self.skipped_reason_counts
 
 
 def _parse_csv_env(name: str) -> set[str] | None:
@@ -615,6 +621,46 @@ def _should_call_llm(entry: dict, runtime: SourceCredibilityRuntime) -> bool:
     return True
 
 
+def _collection_mode_from_state(state: DataCollectionState | dict) -> str:
+    structured = state.get("structured_task") or {}
+    collection = state.get("collection_spec") or {}
+    workflow = state.get("workflow") or {}
+    return str(
+        structured.get("collection_mode")
+        or collection.get("collection_mode")
+        or workflow.get("collection_mode")
+        or state.get("collection_mode")
+        or ""
+    ).strip()
+
+
+def _is_direct_verified_target_source(entry: dict, state: DataCollectionState | dict) -> bool:
+    if _collection_mode_from_state(state) != "direct_collection":
+        return False
+    if entry.get("must_fetch") is True:
+        return True
+    if str(entry.get("target_fit_status") or "").lower() in {
+        "verified_target_collection",
+        "verified_target_source",
+    }:
+        return True
+    if str(entry.get("triage_role") or "").lower() == "verified_target_collection":
+        return True
+    return bool(entry.get("coverage_requirement_ids"))
+
+
+def _direct_verified_target_fast_path_active(state: DataCollectionState | dict) -> bool:
+    if _collection_mode_from_state(state) != "direct_collection":
+        return False
+    for entry in state.get("source_registry") or []:
+        if isinstance(entry, dict) and _is_direct_verified_target_source(entry, state):
+            return True
+    for entry in state.get("must_fetch_sources") or []:
+        if isinstance(entry, dict) and _is_direct_verified_target_source(entry, state):
+            return True
+    return False
+
+
 def _apply_llm_advisory(
     entry: dict,
     state: DataCollectionState,
@@ -767,7 +813,24 @@ def apply_source_credibility_assessment(
         "llm_error_type": None,
         "warnings": warnings,
     }
-    assessment = _apply_llm_advisory(entry, state, assessment, runtime)
+    if runtime.llm_enabled and (
+        _is_direct_verified_target_source(entry, state)
+        or _direct_verified_target_fast_path_active(state)
+    ):
+        reason = "direct_target_official_fast_path_skips_source_credibility"
+        runtime.skipped_count += 1
+        runtime.skipped_reasons()[reason] += 1
+        warnings = list(assessment.get("warnings") or [])
+        if reason not in warnings:
+            warnings.append(reason)
+        assessment.update(
+            {
+                "warnings": warnings,
+                "source_credibility_llm_skipped_reason": reason,
+            }
+        )
+    else:
+        assessment = _apply_llm_advisory(entry, state, assessment, runtime)
     # Keep deterministic final role as the policy boundary, but allow LLM review
     # to add human-review risk.
     human_review = bool(assessment.get("human_review_recommended"))
@@ -854,6 +917,7 @@ def build_source_credibility_summary(
         "llm_assessed_count": runtime.assessed_count,
         "llm_failure_count": runtime.failure_count,
         "llm_skipped_count": runtime.skipped_count,
+        "llm_skipped_reason_counts": dict(runtime.skipped_reasons()),
         "risk_flag_counts": dict(risk_counter),
         "source_disease_relevance_status_counts": dict(disease_status_counter),
         "warnings": runtime.warning_list(),

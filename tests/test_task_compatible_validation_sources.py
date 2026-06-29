@@ -317,6 +317,45 @@ def test_graph_validation_uses_active_validation_records_only():
     assert "val_hps_nm" not in right_ids
 
 
+def test_live_cross_source_uses_live_validation_role_records_without_held_out_file():
+    collection = _record(
+        "rec_live_collection",
+        source_id="src_live_collection",
+        source_role_final="collection",
+        cases_unspecified=100,
+    )
+    live_validation = _record(
+        "rec_live_validation",
+        source_id="src_live_validation",
+        source_role_final="validation",
+        cases_unspecified=100,
+        evidence_quote=(
+            "Independent official validation source reports 100 COVID-19 "
+            "cases in New York in 2024."
+        ),
+    )
+    state = _linked_validation_state(
+        [collection, live_validation],
+        [],
+        task=_task("COVID-19", "New York", "2024", "2024"),
+    )
+    state["validation_mode"] = "live_cross_source"
+
+    result = cross_source_consistency_check(state)
+    summary = result["validation_source_compatibility_summary"]
+
+    assert summary["validation_mode"] == "live_cross_source"
+    assert summary["validation_records_path"] is None
+    assert summary["validation_records_source"] == "live_fetched_records"
+    assert summary["active_validation_record_count"] == 1
+    assert result["active_validation_records"][0]["record_id"] == "rec_live_validation"
+    assert any(
+        item.get("validation_type") == "trusted_source_comparison"
+        and item.get("match_status") == "matched"
+        for item in result["validation_results"]
+    )
+
+
 def test_no_compatible_validation_source_does_not_fail_graph():
     from hdc_workflow.graph import build_graph
 

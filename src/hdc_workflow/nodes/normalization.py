@@ -41,6 +41,11 @@ _NUMERIC_FIELDS = (
     "icu_admissions",
     "tests_positive",
     "tests_total",
+    "positivity_rate",
+    "incidence_rate",
+    "cumulative_count",
+    "new_count",
+    "metric_value",
 )
 
 # Step 16.1.1: kept in sync with `_GEOGRAPHIC_SCOPE_TYPE_ALIASES` /

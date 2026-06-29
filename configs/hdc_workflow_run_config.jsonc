@@ -18,15 +18,12 @@
     // Source role policy overlay. 控制哪些 source 是 collection、context_only、validation_reserved；这是 source split 的核心可靠性设置。
     "source_role_policy_overlay_path": "src/hdc_workflow/resources/live_case_studies/new_mexico_hps_source_role_policy_overlay.json",
 
-    // Held-out validation records. 用于最终 validation comparison；不会作为 collection extraction 的输入。
-    "validation_ground_truth_records_path": "src/hdc_workflow/resources/live_case_studies/new_mexico_hps_ground_truth_records.csv",
-
     // Fixture documents switch. false = 使用真实网页抓取；true = 使用本地 fixture，适合离线测试，不适合真实产品运行展示。
     "use_fixture_documents": false
   },
 
   // User task submitted to LangGraph Studio. 改这里就等于改用户输入任务；下游 source planning、fetch、extraction 都会围绕它运行。
-  "user_request": "Collect data on hantavirus from 2020 to 2026. For this workflow run, use the New Mexico HPS source set, keep collection sources and validation sources separated, extract cases, deaths, dates, locations, source URLs, source types, and evidence quotes, then route uncertain results to human review.",
+  "user_request": "Collect data on hantavirus from 2020 to 2026. For this workflow run, use the New Mexico HPS source set, keep collection sources and validation sources separated, extract cases, deaths, dates, locations, source URLs, source types, and evidence quotes.",
 
   "structured_task": {
     // Stage 1 structured task input. These machine-readable fields take priority over the legacy free-text user_request during task intake.
@@ -72,7 +69,7 @@
     "collection_mode": "masked_validation",
 
     // Human-readable task text retained for Studio display and backward compatibility.
-    "user_request": "Collect data on hantavirus from 2020 to 2026. For this workflow run, use the New Mexico HPS source set, keep collection sources and validation sources separated, extract cases, deaths, dates, locations, source URLs, source types, and evidence quotes, then route uncertain results to human review.",
+    "user_request": "Collect data on hantavirus from 2020 to 2026. For this workflow run, use the New Mexico HPS source set, keep collection sources and validation sources separated, extract cases, deaths, dates, locations, source URLs, source types, and evidence quotes.",
 
     // Run label used in collection_spec metadata. Output session ids are still controlled by output.session_id or automatic timestamps.
     "run_label": "new_mexico_hps_live_llm_workflow_run"
@@ -95,13 +92,12 @@
   },
 
   "source_search": {
-    // Controlled source discovery search. Default is disabled, so the workflow
-    // keeps using the offline seed catalog unless this block is explicitly changed.
-    "enabled": false,
+    // Controlled source discovery search. Default product run uses live Tavily search.
+    "enabled": true,
 
     // Allowed values: disabled, fixture, live.
     // disabled = no provider call; fixture = local JSON results; live = real provider metadata search.
-    "mode": "disabled",
+    "mode": "live",
 
     // Live provider name. Current Stage 5 adapter: tavily.
     // API keys are read only from environment variables, never from this file.
@@ -110,10 +106,10 @@
     // Local fixture path used only when mode = fixture.
     "fixture_path": "src/hdc_workflow/resources/search_fixtures/example_search_results.json",
 
-    // Safety limits. Lower values make test/smoke runs faster and cheaper.
-    "max_queries": 3,
-    "max_results_per_query": 5,
-    "max_total_results": 15,
+    // Adaptive safety limits. These are no longer tiny smoke-test caps.
+    "max_queries": 8,
+    "max_results_per_query": 8,
+    "max_total_results": 64,
     "timeout_seconds": 15,
 
     // true = search candidates are combined with the existing seed catalog.
@@ -131,7 +127,64 @@
       "news_search",
       "literature_api",
       "database_search"
-    ]
+    ],
+
+    "iterative": {
+      "enabled": true,
+      "max_iterations": 3,
+      "max_queries_per_iteration": 4,
+      "max_total_queries": 20,
+      "max_total_results": 120,
+      "require_llm": true,
+      "allow_deterministic_fallback": false,
+      "stop_when_llm_says_sufficient": true,
+      "require_observation_after_each_iteration": true
+    }
+  },
+
+  "content_fetch": {
+    // Search-derived URLs are fetchable by default in real product runs.
+    "fetch_search_derived_sources": true,
+    "max_search_derived_sources": 50,
+    "max_total_sources": 50,
+    "min_credibility_score": 0.55,
+    "allowed_final_roles": [
+      "collection",
+      "validation",
+      "collection_support",
+      "context"
+    ],
+    "allow_needs_review": true,
+    "domain_allowlist": [],
+    "domain_blocklist": [],
+    "max_bytes": 5000000,
+    "parse_pdf_text": true,
+    "parse_tables": true,
+    "store_raw_text": false,
+    "user_agent": "data-collection-workflow/0.1",
+    "content_fixture_map_path": null,
+    "external_fetch": {
+      "enabled": true,
+      "provider_order": [
+        "tavily_extract",
+        "native_requests"
+      ],
+      "tavily_extract": {
+        "format": "markdown",
+        "extract_depth": "advanced",
+        "timeout_seconds": 45,
+        "chunks_per_source": 5
+      },
+      "adaptive_budget": {
+        "max_candidate_urls": 120,
+        "max_fetch_urls": 50,
+        "min_usable_documents": 12,
+        "min_collection_sources": 6,
+        "min_validation_sources": 3,
+        "max_iterations": 3,
+        "stop_when_llm_says_sufficient": true
+      }
+    }
   },
 
   "llm": {
@@ -151,7 +204,7 @@
     "structured_extraction_enabled": true,
 
     // Max evidence chunks sent to extraction LLM. 调大可覆盖更多证据，但会更慢、更花 API；调小更快但可能漏抽。
-    "max_chunks": 8,
+    "max_chunks": 30,
 
     // Max output tokens per LLM call. 调大可减少输出截断风险；调小可控成本，但复杂记录可能输出不完整。
     "max_tokens": 4096,
@@ -164,7 +217,7 @@
       "max_sources": 6,
 
       // Whether LLM critic can block fetch. false = LLM 只 advisory，最终安全边界由 deterministic policy 控制；true = critic 可阻止有风险 source 抓取。
-      "review_blocks_fetch": true
+      "review_blocks_fetch": false
     },
 
     "source_credibility": {
@@ -177,25 +230,58 @@
 
       // Optional source_id allowlist for LLM credibility advisory. Empty list = allow any source up to max_sources; deterministic scoring ignores this limit.
       "source_id_allowlist": []
+    },
+
+    "source_identity": {
+      // LLM-first source triage / publisher identity / source-role classification.
+      // true = use the configured LLM to classify source role, publisher, credibility basis, and fetch/extraction use.
+      "enabled": true,
+
+      // Max source candidates sent to the source identity LLM before fetch.
+      "max_sources": 30,
+
+      // true = run another identity pass after Tavily Extract/native fetch provides real page text.
+      "post_fetch": true,
+
+      // true = formal product runs must stop if source identity LLM is unavailable.
+      "require_llm": true,
+
+      // false = do not silently fall back to deterministic source identity in formal product runs.
+      "allow_deterministic_fallback": false
     }
   },
 
   "disease_intelligence": {
-    // Optional LLM disease intelligence. false = use local curated profiles only; true = call the configured LLM before falling back.
-    "llm_enabled": false,
+    // LLM-first disease/task understanding. true = call the configured LLM to infer aliases, definitions, exclusions, source strategy, and query terms.
+    "llm_enabled": true,
 
-    // force_llm. true keeps the LLM attempt explicit when enabled; default false keeps curated profiles as the normal deterministic path.
-    "force_llm": false,
+    // force_llm. true means formal product runs try LLM disease intelligence before curated profiles.
+    "force_llm": true,
 
-    // fallback_to_curated. true = if LLM disease intelligence fails, use curated/generic deterministic fallback and record a warning.
+    // fallback_to_curated. true = transient LLM failures use curated/generic disease intelligence so downstream collection can continue.
     "fallback_to_curated": true
   },
 
   "validation": {
-    // Task-compatible validation guardrail.
-    // false = held-out ground truth is used only when disease/location/time match the active task.
-    // true = force-load explicitly configured incompatible validation records for diagnostic experiments only.
+    // Default validation mode. live_cross_source uses validation sources found in the same live run.
+    "mode": "live_cross_source",
+    "held_out_records_path": null,
+    "prefer_authoritative_sources": true,
+    "min_independent_validation_sources": 1,
+
+    // Diagnostic override only. true should be used only for explicit compatibility tests.
     "allow_incompatible_validation_records": false
+  },
+
+  "human_review": {
+    // Human review routing switch. false = do not stop the graph at the human_review node;
+    // review flags are retained as audit metadata, and needs_review sources may still be fetched.
+    "enabled": false,
+
+    // Optional decision file. Used only when human_review.enabled is true.
+    "decisions_path": null,
+    "apply_decisions": false,
+    "require_reviewer_id": true
   },
 
   "source_sets": {

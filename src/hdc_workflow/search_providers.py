@@ -14,6 +14,15 @@ from .models import SearchProviderResponse, SearchResult
 _FIXED_RETRIEVED_AT = "2026-05-25T00:00:00Z"
 
 
+def _traceable_tool(name: str):
+    try:
+        from langsmith import traceable
+
+        return traceable(name=name, run_type="tool")
+    except Exception:
+        return lambda fn: fn
+
+
 class SearchProvider(Protocol):
     """Small provider interface: return search metadata, never page bodies."""
 
@@ -155,6 +164,7 @@ class TavilySearchProvider:
     def __init__(self, api_key_env: str = "TAVILY_API_KEY"):
         self.api_key_env = api_key_env
 
+    @_traceable_tool("tavily_search")
     def search(
         self,
         planned_query: dict,

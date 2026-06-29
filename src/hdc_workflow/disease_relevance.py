@@ -435,6 +435,30 @@ def record_compatibility_text(record: dict) -> tuple[str, list[str]]:
     return " ".join(parts), used
 
 
+def _record_identity_disease_terms(record: dict, context: dict) -> tuple[list[str], list[str]]:
+    identity_text = " ".join(
+        str(record.get(field) or "")
+        for field in (
+            "disease",
+            "disease_standard_name",
+            "disease_alias_used",
+            "virus_or_syndrome",
+            "pathogen_or_syndrome",
+            "metric_name",
+            "metric_category",
+            "count_semantics",
+            "statistical_count_type",
+        )
+        if record.get(field)
+    )
+    return (
+        _find_terms(identity_text, list(context.get("target_disease_terms") or [])),
+        _find_terms(
+            identity_text, list(context.get("incompatible_disease_terms") or [])
+        ),
+    )
+
+
 def assess_record_disease_compatibility(record: dict, context: dict) -> dict:
     """Return a compatibility assessment for an extracted record."""
 
@@ -466,6 +490,10 @@ def assess_record_disease_compatibility(record: dict, context: dict) -> dict:
 
     incompatible_values = assessment["incompatible_disease_terms_found"]
     target_values = assessment["target_disease_terms_found"]
+    identity_target_values, identity_incompatible_values = _record_identity_disease_terms(
+        record, context
+    )
+    record_level_target_identity_override = False
     if record_group and target_group and record_group != target_group:
         status = INCOMPATIBLE_DISEASE
         reason = "Record disease/pathogen field is incompatible with the target task disease."
@@ -473,8 +501,16 @@ def assess_record_disease_compatibility(record: dict, context: dict) -> dict:
         status = INCOMPATIBLE_DISEASE
         reason = assessment["reason"]
     elif assessment["status"] == AMBIGUOUS_DISEASE and incompatible_values:
-        status = INCOMPATIBLE_DISEASE
-        reason = "Record evidence contains incompatible disease terms."
+        if identity_target_values and not identity_incompatible_values:
+            status = COMPATIBLE
+            record_level_target_identity_override = True
+            reason = (
+                "Record disease/metric identity matches the target task disease; "
+                "incompatible terms appear in broader mixed-disease evidence."
+            )
+        else:
+            status = INCOMPATIBLE_DISEASE
+            reason = "Record evidence contains incompatible disease terms."
     elif target_values or (
         record_group is not None and target_group is not None and record_group == target_group
     ):
@@ -494,6 +530,7 @@ def assess_record_disease_compatibility(record: dict, context: dict) -> dict:
             "reason": reason,
             "record_group": record_group,
             "target_group": target_group,
+            "record_level_target_identity_override": record_level_target_identity_override,
             "is_compatible": status == COMPATIBLE,
             "reject_record": status in {INCOMPATIBLE_DISEASE},
         }

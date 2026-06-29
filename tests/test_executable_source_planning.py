@@ -192,10 +192,11 @@ def test_llm_executable_source_plan_is_called_once_and_consumed_by_query_strateg
     from hdc_workflow import llm_clients
     from hdc_workflow.graph import build_graph
 
-    calls = {"count": 0}
+    calls = {"count": 0, "user_prompt": ""}
 
     def fake_structured_llm(*, schema_model, **kwargs):  # noqa: ARG001
         calls["count"] += 1
+        calls["user_prompt"] = kwargs.get("user_prompt") or ""
         assert schema_model.__name__ == "ExecutableSourcePlan"
         return {
             "plan_id": "plan_llm_test",
@@ -249,6 +250,8 @@ def test_llm_executable_source_plan_is_called_once_and_consumed_by_query_strateg
         }
 
     monkeypatch.setenv("HDC_ENABLE_LLM_SOURCE_PLANNING", "true")
+    monkeypatch.setenv("LANGSMITH_TRACING", "false")
+    monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
     monkeypatch.setattr(llm_clients, "run_pydantic_structured_llm", fake_structured_llm)
 
     result = build_graph().invoke(
@@ -261,10 +264,13 @@ def test_llm_executable_source_plan_is_called_once_and_consumed_by_query_strateg
     )
 
     assert calls["count"] == 1
+    assert "task_acceptance_contract" in calls["user_prompt"]
+    assert "must_match_task_location" in calls["user_prompt"]
     assert result["source_planning_agent_summary"]["status"] == "success"
     assert result["agentic_source_plan"]["generation_method"] == (
         "llm_executable_source_plan"
     )
+    assert result["evidence_strategy_plan"] == result["agentic_source_plan"]
     planned_inventory = [
         item for item in result["search_query_inventory"]
         if item.get("query_source") == "executable_source_plan"
@@ -363,6 +369,101 @@ def test_final_package_exports_executable_source_plan_summary(monkeypatch):
         "planned_not_executed"
     )
     assert summaries["executable_source_plan_summary"]["planned_query_count"] > 0
+
+
+def test_direct_collection_query_strategy_uses_llm_plan_as_primary_inventory():
+    from hdc_workflow.nodes.task_scope import query_strategy_builder
+
+    state = {
+        "user_request": "Collect FLU data for California from 2024-10-01 to 2024-10-05.",
+        "structured_task": {
+            "disease": "FLU",
+            "location": "California",
+            "start_date": "2024-10-01",
+            "end_date": "2024-10-05",
+            "collection_mode": "direct_collection",
+        },
+        "collection_spec": {
+            "disease": "FLU",
+            "geography": "California",
+            "start_date": "2024-10-01",
+            "end_date": "2024-10-05",
+            "time_window": "2024-10-01 to 2024-10-05",
+            "collection_mode": "direct_collection",
+            "required_fields": ["cases", "deaths", "hospitalizations"],
+        },
+        "disease_profile": {
+            "disease_standard_name": "Seasonal influenza",
+            "include_terms": ["flu", "influenza"],
+            "exclude_terms": ["H5N1"],
+            "syndrome_terms": ["influenza-like illness"],
+            "virus_terms": ["influenza A", "influenza B"],
+            "target_population": "humans",
+            "primary_data_objects": ["surveillance summaries", "aggregate counts"],
+            "required_record_fields": ["date_reported", "location", "evidence_quote"],
+        },
+        "source_strategy": {
+            "source_categories": [
+                {
+                    "source_type": "official_public_health_agency",
+                    "priority": 1,
+                    "description": "official sources",
+                },
+                {
+                    "source_type": "news_and_situation_report",
+                    "priority": 5,
+                    "description": "news sources",
+                },
+            ],
+            "screening_criteria": {
+                "include_if_all_apply": [],
+                "exclude_if_any_apply": [],
+                "uncertain_if_any_apply": [],
+            },
+        },
+        "disease_intelligence": {
+            "disease_standard_name": "Seasonal influenza",
+            "suggested_query_terms": ["influenza", "flu"],
+            "syndrome_terms": ["influenza-like illness"],
+            "pathogen_terms": ["influenza A", "influenza B"],
+        },
+        "agentic_source_plan": {
+            "planned_queries": [
+                {
+                    "query_id": "q_llm_california_001",
+                    "query": (
+                        'California influenza surveillance "October 5, 2024" '
+                        "hospitalizations deaths"
+                    ),
+                    "query_type": "general_web",
+                    "provider_channel": "web_search",
+                    "source_type": "official_public_health_agency",
+                    "role_hint": "collection",
+                    "priority": 1,
+                    "expected_fields": ["hospitalizations", "deaths"],
+                    "disease_terms_used": ["influenza"],
+                    "location_terms_used": ["California"],
+                    "time_terms_used": ["2024-10-05"],
+                    "rationale": (
+                        "LLM evidence strategy selected a California-specific "
+                        "collection route."
+                    ),
+                }
+            ],
+            "generation_method": "llm_executable_source_plan",
+            "llm_enabled": True,
+        },
+        "collection_trace": [],
+    }
+
+    result = query_strategy_builder(state)
+    inventory = result["search_query_inventory"]
+
+    assert [item["query_id"] for item in inventory] == ["q_llm_california_001"]
+    assert inventory[0]["query_source"] == "executable_source_plan"
+    assert result["source_planning_agent_summary"][
+        "deterministic_query_template_suppressed"
+    ] is True
 
 
 def test_full_graph_covid19_exports_executable_source_plan_summary():

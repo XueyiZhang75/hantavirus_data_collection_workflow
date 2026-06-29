@@ -271,7 +271,12 @@ def _write_applied_config(output_dir: Path, config_path: Path, config: dict) -> 
     write_json(payload, output_dir / "applied_workflow_config.json")
 
 
-def _call_configured_runner(config_path: Path) -> dict:
+def _call_configured_runner(
+    config_path: Path,
+    *,
+    live_status: bool = True,
+    write_run_notebook: bool = False,
+) -> dict:
     scripts_dir = PROJECT_ROOT / "scripts"
     if str(scripts_dir) not in sys.path:
         sys.path.insert(0, str(scripts_dir))
@@ -291,6 +296,8 @@ def _call_configured_runner(config_path: Path) -> dict:
         session_id=None,
         user_request=None,
         print_config_only=False,
+        live_status=live_status,
+        write_run_notebook=write_run_notebook,
     )
     return run_workflow(runner_args)
 
@@ -333,7 +340,11 @@ def cmd_collect(args: argparse.Namespace) -> int:
     with tempfile.TemporaryDirectory(prefix="hdc_workflow_cli_") as temp_dir:
         applied_path = Path(temp_dir) / "applied_config.json"
         applied_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
-        summary = _call_configured_runner(applied_path)
+        summary = _call_configured_runner(
+            applied_path,
+            live_status=bool(getattr(args, "live_status", True)),
+            write_run_notebook=bool(getattr(args, "write_run_notebook", False)),
+        )
 
     output_dir = Path(str(summary.get("output_dir")))
     _write_applied_config(output_dir, config_path, config)
@@ -701,6 +712,9 @@ def build_parser() -> argparse.ArgumentParser:
     collect.add_argument("--apply-review-decisions", action="store_true")
     collect.add_argument("--dry-run", action="store_true")
     collect.add_argument("--print-config-only", action="store_true")
+    collect.add_argument("--live-status", dest="live_status", action="store_true", default=True)
+    collect.add_argument("--no-live-status", dest="live_status", action="store_false")
+    collect.add_argument("--write-run-notebook", action="store_true")
     collect.set_defaults(func=cmd_collect)
 
     validate = subparsers.add_parser("validate-config", help="Validate a workflow config.")

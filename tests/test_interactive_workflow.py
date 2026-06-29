@@ -4,7 +4,10 @@ import json
 import os
 import subprocess
 import sys
+from argparse import Namespace
 from pathlib import Path
+
+import scripts.run_interactive_workflow as interactive
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -63,6 +66,7 @@ def test_interactive_script_generates_real_workflow_config_from_prompts_without_
                 "2022",
                 "2026",
                 "orthoebolavirus_drc_preview",
+                "",
             ]
         )
         + "\n",
@@ -82,8 +86,8 @@ def test_interactive_script_generates_real_workflow_config_from_prompts_without_
     config = preview["config"]
     assert config["structured_task"]["disease"] == "Orthoebolavirus zairense"
     assert config["structured_task"]["location"] == "Democratic Republic of the Congo"
-    assert config["structured_task"]["start_date"] == "2022"
-    assert config["structured_task"]["end_date"] == "2026"
+    assert config["structured_task"]["start_date"] == "2022-01-01"
+    assert config["structured_task"]["end_date"] == "2026-12-31"
     assert config["structured_task"]["target_fields"] == [
         "disease",
         "country",
@@ -100,18 +104,41 @@ def test_interactive_script_generates_real_workflow_config_from_prompts_without_
         "source_type",
         "evidence_quote",
     ]
+    assert config["workflow"]["collection_mode"] == "direct_collection"
+    assert config["structured_task"]["collection_mode"] == "direct_collection"
     assert config["workflow"]["use_fixture_documents"] is False
     assert config["source_search"]["enabled"] is True
     assert config["source_search"]["mode"] == "live"
     assert config["source_search"]["provider"] == "tavily"
     assert config["source_search"]["combine_with_seed_catalog"] is False
+    assert config["source_search"]["max_queries"] == 8
+    assert config["source_search"]["max_results_per_query"] == 8
+    assert config["source_search"]["max_total_results"] == 64
+    assert config["source_search"]["iterative"]["enabled"] is True
+    assert config["source_search"]["iterative"]["require_llm"] is True
+    assert config["source_search"]["iterative"]["allow_deterministic_fallback"] is False
     assert config["live_web"]["enabled"] is True
     assert config["content_fetch"]["fetch_search_derived_sources"] is True
+    assert config["content_fetch"]["max_search_derived_sources"] == 18
+    assert config["content_fetch"]["max_total_sources"] == 18
+    assert config["content_fetch"]["allow_needs_review"] is True
+    assert config["content_fetch"]["external_fetch"]["enabled"] is True
+    assert config["content_fetch"]["external_fetch"]["provider_order"] == [
+        "tavily_extract",
+        "native_requests",
+    ]
     assert config["llm"]["source_planning_enabled"] is True
     assert config["llm"]["source_critic_enabled"] is True
     assert config["llm"]["structured_extraction_enabled"] is True
+    assert config["llm"]["source_identity"]["enabled"] is True
+    assert config["llm"]["source_identity"]["require_llm"] is True
+    assert config["llm"]["source_identity"]["allow_deterministic_fallback"] is False
     assert config["llm"]["source_credibility"]["enabled"] is True
     assert config["disease_intelligence"]["llm_enabled"] is True
+    assert config["disease_intelligence"]["force_llm"] is True
+    assert config["disease_intelligence"]["fallback_to_curated"] is True
+    assert config["human_review"]["enabled"] is False
+    assert config["validation"]["mode"] == "diagnostic_only"
     assert config["output"]["session_id"] == "orthoebolavirus_drc_preview"
 
 
@@ -141,20 +168,70 @@ def test_interactive_script_accepts_noninteractive_arguments_for_preview():
     config = _extract_preview_json(result.stdout)["config"]
     assert config["structured_task"]["disease"] == "COVID-19"
     assert config["structured_task"]["target_fields"] == ["cases_confirmed", "deaths"]
+    assert config["structured_task"]["start_date"] == "2024-01-01"
+    assert config["structured_task"]["end_date"] == "2024-12-31"
     assert config["source_search"]["mode"] == "live"
     assert config["llm"]["provider"] == "anthropic"
 
 
-def test_interactive_script_normalizes_range_and_question_mark_session_id_without_field_prompt():
+def test_collect_inputs_uses_default_request_for_fully_specified_cli_even_when_tty(
+    monkeypatch,
+):
+    def fail_prompt(*_args, **_kwargs):
+        raise AssertionError("fully specified CLI arguments should not prompt")
+
+    monkeypatch.setattr(sys.stdin, "isatty", lambda: True)
+    monkeypatch.setattr(interactive, "_prompt", fail_prompt)
+
+    collected = interactive._collect_inputs(
+        Namespace(
+            disease="COVID-19",
+            location="New York",
+            start_date="2024-01-01",
+            end_date="2024-01-07",
+            target_field=[],
+            session_id="covid19_ny_cli",
+            user_request=None,
+        )
+    )
+
+    assert collected["session_id"] == "covid19_ny_cli"
+    assert collected["user_request"] == (
+        "Collect COVID-19 cases, deaths, dates, locations, source URLs, "
+        "source types, and evidence quotes for New York from 2024-01-01 to 2024-01-07."
+    )
+
+
+def test_configure_utf8_stdio_reconfigures_non_utf8_streams():
+    class FakeStream:
+        encoding = "cp1252"
+
+        def __init__(self) -> None:
+            self.calls: list[dict] = []
+
+        def reconfigure(self, **kwargs) -> None:
+            self.calls.append(kwargs)
+
+    stdout = FakeStream()
+    stderr = FakeStream()
+
+    interactive._configure_utf8_stdio(stdout=stdout, stderr=stderr)
+
+    assert stdout.calls == [{"encoding": "utf-8", "errors": "replace"}]
+    assert stderr.calls == [{"encoding": "utf-8", "errors": "replace"}]
+
+
+def test_interactive_script_normalizes_day_level_dates_and_question_mark_session_id_without_field_prompt():
     result = _run(
         ["--print-config-only"],
         input_text="\n".join(
             [
                 "hantavirus",
                 "America",
-                "2024-2026",
-                "2026",
+                "2024-5-1",
+                "2024-5-3",
                 "？",
+                "",
             ]
         )
         + "\n",
@@ -163,13 +240,13 @@ def test_interactive_script_normalizes_range_and_question_mark_session_id_withou
 
     combined = result.stdout + result.stderr
     assert result.returncode == 0, combined
-    assert "Interpreted Start year/date '2024-2026' as date range 2024 to 2026." in combined
+    assert "Start date (YYYY, YYYY-M-D, or YYYY-MM-DD)" in combined
     assert "Using safe session id:" in combined
     assert "Target fields" not in combined
 
     config = _extract_preview_json(result.stdout)["config"]
-    assert config["structured_task"]["start_date"] == "2024"
-    assert config["structured_task"]["end_date"] == "2026"
+    assert config["structured_task"]["start_date"] == "2024-05-01"
+    assert config["structured_task"]["end_date"] == "2024-05-03"
     assert config["structured_task"]["target_fields"] == [
         "disease",
         "country",
@@ -186,8 +263,91 @@ def test_interactive_script_normalizes_range_and_question_mark_session_id_withou
         "source_type",
         "evidence_quote",
     ]
-    assert config["output"]["session_id"].startswith("hantavirus_america_2024_2026_")
+    assert config["output"]["session_id"].startswith("hantavirus_america_2024_05_01_2024_05_03_")
     assert "？" not in config["output"]["session_id"]
+
+
+def test_interactive_script_quick_test_mode_matches_visual_budget_controls():
+    result = _run(
+        [
+            "--disease",
+            "FLU",
+            "--location",
+            "Virginia",
+            "--start-date",
+            "2024-11-1",
+            "--end-date",
+            "2024-11-5",
+            "--session-id",
+            "flu_va_quick_preview",
+            "--quick-test-mode",
+            "--print-config-only",
+        ],
+        env=_env({"TAVILY_API_KEY": "tvly-test-key", "ANTHROPIC_API_KEY": "sk-ant-test-key"}),
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    config = _extract_preview_json(result.stdout)["config"]
+    assert config["structured_task"]["start_date"] == "2024-11-01"
+    assert config["structured_task"]["end_date"] == "2024-11-05"
+    assert config["structured_task"]["quick_test_mode"] is True
+    assert config["quick_test_mode"] is True
+    assert config["source_search"]["max_queries"] == 2
+    assert config["content_fetch"]["max_total_sources"] == 5
+    assert config["llm"]["max_chunks"] == 5
+
+
+def test_interactive_script_defaults_to_direct_collection_mode():
+    result = _run(
+        [
+            "--disease",
+            "FLU",
+            "--location",
+            "Virginia",
+            "--start-date",
+            "2024-10-01",
+            "--end-date",
+            "2024-10-10",
+            "--session-id",
+            "flu_va_direct_preview",
+            "--print-config-only",
+        ],
+        env=_env({"TAVILY_API_KEY": "tvly-test-key", "ANTHROPIC_API_KEY": "sk-ant-test-key"}),
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    config = _extract_preview_json(result.stdout)["config"]
+    assert config["workflow"]["collection_mode"] == "direct_collection"
+    assert config["structured_task"]["collection_mode"] == "direct_collection"
+    assert config["human_review"]["enabled"] is False
+    assert config["validation"]["mode"] == "diagnostic_only"
+    assert config["llm"]["source_critic"]["review_blocks_fetch"] is False
+
+
+def test_interactive_script_audit_mode_preserves_legacy_standard_collection_mode():
+    result = _run(
+        [
+            "--disease",
+            "FLU",
+            "--location",
+            "Virginia",
+            "--start-date",
+            "2024-10-01",
+            "--end-date",
+            "2024-10-10",
+            "--session-id",
+            "flu_va_audit_preview",
+            "--audit-mode",
+            "--print-config-only",
+        ],
+        env=_env({"TAVILY_API_KEY": "tvly-test-key", "ANTHROPIC_API_KEY": "sk-ant-test-key"}),
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    config = _extract_preview_json(result.stdout)["config"]
+    assert config["workflow"]["collection_mode"] == "standard"
+    assert config["structured_task"]["collection_mode"] == "standard"
+    assert config["validation"]["mode"] == "live_cross_source"
 
 
 def test_interactive_script_blocks_real_run_when_required_keys_are_missing():
@@ -213,3 +373,49 @@ def test_interactive_script_blocks_real_run_when_required_keys_are_missing():
     assert "Missing required API key" in combined
     assert "TAVILY_API_KEY" in combined
     assert "ANTHROPIC_API_KEY" in combined
+
+
+def test_interactive_parser_writes_replay_notebook_by_default():
+    args = interactive.build_parser().parse_args([])
+
+    assert args.write_run_notebook is True
+
+
+def test_interactive_runner_args_write_replay_notebook_by_default(tmp_path):
+    args = Namespace(output_dir=None, live_status=True, write_run_notebook=True)
+
+    runner_args = interactive._runner_args(tmp_path / "generated_config.json", args)
+
+    assert runner_args.live_status is True
+    assert runner_args.write_run_notebook is True
+
+
+def test_interactive_dashboard_launcher_uses_streamlit_module(tmp_path, monkeypatch):
+    calls = []
+
+    class FakeProcess:
+        pid = 12345
+
+    def fake_popen(command, **kwargs):
+        calls.append((command, kwargs))
+        return FakeProcess()
+
+    monkeypatch.setattr(interactive.importlib.util, "find_spec", lambda name: object())
+    monkeypatch.setattr(interactive.subprocess, "Popen", fake_popen)
+
+    launched = interactive._launch_live_dashboard(
+        tmp_path / "sessions" / "session_a",
+        preferred_port=8765,
+    )
+
+    assert launched["url"] == "http://localhost:8765"
+    command, kwargs = calls[0]
+    assert command[:4] == [
+        sys.executable,
+        "-m",
+        "streamlit",
+        "run",
+    ]
+    assert "--session-dir" in command
+    assert str(tmp_path / "sessions" / "session_a") in command
+    assert kwargs["cwd"] == interactive.PROJECT_ROOT

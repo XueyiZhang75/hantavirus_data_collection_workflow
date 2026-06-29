@@ -52,6 +52,35 @@ def _hantavirus_state(**overrides) -> dict:
     return state
 
 
+def _flu_state(**overrides) -> dict:
+    state = {
+        "structured_task": {
+            "disease": "FLU",
+            "location": "Virginia",
+            "start_date": "2024-10-06",
+            "end_date": "2024-10-12",
+        },
+        "collection_spec": {
+            "disease": "FLU",
+            "geography": "Virginia",
+            "time_window": "2024-10-06 to 2024-10-12",
+            "target_population": "human",
+        },
+        "disease_intelligence": {
+            "disease_input": "FLU",
+            "disease_standard_name": "Seasonal influenza",
+            "aliases": ["flu", "influenza", "seasonal influenza"],
+            "abbreviations": ["ILI"],
+            "pathogen_terms": ["influenza"],
+            "syndrome_terms": ["influenza-like illness"],
+        },
+        "collection_trace": [],
+        "human_review_queue": [],
+    }
+    state.update(overrides)
+    return state
+
+
 def _covid_source() -> dict:
     return {
         "source_id": "src_yahoo_covid_shanghai",
@@ -271,6 +300,33 @@ def test_record_compatibility_accepts_target_hantavirus_evidence():
 
     assert assessment["status"] == "compatible"
     assert assessment["target_disease_terms_found"]
+
+
+def test_record_compatibility_accepts_influenza_row_from_mixed_respiratory_report():
+    context = build_disease_relevance_context(_flu_state())
+    assessment = assess_record_disease_compatibility(
+        {
+            "disease": "Influenza",
+            "disease_standard_name": "Seasonal influenza",
+            "virus_or_syndrome": "influenza",
+            "metric_name": "Influenza positive lab reports",
+            "metric_category": "lab_positive_count",
+            "count_semantics": "weekly influenza laboratory positive specimens",
+            "evidence_quote": (
+                "Influenza positive lab reports: 119. The same respiratory "
+                "disease surveillance report also tracks COVID-19 and RSV."
+            ),
+        },
+        context,
+    )
+
+    assert assessment["status"] == "compatible"
+    assert assessment["reject_record"] is False
+    assert "influenza" in {
+        str(value).lower() for value in assessment["target_disease_terms_found"]
+    }
+    assert "COVID-19" in assessment["incompatible_disease_terms_found"]
+    assert assessment["record_level_target_identity_override"] is True
 
 
 def test_llm_extraction_policy_requires_task_disease_match():

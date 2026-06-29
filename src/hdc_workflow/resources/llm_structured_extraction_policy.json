@@ -7,7 +7,7 @@
   "fallback_to_rule_based_env_var": "HDC_LLM_FALLBACK_TO_RULE_BASED",
   "default_fallback_to_rule_based": true,
   "llm_extraction_method": "llm_structured_output_extractor",
-  "system_prompt": "You are a public health data extraction agent. Extract only explicitly stated disease case, death, hospitalization, testing, date, location, and source information from the provided evidence chunk. Use the active target task disease and disease-intelligence terms supplied by the workflow context. Do not extract records for an incompatible disease named in the evidence chunk, even if the chunk contains cases, deaths, dates, or locations. Do not browse, fetch, invent URLs, infer missing values, or calculate derived quantities. If a value is not explicitly stated, return null. Preserve source_url, source_type, source_id, supporting_chunk_id, and evidence_quote through downstream provenance. Return structured JSON only.",
+  "system_prompt": "You are a public health data extraction agent. Extract only explicitly stated disease case, death, hospitalization, testing, surveillance metric, date, location, and source information from the provided evidence chunk. Use the active target task disease and disease-intelligence terms supplied by the workflow context. For non-case public-health metrics such as ILI percent, ED visit percent, lab positivity, test positives, hospitalization rate, outbreak count, or death count, populate the generic metric_* fields in addition to any compatible legacy count field. Do not extract records for an incompatible disease named in the evidence chunk, even if the chunk contains cases, deaths, dates, or locations. Do not browse, fetch, invent URLs, infer missing values, or calculate derived quantities. If a value is not explicitly stated, return null. Preserve source_url, source_type, source_id, supporting_chunk_id, and evidence_quote through downstream provenance. Return structured JSON only.",
   "required_output_rules": [
     "Extract only human public-health case, outbreak, hospitalization, death, testing, or surveillance records for the active task disease.",
     "The evidence chunk must explicitly match the target task disease or one of its disease-intelligence aliases. If it only names an incompatible disease, return an empty records list.",
@@ -25,6 +25,14 @@
     "Use pathogen_or_syndrome or virus_or_syndrome only when the evidence explicitly names a pathogen, syndrome, or disease alias such as SARS-CoV-2, DENV, HPS, or Sin Nombre virus.",
     "If a numeric death count is explicitly stated anywhere in the chunk text, including narrative forms such as '5 people died' or '5 deaths were reported', populate deaths.",
     "If a numeric hospitalization count is explicitly stated, populate hospitalizations.",
+    "For every extractable public-health metric, populate metric_name, metric_value, metric_unit, metric_category, and the most specific metric_period_start/metric_period_end or reporting_period available.",
+    "Use metric_category values such as lab_positive_count, lab_test_count, lab_positivity_percent, ili_percent, ed_visit_percent, hospitalization_count, hospitalization_rate, death_count, case_count, outbreak_count, or other clear task-specific categories.",
+    "Do not put ED visit percent, ILI percent, hospitalization rate, or outpatient visit percent into positivity_rate. Use positivity_rate only for laboratory test positivity.",
+    "If a table contains multiple rows or metrics, emit separate records for distinct rows/metrics and keep each evidence quote focused on the relevant row or metric.",
+    "For metric_row_batch chunks, use the bracketed row id shown at the start of each row as source_row_id for every emitted record.",
+    "Do not attach a record to a source_row_id unless that row contains the metric label or numeric value used by the record.",
+    "When a row has multiple value columns such as current week, previous week, cumulative, or season to date, populate source_column_label or metric_column_label with the column used for the metric value.",
+    "If a metric is a percentage, set metric_unit='percent'. If it is a count, set metric_unit='count'. If it is a rate, set metric_unit='rate' and preserve the rate denominator in metric_denominator when stated.",
     "If a number refers to cumulative cases, newly reported cases, annual cases, historical total, or a subset, populate statistical_count_type.",
     "If the text states the period or cutoff for the statistic, populate reporting_period and/or as_of_date.",
     "If the geographic scope is regional or multi-country, such as EU/EEA, do not force it into a single country. Populate geographic_scope and geographic_scope_type.",
@@ -55,7 +63,9 @@
   ],
   "allowed_chunk_kinds": [
     "text",
-    "table"
+    "table",
+    "metric_row",
+    "metric_row_batch"
   ],
   "max_records_per_chunk": 5
 }

@@ -398,12 +398,13 @@ def test_configured_workflow_script_uses_config_without_runtime_confirmations(tm
             encoding="utf-8"
         )
     )
-    assert review_items
-    assert review_items[0]["item_type"] == "masked_validation"
+    assert isinstance(review_items, list)
     summary = json.loads(
         (session_dir / "workflow_run_summary.json").read_text(encoding="utf-8")
     )
     assert summary["human_review_item_count"] == len(review_items)
+    assert summary["human_review_enabled"] is False
+    assert summary["validation_mode"] == "live_cross_source"
     assert "Pass --allow-live-fetch" not in result.stderr
 
 

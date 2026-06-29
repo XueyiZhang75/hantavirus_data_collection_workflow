@@ -116,7 +116,12 @@ ENV_KEYS = [
     "HDC_ENABLE_LLM_SOURCE_PLANNING",
     "HDC_ENABLE_LLM_SOURCE_CRITIC",
     "HDC_ENABLE_LLM_SOURCE_CREDIBILITY",
+    "HDC_ENABLE_LLM_SOURCE_IDENTITY",
     "HDC_ENABLE_LLM_EXTRACTION",
+    "HDC_LLM_SOURCE_IDENTITY_MAX_SOURCES",
+    "HDC_LLM_SOURCE_IDENTITY_POST_FETCH",
+    "HDC_LLM_SOURCE_IDENTITY_REQUIRE_LLM",
+    "HDC_LLM_SOURCE_IDENTITY_ALLOW_DETERMINISTIC_FALLBACK",
     "HDC_LLM_SOURCE_CRITIC_SOURCE_ID_ALLOWLIST",
     "HDC_LLM_SOURCE_CRITIC_MAX_SOURCES",
     "HDC_LLM_SOURCE_CRITIC_REVIEW_BLOCKS_FETCH",
@@ -125,8 +130,11 @@ ENV_KEYS = [
     "HDC_LLM_PROVIDER",
     "HDC_LLM_MODEL",
     "HDC_LLM_MAX_CHUNKS",
+    "HDC_LLM_MUST_FETCH_MIN_CHUNKS_PER_SOURCE",
+    "HDC_LLM_OFFICIAL_EXTRACTION_MAX_CHUNKS",
     "HDC_LLM_MAX_TOKENS",
     "HDC_LLM_FALLBACK_TO_RULE_BASED",
+    "HDC_DIRECT_COLLECTION_ENABLE_AUDIT_VALIDATION",
     "HDC_SOURCE_ID_ALLOWLIST",
     "HDC_FETCH_TIMEOUT_SECONDS",
     "HDC_FETCH_SEARCH_DERIVED_SOURCES",
@@ -143,6 +151,12 @@ ENV_KEYS = [
     "HDC_FETCH_PARSE_TABLES",
     "HDC_FETCH_STORE_RAW_TEXT",
     "HDC_CONTENT_FIXTURE_MAP_PATH",
+    "HDC_EXTERNAL_FETCH_ENABLED",
+    "HDC_EXTERNAL_FETCH_PROVIDER_ORDER",
+    "HDC_TAVILY_EXTRACT_FORMAT",
+    "HDC_TAVILY_EXTRACT_DEPTH",
+    "HDC_TAVILY_EXTRACT_TIMEOUT_SECONDS",
+    "HDC_TAVILY_EXTRACT_CHUNKS_PER_SOURCE",
     "HDC_ENABLE_LIVE_SEARCH",
     "HDC_SEARCH_MODE",
     "HDC_SEARCH_PROVIDER",
@@ -154,7 +168,19 @@ ENV_KEYS = [
     "HDC_SEARCH_COMBINE_WITH_SEED_CATALOG",
     "HDC_SEARCH_CACHE_ENABLED",
     "HDC_SEARCH_PROVIDER_CHANNEL_ALLOWLIST",
+    "HDC_ENABLE_ITERATIVE_SOURCE_DISCOVERY",
+    "HDC_ITERATIVE_SEARCH_MAX_ITERATIONS",
+    "HDC_ITERATIVE_SEARCH_MAX_QUERIES_PER_ITERATION",
+    "HDC_ITERATIVE_SEARCH_MAX_TOTAL_QUERIES",
+    "HDC_ITERATIVE_SEARCH_MAX_TOTAL_RESULTS",
+    "HDC_ITERATIVE_SEARCH_REQUIRE_LLM",
+    "HDC_ITERATIVE_SEARCH_ALLOW_DETERMINISTIC_FALLBACK",
+    "HDC_ITERATIVE_SEARCH_STOP_WHEN_LLM_SAYS_SUFFICIENT",
+    "HDC_ITERATIVE_SEARCH_REQUIRE_OBSERVATION_AFTER_EACH_ITERATION",
+    "HDC_VALIDATION_MODE",
+    "HDC_VALIDATION_HELD_OUT_RECORDS_PATH",
     "HDC_ALLOW_INCOMPATIBLE_VALIDATION_RECORDS",
+    "HDC_HUMAN_REVIEW_ENABLED",
     "HDC_HUMAN_REVIEW_DECISIONS_PATH",
     "HDC_HUMAN_REVIEW_APPLY_DECISIONS",
     "HDC_HUMAN_REVIEW_REQUIRE_REVIEWER_ID",
@@ -175,18 +201,25 @@ def workflow_run_env(
     llm_source_planning: bool = True,
     llm_source_critic: bool = True,
     llm_source_credibility: bool = False,
+    llm_source_identity: bool = True,
     llm_extraction: bool = True,
-    llm_disease_intelligence: bool = False,
-    disease_intelligence_force_llm: bool = False,
+    llm_disease_intelligence: bool = True,
+    disease_intelligence_force_llm: bool = True,
     disease_intelligence_fallback_to_curated: bool = True,
     provider: str | None = None,
     model: str | None = None,
     timeout_seconds: float = 30.0,
     llm_max_chunks: int = 8,
+    llm_must_fetch_min_chunks_per_source: int = 6,
+    llm_official_extraction_max_chunks: int = 30,
     llm_source_critic_max_sources: int | None = 6,
     llm_source_critic_review_blocks_fetch: bool = True,
     llm_source_credibility_max_sources: int | None = None,
     llm_source_credibility_source_id_allowlist: list[str] | None = None,
+    llm_source_identity_max_sources: int | None = 30,
+    llm_source_identity_post_fetch: bool = True,
+    llm_source_identity_require_llm: bool = True,
+    llm_source_identity_allow_deterministic_fallback: bool = False,
     llm_max_tokens: int = 4096,
     fallback_to_rule_based: bool = False,
     source_id_allowlist: list[str] | None = None,
@@ -203,6 +236,15 @@ def workflow_run_env(
     search_combine_with_seed_catalog: bool = True,
     search_cache_enabled: bool = True,
     search_provider_channel_allowlist: list[str] | None = None,
+    iterative_source_discovery: bool = False,
+    iterative_search_max_iterations: int = 3,
+    iterative_search_max_queries_per_iteration: int = 3,
+    iterative_search_max_total_queries: int = 9,
+    iterative_search_max_total_results: int = 30,
+    iterative_search_require_llm: bool = True,
+    iterative_search_allow_deterministic_fallback: bool = False,
+    iterative_search_stop_when_llm_says_sufficient: bool = True,
+    iterative_search_require_observation_after_each_iteration: bool = True,
     fetch_search_derived_sources: bool = False,
     fetch_max_search_derived_sources: int = 2,
     fetch_max_total_sources: int = 10,
@@ -217,10 +259,20 @@ def workflow_run_env(
     fetch_store_raw_text: bool = False,
     fetch_user_agent: str = "data-collection-workflow/0.1",
     content_fixture_map_path: str | Path | None = None,
+    external_fetch_enabled: bool = True,
+    external_fetch_provider_order: list[str] | None = None,
+    tavily_extract_format: str = "markdown",
+    tavily_extract_depth: str = "advanced",
+    tavily_extract_timeout_seconds: float = 45.0,
+    tavily_extract_chunks_per_source: int = 5,
+    human_review_enabled: bool = True,
     human_review_decisions_path: str | Path | None = None,
     human_review_apply_decisions: bool = False,
     human_review_require_reviewer_id: bool = True,
+    validation_mode: str = "live_cross_source",
+    validation_held_out_records_path: str | Path | None = None,
     allow_incompatible_validation_records: bool = False,
+    direct_collection_enable_audit_validation: bool = False,
     anomaly_max_cases_threshold: float = 1_000_000,
     anomaly_max_deaths_threshold: float = 100_000,
     anomaly_spike_multiplier: float = 10,
@@ -229,17 +281,17 @@ def workflow_run_env(
     """Return the environment for a configured HDC workflow run."""
 
     workflow_source_ids = (
-        source_id_allowlist or CASE_SOURCE_IDS
-        if source_id_allowlist_enabled
-        else []
-    )
+        CASE_SOURCE_IDS if source_id_allowlist is None else list(source_id_allowlist)
+    ) if source_id_allowlist_enabled else []
     critic_source_ids = list(llm_source_critic_source_id_allowlist or [])
-    seed_overlay = seed_source_overlay_path or SEED_SOURCE_OVERLAY_PATH
-    role_overlay = source_role_policy_overlay_path or SOURCE_ROLE_POLICY_OVERLAY_PATH
+    seed_overlay = seed_source_overlay_path
+    role_overlay = source_role_policy_overlay_path
     env = {
         "HDC_COLLECTION_MODE": collection_mode,
-        "HDC_SEED_SOURCE_OVERLAY_PATH": str(seed_overlay),
-        "HDC_SOURCE_ROLE_POLICY_OVERLAY_PATH": str(role_overlay),
+        "HDC_SEED_SOURCE_OVERLAY_PATH": str(seed_overlay) if seed_overlay else "",
+        "HDC_SOURCE_ROLE_POLICY_OVERLAY_PATH": (
+            str(role_overlay) if role_overlay else ""
+        ),
         "HDC_USE_FIXTURE_DOCUMENTS": "true" if use_fixture_documents else "false",
         "HDC_ENABLE_LIVE_FETCH": "true" if live_fetch else "false",
         "HDC_ENABLE_LLM_DISEASE_INTELLIGENCE": (
@@ -255,6 +307,18 @@ def workflow_run_env(
         "HDC_ENABLE_LLM_SOURCE_CRITIC": "true" if llm_source_critic else "false",
         "HDC_ENABLE_LLM_SOURCE_CREDIBILITY": (
             "true" if llm_source_credibility else "false"
+        ),
+        "HDC_ENABLE_LLM_SOURCE_IDENTITY": (
+            "true" if llm_source_identity else "false"
+        ),
+        "HDC_LLM_SOURCE_IDENTITY_POST_FETCH": (
+            "true" if llm_source_identity_post_fetch else "false"
+        ),
+        "HDC_LLM_SOURCE_IDENTITY_REQUIRE_LLM": (
+            "true" if llm_source_identity_require_llm else "false"
+        ),
+        "HDC_LLM_SOURCE_IDENTITY_ALLOW_DETERMINISTIC_FALLBACK": (
+            "true" if llm_source_identity_allow_deterministic_fallback else "false"
         ),
         "HDC_ENABLE_LLM_EXTRACTION": "true" if llm_extraction else "false",
         "HDC_SOURCE_ID_ALLOWLIST": ",".join(workflow_source_ids),
@@ -284,7 +348,23 @@ def workflow_run_env(
         "HDC_CONTENT_FIXTURE_MAP_PATH": (
             str(content_fixture_map_path) if content_fixture_map_path else ""
         ),
+        "HDC_EXTERNAL_FETCH_ENABLED": "true" if external_fetch_enabled else "false",
+        "HDC_EXTERNAL_FETCH_PROVIDER_ORDER": ",".join(
+            external_fetch_provider_order or ["tavily_extract", "native_requests"]
+        ),
+        "HDC_TAVILY_EXTRACT_FORMAT": str(tavily_extract_format or "markdown"),
+        "HDC_TAVILY_EXTRACT_DEPTH": str(tavily_extract_depth or "advanced"),
+        "HDC_TAVILY_EXTRACT_TIMEOUT_SECONDS": str(tavily_extract_timeout_seconds),
+        "HDC_TAVILY_EXTRACT_CHUNKS_PER_SOURCE": str(
+            tavily_extract_chunks_per_source
+        ),
         "HDC_LLM_MAX_CHUNKS": str(llm_max_chunks),
+        "HDC_LLM_MUST_FETCH_MIN_CHUNKS_PER_SOURCE": str(
+            llm_must_fetch_min_chunks_per_source
+        ),
+        "HDC_LLM_OFFICIAL_EXTRACTION_MAX_CHUNKS": str(
+            llm_official_extraction_max_chunks
+        ),
         "HDC_LLM_MAX_TOKENS": str(llm_max_tokens),
         "HDC_LLM_SOURCE_CRITIC_SOURCE_ID_ALLOWLIST": ",".join(critic_source_ids),
         "HDC_LLM_SOURCE_CRITIC_REVIEW_BLOCKS_FETCH": (
@@ -311,9 +391,48 @@ def workflow_run_env(
             search_provider_channel_allowlist
             or DEFAULT_SEARCH_PROVIDER_CHANNEL_ALLOWLIST
         ),
+        "HDC_ENABLE_ITERATIVE_SOURCE_DISCOVERY": (
+            "true" if iterative_source_discovery else "false"
+        ),
+        "HDC_ITERATIVE_SEARCH_MAX_ITERATIONS": str(
+            iterative_search_max_iterations
+        ),
+        "HDC_ITERATIVE_SEARCH_MAX_QUERIES_PER_ITERATION": str(
+            iterative_search_max_queries_per_iteration
+        ),
+        "HDC_ITERATIVE_SEARCH_MAX_TOTAL_QUERIES": str(
+            iterative_search_max_total_queries
+        ),
+        "HDC_ITERATIVE_SEARCH_MAX_TOTAL_RESULTS": str(
+            iterative_search_max_total_results
+        ),
+        "HDC_ITERATIVE_SEARCH_REQUIRE_LLM": (
+            "true" if iterative_search_require_llm else "false"
+        ),
+        "HDC_ITERATIVE_SEARCH_ALLOW_DETERMINISTIC_FALLBACK": (
+            "true" if iterative_search_allow_deterministic_fallback else "false"
+        ),
+        "HDC_ITERATIVE_SEARCH_STOP_WHEN_LLM_SAYS_SUFFICIENT": (
+            "true" if iterative_search_stop_when_llm_says_sufficient else "false"
+        ),
+        "HDC_ITERATIVE_SEARCH_REQUIRE_OBSERVATION_AFTER_EACH_ITERATION": (
+            "true"
+            if iterative_search_require_observation_after_each_iteration
+            else "false"
+        ),
+        "HDC_VALIDATION_MODE": str(validation_mode or "live_cross_source"),
+        "HDC_VALIDATION_HELD_OUT_RECORDS_PATH": (
+            str(validation_held_out_records_path)
+            if validation_held_out_records_path
+            else ""
+        ),
         "HDC_ALLOW_INCOMPATIBLE_VALIDATION_RECORDS": (
             "true" if allow_incompatible_validation_records else "false"
         ),
+        "HDC_DIRECT_COLLECTION_ENABLE_AUDIT_VALIDATION": (
+            "true" if direct_collection_enable_audit_validation else "false"
+        ),
+        "HDC_HUMAN_REVIEW_ENABLED": "true" if human_review_enabled else "false",
         "HDC_HUMAN_REVIEW_DECISIONS_PATH": (
             str(human_review_decisions_path) if human_review_decisions_path else ""
         ),
@@ -340,6 +459,10 @@ def workflow_run_env(
         env["HDC_LLM_SOURCE_CREDIBILITY_SOURCE_ID_ALLOWLIST"] = ",".join(
             llm_source_credibility_source_id_allowlist
         )
+    if llm_source_identity_max_sources is not None:
+        env["HDC_LLM_SOURCE_IDENTITY_MAX_SOURCES"] = str(
+            llm_source_identity_max_sources
+        )
     resolved_provider = provider or os.environ.get("HDC_LLM_PROVIDER") or DEFAULT_PROVIDER
     resolved_model = model or os.environ.get("HDC_LLM_MODEL") or DEFAULT_MODEL
     if resolved_provider:
@@ -365,9 +488,6 @@ def default_workflow_run_config() -> dict:
             "source_role_policy_overlay_path": str(
                 SOURCE_ROLE_POLICY_OVERLAY_PATH.relative_to(PROJECT_ROOT)
             ),
-            "validation_ground_truth_records_path": str(
-                GROUND_TRUTH_RECORDS_PATH.relative_to(PROJECT_ROOT)
-            ),
             "use_fixture_documents": False,
         },
         "user_request": DEFAULT_USER_REQUEST,
@@ -381,24 +501,35 @@ def default_workflow_run_config() -> dict:
             "timeout_seconds": 30,
         },
         "source_search": {
-            "enabled": False,
-            "mode": "disabled",
+            "enabled": True,
+            "mode": "live",
             "provider": "tavily",
             "fixture_path": str(DEFAULT_SEARCH_FIXTURE_PATH.relative_to(PROJECT_ROOT)),
-            "max_queries": 3,
-            "max_results_per_query": 5,
-            "max_total_results": 15,
+            "max_queries": 8,
+            "max_results_per_query": 8,
+            "max_total_results": 64,
             "timeout_seconds": 15,
             "combine_with_seed_catalog": True,
             "cache_enabled": True,
             "provider_channel_allowlist": list(
                 DEFAULT_SEARCH_PROVIDER_CHANNEL_ALLOWLIST
             ),
+            "iterative": {
+                "enabled": True,
+                "max_iterations": 3,
+                "max_queries_per_iteration": 4,
+                "max_total_queries": 20,
+                "max_total_results": 120,
+                "require_llm": True,
+                "allow_deterministic_fallback": False,
+                "stop_when_llm_says_sufficient": True,
+                "require_observation_after_each_iteration": True,
+            },
         },
         "content_fetch": {
-            "fetch_search_derived_sources": False,
-            "max_search_derived_sources": 2,
-            "max_total_sources": 10,
+            "fetch_search_derived_sources": True,
+            "max_search_derived_sources": 50,
+            "max_total_sources": 50,
             "min_credibility_score": 0.55,
             "allowed_final_roles": [
                 "collection",
@@ -406,15 +537,34 @@ def default_workflow_run_config() -> dict:
                 "collection_support",
                 "context",
             ],
-            "allow_needs_review": False,
+            "allow_needs_review": True,
             "domain_allowlist": [],
             "domain_blocklist": [],
-            "max_bytes": 1_000_000,
+            "max_bytes": 5_000_000,
             "parse_pdf_text": True,
             "parse_tables": True,
             "store_raw_text": False,
             "user_agent": "data-collection-workflow/0.1",
             "content_fixture_map_path": None,
+            "external_fetch": {
+                "enabled": True,
+                "provider_order": ["tavily_extract", "native_requests"],
+                "tavily_extract": {
+                    "format": "markdown",
+                    "extract_depth": "advanced",
+                    "timeout_seconds": 45,
+                    "chunks_per_source": 5,
+                },
+                "adaptive_budget": {
+                    "max_candidate_urls": 120,
+                    "max_fetch_urls": 50,
+                    "min_usable_documents": 12,
+                    "min_collection_sources": 6,
+                    "min_validation_sources": 3,
+                    "max_iterations": 3,
+                    "stop_when_llm_says_sufficient": True,
+                },
+            },
         },
         "llm": {
             "provider": DEFAULT_PROVIDER,
@@ -422,22 +572,29 @@ def default_workflow_run_config() -> dict:
             "source_planning_enabled": True,
             "source_critic_enabled": True,
             "structured_extraction_enabled": True,
-            "max_chunks": 8,
+            "max_chunks": 30,
             "max_tokens": 4096,
             "fallback_to_rule_based": False,
             "source_critic": {
-                "max_sources": 6,
-                "review_blocks_fetch": True,
+                "max_sources": 30,
+                "review_blocks_fetch": False,
             },
             "source_credibility": {
                 "enabled": False,
                 "max_sources": 6,
                 "source_id_allowlist": [],
             },
+            "source_identity": {
+                "enabled": True,
+                "max_sources": 30,
+                "post_fetch": True,
+                "require_llm": True,
+                "allow_deterministic_fallback": False,
+            },
         },
         "disease_intelligence": {
-            "llm_enabled": False,
-            "force_llm": False,
+            "llm_enabled": True,
+            "force_llm": True,
             "fallback_to_curated": True,
         },
         "anomaly_detection": {
@@ -448,11 +605,16 @@ def default_workflow_run_config() -> dict:
             "min_prior_records": 1,
         },
         "human_review": {
+            "enabled": False,
             "decisions_path": None,
             "apply_decisions": False,
             "require_reviewer_id": True,
         },
         "validation": {
+            "mode": "live_cross_source",
+            "held_out_records_path": None,
+            "prefer_authoritative_sources": True,
+            "min_independent_validation_sources": 1,
             "allow_incompatible_validation_records": False,
         },
         "source_sets": {
@@ -561,13 +723,45 @@ def load_config(config_path: str | Path | None = None) -> dict:
     if path.exists():
         loaded = _load_json_or_jsonc(path)
         config = _deep_merge(config, loaded)
+        if path != DEFAULT_WORKFLOW_RUN_CONFIG_PATH:
+            workflow_loaded = (
+                loaded.get("workflow") if isinstance(loaded.get("workflow"), dict) else {}
+            )
+            if "seed_source_overlay_path" not in workflow_loaded:
+                config.setdefault("workflow", {})["seed_source_overlay_path"] = None
+            if "source_role_policy_overlay_path" not in workflow_loaded:
+                config.setdefault("workflow", {})[
+                    "source_role_policy_overlay_path"
+                ] = None
+
+            source_sets_loaded = (
+                loaded.get("source_sets")
+                if isinstance(loaded.get("source_sets"), dict)
+                else {}
+            )
+            if not source_sets_loaded:
+                config["source_sets"] = {
+                    "source_id_allowlist_enabled": False,
+                    "collection_source_ids": [],
+                    "context_source_ids": [],
+                    "validation_reserved_source_ids": [],
+                    "workflow_source_ids": [],
+                    "llm_source_critic_source_ids": [],
+                }
+            elif "workflow_source_ids" not in source_sets_loaded:
+                config.setdefault("source_sets", {})["workflow_source_ids"] = []
     elif config_path:
         raise FileNotFoundError(f"Workflow run config not found: {path}")
     return config
 
 
-def _resolve_project_path(value: str | Path | None, default: Path) -> Path:
-    path = Path(value) if value else default
+def _resolve_project_path(
+    value: str | Path | None,
+    default: Path | None,
+) -> Path | None:
+    if not value:
+        return default
+    path = Path(value)
     if not path.is_absolute():
         path = PROJECT_ROOT / path
     return path
@@ -581,13 +775,55 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
     llm = config.get("llm") or {}
     disease_intelligence = config.get("disease_intelligence") or {}
     source_search = config.get("source_search") or {}
+    source_search_iterative = source_search.get("iterative") or {}
     content_fetch = config.get("content_fetch") or {}
+    external_fetch = content_fetch.get("external_fetch") or {}
+    tavily_extract = external_fetch.get("tavily_extract") or {}
     human_review = config.get("human_review") or {}
     validation = config.get("validation") or {}
     anomaly_detection = config.get("anomaly_detection") or {}
     source_critic = llm.get("source_critic") or {}
     source_credibility = llm.get("source_credibility") or {}
+    source_identity = llm.get("source_identity") or {}
     source_sets = config.get("source_sets") or {}
+    live_fetch_enabled = bool(live_web.get("enabled", True))
+    llm_source_planning_enabled = bool(llm.get("source_planning_enabled", True))
+    llm_source_critic_enabled = bool(llm.get("source_critic_enabled", True))
+    llm_extraction_enabled = bool(llm.get("structured_extraction_enabled", True))
+    llm_source_credibility_enabled = bool(source_credibility.get("enabled", False))
+    llm_source_identity_enabled = bool(source_identity.get("enabled", False))
+    llm_source_identity_require_llm = bool(
+        source_identity.get("require_llm", False)
+    )
+    llm_source_identity_allow_fallback = bool(
+        source_identity.get("allow_deterministic_fallback", True)
+    )
+    llm_disease_intelligence_enabled = bool(
+        disease_intelligence.get("llm_enabled", False)
+    )
+    disease_intelligence_force_llm = bool(
+        disease_intelligence.get("force_llm", False)
+    )
+    disease_intelligence_fallback_to_curated = bool(
+        disease_intelligence.get("fallback_to_curated", True)
+    )
+    offline_deterministic_run = (
+        not live_fetch_enabled
+        and not llm_source_planning_enabled
+        and not llm_source_critic_enabled
+        and not llm_extraction_enabled
+        and not llm_source_credibility_enabled
+    )
+    if offline_deterministic_run:
+        llm_disease_intelligence_enabled = False
+        disease_intelligence_force_llm = False
+        disease_intelligence_fallback_to_curated = True
+        llm_source_identity_enabled = False
+        llm_source_identity_require_llm = False
+        llm_source_identity_allow_fallback = True
+    human_review_enabled = bool(human_review.get("enabled", True))
+    if human_review.get("decisions_path") and human_review.get("apply_decisions"):
+        human_review_enabled = True
     search_enabled = bool(source_search.get("enabled", False))
     search_mode = str(source_search.get("mode") or "disabled").strip().lower()
     if not search_enabled:
@@ -597,34 +833,40 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         and search_mode == "live"
         and bool(source_search.get("live_search_enabled", True))
     )
+    iterative_enabled = bool(source_search_iterative.get("enabled", False)) and (
+        search_mode == "live"
+    )
     return workflow_run_env(
         collection_mode=workflow.get("collection_mode", "masked_validation"),
         seed_source_overlay_path=_resolve_project_path(
-            workflow.get("seed_source_overlay_path"), SEED_SOURCE_OVERLAY_PATH
+            workflow.get("seed_source_overlay_path"), None
         ),
         source_role_policy_overlay_path=_resolve_project_path(
             workflow.get("source_role_policy_overlay_path"),
-            SOURCE_ROLE_POLICY_OVERLAY_PATH,
+            None,
         ),
         use_fixture_documents=bool(workflow.get("use_fixture_documents", False)),
-        live_fetch=bool(live_web.get("enabled", True)),
-        llm_source_planning=bool(llm.get("source_planning_enabled", True)),
-        llm_source_critic=bool(llm.get("source_critic_enabled", True)),
-        llm_source_credibility=bool(source_credibility.get("enabled", False)),
-        llm_extraction=bool(llm.get("structured_extraction_enabled", True)),
-        llm_disease_intelligence=bool(
-            disease_intelligence.get("llm_enabled", False)
-        ),
-        disease_intelligence_force_llm=bool(
-            disease_intelligence.get("force_llm", False)
-        ),
-        disease_intelligence_fallback_to_curated=bool(
-            disease_intelligence.get("fallback_to_curated", True)
+        live_fetch=live_fetch_enabled,
+        llm_source_planning=llm_source_planning_enabled,
+        llm_source_critic=llm_source_critic_enabled,
+        llm_source_credibility=llm_source_credibility_enabled,
+        llm_source_identity=llm_source_identity_enabled,
+        llm_extraction=llm_extraction_enabled,
+        llm_disease_intelligence=llm_disease_intelligence_enabled,
+        disease_intelligence_force_llm=disease_intelligence_force_llm,
+        disease_intelligence_fallback_to_curated=(
+            disease_intelligence_fallback_to_curated
         ),
         provider=llm.get("provider"),
         model=llm.get("model"),
         timeout_seconds=float(live_web.get("timeout_seconds", 30)),
         llm_max_chunks=int(llm.get("max_chunks", 8)),
+        llm_must_fetch_min_chunks_per_source=int(
+            llm.get("must_fetch_min_chunks_per_source", 6)
+        ),
+        llm_official_extraction_max_chunks=int(
+            llm.get("official_extraction_max_chunks", 30)
+        ),
         llm_source_critic_max_sources=source_critic.get("max_sources", 6),
         llm_source_critic_review_blocks_fetch=bool(
             source_critic.get("review_blocks_fetch", True)
@@ -633,9 +875,15 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         llm_source_credibility_source_id_allowlist=source_credibility.get(
             "source_id_allowlist"
         ),
+        llm_source_identity_max_sources=source_identity.get("max_sources", 6),
+        llm_source_identity_post_fetch=bool(source_identity.get("post_fetch", True)),
+        llm_source_identity_require_llm=llm_source_identity_require_llm,
+        llm_source_identity_allow_deterministic_fallback=(
+            llm_source_identity_allow_fallback
+        ),
         llm_max_tokens=int(llm.get("max_tokens", 4096)),
         fallback_to_rule_based=bool(llm.get("fallback_to_rule_based", False)),
-        source_id_allowlist=source_sets.get("workflow_source_ids") or CASE_SOURCE_IDS,
+        source_id_allowlist=source_sets.get("workflow_source_ids"),
         source_id_allowlist_enabled=bool(
             source_sets.get("source_id_allowlist_enabled", True)
         ),
@@ -663,6 +911,33 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
             "provider_channel_allowlist"
         )
         or DEFAULT_SEARCH_PROVIDER_CHANNEL_ALLOWLIST,
+        iterative_source_discovery=iterative_enabled,
+        iterative_search_max_iterations=int(
+            source_search_iterative.get("max_iterations", 3)
+        ),
+        iterative_search_max_queries_per_iteration=int(
+            source_search_iterative.get("max_queries_per_iteration", 3)
+        ),
+        iterative_search_max_total_queries=int(
+            source_search_iterative.get("max_total_queries", 9)
+        ),
+        iterative_search_max_total_results=int(
+            source_search_iterative.get("max_total_results", 30)
+        ),
+        iterative_search_require_llm=bool(
+            source_search_iterative.get("require_llm", True)
+        ),
+        iterative_search_allow_deterministic_fallback=bool(
+            source_search_iterative.get("allow_deterministic_fallback", False)
+        ),
+        iterative_search_stop_when_llm_says_sufficient=bool(
+            source_search_iterative.get("stop_when_llm_says_sufficient", True)
+        ),
+        iterative_search_require_observation_after_each_iteration=bool(
+            source_search_iterative.get(
+                "require_observation_after_each_iteration", True
+            )
+        ),
         fetch_search_derived_sources=bool(
             content_fetch.get("fetch_search_derived_sources", False)
         ),
@@ -675,7 +950,10 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         ),
         fetch_allowed_final_roles=content_fetch.get("allowed_final_roles")
         or ["collection", "validation", "collection_support", "context"],
-        fetch_allow_needs_review=bool(content_fetch.get("allow_needs_review", False)),
+        fetch_allow_needs_review=bool(
+            content_fetch.get("allow_needs_review", False)
+            or not human_review_enabled
+        ),
         fetch_domain_allowlist=content_fetch.get("domain_allowlist") or [],
         fetch_domain_blocklist=content_fetch.get("domain_blocklist") or [],
         fetch_max_bytes=int(content_fetch.get("max_bytes", 1_000_000)),
@@ -691,6 +969,18 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         )
         if content_fetch.get("content_fixture_map_path")
         else None,
+        external_fetch_enabled=bool(external_fetch.get("enabled", True)),
+        external_fetch_provider_order=external_fetch.get("provider_order")
+        or ["tavily_extract", "native_requests"],
+        tavily_extract_format=str(tavily_extract.get("format") or "markdown"),
+        tavily_extract_depth=str(tavily_extract.get("extract_depth") or "advanced"),
+        tavily_extract_timeout_seconds=float(
+            tavily_extract.get("timeout_seconds", 45)
+        ),
+        tavily_extract_chunks_per_source=int(
+            tavily_extract.get("chunks_per_source", 5)
+        ),
+        human_review_enabled=human_review_enabled,
         human_review_decisions_path=_resolve_project_path(
             human_review.get("decisions_path")
             or config.get("human_review_decisions_path"),
@@ -704,8 +994,19 @@ def workflow_run_env_from_config(config: dict) -> dict[str, str]:
         human_review_require_reviewer_id=bool(
             human_review.get("require_reviewer_id", True)
         ),
+        validation_mode=str(validation.get("mode") or "live_cross_source"),
+        validation_held_out_records_path=_resolve_project_path(
+            validation.get("held_out_records_path"),
+            PROJECT_ROOT,
+        )
+        if validation.get("held_out_records_path")
+        else None,
         allow_incompatible_validation_records=bool(
             validation.get("allow_incompatible_validation_records", False)
+        ),
+        direct_collection_enable_audit_validation=bool(
+            config.get("direct_collection_enable_audit_validation")
+            or validation.get("direct_collection_enable_audit_validation", False)
         ),
         anomaly_max_cases_threshold=float(
             anomaly_detection.get("max_cases_threshold", 1_000_000)
@@ -772,6 +1073,14 @@ def workflow_run_config_with_overrides(
         updated["llm"]["source_planning_enabled"] = bool(all_llm)
         updated["llm"]["source_critic_enabled"] = bool(all_llm)
         updated["llm"]["structured_extraction_enabled"] = bool(all_llm)
+        source_identity = updated["llm"].setdefault("source_identity", {})
+        source_identity["enabled"] = bool(all_llm)
+        source_identity["require_llm"] = bool(all_llm)
+        source_identity["allow_deterministic_fallback"] = not bool(all_llm)
+        disease_intelligence = updated.setdefault("disease_intelligence", {})
+        disease_intelligence["llm_enabled"] = bool(all_llm)
+        disease_intelligence["force_llm"] = bool(all_llm)
+        disease_intelligence["fallback_to_curated"] = True
     if provider:
         updated["llm"]["provider"] = provider
     if model:
@@ -862,14 +1171,24 @@ def workflow_console_output_dir_from_config(
     return console_root
 
 
-def validation_records_path_from_config(config: dict) -> Path:
-    """Resolve the validation ground-truth CSV path from a runtime profile."""
+def validation_records_path_from_config(config: dict) -> Path | None:
+    """Resolve an explicitly configured held-out validation CSV path.
 
+    Live cross-source validation is the default and intentionally has no local
+    held-out CSV. The bundled New Mexico file remains available only when a
+    profile explicitly points to it.
+    """
+
+    validation = config.get("validation") or {}
     workflow = config.get("workflow") or {}
-    return _resolve_project_path(
-        workflow.get("validation_ground_truth_records_path"),
-        GROUND_TRUTH_RECORDS_PATH,
+    raw_path = (
+        validation.get("held_out_records_path")
+        or validation.get("validation_records_path")
+        or workflow.get("validation_ground_truth_records_path")
     )
+    if not raw_path:
+        return None
+    return _resolve_project_path(raw_path, PROJECT_ROOT)
 
 
 def resolve_workflow_run_config_path(config_path: str | Path | None = None) -> Path:
@@ -900,6 +1219,22 @@ def workflow_initial_state_from_config(
         include_empty_fields=include_empty_fields,
     )
     human_review = config.get("human_review") or {}
+    validation = config.get("validation") or {}
+    human_review_enabled = bool(human_review.get("enabled", True))
+    if human_review.get("decisions_path") and human_review.get("apply_decisions"):
+        human_review_enabled = True
+    state["human_review_enabled"] = human_review_enabled
+    state["validation_mode"] = str(validation.get("mode") or "live_cross_source")
+    state["validation_config"] = {
+        "mode": state["validation_mode"],
+        "held_out_records_path": validation.get("held_out_records_path"),
+        "prefer_authoritative_sources": bool(
+            validation.get("prefer_authoritative_sources", True)
+        ),
+        "min_independent_validation_sources": int(
+            validation.get("min_independent_validation_sources", 1)
+        ),
+    }
     decisions_path = human_review.get("decisions_path") or config.get(
         "human_review_decisions_path"
     )
@@ -929,6 +1264,11 @@ def studio_initial_state(
             "source_search_results": [],
             "source_search_execution_summary": None,
             "source_discovery_summary": None,
+            "iterative_source_discovery_summary": None,
+            "search_iteration_plans": [],
+            "search_iteration_observations": [],
+            "search_refinement_decisions": [],
+            "iterative_search_queries": [],
             "source_registry": [],
             "source_registry_summary": None,
             "source_screening_summary": None,
@@ -959,6 +1299,7 @@ def studio_initial_state(
             "anomaly_review_items": [],
             "conflicts": [],
             "human_review_queue": [],
+            "human_review_enabled": True,
             "human_review_decisions": [],
             "human_review_decisions_path": None,
             "applied_human_review_decisions": [],

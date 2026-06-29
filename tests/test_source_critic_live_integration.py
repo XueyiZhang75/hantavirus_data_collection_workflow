@@ -4,6 +4,8 @@ import importlib
 import sys
 from pathlib import Path
 
+import pytest
+
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _SRC = _PROJECT_ROOT / "src"
 if str(_SRC) not in sys.path:
@@ -16,6 +18,10 @@ CRITIC_ENV_KEYS = [
     "HDC_LLM_SOURCE_CRITIC_MAX_SOURCES",
     "HDC_LLM_SOURCE_CRITIC_REVIEW_BLOCKS_FETCH",
     "HDC_ENABLE_LLM_SOURCE_CREDIBILITY",
+    "HDC_ENABLE_LLM_SOURCE_IDENTITY",
+    "HDC_LLM_SOURCE_IDENTITY_MAX_SOURCES",
+    "HDC_LLM_SOURCE_IDENTITY_REQUIRE_LLM",
+    "HDC_LLM_SOURCE_IDENTITY_ALLOW_DETERMINISTIC_FALLBACK",
     "HDC_LLM_PROVIDER",
     "HDC_LLM_MODEL",
 ]
@@ -360,6 +366,35 @@ def test_critic_failure_does_not_crash_workflow(monkeypatch):
     assert summary["assessed_source_count"] == 0
     assert result["source_registry"][0]["llm_source_critic_failed"] is True
     assert result["source_registry"][0]["ready_for_content_fetch"] is True
+
+
+def test_required_source_identity_llm_failure_stops_product_workflow(monkeypatch):
+    source_identity_module = importlib.import_module("hdc_workflow.source_identity")
+    from hdc_workflow.nodes.source_screening import (
+        source_critic_and_uncertainty_routing,
+        source_screening,
+    )
+
+    _clear_critic_env(monkeypatch)
+    monkeypatch.setenv("HDC_ENABLE_LLM_SOURCE_IDENTITY", "true")
+    monkeypatch.setenv("HDC_LLM_SOURCE_IDENTITY_MAX_SOURCES", "1")
+    monkeypatch.setenv("HDC_LLM_SOURCE_IDENTITY_REQUIRE_LLM", "true")
+    monkeypatch.setenv("HDC_LLM_SOURCE_IDENTITY_ALLOW_DETERMINISTIC_FALLBACK", "false")
+
+    def fail_identity(**_kwargs):
+        raise RuntimeError("mock missing source identity LLM")
+
+    monkeypatch.setattr(
+        source_identity_module,
+        "assess_source_identity_with_llm",
+        fail_identity,
+    )
+
+    state = _state([_entry("src_identity_required")])
+    state.update(source_screening(state))
+
+    with pytest.raises(RuntimeError, match="source identity LLM required"):
+        source_critic_and_uncertainty_routing(state)
 
 
 def test_disabled_critic_does_not_call_llm(monkeypatch):

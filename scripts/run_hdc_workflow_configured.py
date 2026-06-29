@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import uuid
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,6 +28,23 @@ from hdc_workflow.evaluation_report_builder import (  # noqa: E402
 )
 from hdc_workflow.export import export_final_data_package, write_json  # noqa: E402
 from hdc_workflow.graph import build_graph  # noqa: E402
+from hdc_workflow.interpretive_report import (  # noqa: E402
+    CHINESE_REPORT,
+    ENGLISH_REPORT,
+    SUMMARY_JSON,
+    write_interpretive_reports,
+)
+from hdc_workflow.run_events import (  # noqa: E402
+    RunEventWriter,
+    summarize_state_update,
+)
+from hdc_workflow.workflow_notebook import write_workflow_replay_notebook  # noqa: E402
+from hdc_workflow.human_review_productization import (  # noqa: E402
+    write_human_review_workflow_artifacts,
+)
+from hdc_workflow.workflow_visualization import (  # noqa: E402
+    write_workflow_visualization_artifacts,
+)
 from hdc_workflow.search_providers import search_api_key_present  # noqa: E402
 from hdc_workflow.validation_source_compatibility import (  # noqa: E402
     resolve_task_compatible_validation_records,
@@ -59,13 +78,252 @@ _TOP_LEVEL_REPORT_PATH = (
 _TOP_LEVEL_SUMMARY_PATH = (
     _PROJECT_ROOT / "outputs" / "workflow_runs" / "latest_workflow_run_summary.json"
 )
+_TOP_LEVEL_INTERPRETIVE_CHINESE_PATH = (
+    _PROJECT_ROOT
+    / "outputs"
+    / "workflow_runs"
+    / "latest_workflow_interpretive_report_chinese.md"
+)
+_TOP_LEVEL_INTERPRETIVE_ENGLISH_PATH = (
+    _PROJECT_ROOT
+    / "outputs"
+    / "workflow_runs"
+    / "latest_workflow_interpretive_report.md"
+)
+_TOP_LEVEL_INTERPRETIVE_SUMMARY_PATH = (
+    _PROJECT_ROOT
+    / "outputs"
+    / "workflow_runs"
+    / "latest_workflow_interpretive_report_summary.json"
+)
+_TOP_LEVEL_WORKFLOW_VISUALIZATION_DIR = (
+    _PROJECT_ROOT / "outputs" / "workflow_visualization"
+)
+WORKFLOW_NODE_ORDER = [
+    "task_intake_and_scope_planning",
+    "disease_intelligence_builder",
+    "profile_and_schema_setup",
+    "executable_source_planning",
+    "query_strategy_builder",
+    "source_discovery",
+    "source_dedup_and_registry",
+    "source_screening",
+    "source_critic_and_uncertainty_routing",
+    "content_fetch_and_parse",
+    "document_quality_check",
+    "evidence_chunking_and_data_presence_flagging",
+    "structured_extraction",
+    "schema_validation_and_repair",
+    "record_normalization",
+    "record_linking",
+    "cross_source_consistency_check",
+    "quality_gate_routing",
+    "human_review",
+    "final_data_package_builder",
+]
+
+
+def _langsmith_project_name() -> str:
+    return (os.environ.get("LANGSMITH_PROJECT") or "hdc-workflow-demo").strip()
+
+
+def _langsmith_trace_config(session_id: str) -> dict:
+    trace_uuid = uuid.uuid4()
+    trace_id = str(trace_uuid)
+    return {
+        "run_name": f"HDC workflow run {session_id}",
+        "run_id": trace_uuid,
+        "tags": ["hdc-workflow", f"session:{session_id}"],
+        "metadata": {
+            "session_id": session_id,
+            "trace_id": trace_id,
+            "langsmith_project": _langsmith_project_name(),
+            "langgraph_graph": "hantavirus_data_collection_workflow",
+        },
+    }
+
+
+def _install_trace_env(trace_config: dict) -> dict[str, str | None]:
+    metadata = trace_config.get("metadata") or {}
+    updates = {
+        "HDC_TRACE_SESSION_ID": str(metadata.get("session_id") or ""),
+        "HDC_TRACE_ID": str(metadata.get("trace_id") or ""),
+        "HDC_TRACE_RUN_NAME": str(trace_config.get("run_name") or ""),
+    }
+    previous = {key: os.environ.get(key) for key in updates}
+    for key, value in updates.items():
+        if value:
+            os.environ[key] = value
+    return previous
+
+
+def _restore_env(previous: dict[str, str | None]) -> None:
+    for key, value in previous.items():
+        if value is None:
+            os.environ.pop(key, None)
+        else:
+            os.environ[key] = value
+
+
+def _langsmith_external_trace_enabled() -> bool:
+    return (os.environ.get("HDC_ENABLE_LANGSMITH_TRACE") or "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _suppress_external_langsmith_env() -> dict[str, str | None]:
+    keys = [
+        "LANGSMITH_API_KEY",
+        "LANGCHAIN_API_KEY",
+        "LANGSMITH_TRACING",
+        "LANGCHAIN_TRACING_V2",
+        "LANGCHAIN_TRACING",
+    ]
+    previous = {key: os.environ.get(key) for key in keys}
+    os.environ.pop("LANGSMITH_API_KEY", None)
+    os.environ.pop("LANGCHAIN_API_KEY", None)
+    os.environ["LANGSMITH_TRACING"] = "false"
+    os.environ["LANGCHAIN_TRACING_V2"] = "false"
+    os.environ["LANGCHAIN_TRACING"] = "false"
+    return previous
+
+
+def _flush_langsmith_tracers() -> None:
+    try:
+        from langchain_core.tracers.langchain import wait_for_all_tracers
+    except Exception:
+        return
+    try:
+        wait_for_all_tracers()
+    except Exception:
+        return
+
+
+def _copy_text_file(source: Path | str, target: Path) -> None:
+    source = Path(source)
+    if not source.exists():
+        return
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+
+def _write_workflow_visualization_latest_aliases(paths: dict[str, str]) -> dict[str, str]:
+    aliases = {
+        "latest_workflow_visualization_index": (
+            paths.get("workflow_visualization_index"),
+            _TOP_LEVEL_WORKFLOW_VISUALIZATION_DIR / "index.html",
+        ),
+        "latest_workflow_visualization_summary": (
+            paths.get("workflow_visualization_summary"),
+            _TOP_LEVEL_WORKFLOW_VISUALIZATION_DIR
+            / "workflow_visualization_summary.json",
+        ),
+        "latest_evidence_flow_graph_html": (
+            paths.get("evidence_flow_graph_html"),
+            _TOP_LEVEL_WORKFLOW_VISUALIZATION_DIR / "evidence_flow_graph.html",
+        ),
+        "latest_dataset_decision_flow_html": (
+            paths.get("dataset_decision_flow_html"),
+            _TOP_LEVEL_WORKFLOW_VISUALIZATION_DIR / "dataset_decision_flow.html",
+        ),
+        "latest_human_review_workflow_html": (
+            paths.get("human_review_workflow_html"),
+            _TOP_LEVEL_WORKFLOW_VISUALIZATION_DIR / "human_review_workflow.html",
+        ),
+    }
+    written: dict[str, str] = {}
+    for key, (source, target) in aliases.items():
+        if source:
+            _copy_text_file(source, target)
+            if target.exists():
+                written[key] = str(target)
+    return written
+
+
+def _append_visualization_report_section(
+    report_path: Path,
+    visualization_paths: dict[str, str],
+) -> None:
+    if not report_path.exists():
+        return
+    lines = [
+        "",
+        "## 12. Workflow visualization artifacts",
+        "",
+        "- Workflow visualization index: "
+        f"`{visualization_paths.get('workflow_visualization_index')}`",
+        "- Workflow timeline: "
+        f"`{visualization_paths.get('workflow_timeline_html')}`",
+        "- Evidence flow graph: "
+        f"`{visualization_paths.get('evidence_flow_graph_html')}`",
+        "- Claim comparison cards: "
+        f"`{visualization_paths.get('claim_comparison_cards_html')}`",
+        "- Dataset decision flow: "
+        f"`{visualization_paths.get('dataset_decision_flow_html')}`",
+        "- Human review workflow visualization: "
+        f"`{visualization_paths.get('human_review_workflow_html')}`",
+        "- Visualization summary: "
+        f"`{visualization_paths.get('workflow_visualization_summary')}`",
+        "",
+    ]
+    with report_path.open("a", encoding="utf-8") as handle:
+        handle.write("\n".join(lines))
+
+
+def _write_interpretive_report_outputs(
+    output_dir: Path,
+    *,
+    write_latest_alias: bool,
+) -> dict:
+    """Write deterministic interpretive reports from current session artifacts."""
+
+    paths = write_interpretive_reports(output_dir)
+    manifest = {
+        "interpretive_report_chinese": paths["chinese_report"],
+        "interpretive_report_english": paths["english_report"],
+        "interpretive_report_summary": paths["summary_json"],
+    }
+    if write_latest_alias:
+        _TOP_LEVEL_INTERPRETIVE_CHINESE_PATH.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+        _TOP_LEVEL_INTERPRETIVE_CHINESE_PATH.write_text(
+            Path(paths["chinese_report"]).read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        _TOP_LEVEL_INTERPRETIVE_ENGLISH_PATH.write_text(
+            Path(paths["english_report"]).read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        _TOP_LEVEL_INTERPRETIVE_SUMMARY_PATH.write_text(
+            Path(paths["summary_json"]).read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        manifest.update(
+            {
+                "stable_interpretive_report_chinese": str(
+                    _TOP_LEVEL_INTERPRETIVE_CHINESE_PATH
+                ),
+                "stable_interpretive_report_english": str(
+                    _TOP_LEVEL_INTERPRETIVE_ENGLISH_PATH
+                ),
+                "stable_interpretive_report_summary": str(
+                    _TOP_LEVEL_INTERPRETIVE_SUMMARY_PATH
+                ),
+            }
+        )
+    return manifest
 
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Run a configured HDC workflow profile with live source fetch, LLM "
-            "source planning, LLM source critic, and LLM structured extraction."
+            "source planning, source identity, source critic, and structured extraction."
         )
     )
     parser.add_argument(
@@ -86,12 +344,12 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--enable-all-llm",
         action="store_true",
-        help="Override config and enable all three LLM stages for this run.",
+        help="Override config and enable all configured LLM stages for this run.",
     )
     parser.add_argument(
         "--disable-all-llm",
         action="store_true",
-        help="Override config and disable all three LLM stages for this run.",
+        help="Override config and disable all configured LLM stages for this run.",
     )
     parser.add_argument("--provider", default=None)
     parser.add_argument("--model", default=None)
@@ -108,6 +366,24 @@ def _build_parser() -> argparse.ArgumentParser:
         "--print-config-only",
         action="store_true",
         help="Print sanitized configuration without running live fetch or LLM calls.",
+    )
+    parser.add_argument(
+        "--live-status",
+        dest="live_status",
+        action="store_true",
+        default=True,
+        help="Show an interactive Rich terminal status panel while the graph runs.",
+    )
+    parser.add_argument(
+        "--no-live-status",
+        dest="live_status",
+        action="store_false",
+        help="Disable terminal live status; runtime event files are still written.",
+    )
+    parser.add_argument(
+        "--write-run-notebook",
+        action="store_true",
+        help="Write workflow_replay_notebook.ipynb after the run completes.",
     )
     return parser
 
@@ -151,6 +427,7 @@ def _llm_enabled(env_updates: dict[str, str]) -> bool:
             "HDC_ENABLE_LLM_SOURCE_PLANNING",
             "HDC_ENABLE_LLM_SOURCE_CRITIC",
             "HDC_ENABLE_LLM_SOURCE_CREDIBILITY",
+            "HDC_ENABLE_LLM_SOURCE_IDENTITY",
             "HDC_ENABLE_LLM_EXTRACTION",
         )
     )
@@ -261,6 +538,8 @@ def _live_fetch_summary(result: dict) -> dict:
                 "credibility_score": doc.get("credibility_score"),
                 "credibility_level": doc.get("credibility_level"),
                 "fetch_status": doc.get("fetch_status"),
+                "fetch_provider": doc.get("fetch_provider"),
+                "provider_attempts": doc.get("provider_attempts") or [],
                 "http_status_code": doc.get("http_status_code"),
                 "quality_status": doc.get("quality_status"),
                 "parse_status": doc.get("parse_status"),
@@ -276,6 +555,20 @@ def _live_fetch_summary(result: dict) -> dict:
         "document_count": len(documents),
         "document_source_ids": sorted({row["source_id"] for row in rows if row["source_id"]}),
         "fetch_status_counts": fetch_summary.get("fetch_status_counts") or {},
+        "external_fetch_enabled": fetch_summary.get("external_fetch_enabled"),
+        "external_fetch_provider_order": fetch_summary.get(
+            "external_fetch_provider_order"
+        )
+        or [],
+        "fetch_provider_counts": fetch_summary.get("fetch_provider_counts") or {},
+        "external_fetch_failure_counts": fetch_summary.get(
+            "external_fetch_failure_counts"
+        )
+        or {},
+        "selected_fetch_bucket_counts": fetch_summary.get(
+            "selected_fetch_bucket_counts"
+        )
+        or {},
         "parser_status_counts": fetch_summary.get("parser_status_counts") or {},
         "parser_used_counts": fetch_summary.get("parser_used_counts") or {},
         "selected_search_derived_fetch_count": fetch_summary.get(
@@ -306,6 +599,7 @@ def _llm_stage_summary(result: dict, provider: str, model: str) -> dict:
     planning = result.get("source_planning_agent_summary") or {}
     critic = result.get("source_critic_summary") or {}
     credibility = result.get("source_credibility_summary") or {}
+    identity = result.get("source_identity_summary") or {}
     extraction = result.get("structured_extraction_summary") or {}
     llm_extraction = result.get("llm_extraction_summary") or {}
     return {
@@ -391,6 +685,30 @@ def _llm_stage_summary(result: dict, provider: str, model: str) -> dict:
             "llm_failure_count": credibility.get("llm_failure_count", 0),
             "needs_review_count": credibility.get("needs_review_count", 0),
         },
+        "source_identity": {
+            "enabled": (
+                identity.get("llm_identity_assessed_count", 0) > 0
+                or bool(identity.get("identity_assessed_count", 0))
+            ),
+            "identity_assessed_count": identity.get("identity_assessed_count", 0),
+            "llm_identity_assessed_count": identity.get(
+                "llm_identity_assessed_count", 0
+            ),
+            "post_fetch_identity_assessed_count": identity.get(
+                "post_fetch_identity_assessed_count", 0
+            ),
+            "unknown_publisher_count": identity.get("unknown_publisher_count", 0),
+            "source_type_counts": identity.get("source_type_counts") or {},
+            "claim_support_role_counts": identity.get(
+                "claim_support_role_counts"
+            )
+            or {},
+            "recommended_fetch_use_counts": identity.get(
+                "recommended_fetch_use_counts"
+            )
+            or {},
+            "warning_counts": identity.get("warning_counts") or {},
+        },
         "structured_extraction": {
             "enabled": bool(extraction.get("llm_enabled")),
             "mode": extraction.get("extraction_mode"),
@@ -458,6 +776,12 @@ def _write_validation_outputs(
         "active_validation_record_count": len(validation_records),
         "inactive_validation_record_count": len(inactive_validation_records or []),
         "raw_validation_record_count": len(raw_validation_records or []),
+        "validation_mode": (validation_source_compatibility_summary or {}).get(
+            "validation_mode"
+        ),
+        "validation_records_source": (
+            validation_source_compatibility_summary or {}
+        ).get("validation_records_source"),
         "validation_source_compatibility_status": (
             validation_source_compatibility_summary or {}
         ).get("compatibility_status"),
@@ -629,8 +953,12 @@ def _write_report(
     )
     route = result.get("current_route")
     source_search = result.get("source_search_execution_summary") or {}
+    iterative_source_discovery = (
+        result.get("iterative_source_discovery_summary") or {}
+    )
     source_discovery = result.get("source_discovery_summary") or {}
     source_credibility = result.get("source_credibility_summary") or {}
+    source_identity = result.get("source_identity_summary") or {}
     disease_relevance = result.get("disease_relevance_summary") or {}
     run_quality = result.get("run_quality_summary") or final_package.get(
         "run_quality_summary"
@@ -638,6 +966,22 @@ def _write_report(
     final_dataset_quality = result.get(
         "final_dataset_quality_summary"
     ) or final_package.get("final_dataset_quality_summary") or {}
+    claims = list(result.get("claims") or final_package.get("claims") or [])
+    claim_comparisons = list(
+        result.get("claim_comparisons")
+        or final_package.get("claim_comparisons")
+        or []
+    )
+    corroborated_events = list(
+        result.get("corroborated_events")
+        or final_package.get("corroborated_events")
+        or []
+    )
+    corroboration_summary = (
+        result.get("corroboration_summary")
+        or final_package.get("corroboration_summary")
+        or {}
+    )
     final_dataset_pre_quality_gate = list(
         result.get("final_dataset_pre_quality_gate")
         or final_package.get("final_dataset_pre_quality_gate")
@@ -653,16 +997,45 @@ def _write_report(
         or final_package.get("pending_review_records")
         or []
     )
+    non_primary_observations = list(
+        result.get("non_primary_observations")
+        or final_package.get("non_primary_observations")
+        or []
+    )
+    final_case_dataset = list(final_package.get("final_case_dataset") or [])
+    zero_case_statements = list(final_package.get("zero_case_statements") or [])
+    exposure_monitoring_records = list(
+        final_package.get("exposure_monitoring_records") or []
+    )
+    surveillance_summary_records = list(
+        final_package.get("surveillance_summary_records") or []
+    )
+    outbreak_summary_records = list(final_package.get("outbreak_summary_records") or [])
+    context_records = list(final_package.get("context_records") or [])
+    unclassified_observation_records = list(
+        final_package.get("unclassified_observation_records") or []
+    )
+    observation_type_dataset_summary = (
+        final_package.get("observation_type_dataset_summary") or {}
+    )
     accepted_records = list(final_package.get("final_dataset") or [])
     accepted_record_count = len(accepted_records)
     pre_quality_record_count = len(final_dataset_pre_quality_gate)
     quarantined_record_count = len(quarantined_records)
     pending_review_record_count = len(pending_review_records)
+    non_primary_observation_count = len(non_primary_observations)
     post_review_record_count = len(final_dataset_post_review)
     run_status_text = user_facing_run_status(run_quality)
     recommended_user_message = run_quality.get("recommended_user_message")
     validation_compatibility_status = validation_manifest.get(
         "validation_source_compatibility_status"
+    )
+    validation_mode = (
+        validation_manifest.get("validation_mode")
+        or (result.get("validation_source_compatibility_summary") or {}).get(
+            "validation_mode"
+        )
+        or "live_cross_source"
     )
     validation_limited = bool(
         run_quality.get("validation_limited")
@@ -698,13 +1071,21 @@ def _write_report(
         f"- API key present: `{api_key_present(provider)}`",
         f"- LLM source planning: `{llm_summary['source_planning']['enabled']}`",
         f"- LLM source critic: `{llm_summary['source_critic']['enabled']}`",
+        f"- LLM source identity assessed sources: `{llm_summary['source_identity'].get('llm_identity_assessed_count')}`",
         f"- LLM structured extraction: `{llm_summary['structured_extraction']['enabled']}`",
         f"- Source search mode: `{source_search.get('search_mode') or 'disabled'}`",
         f"- Source search provider: `{source_search.get('search_provider') or 'n/a'}`",
         f"- Source search executed queries: `{source_search.get('executed_query_count', 0)}`",
         f"- Search-derived source candidates: `{source_search.get('candidate_from_search_count', 0)}`",
+        f"- Iterative source discovery: `{iterative_source_discovery.get('iterative_source_discovery_enabled', False)}`",
+        f"- Iterative search iterations: `{iterative_source_discovery.get('search_iteration_count', 0)}`",
+        f"- Iterative stop decision: `{iterative_source_discovery.get('stop_decision') or 'n/a'}`",
+        f"- Iterative stop reason: `{iterative_source_discovery.get('stop_reason') or 'n/a'}`",
         f"- Source credibility assessed sources: `{source_credibility.get('assessed_source_count', 0)}`",
         f"- Source credibility role counts: `{source_credibility.get('role_counts') or {}}`",
+        f"- Source identity assessed sources: `{source_identity.get('identity_assessed_count', 0)}`",
+        f"- Source identity type counts: `{source_identity.get('source_type_counts') or {}}`",
+        f"- Source identity warning counts: `{source_identity.get('warning_counts') or {}}`",
         f"- Source discovery method: `{source_discovery.get('discovery_method')}`",
         f"- Disease relevance target: `{disease_relevance.get('target_disease') or 'n/a'}`",
         f"- Disease relevance source status counts: `{disease_relevance.get('source_status_counts') or {}}`",
@@ -720,10 +1101,23 @@ def _write_report(
         f"- Run quality status: `{run_quality.get('run_quality_status') or 'n/a'}`",
         f"- Final dataset mode: `{run_quality.get('final_dataset_mode') or 'n/a'}`",
         f"- Accepted final dataset count: `{accepted_record_count}`",
+        f"- Final case dataset count: `{len(final_case_dataset)}`",
+        f"- Zero-case statement count: `{len(zero_case_statements)}`",
+        f"- Exposure-monitoring record count: `{len(exposure_monitoring_records)}`",
+        f"- Surveillance summary record count: `{len(surveillance_summary_records)}`",
+        f"- Outbreak summary record count: `{len(outbreak_summary_records)}`",
+        f"- Context record count: `{len(context_records)}`",
+        f"- Unclassified observation count: `{len(unclassified_observation_records)}`",
+        f"- Observation dataset view counts: `{observation_type_dataset_summary.get('dataset_view_counts') or {}}`",
         f"- Pre-quality-gate record count: `{pre_quality_record_count}`",
         f"- Quarantined record count: `{quarantined_record_count}`",
         f"- Pending review record count: `{pending_review_record_count}`",
+        f"- Non-primary observation count: `{non_primary_observation_count}`",
         f"- Final dataset post-review count: `{post_review_record_count}`",
+        f"- Primary-case dataset status: `{run_quality.get('primary_case_dataset_status') or 'n/a'}`",
+        f"- Recommended primary dataset message: `{run_quality.get('recommended_primary_dataset_message') or 'n/a'}`",
+        f"- Primary-case eligible accepted count: `{run_quality.get('primary_case_dataset_eligible_count', 0)}`",
+        f"- Corroborated primary case event count: `{run_quality.get('corroborated_primary_case_event_count', 0)}`",
         f"- Recommended user message: `{recommended_user_message or 'n/a'}`",
         "",
         *(
@@ -747,6 +1141,34 @@ def _write_report(
         *(
             [
                 (
+                    "Workflow technically completed, but no primary case dataset "
+                    "records were accepted. Non-primary observations were preserved "
+                    "separately and should not be read as final epidemiological case data."
+                ),
+                "",
+            ]
+            if run_quality.get("no_primary_case_dataset_records")
+            else []
+        ),
+        *(
+            [
+                (
+                    "Live cross-source validation was limited because this run "
+                    "did not find a task-compatible validation source."
+                ),
+                (
+                    "This does not prove absence of cases; it means the live "
+                    "search/fetch set did not include enough independent "
+                    "validation evidence."
+                ),
+                "",
+            ]
+            if validation_limited and validation_mode == "live_cross_source"
+            else []
+        ),
+        *(
+            [
+                (
                     "Held-out validation was limited because no task-compatible "
                     "validation source was available."
                 ),
@@ -756,7 +1178,7 @@ def _write_report(
                 ),
                 "",
             ]
-            if validation_limited
+            if validation_limited and validation_mode != "live_cross_source"
             else []
         ),
         "## 3. Workflow 运行过程",
@@ -807,13 +1229,17 @@ def _write_report(
             f"- Search-derived sources selected for fetch: `{live_summary.get('selected_search_derived_fetch_count', 0)}`",
             f"- Search-derived skipped by reason: `{live_summary.get('skipped_search_derived_by_reason_counts') or {}}`",
             f"- Fetch status counts: `{_format_counts(live_summary.get('fetch_status_counts'))}`",
+            f"- External fetch enabled: `{live_summary.get('external_fetch_enabled')}`",
+            f"- Fetch provider counts: `{_format_counts(live_summary.get('fetch_provider_counts'))}`",
+            f"- External fetch failure counts: `{_format_counts(live_summary.get('external_fetch_failure_counts'))}`",
+            f"- Selected fetch bucket counts: `{_format_counts(live_summary.get('selected_fetch_bucket_counts'))}`",
             f"- Parser status counts: `{_format_counts(live_summary.get('parser_status_counts'))}`",
             f"- Parser used counts: `{_format_counts(live_summary.get('parser_used_counts'))}`",
             f"- Quality status counts: `{_format_counts(live_summary.get('quality_status_counts'))}`",
             f"- Validation-reserved skipped from fetch: `{live_summary.get('skipped_validation_reserved_source_ids')}`",
             "",
-            "| Source ID | Fetch status | HTTP | Parse | Parser | Quality | Text chars | Tables |",
-            "|---|---|---|---|---|---|---|---|",
+            "| Source ID | Provider | Fetch status | HTTP | Parse | Parser | Quality | Text chars | Tables |",
+            "|---|---|---|---|---|---|---|---|---|",
         ]
     )
     for row in live_summary.get("documents") or []:
@@ -822,6 +1248,7 @@ def _write_report(
             + " | ".join(
                     [
                         _cell(row.get("source_id")),
+                        _cell(row.get("fetch_provider")),
                         _cell(row.get("fetch_status")),
                         _cell(row.get("http_status_code")),
                         _cell(row.get("parse_status")),
@@ -850,6 +1277,19 @@ def _write_report(
             f"- Agent query count: `{llm_summary['source_planning'].get('agent_query_count')}`",
             f"- Agent query added count: `{llm_summary['source_planning'].get('agent_query_added_count')}`",
             f"- Candidate hint count: `{llm_summary['source_planning'].get('candidate_hint_count')}`",
+            "",
+            "### 6.1.5 LLM Iterative Source Discovery",
+            "",
+            f"- Enabled: `{iterative_source_discovery.get('iterative_source_discovery_enabled', False)}`",
+            f"- LLM iterative planning enabled: `{iterative_source_discovery.get('llm_iterative_planning_enabled', False)}`",
+            f"- Search iteration count: `{iterative_source_discovery.get('search_iteration_count', 0)}`",
+            f"- LLM refinement call count: `{iterative_source_discovery.get('llm_refinement_call_count', 0)}`",
+            f"- Total queries planned: `{iterative_source_discovery.get('total_queries_planned', 0)}`",
+            f"- Total queries executed: `{iterative_source_discovery.get('total_queries_executed', 0)}`",
+            f"- Stop decision: `{iterative_source_discovery.get('stop_decision') or 'n/a'}`",
+            f"- Stop reason: `{iterative_source_discovery.get('stop_reason') or 'n/a'}`",
+            f"- Query source counts: `{source_search.get('query_source_counts') or {}}`",
+            f"- Iteration query counts: `{source_search.get('iteration_query_counts') or {}}`",
             "",
             "### 6.2 LLM Source Critic",
             "",
@@ -880,6 +1320,17 @@ def _write_report(
             f"- LLM failure count: `{llm_summary['source_credibility'].get('llm_failure_count')}`",
             f"- Needs review count: `{llm_summary['source_credibility'].get('needs_review_count')}`",
             "",
+            "### 6.3.5 Source Identity / Publisher Assessment",
+            "",
+            f"- Identity assessed source count: `{llm_summary['source_identity'].get('identity_assessed_count')}`",
+            f"- LLM identity assessed source count: `{llm_summary['source_identity'].get('llm_identity_assessed_count')}`",
+            f"- Post-fetch identity assessed source count: `{llm_summary['source_identity'].get('post_fetch_identity_assessed_count')}`",
+            f"- Unknown publisher count: `{llm_summary['source_identity'].get('unknown_publisher_count')}`",
+            f"- Source type counts: `{_format_counts(llm_summary['source_identity'].get('source_type_counts'))}`",
+            f"- Claim support role counts: `{_format_counts(llm_summary['source_identity'].get('claim_support_role_counts'))}`",
+            f"- Fetch use counts: `{_format_counts(llm_summary['source_identity'].get('recommended_fetch_use_counts'))}`",
+            f"- Warning counts: `{_format_counts(llm_summary['source_identity'].get('warning_counts'))}`",
+            "",
             "### 6.4 LLM Structured Extraction",
             "",
             f"- Extraction mode: `{llm_summary['structured_extraction'].get('mode')}`",
@@ -895,10 +1346,23 @@ def _write_report(
             f"- Run quality status: `{run_quality.get('run_quality_status') or 'n/a'}`",
             f"- Final dataset mode: `{run_quality.get('final_dataset_mode') or 'n/a'}`",
             f"- Quality-gated accepted final dataset count: `{accepted_record_count}`",
+            f"- Final case dataset count: `{len(final_case_dataset)}`",
+            f"- Zero-case statement count: `{len(zero_case_statements)}`",
+            f"- Exposure-monitoring record count: `{len(exposure_monitoring_records)}`",
+            f"- Surveillance summary record count: `{len(surveillance_summary_records)}`",
+            f"- Outbreak summary record count: `{len(outbreak_summary_records)}`",
+            f"- Context record count: `{len(context_records)}`",
+            f"- Unclassified observation count: `{len(unclassified_observation_records)}`",
+            f"- Observation dataset view counts: `{observation_type_dataset_summary.get('dataset_view_counts') or {}}`",
             f"- Pre-quality-gate record count: `{pre_quality_record_count}`",
             f"- Quarantined record count: `{quarantined_record_count}`",
             f"- Pending review record count: `{pending_review_record_count}`",
+            f"- Non-primary observation count: `{non_primary_observation_count}`",
             f"- Final dataset post-review count: `{post_review_record_count}`",
+            f"- Primary-case dataset status: `{run_quality.get('primary_case_dataset_status') or 'n/a'}`",
+            f"- Recommended primary dataset message: `{run_quality.get('recommended_primary_dataset_message') or 'n/a'}`",
+            f"- Primary-case eligible accepted count: `{run_quality.get('primary_case_dataset_eligible_count', 0)}`",
+            f"- Corroborated primary case event count: `{run_quality.get('corroborated_primary_case_event_count', 0)}`",
             f"- Record inclusion status counts: `{final_dataset_quality.get('record_final_inclusion_status_counts') or {}}`",
             f"- Run quality warnings: `{run_quality.get('warnings') or []}`",
             f"- Accepted source counts: `{_format_counts(_count_by(accepted_records, 'source_id'))}`",
@@ -939,6 +1403,24 @@ def _write_report(
         [
             "",
             "## 8. Validation 对比",
+            "",
+            "### Claim-level corroboration",
+            "",
+            f"- Claim count: `{len(claims)}`",
+            f"- Claim comparison count: `{len(claim_comparisons)}`",
+            f"- Corroborated event count: `{len(corroborated_events)}`",
+            (
+                "- Corroborated primary case event count: "
+                f"`{corroboration_summary.get('corroborated_primary_case_event_count', 0)}`"
+            ),
+            (
+                "- Observation type counts: "
+                f"`{_format_counts(corroboration_summary.get('observation_type_counts'))}`"
+            ),
+            (
+                "- Corroboration status counts: "
+                f"`{_format_counts(corroboration_summary.get('status_counts'))}`"
+            ),
             "",
             (
                 "- Validation source compatibility status: "
@@ -1023,15 +1505,26 @@ def _write_report(
             "",
             f"- Run output directory: `{output_dir}`",
             f"- Collection final dataset: `{collection_manifest['files'].get('final_dataset_csv')}`",
+            f"- Collection final case dataset: `{collection_manifest['files'].get('final_case_dataset_csv')}`",
+            f"- Collection zero-case statements: `{collection_manifest['files'].get('zero_case_statements_csv')}`",
+            f"- Collection exposure-monitoring records: `{collection_manifest['files'].get('exposure_monitoring_records_csv')}`",
+            f"- Collection surveillance summaries: `{collection_manifest['files'].get('surveillance_summary_records_csv')}`",
+            f"- Collection outbreak summaries: `{collection_manifest['files'].get('outbreak_summary_records_csv')}`",
+            f"- Collection context records: `{collection_manifest['files'].get('context_records_csv')}`",
+            f"- Collection unclassified observations: `{collection_manifest['files'].get('unclassified_observation_records_csv')}`",
+            f"- Collection observation dataset summary: `{collection_manifest['files'].get('observation_type_dataset_summary_json')}`",
             f"- Collection pre-quality-gate records: `{collection_manifest['files'].get('final_dataset_pre_quality_gate_csv')}`",
             f"- Collection quarantined records: `{collection_manifest['files'].get('quarantined_records_csv')}`",
             f"- Collection pending review records: `{collection_manifest['files'].get('pending_review_records_csv')}`",
+            f"- Collection non-primary observations: `{collection_manifest['files'].get('non_primary_observations_csv')}`",
             f"- Collection record inclusion decisions: `{collection_manifest['files'].get('record_inclusion_decisions_json')}`",
             f"- Collection final dataset post-review: `{collection_manifest['files'].get('final_dataset_post_review_csv')}`",
             f"- Collection anomaly results: `{collection_manifest['files'].get('anomaly_results_json')}`",
             f"- Collection human review audit trail: `{collection_manifest['files'].get('human_review_audit_trail_json')}`",
             f"- Collection source registry: `{collection_manifest['files'].get('source_registry_json')}`",
-            f"- Validation ground truth: `{validation_manifest.get('ground_truth_records_csv')}`",
+            f"- Validation mode: `{validation_manifest.get('validation_mode')}`",
+            f"- Validation records source: `{validation_manifest.get('validation_records_source')}`",
+            f"- Validation records output: `{validation_manifest.get('ground_truth_records_csv')}`",
             (
                 "- Inactive validation records: "
                 f"`{validation_manifest.get('inactive_validation_records_csv')}`"
@@ -1079,6 +1572,156 @@ def _write_report(
     return report
 
 
+def _stream_chunk_type_and_data(chunk) -> tuple[str | None, object]:
+    if isinstance(chunk, tuple) and len(chunk) == 2:
+        mode, data = chunk
+        return str(mode), data
+    if isinstance(chunk, dict) and "type" in chunk and "data" in chunk:
+        return str(chunk.get("type")), chunk.get("data")
+    if isinstance(chunk, dict) and len(chunk) == 1:
+        mode, data = next(iter(chunk.items()))
+        if mode in {"tasks", "updates", "custom", "values", "debug"}:
+            return str(mode), data
+    return None, chunk
+
+
+def _task_node_name(data: object) -> str | None:
+    if not isinstance(data, dict):
+        return None
+    name = data.get("name") or data.get("node") or data.get("node_name")
+    return str(name) if name else None
+
+
+def _is_task_start(data: object) -> bool:
+    return (
+        isinstance(data, dict)
+        and "input" in data
+        and "result" not in data
+        and "error" not in data
+    )
+
+
+def _is_task_finish(data: object) -> bool:
+    return isinstance(data, dict) and ("result" in data or "error" in data)
+
+
+def _run_completion_payload(result: dict) -> dict:
+    return {
+        "source_candidate_count": len(result.get("source_candidates") or []),
+        "source_registry_count": len(result.get("source_registry") or []),
+        "document_count": len(result.get("documents") or []),
+        "raw_record_count": len(result.get("raw_records") or []),
+        "validated_record_count": len(result.get("validated_records") or []),
+        "normalized_record_count": len(result.get("normalized_records") or []),
+        "human_review_item_count": len(result.get("human_review_queue") or []),
+        "current_route": result.get("current_route"),
+    }
+
+
+def _run_graph_with_events(
+    initial_state: dict,
+    *,
+    output_dir: Path,
+    session_id: str,
+    live_status: bool = True,
+    return_writer: bool = False,
+):
+    """Run the LangGraph graph through stream events and return final state."""
+
+    final_state = dict(initial_state)
+    latest_node_payloads: dict[str, dict] = {}
+    current_node: str | None = None
+    failed_event_written = False
+    trace_config = _langsmith_trace_config(session_id)
+    previous_trace_env = _install_trace_env(trace_config)
+    previous_external_trace_env = (
+        None
+        if _langsmith_external_trace_enabled()
+        else _suppress_external_langsmith_env()
+    )
+    writer = RunEventWriter(
+        session_dir=output_dir,
+        session_id=session_id,
+        node_order=WORKFLOW_NODE_ORDER,
+        live_status=live_status,
+    )
+    try:
+        with writer:
+            writer.append_run_started(
+                {
+                    "user_request": initial_state.get("user_request"),
+                    "structured_task": initial_state.get("structured_task"),
+                    **(trace_config.get("metadata") or {}),
+                }
+            )
+            try:
+                for chunk in build_graph().stream(
+                    initial_state,
+                    config=trace_config,
+                    stream_mode=["tasks", "updates", "custom"],
+                    version="v2",
+                ):
+                    chunk_type, data = _stream_chunk_type_and_data(chunk)
+                    if chunk_type == "tasks":
+                        node_name = _task_node_name(data)
+                        if _is_task_start(data) and node_name:
+                            current_node = node_name
+                            payload = {"input": data.get("input")} if isinstance(data, dict) else {}
+                            writer.append_node_started(node_name, payload)
+                        elif _is_task_finish(data) and node_name:
+                            current_node = node_name
+                            if isinstance(data, dict) and data.get("error") is not None:
+                                error_value = data.get("error")
+                                failed_event_written = True
+                                writer.append_node_failed(
+                                    node_name,
+                                    error_value,
+                                    latest_node_payloads.get(node_name) or data,
+                                )
+                                writer.mark_run_failed(error_value, node_name=node_name)
+                                if isinstance(error_value, BaseException):
+                                    raise error_value
+                                if isinstance(error_value, dict):
+                                    raise RuntimeError(
+                                        str(error_value.get("message") or error_value)
+                                    )
+                                raise RuntimeError(str(error_value))
+                            else:
+                                payload = latest_node_payloads.get(node_name)
+                                if payload is None and isinstance(data, dict):
+                                    payload = summarize_state_update(data.get("result") or {})
+                                writer.append_node_completed(node_name, payload or {})
+                        continue
+                    if chunk_type == "updates" and isinstance(data, dict):
+                        for node_name, update in data.items():
+                            if isinstance(update, dict):
+                                final_state.update(update)
+                            latest_node_payloads[str(node_name)] = summarize_state_update(update)
+                        continue
+                    if chunk_type == "custom":
+                        payload = data if isinstance(data, dict) else {"value": data}
+                        writer.append_custom_progress(
+                            node_name=payload.get("node_name"),
+                            message=str(payload.get("message") or "workflow progress"),
+                            payload=payload.get("payload", payload),
+                            status=str(payload.get("status") or "running"),
+                        )
+                writer.append_run_completed(_run_completion_payload(final_state))
+            except Exception as exc:
+                if not failed_event_written:
+                    writer.append_node_failed(current_node, exc)
+                writer.mark_run_failed(exc, node_name=current_node)
+                raise
+    finally:
+        _flush_langsmith_tracers()
+        if previous_external_trace_env is not None:
+            _restore_env(previous_external_trace_env)
+        _restore_env(previous_trace_env)
+    if return_writer:
+        return final_state, writer
+    return final_state
+
+
 def run_workflow(args: argparse.Namespace) -> dict:
     _, config = _config_with_cli_overrides(args)
     provider, model = _config_provider_model(config)
@@ -1086,8 +1729,11 @@ def run_workflow(args: argparse.Namespace) -> dict:
     env_updates = workflow_run_env_from_config(config)
     output_config = config.get("output") or {}
     workflow_config = config.get("workflow") or {}
-    validation_records_requested_path = workflow_config.get(
-        "validation_ground_truth_records_path"
+    validation_config = config.get("validation") or {}
+    validation_records_requested_path = (
+        validation_config.get("held_out_records_path")
+        or validation_config.get("validation_records_path")
+        or workflow_config.get("validation_ground_truth_records_path")
     )
     validation_records_explicit = validation_records_requested_path not in {
         None,
@@ -1096,10 +1742,9 @@ def run_workflow(args: argparse.Namespace) -> dict:
     validation_records_path = validation_records_path_from_config(config)
     validation_records = (
         read_csv_records(validation_records_path)
-        if validation_records_path.exists()
+        if validation_records_path and validation_records_path.exists()
         else []
     )
-    validation_config = config.get("validation") or {}
     allow_incompatible_validation_records = validation_config.get(
         "allow_incompatible_validation_records"
     )
@@ -1112,6 +1757,7 @@ def run_workflow(args: argparse.Namespace) -> dict:
         validation_records_explicit=validation_records_explicit,
         validation_records_defaulted=not validation_records_explicit,
         allow_incompatible_validation_records=allow_incompatible_validation_records,
+        validation_mode=validation_config.get("mode") or "live_cross_source",
     )
 
     with temporary_workflow_env(env_updates):
@@ -1125,7 +1771,13 @@ def run_workflow(args: argparse.Namespace) -> dict:
         initial_state["validation_source_compatibility_summary"] = (
             resolved_validation["validation_source_compatibility_summary"]
         )
-        result = build_graph().invoke(initial_state)
+        result, event_writer = _run_graph_with_events(
+            initial_state,
+            output_dir=output_dir,
+            session_id=str((config.get("output") or {}).get("session_id") or output_dir.name),
+            live_status=bool(getattr(args, "live_status", True)),
+            return_writer=True,
+        )
 
     package = dict(result.get("final_data_package") or {})
     registry = list(result.get("source_registry") or package.get("source_registry") or [])
@@ -1170,6 +1822,10 @@ def run_workflow(args: argparse.Namespace) -> dict:
             == "true",
             "llm_source_critic_enabled": env_updates.get(
                 "HDC_ENABLE_LLM_SOURCE_CRITIC"
+            )
+            == "true",
+            "llm_source_identity_enabled": env_updates.get(
+                "HDC_ENABLE_LLM_SOURCE_IDENTITY"
             )
             == "true",
             "llm_extraction_enabled": env_updates.get("HDC_ENABLE_LLM_EXTRACTION")
@@ -1244,12 +1900,94 @@ def run_workflow(args: argparse.Namespace) -> dict:
         diagnostics_dir / "source_discovery_summary.json",
     )
     write_json(
+        result.get("iterative_source_discovery_summary") or {},
+        diagnostics_dir / "iterative_source_discovery_summary.json",
+    )
+    write_json(
+        result.get("search_iteration_plans") or [],
+        diagnostics_dir / "search_iteration_plans.json",
+    )
+    write_json(
+        result.get("search_iteration_observations") or [],
+        diagnostics_dir / "search_iteration_observations.json",
+    )
+    write_json(
+        result.get("search_refinement_decisions") or [],
+        diagnostics_dir / "search_refinement_decisions.json",
+    )
+    write_json(
+        result.get("iterative_search_queries") or [],
+        diagnostics_dir / "iterative_search_queries.json",
+    )
+    write_json(
         result.get("source_credibility_summary") or {},
         diagnostics_dir / "source_credibility_summary.json",
     )
     write_json(
         result.get("source_credibility_assessments") or [],
         diagnostics_dir / "source_credibility_assessments.json",
+    )
+    write_json(
+        result.get("source_identity_summary") or {},
+        diagnostics_dir / "source_identity_summary.json",
+    )
+    write_json(
+        result.get("source_identity_assessments") or [],
+        diagnostics_dir / "source_identity_assessments.json",
+    )
+    write_json(
+        result.get("source_triage_results") or [],
+        diagnostics_dir / "source_triage_results.json",
+    )
+    write_json(
+        result.get("chunk_relevance_assessments")
+        or package.get("chunk_relevance_assessments")
+        or [],
+        diagnostics_dir / "chunk_relevance_assessments.json",
+    )
+    write_json(
+        result.get("record_task_fit_assessments")
+        or package.get("record_task_fit_assessments")
+        or [],
+        diagnostics_dir / "record_task_fit_assessments.json",
+    )
+    write_json(
+        result.get("metric_extraction_plan")
+        or package.get("metric_extraction_plan")
+        or {},
+        diagnostics_dir / "metric_extraction_plan.json",
+    )
+    write_json(
+        result.get("source_coverage_requirements") or [],
+        diagnostics_dir / "source_coverage_requirements.json",
+    )
+    write_json(
+        result.get("source_coverage_audit") or {},
+        diagnostics_dir / "source_coverage_audit.json",
+    )
+    write_json(
+        result.get("must_fetch_sources") or [],
+        diagnostics_dir / "must_fetch_sources.json",
+    )
+    write_json(
+        result.get("fetch_failures_blocking") or [],
+        diagnostics_dir / "fetch_failures_blocking.json",
+    )
+    write_json(
+        result.get("official_extraction_queue") or [],
+        diagnostics_dir / "official_extraction_queue.json",
+    )
+    write_json(
+        result.get("official_extraction_failures") or [],
+        diagnostics_dir / "official_extraction_failures.json",
+    )
+    write_json(
+        result.get("extraction_budget_by_source") or {},
+        diagnostics_dir / "extraction_budget_by_source.json",
+    )
+    write_json(
+        result.get("evidence_chunks") or package.get("evidence_chunks") or [],
+        diagnostics_dir / "evidence_chunks.json",
     )
     write_json(result.get("raw_records") or [], diagnostics_dir / "raw_records.json")
     write_json(
@@ -1308,6 +2046,19 @@ def run_workflow(args: argparse.Namespace) -> dict:
         result.get("cross_source_validation_summary") or {},
         diagnostics_dir / "cross_source_validation_summary.json",
     )
+    write_json(result.get("claims") or [], diagnostics_dir / "claims.json")
+    write_json(
+        result.get("claim_comparisons") or [],
+        diagnostics_dir / "claim_comparisons.json",
+    )
+    write_json(
+        result.get("corroborated_events") or [],
+        diagnostics_dir / "corroborated_events.json",
+    )
+    write_json(
+        result.get("corroboration_summary") or {},
+        diagnostics_dir / "corroboration_summary.json",
+    )
     write_json(result.get("conflicts") or [], diagnostics_dir / "conflicts.json")
     write_json(
         result.get("anomaly_results") or [],
@@ -1342,6 +2093,20 @@ def run_workflow(args: argparse.Namespace) -> dict:
         diagnostics_dir / "run_quality_summary.json",
     )
     write_json(
+        result.get("direct_collection_summary")
+        or package.get("direct_collection_summary")
+        or {},
+        diagnostics_dir / "direct_collection_summary.json",
+    )
+    source_critic_summary_for_fast_path = result.get("source_critic_summary") or {}
+    write_json(
+        result.get("direct_fast_path_summary")
+        or package.get("direct_fast_path_summary")
+        or source_critic_summary_for_fast_path.get("direct_fast_path_summary")
+        or {},
+        diagnostics_dir / "direct_fast_path_summary.json",
+    )
+    write_json(
         result.get("final_dataset_quality_summary")
         or package.get("final_dataset_quality_summary")
         or {},
@@ -1368,6 +2133,32 @@ def run_workflow(args: argparse.Namespace) -> dict:
         or package.get("pending_review_records")
         or [],
         diagnostics_dir / "pending_review_records.json",
+    )
+    write_json(
+        result.get("non_primary_observations")
+        or package.get("non_primary_observations")
+        or [],
+        diagnostics_dir / "non_primary_observations.json",
+    )
+    observation_dataset_sections = [
+        "final_case_dataset",
+        "zero_case_statements",
+        "exposure_monitoring_records",
+        "surveillance_summary_records",
+        "outbreak_summary_records",
+        "context_records",
+        "unclassified_observation_records",
+    ]
+    for section in observation_dataset_sections:
+        write_json(
+            result.get(section) or package.get(section) or [],
+            diagnostics_dir / f"{section}.json",
+        )
+    write_json(
+        result.get("observation_type_dataset_summary")
+        or package.get("observation_type_dataset_summary")
+        or {},
+        diagnostics_dir / "observation_type_dataset_summary.json",
     )
     write_json(
         result.get("final_dataset_post_review") or [],
@@ -1431,12 +2222,16 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "source_search_execution_summary": result.get(
                 "source_search_execution_summary"
             ),
+            "iterative_source_discovery_summary": result.get(
+                "iterative_source_discovery_summary"
+            ),
             "source_discovery_summary": result.get("source_discovery_summary"),
             "source_registry_summary": result.get("source_registry_summary"),
             "source_screening_summary": result.get("source_screening_summary"),
             "source_critic_summary": result.get("source_critic_summary"),
             "source_routing_summary": result.get("source_routing_summary"),
             "source_credibility_summary": result.get("source_credibility_summary"),
+            "source_identity_summary": result.get("source_identity_summary"),
             "content_fetch_summary": result.get("content_fetch_summary"),
             "document_parse_summary": result.get("document_parse_summary"),
             "fixture_document_summary": result.get("fixture_document_summary"),
@@ -1460,6 +2255,7 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "cross_source_validation_summary": result.get(
                 "cross_source_validation_summary"
             ),
+            "corroboration_summary": result.get("corroboration_summary"),
             "cross_source_consistency_summary": result.get(
                 "cross_source_consistency_summary"
             ),
@@ -1474,6 +2270,10 @@ def run_workflow(args: argparse.Namespace) -> dict:
                 "final_dataset_quality_summary"
             )
             or package.get("final_dataset_quality_summary"),
+            "observation_type_dataset_summary": result.get(
+                "observation_type_dataset_summary"
+            )
+            or package.get("observation_type_dataset_summary"),
             "disease_relevance_summary": result.get("disease_relevance_summary"),
             "finalization_summary": result.get("finalization_summary"),
         },
@@ -1513,6 +2313,23 @@ def run_workflow(args: argparse.Namespace) -> dict:
     )
     quarantined_records = list(package.get("quarantined_records") or [])
     pending_review_records = list(package.get("pending_review_records") or [])
+    non_primary_observations = list(package.get("non_primary_observations") or [])
+    final_case_dataset = list(package.get("final_case_dataset") or [])
+    zero_case_statements = list(package.get("zero_case_statements") or [])
+    exposure_monitoring_records = list(
+        package.get("exposure_monitoring_records") or []
+    )
+    surveillance_summary_records = list(
+        package.get("surveillance_summary_records") or []
+    )
+    outbreak_summary_records = list(package.get("outbreak_summary_records") or [])
+    context_records = list(package.get("context_records") or [])
+    unclassified_observation_records = list(
+        package.get("unclassified_observation_records") or []
+    )
+    observation_type_dataset_summary = (
+        package.get("observation_type_dataset_summary") or {}
+    )
     final_dataset_post_review = list(result.get("final_dataset_post_review") or [])
 
     summary = {
@@ -1525,6 +2342,13 @@ def run_workflow(args: argparse.Namespace) -> dict:
         "config_path": str(resolve_workflow_run_config_path(args.config)),
         "live_fetch_enabled": env_updates.get("HDC_ENABLE_LIVE_FETCH") == "true",
         "live_search_enabled": env_updates.get("HDC_ENABLE_LIVE_SEARCH") == "true",
+        "external_fetch_enabled": env_updates.get("HDC_EXTERNAL_FETCH_ENABLED")
+        == "true",
+        "external_fetch_provider_order": env_updates.get(
+            "HDC_EXTERNAL_FETCH_PROVIDER_ORDER"
+        ),
+        "human_review_enabled": env_updates.get("HDC_HUMAN_REVIEW_ENABLED")
+        == "true",
         "source_search_mode": env_updates.get("HDC_SEARCH_MODE"),
         "source_search_provider": env_updates.get("HDC_SEARCH_PROVIDER"),
         "source_search_api_key_present": search_api_key_present(
@@ -1542,11 +2366,33 @@ def run_workflow(args: argparse.Namespace) -> dict:
         "trace_node_count": len(result.get("collection_trace") or []),
         "current_route": result.get("current_route"),
         "source_registry_count": len(registry),
+        "source_identity_assessed_count": (
+            result.get("source_identity_summary") or {}
+        ).get("identity_assessed_count", 0),
+        "llm_source_identity_assessed_count": (
+            result.get("source_identity_summary") or {}
+        ).get("llm_identity_assessed_count", 0),
         "document_count": live_summary.get("document_count", 0),
+        "fetch_provider_counts": live_summary.get("fetch_provider_counts") or {},
+        "external_fetch_failure_counts": live_summary.get(
+            "external_fetch_failure_counts"
+        )
+        or {},
+        "selected_fetch_bucket_counts": live_summary.get(
+            "selected_fetch_bucket_counts"
+        )
+        or {},
         "normalized_record_count": len(result.get("normalized_records") or []),
         "evaluation_row_count": evaluation_summary.get("evaluation_row_count", 0),
         "validation_source_compatibility_status": (
             validation_source_compatibility_summary.get("compatibility_status")
+        ),
+        "validation_mode": validation_source_compatibility_summary.get(
+            "validation_mode"
+        )
+        or env_updates.get("HDC_VALIDATION_MODE"),
+        "validation_records_source": validation_source_compatibility_summary.get(
+            "validation_records_source"
         ),
         "active_validation_record_count": len(active_validation_records),
         "inactive_validation_record_count": len(inactive_validation_records),
@@ -1554,6 +2400,19 @@ def run_workflow(args: argparse.Namespace) -> dict:
         "validation_result_count": (result.get("validation_summary") or {}).get(
             "validation_result_count", 0
         ),
+        "claim_count": (result.get("corroboration_summary") or {}).get(
+            "claim_count", 0
+        ),
+        "claim_comparison_count": (
+            result.get("corroboration_summary") or {}
+        ).get("claim_comparison_count", 0),
+        "corroborated_event_count": (
+            result.get("corroboration_summary") or {}
+        ).get("corroborated_event_count", 0),
+        "corroborated_primary_case_event_count": (
+            result.get("corroboration_summary") or {}
+        ).get("corroborated_primary_case_event_count", 0),
+        "corroboration_summary": result.get("corroboration_summary") or {},
         "anomaly_result_count": len(result.get("anomaly_results") or []),
         "anomaly_severity_counts": (
             result.get("anomaly_summary") or {}
@@ -1581,6 +2440,51 @@ def run_workflow(args: argparse.Namespace) -> dict:
         ),
         "accepted_record_count": len(final_dataset),
         "final_dataset_count": len(final_dataset),
+        "final_case_dataset_count": len(final_case_dataset),
+        "zero_case_statement_count": len(zero_case_statements),
+        "exposure_monitoring_record_count": len(exposure_monitoring_records),
+        "surveillance_summary_record_count": len(surveillance_summary_records),
+        "outbreak_summary_record_count": len(outbreak_summary_records),
+        "context_record_count": len(context_records),
+        "unclassified_observation_count": len(unclassified_observation_records),
+        "observation_type_dataset_summary": observation_type_dataset_summary,
+        "dataset_view_counts": observation_type_dataset_summary.get(
+            "dataset_view_counts"
+        )
+        or {},
+        "primary_case_dataset_eligible_count": run_quality_summary.get(
+            "primary_case_dataset_eligible_count",
+            final_dataset_quality_summary.get("primary_case_dataset_eligible_count", 0),
+        ),
+        "accepted_primary_case_record_count": run_quality_summary.get(
+            "accepted_primary_case_record_count",
+            final_dataset_quality_summary.get("accepted_primary_case_record_count", 0),
+        ),
+        "accepted_non_primary_observation_count": run_quality_summary.get(
+            "accepted_non_primary_observation_count",
+            final_dataset_quality_summary.get(
+                "accepted_non_primary_observation_count", 0
+            ),
+        ),
+        "non_primary_observation_count": len(non_primary_observations),
+        "primary_case_dataset_status": run_quality_summary.get(
+            "primary_case_dataset_status"
+        )
+        or final_dataset_quality_summary.get("primary_case_dataset_status"),
+        "no_primary_case_dataset_records": bool(
+            run_quality_summary.get("no_primary_case_dataset_records")
+            or final_dataset_quality_summary.get("no_primary_case_dataset_records")
+        ),
+        "no_corroborated_primary_case_events": bool(
+            run_quality_summary.get("no_corroborated_primary_case_events")
+            or final_dataset_quality_summary.get("no_corroborated_primary_case_events")
+        ),
+        "accepted_records_are_not_primary_case_records": bool(
+            run_quality_summary.get("accepted_records_are_not_primary_case_records")
+            or final_dataset_quality_summary.get(
+                "accepted_records_are_not_primary_case_records"
+            )
+        ),
         "pre_quality_record_count": len(final_dataset_pre_quality_gate),
         "final_dataset_pre_quality_gate_count": len(final_dataset_pre_quality_gate),
         "quarantined_record_count": len(quarantined_records),
@@ -1592,12 +2496,17 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "source_search_execution_summary"
         )
         or {},
+        "iterative_source_discovery_summary": result.get(
+            "iterative_source_discovery_summary"
+        )
+        or {},
         "localized_source_planning_summary": result.get(
             "localized_source_planning_summary"
         )
         or {},
         "source_critic_summary": result.get("source_critic_summary") or {},
         "source_credibility_summary": result.get("source_credibility_summary") or {},
+        "source_identity_summary": result.get("source_identity_summary") or {},
         "disease_relevance_summary": result.get("disease_relevance_summary") or {},
         "validation_source_compatibility_summary": (
             validation_source_compatibility_summary
@@ -1621,6 +2530,21 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "source_discovery_summary": str(
                 diagnostics_dir / "source_discovery_summary.json"
             ),
+            "iterative_source_discovery_summary": str(
+                diagnostics_dir / "iterative_source_discovery_summary.json"
+            ),
+            "search_iteration_plans": str(
+                diagnostics_dir / "search_iteration_plans.json"
+            ),
+            "search_iteration_observations": str(
+                diagnostics_dir / "search_iteration_observations.json"
+            ),
+            "search_refinement_decisions": str(
+                diagnostics_dir / "search_refinement_decisions.json"
+            ),
+            "iterative_search_queries": str(
+                diagnostics_dir / "iterative_search_queries.json"
+            ),
             "localized_source_planning_summary": str(
                 diagnostics_dir / "localized_source_planning_summary.json"
             ),
@@ -1636,6 +2560,35 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "source_credibility_assessments": str(
                 diagnostics_dir / "source_credibility_assessments.json"
             ),
+            "source_identity_summary": str(
+                diagnostics_dir / "source_identity_summary.json"
+            ),
+            "source_identity_assessments": str(
+                diagnostics_dir / "source_identity_assessments.json"
+            ),
+            "source_triage_results": str(
+                diagnostics_dir / "source_triage_results.json"
+            ),
+            "chunk_relevance_assessments": str(
+                diagnostics_dir / "chunk_relevance_assessments.json"
+            ),
+            "record_task_fit_assessments": str(
+                diagnostics_dir / "record_task_fit_assessments.json"
+            ),
+            "metric_extraction_plan": str(
+                diagnostics_dir / "metric_extraction_plan.json"
+            ),
+            "source_coverage_requirements": str(
+                diagnostics_dir / "source_coverage_requirements.json"
+            ),
+            "source_coverage_audit": str(
+                diagnostics_dir / "source_coverage_audit.json"
+            ),
+            "must_fetch_sources": str(diagnostics_dir / "must_fetch_sources.json"),
+            "fetch_failures_blocking": str(
+                diagnostics_dir / "fetch_failures_blocking.json"
+            ),
+            "evidence_chunks": str(diagnostics_dir / "evidence_chunks.json"),
             "content_fetch_summary": str(diagnostics_dir / "content_fetch_summary.json"),
             "document_quality_summary": str(
                 diagnostics_dir / "document_quality_summary.json"
@@ -1665,6 +2618,10 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "cross_source_validation_summary": str(
                 diagnostics_dir / "cross_source_validation_summary.json"
             ),
+            "claims": str(diagnostics_dir / "claims.json"),
+            "claim_comparisons": str(diagnostics_dir / "claim_comparisons.json"),
+            "corroborated_events": str(diagnostics_dir / "corroborated_events.json"),
+            "corroboration_summary": str(diagnostics_dir / "corroboration_summary.json"),
             "conflicts": str(diagnostics_dir / "conflicts.json"),
             "anomaly_results": str(diagnostics_dir / "anomaly_results.json"),
             "anomaly_summary": str(diagnostics_dir / "anomaly_summary.json"),
@@ -1690,12 +2647,33 @@ def run_workflow(args: argparse.Namespace) -> dict:
             "record_inclusion_decisions": str(
                 diagnostics_dir / "record_inclusion_decisions.json"
             ),
+            "observation_type_dataset_summary": str(
+                diagnostics_dir / "observation_type_dataset_summary.json"
+            ),
+            "final_case_dataset": str(diagnostics_dir / "final_case_dataset.json"),
+            "zero_case_statements": str(diagnostics_dir / "zero_case_statements.json"),
+            "exposure_monitoring_records": str(
+                diagnostics_dir / "exposure_monitoring_records.json"
+            ),
+            "surveillance_summary_records": str(
+                diagnostics_dir / "surveillance_summary_records.json"
+            ),
+            "outbreak_summary_records": str(
+                diagnostics_dir / "outbreak_summary_records.json"
+            ),
+            "context_records": str(diagnostics_dir / "context_records.json"),
+            "unclassified_observation_records": str(
+                diagnostics_dir / "unclassified_observation_records.json"
+            ),
             "final_dataset_pre_quality_gate": str(
                 diagnostics_dir / "final_dataset_pre_quality_gate.json"
             ),
             "quarantined_records": str(diagnostics_dir / "quarantined_records.json"),
             "pending_review_records": str(
                 diagnostics_dir / "pending_review_records.json"
+            ),
+            "non_primary_observations": str(
+                diagnostics_dir / "non_primary_observations.json"
             ),
             "final_dataset_post_review": str(
                 diagnostics_dir / "final_dataset_post_review.json"
@@ -1708,6 +2686,92 @@ def run_workflow(args: argparse.Namespace) -> dict:
             ),
         },
     }
+    summary["artifact_paths"].update(event_writer.artifact_paths)
+    summary.update(event_writer.artifact_paths)
+    write_json(summary, output_dir / "workflow_run_summary.json")
+    interpretive_paths = _write_interpretive_report_outputs(
+        output_dir,
+        write_latest_alias=bool(output_config.get("write_latest_alias", True)),
+    )
+    summary["artifact_paths"].update(interpretive_paths)
+    write_json(summary, output_dir / "workflow_run_summary.json")
+    human_review_workflow_paths = write_human_review_workflow_artifacts(output_dir)
+    summary["artifact_paths"].update(human_review_workflow_paths)
+    priority_summary_path = Path(
+        human_review_workflow_paths["human_review_priority_summary_json"]
+    )
+    if priority_summary_path.exists():
+        priority_summary = json.loads(priority_summary_path.read_text(encoding="utf-8"))
+        summary["human_review_productization"] = {
+            "human_review_priority_summary": str(priority_summary_path),
+            "prioritized_review_item_count": priority_summary.get(
+                "prioritized_review_item_count", 0
+            ),
+            "top_n_recommended": priority_summary.get(
+                "top_n_recommended", 10
+            ),
+            "priority_level_counts": priority_summary.get(
+                "priority_level_counts", {}
+            ),
+            "issue_category_counts": priority_summary.get(
+                "issue_category_counts", {}
+            ),
+            "generated_from_artifacts_only": True,
+            "llm_called_for_review_productization": False,
+            "search_called_for_review_productization": False,
+            "fetch_called_for_review_productization": False,
+        }
+    write_json(summary, output_dir / "workflow_run_summary.json")
+    workflow_visualization_paths = write_workflow_visualization_artifacts(output_dir)
+    summary["artifact_paths"].update(workflow_visualization_paths)
+    visualization_summary_path = Path(
+        workflow_visualization_paths["workflow_visualization_summary"]
+    )
+    if visualization_summary_path.exists():
+        visualization_summary = json.loads(
+            visualization_summary_path.read_text(encoding="utf-8")
+        )
+        summary["workflow_visualization"] = {
+            "workflow_visualization_index": workflow_visualization_paths.get(
+                "workflow_visualization_index"
+            ),
+            "workflow_visualization_summary": str(visualization_summary_path),
+            "generated_from_artifacts_only": True,
+            "llm_called_for_visualization": False,
+            "search_called_for_visualization": False,
+            "fetch_called_for_visualization": False,
+            "workflow_timeline_step_count": visualization_summary.get(
+                "workflow_timeline_step_count", 0
+            ),
+            "evidence_flow_node_count": visualization_summary.get(
+                "evidence_flow_node_count", 0
+            ),
+            "evidence_flow_edge_count": visualization_summary.get(
+                "evidence_flow_edge_count", 0
+            ),
+            "claim_comparison_card_count": visualization_summary.get(
+                "claim_comparison_card_count", 0
+            ),
+            "dataset_view_node_count": visualization_summary.get(
+                "dataset_view_node_count", 0
+            ),
+            "human_review_visualization_item_count": visualization_summary.get(
+                "human_review_visualization_item_count", 0
+            ),
+            "missing_link_warning_count": visualization_summary.get(
+                "missing_link_warning_count", 0
+            ),
+        }
+    _append_visualization_report_section(report_path, workflow_visualization_paths)
+    if bool(output_config.get("write_latest_alias", True)):
+        latest_visualization_paths = _write_workflow_visualization_latest_aliases(
+            workflow_visualization_paths
+        )
+        summary["artifact_paths"].update(latest_visualization_paths)
+        _append_visualization_report_section(
+            _TOP_LEVEL_REPORT_PATH,
+            {**workflow_visualization_paths, **latest_visualization_paths},
+        )
     write_json(summary, output_dir / "workflow_run_summary.json")
     if bool(output_config.get("auto_build_console", True)):
         console_dir = workflow_console_output_dir_from_config(
@@ -1731,8 +2795,29 @@ def run_workflow(args: argparse.Namespace) -> dict:
             )
             summary["artifact_paths"]["latest_workflow_console_summary_json"] = (
                 latest_console_summary.get("summary_path")
-            )
+        )
         write_json(summary, output_dir / "workflow_run_summary.json")
+    if bool(getattr(args, "write_run_notebook", False)):
+        notebook_path = write_workflow_replay_notebook(output_dir)
+        summary["artifact_paths"]["workflow_replay_notebook"] = str(notebook_path)
+        summary["workflow_replay_notebook"] = str(notebook_path)
+        write_json(summary, output_dir / "workflow_run_summary.json")
+    for artifact_key in (
+        "run_report",
+        "workflow_console_html",
+        "workflow_console_summary_json",
+        "workflow_visualization_index",
+        "interpretive_report_chinese",
+        "interpretive_report_english",
+        "workflow_replay_notebook",
+    ):
+        artifact_path = summary["artifact_paths"].get(artifact_key)
+        if artifact_path:
+            event_writer.append_artifact_written(artifact_key, artifact_path)
+    event_writer.append_artifact_written(
+        "workflow_run_summary",
+        output_dir / "workflow_run_summary.json",
+    )
     if bool(output_config.get("write_latest_alias", True)):
         write_json(summary, _TOP_LEVEL_SUMMARY_PATH)
     return summary
@@ -1800,6 +2885,16 @@ def main() -> int:
             "workflow_console:",
             _console_text(artifact_paths.get("workflow_console_html")),
         )
+    if artifact_paths.get("interpretive_report_chinese"):
+        print(
+            "interpretive_report_chinese:",
+            _console_text(artifact_paths.get("interpretive_report_chinese")),
+        )
+    if artifact_paths.get("interpretive_report_english"):
+        print(
+            "interpretive_report_english:",
+            _console_text(artifact_paths.get("interpretive_report_english")),
+        )
     print(f"provider: {summary.get('provider')}")
     print(f"model: {summary.get('model')}")
     print(f"trace_node_count: {summary.get('trace_node_count')}")
@@ -1816,9 +2911,51 @@ def main() -> int:
         "search_derived_candidate_count:",
         source_search.get("candidate_from_search_count"),
     )
+    iterative_search = summary.get("iterative_source_discovery_summary") or {}
+    print(
+        "iterative_source_discovery_enabled:",
+        iterative_search.get("iterative_source_discovery_enabled"),
+    )
+    print(
+        "iterative_search_iteration_count:",
+        iterative_search.get("search_iteration_count"),
+    )
+    print("iterative_search_stop_decision:", iterative_search.get("stop_decision"))
     print(f"normalized_record_count: {summary.get('normalized_record_count')}")
     print(f"run_quality_status: {summary.get('run_quality_status')}")
     print(f"final_dataset_count: {summary.get('final_dataset_count')}")
+    print(f"final_case_dataset_count: {summary.get('final_case_dataset_count')}")
+    print(f"zero_case_statement_count: {summary.get('zero_case_statement_count')}")
+    print(
+        "exposure_monitoring_record_count:",
+        summary.get("exposure_monitoring_record_count"),
+    )
+    print(f"context_record_count: {summary.get('context_record_count')}")
+    print(
+        "surveillance_summary_record_count:",
+        summary.get("surveillance_summary_record_count"),
+    )
+    print(
+        "outbreak_summary_record_count:",
+        summary.get("outbreak_summary_record_count"),
+    )
+    print(
+        "unclassified_observation_count:",
+        summary.get("unclassified_observation_count"),
+    )
+    print(f"primary_case_dataset_status: {summary.get('primary_case_dataset_status')}")
+    print(
+        "primary_case_dataset_eligible_count:",
+        summary.get("primary_case_dataset_eligible_count"),
+    )
+    print(
+        "corroborated_primary_case_event_count:",
+        summary.get("corroborated_primary_case_event_count"),
+    )
+    print(
+        "non_primary_observation_count:",
+        summary.get("non_primary_observation_count"),
+    )
     print(f"quarantined_record_count: {summary.get('quarantined_record_count')}")
     print(f"pending_review_record_count: {summary.get('pending_review_record_count')}")
     print(f"evaluation_row_count: {summary.get('evaluation_row_count')}")
@@ -1834,6 +2971,14 @@ def main() -> int:
     print(
         "source_credibility_assessed_source_count:",
         (llm.get("source_credibility") or {}).get("assessed_source_count"),
+    )
+    print(
+        "source_identity_assessed_source_count:",
+        (llm.get("source_identity") or {}).get("identity_assessed_count"),
+    )
+    print(
+        "llm_source_identity_assessed_source_count:",
+        (llm.get("source_identity") or {}).get("llm_identity_assessed_count"),
     )
     print(
         "llm_structured_extraction_call_count:",

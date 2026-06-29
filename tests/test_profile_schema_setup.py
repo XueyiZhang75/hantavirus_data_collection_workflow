@@ -146,6 +146,24 @@ def test_covid19_generated_profile_schema_is_not_hantavirus_active_resource():
     assert "extraction_record_model_still_hantavirus_named" in warnings
 
 
+def test_profile_schema_setup_exports_task_acceptance_contract():
+    result = _run_profile_schema("FLU", "California", "2024-10-01", "2024-10-05")
+
+    contract = result["task_acceptance_contract"]
+    assert contract["disease"] == "FLU"
+    assert contract["location"] == "California"
+    assert contract["start_date"] == "2024-10-01"
+    assert contract["end_date"] == "2024-10-05"
+    assert "must_match_task_location" in contract["record_acceptance_rules"]
+    assert "must_have_interpretable_numeric_or_zero_metric" in contract[
+        "record_acceptance_rules"
+    ]
+    assert "national_or_broader_aggregate_without_target_location_fit" in contract[
+        "context_or_quarantine_rules"
+    ]
+    assert result["profile_schema_summary"]["task_acceptance_contract_version"] == "v1"
+
+
 def test_dengue_generated_profile_schema_is_not_hantavirus_active_resource():
     result = _run_profile_schema("dengue", "Florida", "2025", "2025")
 

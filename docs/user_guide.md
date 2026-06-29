@@ -23,6 +23,12 @@ For a normal user run, start from the interactive script. It asks for the task
 inputs and then runs the full real workflow with live search, live fetch, and
 LLM stages enabled by default.
 
+The interactive and visual entrypoints default to `direct_collection`. This is
+the normal data-collection path: official public-health sources, task coverage,
+and task-compatible surveillance or aggregate records are prioritized for
+`collection/final_dataset.*`. The older full-audit behavior remains available
+from the interactive script with `--audit-mode`.
+
 ```powershell
 cd "C:\Users\zhang\OneDrive - University of Virginia\桌面\FLU\Epidemics-ML\Data_Collection\hantavirus_data_collection_workflow"
 $env:PYTHONPATH = "src"
@@ -61,6 +67,8 @@ Default behavior for this entrypoint:
 - API keys read from environment variables
 - missing API keys stop the run instead of falling back to fixture data
 - session report, workflow console, JSON, and CSV artifacts are exported
+- `direct_collection` is the default result mode; audit validation and human
+  review diagnostics are written but do not block the primary final dataset
 
 Use `--print-config-only` to preview the generated config without running live
 search, live fetch, or LLM calls:
@@ -218,6 +226,117 @@ The console is a readable inspection view over a completed run. It shows node
 trace, source registry, fetch/parse summaries, evidence chunks, extracted
 records, validation results, anomaly results, and human-review status.
 
+The runner also writes live runtime event files while the graph is executing:
+
+```text
+outputs/sessions/<session_id>/diagnostics/run_events.ndjson
+outputs/sessions/<session_id>/diagnostics/run_status.json
+outputs/sessions/<session_id>/diagnostics/node_status.json
+```
+
+`--live-status` is enabled by default and shows a Rich terminal panel when the
+terminal supports it. Use `--no-live-status` to disable the terminal panel while
+still writing the event files.
+
+For an optional browser dashboard:
+
+```powershell
+python -m pip install -e .[visualization]
+streamlit run scripts/live_workflow_dashboard.py -- --session-dir outputs/sessions/<session_id>
+```
+
+For a local visual workflow entrypoint, use the optional Langflow visual demo:
+
+```powershell
+python -m pip install -e .[langflow-demo]
+python scripts\start_langflow_demo.py
+```
+
+This starts only the local HDC demo API and Langflow. The existing HDC
+LangGraph workflow still performs source discovery, fetching, extraction,
+validation, human-review routing, and final package export, while Langflow is
+the primary visual interface for running and inspecting it.
+
+The startup script waits for both local services to be ready, auto-imports the
+bundled flow, and opens the flow page. If auto-import fails, import:
+
+```text
+integrations/langflow/flows/hdc_deep_visual_demo_flow.json
+```
+
+Use `HDC Workflow Runner` for the free-text `User Request` plus disease,
+location, date range, provider, and model, but start the visual demo by
+pressing Play on `HDC Final Results - Run Full Workflow`. That final node builds
+the whole Langflow chain once. Each `HDC Workflow Node Inspector` waits for its
+matching real workflow node to complete before returning, then exposes real
+status, real duration, input/output summaries, recent events, tool summary, LLM
+summary, artifact URLs, and optional trace links. The node Message output is a
+readable detail report. Langflow card timing is component build timing; use
+Node Details and the Final Timeline for real HDC workflow timing.
+
+For the primary interactive visual path:
+
+```powershell
+python scripts\run_visual_workflow.py
+```
+
+This prompts for disease, location, exact dates such as `2024-5-1` to
+`2024-5-3`, session id, and user request. It opens a newly imported,
+session-specific prefilled Langflow flow; use that newly opened URL instead of
+older Langflow tabs, then press Play on `HDC Final Results - Run Full Workflow`
+to start and watch the real workflow chain. Dates are normalized to ISO dates before the run is submitted. Add
+`--quick-test-mode` for fast smoke tests with lower search, fetch, and LLM
+budgets while leaving normal full-run defaults unchanged.
+
+### Deep visual demo
+
+For optional LangSmith/LangGraph Studio tracing, start the local demo API,
+Langflow, Studio, and LangSmith tracing together:
+
+```powershell
+python -m pip install -e .[langflow-deep-demo]
+$env:LANGSMITH_API_KEY = [Environment]::GetEnvironmentVariable("LANGSMITH_API_KEY", "User")
+python scripts\start_langflow_deep_demo.py
+```
+
+This mode requires `LANGSMITH_API_KEY`. It sets `LANGSMITH_TRACING=true`,
+defaults `LANGSMITH_PROJECT` to `hdc-workflow-demo`, and sets
+`LANGCHAIN_CALLBACKS_BACKGROUND=false` so traces are flushed before the workflow
+process exits. If your LangSmith account needs a workspace or regional endpoint,
+set `LANGSMITH_WORKSPACE_ID` or `LANGSMITH_ENDPOINT` in the shell before
+starting the script.
+
+This is optional for cloud trace/debug work. The normal Langflow visual demo
+does not require LangSmith. In the deep mode, use:
+
+- `HDC Final Results - Run Full Workflow` to build the whole visual chain once.
+- `HDC Workflow Runner` to create or reuse the backend HDC LangGraph workflow.
+- `HDC Workflow Node Inspector` components to mirror each workflow node and
+  query node status, payload summaries, tool summaries, LLM summaries, and trace
+  links for the active `session_id`.
+- `HDC Final Results - Run Full Workflow` to open optional Studio/LangSmith trace links plus the
+  workflow console, workflow visualization, reports, and exported datasets.
+
+The bundled Langflow blueprint is:
+
+```text
+integrations/langflow/flows/hdc_deep_visual_demo_flow.json
+```
+
+LangGraph Studio shows the real graph structure and reproducible graph entry
+point. LangSmith stores the deep trace. Full debug tracing can include prompts,
+LLM responses, source snippets, search/fetch summaries, and tool span
+summaries, so use this mode only for data you are comfortable sending to
+LangSmith.
+
+For a replay notebook suitable for research review or supplementary material,
+add `--write-run-notebook` to the configured or interactive run. The notebook is
+written to:
+
+```text
+outputs/sessions/<session_id>/workflow_replay_notebook.ipynb
+```
+
 ## 10. Inspecting, reviewing, and exporting runs
 
 After a run:
@@ -253,6 +372,9 @@ Important session files:
 - `collection/final_dataset.csv`: final dataset before review application.
 - `collection/final_dataset_post_review.json`: final dataset after applied review decisions.
 - `diagnostics/source_search_execution_summary.json`: search execution summary.
+- `diagnostics/run_events.ndjson`: append-only live runtime event stream.
+- `diagnostics/run_status.json`: compact latest run status.
+- `diagnostics/node_status.json`: compact latest per-node status.
 - `diagnostics/live_fetch_summary.json`: fetch and parse summary.
 - `diagnostics/llm_stage_summary.json`: LLM stage status and call counts.
 - `diagnostics/disease_relevance_summary.json`: source, document, chunk, and record disease-match guardrail summary.
@@ -261,6 +383,7 @@ Important session files:
 - `validation/inactive_validation_records.csv`: loaded validation records disabled because they do not match this task.
 - `diagnostics/anomaly_results.json`: anomaly review candidates.
 - `diagnostics/human_review_audit_trail.json`: review decision audit trail.
+- `workflow_replay_notebook.ipynb`: optional replay notebook when `--write-run-notebook` is used.
 - `workflow_console/hdc_workflow_console.html`: visual run console.
 
 ## 13. Safety and limitations

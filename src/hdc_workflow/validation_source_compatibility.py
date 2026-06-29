@@ -27,6 +27,7 @@ EMPTY_STATUS = "validation_source_empty"
 INSUFFICIENT_METADATA_STATUS = "insufficient_validation_metadata"
 EXPLICIT_OVERRIDE_STATUS = "explicit_validation_source_loaded_with_warning"
 DISABLED_STATUS = "validation_disabled_by_config"
+LIVE_VALIDATION_PENDING_STATUS = "live_validation_pending"
 
 _DATE_FIELDS = (
     "date_reported",
@@ -244,6 +245,7 @@ def resolve_task_compatible_validation_records(
     validation_records_explicit: bool = False,
     validation_records_defaulted: bool | None = None,
     allow_incompatible_validation_records: bool | None = None,
+    validation_mode: str | None = None,
 ) -> dict:
     """Split validation records into active and inactive task-compatible sets."""
 
@@ -261,6 +263,52 @@ def resolve_task_compatible_validation_records(
         if validation_records_path_requested
         else path
     )
+    mode = str(validation_mode or os.environ.get("HDC_VALIDATION_MODE") or "").strip()
+    if not mode:
+        mode = "held_out_file"
+    if mode == "live_cross_source" and not path and not records:
+        summary = {
+            "validation_mode": "live_cross_source",
+            "validation_records_path": None,
+            "validation_records_path_requested": str(requested_path)
+            if requested_path
+            else None,
+            "validation_records_path_used": None,
+            "validation_records_source": "none",
+            "validation_records_explicit": bool(validation_records_explicit),
+            "validation_records_defaulted": False,
+            "validation_records_loaded": False,
+            "validation_records_enabled": False,
+            "validation_record_count": 0,
+            "validation_compatible_record_count": 0,
+            "validation_incompatible_record_count": 0,
+            "active_validation_record_count": 0,
+            "inactive_validation_record_count": 0,
+            "compatibility_status": LIVE_VALIDATION_PENDING_STATUS,
+            "compatibility_reason": (
+                "Live cross-source validation will be derived from fetched "
+                "task-compatible validation sources."
+            ),
+            "task_disease": task["task_disease"],
+            "task_location": task["task_location"],
+            "task_start_date": (context.get("structured_task") or {}).get(
+                "start_date"
+            ),
+            "task_end_date": (context.get("structured_task") or {}).get("end_date"),
+            "validation_diseases_seen": [],
+            "validation_locations_seen": [],
+            "validation_time_windows_seen": [],
+            "warnings": [],
+            "record_status_counts": {},
+            "allow_incompatible_validation_records": False,
+        }
+        return {
+            "validation_records": [],
+            "active_validation_records": [],
+            "inactive_validation_records": [],
+            "validation_record_compatibility": [],
+            "validation_source_compatibility_summary": summary,
+        }
     path_missing = bool(path and not path.exists())
 
     assessments = [
@@ -311,6 +359,7 @@ def resolve_task_compatible_validation_records(
                 time_values.append(str(record.get(field)))
 
     summary = {
+        "validation_mode": mode,
         "validation_records_path": str(path) if path else None,
         "validation_records_path_requested": str(requested_path)
         if requested_path

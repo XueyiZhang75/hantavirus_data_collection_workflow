@@ -18,6 +18,10 @@ from ..localized_source_planning import (
     build_localized_source_planning_hints,
     public_summary as localized_source_planning_public_summary,
 )
+from ..source_coverage import (
+    build_source_coverage_requirements,
+    build_task_evidence_contract,
+)
 from ..models import (
     CollectionSchema,
     CollectionSpec,
@@ -430,7 +434,14 @@ def disease_intelligence_builder(state: DataCollectionState) -> dict:
                 "collection_trace": trace,
             }
 
-    if generation_error is not None and (curated_raw is not None or _llm_fallback_to_curated()):
+    if generation_error is not None and not _llm_fallback_to_curated():
+        raise RuntimeError(
+            "disease intelligence LLM required but failed; "
+            "set HDC_DISEASE_INTELLIGENCE_FALLBACK_TO_CURATED=true only for "
+            "offline/debug fallback runs."
+        ) from generation_error
+
+    if generation_error is not None and _llm_fallback_to_curated():
         profile = _profile_from_curated_or_generic(spec)
         if curated_raw is not None:
             profile.generation_method = "llm_failed_curated_fallback"
@@ -783,6 +794,7 @@ def _profile_schema_summary(
     strategy: SourceStrategy,
     generation_method: str,
     warnings: list[str],
+    task_acceptance_contract: dict | None = None,
 ) -> dict:
     return {
         "disease": spec.disease,
@@ -796,7 +808,88 @@ def _profile_schema_summary(
         "target_field_count": len(spec.required_fields),
         "target_fields": list(spec.required_fields),
         "source_category_count": len(strategy.source_categories),
+        "task_acceptance_contract_version": (
+            (task_acceptance_contract or {}).get("contract_version")
+        ),
         "warnings": list(warnings),
+    }
+
+
+def _infer_task_geography_scope(location: str | None) -> str:
+    normalized = re.sub(r"[^a-z0-9]+", " ", (location or "").lower()).strip()
+    if not normalized or normalized in {"global", "world", "worldwide"}:
+        return "global"
+    if normalized in {
+        "united states",
+        "united states of america",
+        "usa",
+        "us",
+        "u s",
+        "u s a",
+    }:
+        return "country"
+    return "subnational_or_local"
+
+
+def _build_task_acceptance_contract(
+    *,
+    spec: CollectionSpec,
+    intelligence: DiseaseIntelligenceProfile | None,
+    schema: CollectionSchema,
+) -> dict:
+    standard_name = (
+        intelligence.disease_standard_name
+        if intelligence is not None
+        else spec.disease
+    )
+    aliases = (
+        _unique_preserve_order(
+            [
+                *intelligence.aliases,
+                *intelligence.abbreviations,
+                *intelligence.pathogen_terms,
+                *intelligence.syndrome_terms,
+            ]
+        )
+        if intelligence is not None
+        else []
+    )
+    field_names = [field.name for field in schema.core_fields]
+    return {
+        "contract_version": "v1",
+        "contract_scope": "task_compatible_collection_record",
+        "disease": spec.disease,
+        "disease_standard_name": standard_name,
+        "accepted_disease_terms": _unique_preserve_order(
+            [spec.disease, standard_name, *aliases]
+        ),
+        "excluded_disease_terms": (
+            list(intelligence.exclusion_terms) if intelligence is not None else []
+        ),
+        "location": spec.geography,
+        "target_geography_scope": _infer_task_geography_scope(spec.geography),
+        "start_date": spec.start_date,
+        "end_date": spec.end_date,
+        "time_window": spec.time_window,
+        "target_fields": list(spec.required_fields or spec.target_fields),
+        "available_schema_fields": field_names,
+        "record_acceptance_rules": [
+            "must_match_task_disease_or_accepted_synonym",
+            "must_match_task_location",
+            "must_match_task_date_window_or_report_period",
+            "must_have_interpretable_numeric_or_zero_metric",
+            "must_include_source_provenance_and_evidence_quote",
+        ],
+        "context_or_quarantine_rules": [
+            "national_or_broader_aggregate_without_target_location_fit",
+            "reporting_period_substantially_broader_than_task_window",
+            "source_context_only_without_extractable_target_record",
+            "non_target_subtype_for_default_disease_scope",
+        ],
+        "semantic_decision_owner": (
+            "LLM agents judge source/chunk/record task fit; deterministic "
+            "rules enforce dates, schema, provenance, and final hard boundaries."
+        ),
     }
 
 
@@ -804,6 +897,7 @@ def profile_and_schema_setup(state: DataCollectionState) -> dict:
     """Build active disease profile, collection schema, and source strategy."""
 
     spec = CollectionSpec(**(state.get("collection_spec") or {}))
+    intelligence_for_contract: DiseaseIntelligenceProfile | None = None
     if _is_hantavirus_like(spec.disease):
         profile = DiseaseProfile(**load_hantavirus_profile())
         schema = CollectionSchema(**load_hantavirus_collection_schema())
@@ -812,6 +906,7 @@ def profile_and_schema_setup(state: DataCollectionState) -> dict:
         warnings: list[str] = []
     else:
         intelligence = DiseaseIntelligenceProfile(**(state.get("disease_intelligence") or {}))
+        intelligence_for_contract = intelligence
         warnings = _unique_preserve_order(
             [
                 "source_discovery_not_yet_disease_generic",
@@ -838,6 +933,12 @@ def profile_and_schema_setup(state: DataCollectionState) -> dict:
         )
         strategy = _build_generated_source_strategy(intelligence, spec)
 
+    task_acceptance_contract = _build_task_acceptance_contract(
+        spec=spec,
+        intelligence=intelligence_for_contract,
+        schema=schema,
+    )
+    task_evidence_contract = build_task_evidence_contract(state)
     summary = _profile_schema_summary(
         spec=spec,
         profile=profile,
@@ -845,6 +946,7 @@ def profile_and_schema_setup(state: DataCollectionState) -> dict:
         strategy=strategy,
         generation_method=generation_method,
         warnings=warnings,
+        task_acceptance_contract=task_acceptance_contract,
     )
     trace = append_trace(
         state,
@@ -860,6 +962,9 @@ def profile_and_schema_setup(state: DataCollectionState) -> dict:
         "collection_schema": schema.model_dump(),
         "source_strategy": strategy.model_dump(),
         "screening_criteria": strategy.screening_criteria.model_dump(),
+        "task_acceptance_contract": task_acceptance_contract,
+        "task_evidence_contract": task_evidence_contract,
+        "source_coverage_requirements": list(task_evidence_contract.get("requirements") or []),
         "profile_schema_summary": summary,
         "collection_trace": trace,
     }
@@ -1403,6 +1508,7 @@ def _build_executable_source_plan_prompt(
     strategy: dict,
     schema_dict: dict,
     deterministic_plan: ExecutableSourcePlan,
+    task_acceptance_contract: dict | None = None,
 ) -> tuple[str, str]:
     system_prompt = (
         "You create executable source discovery plans for the data collection "
@@ -1419,6 +1525,7 @@ def _build_executable_source_plan_prompt(
             "time_window": spec.get("time_window"),
             "target_fields": _source_plan_target_fields(spec, schema_dict),
         },
+        "task_acceptance_contract": task_acceptance_contract or {},
         "disease_profile": {
             "disease_standard_name": profile.get("disease_standard_name"),
             "include_terms": _as_str_list(profile.get("include_terms")),
@@ -1640,6 +1747,7 @@ def executable_source_planning(state: DataCollectionState) -> dict:
             strategy=strategy_dict,
             schema_dict=schema_dict,
             deterministic_plan=deterministic_plan,
+            task_acceptance_contract=state.get("task_acceptance_contract") or {},
         )
         try:
             raw = llm_clients.run_pydantic_structured_llm(
@@ -1692,6 +1800,7 @@ def executable_source_planning(state: DataCollectionState) -> dict:
     )
     return {
         "agentic_source_plan": plan.model_dump(),
+        "evidence_strategy_plan": plan.model_dump(),
         "executable_source_plan_summary": plan_summary,
         "localized_source_planning_summary": localized_summary,
         "source_planning_agent_summary": source_planning_summary,
@@ -1827,6 +1936,60 @@ def _append_executable_plan_queries(
     return added_count
 
 
+def _state_collection_mode(state: DataCollectionState) -> str:
+    structured_task = state.get("structured_task") or {}
+    collection_spec = state.get("collection_spec") or {}
+    workflow = state.get("workflow") or {}
+    return str(
+        structured_task.get("collection_mode")
+        or collection_spec.get("collection_mode")
+        or workflow.get("collection_mode")
+        or state.get("collection_mode")
+        or ""
+    ).strip()
+
+
+def _direct_collection_llm_plan_primary(state: DataCollectionState) -> bool:
+    if _state_collection_mode(state) != "direct_collection":
+        return False
+    plan = state.get("agentic_source_plan") or {}
+    planned = plan.get("planned_queries") if isinstance(plan, dict) else None
+    return bool(planned)
+
+
+def _search_query_set_from_inventory(inventory_dicts: list[dict]) -> SearchQuerySet:
+    official_source_queries = [
+        item["query"]
+        for item in inventory_dicts
+        if item.get("source_type") == "official_public_health_agency"
+    ]
+    literature_queries = [
+        item["query"]
+        for item in inventory_dicts
+        if item.get("source_type") == "peer_reviewed_literature"
+    ]
+    news_and_report_queries = [
+        item["query"]
+        for item in inventory_dicts
+        if item.get("source_type")
+        in (
+            "news_and_situation_report",
+            "international_organization_report",
+        )
+    ]
+    database_queries = [
+        item["query"]
+        for item in inventory_dicts
+        if item.get("source_type") == "structured_database"
+    ]
+    return SearchQuerySet(
+        official_source_queries=official_source_queries,
+        literature_queries=literature_queries,
+        news_and_report_queries=news_and_report_queries,
+        database_queries=database_queries,
+    )
+
+
 def query_strategy_builder(state: DataCollectionState) -> dict:
     """Build deterministic queries grouped both as SearchQuerySet and a typed inventory."""
 
@@ -1871,6 +2034,83 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
     inventory: list[SearchQuery] = []
     seen: set[str] = set()
     next_index: dict[str, int] = {}
+    agentic_source_plan = state.get("agentic_source_plan")
+    direct_llm_plan_primary = _direct_collection_llm_plan_primary(state)
+    source_planning_agent_summary = dict(
+        state.get("source_planning_agent_summary")
+        or {
+            "llm_source_planning_enabled": llm_clients.llm_source_planning_enabled(),
+            "status": "not_run",
+            "agent_query_count": 0,
+            "agent_query_added_count": 0,
+            "agent_candidate_hint_count": 0,
+            "warnings": ["executable_source_planning_node_not_run"],
+        }
+    )
+    localized_summary = state.get("localized_source_planning_summary") or (
+        (state.get("executable_source_plan_summary") or {}).get(
+            "localized_source_planning"
+        )
+        or {}
+    )
+    planned_query_count = len(
+        (agentic_source_plan or {}).get("planned_queries") or []
+    )
+
+    if direct_llm_plan_primary:
+        inventory_dicts: list[dict] = []
+        executable_query_added_count = _append_executable_plan_queries(
+            inventory_dicts,
+            seen,
+            agentic_source_plan,
+        )
+        source_planning_agent_summary.update(
+            {
+                "agent_query_count": planned_query_count,
+                "agent_query_added_count": executable_query_added_count,
+                "query_strategy_consumed_executable_plan": True,
+                "deterministic_query_template_suppressed": True,
+                "deterministic_query_template_suppression_reason": (
+                    "direct_collection uses LLM evidence strategy queries as the "
+                    "primary search inventory; deterministic templates are a "
+                    "fallback only when no executable plan queries exist."
+                ),
+            }
+        )
+        if localized_summary:
+            source_planning_agent_summary[
+                "localized_source_planning_summary"
+            ] = localized_summary
+        query_set = _search_query_set_from_inventory(inventory_dicts)
+        trace = append_trace(
+            state,
+            node_name="query_strategy_builder",
+            message=(
+                f"Built {len(inventory_dicts)} direct_collection search queries "
+                "from the LLM evidence strategy plan."
+            ),
+            metadata={
+                "inventory_size": len(inventory_dicts),
+                "deterministic_inventory_size": 0,
+                "official_source_query_count": len(query_set.official_source_queries),
+                "literature_query_count": len(query_set.literature_queries),
+                "news_and_report_query_count": len(query_set.news_and_report_queries),
+                "database_query_count": len(query_set.database_queries),
+                "geography": geography,
+                "time_window": time_window,
+                "executable_source_plan_present": True,
+                "localized_source_planning_summary": localized_summary,
+                **source_planning_agent_summary,
+            },
+        )
+        return {
+            "search_queries": query_set.model_dump(),
+            "search_query_inventory": inventory_dicts,
+            "evidence_strategy_plan": agentic_source_plan,
+            "localized_source_planning_summary": localized_summary,
+            "source_planning_agent_summary": source_planning_agent_summary,
+            "collection_trace": trace,
+        }
 
     official_priority = _priority_for("official_public_health_agency", strategy)
     international_priority = _priority_for("international_organization_report", strategy)
@@ -1895,6 +2135,103 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
                 inventory, seen, next_index, "official",
                 q, "official_public_health_agency", official_priority,
                 f"Find {term} surveillance content from {site}.",
+                expected_fields,
+            )
+
+    coverage_requirements = build_source_coverage_requirements(state)
+    for requirement in coverage_requirements:
+        candidate_urls = list(requirement.get("official_candidate_urls") or [])
+        candidate_filenames = [
+            str(url).rsplit("/", 1)[-1]
+            for url in candidate_urls
+            if str(url).strip()
+        ]
+        title_hints = [
+            str(value).strip()
+            for value in (requirement.get("title_hints") or [])
+            if str(value).strip()
+        ]
+        date_hints = [
+            str(value).strip()
+            for value in (requirement.get("date_hints") or [])
+            if str(value).strip()
+        ]
+        for domain in requirement.get("official_domains") or []:
+            week = requirement.get("week")
+            year = requirement.get("year")
+            for filename in candidate_filenames:
+                q = f'site:{domain} "{filename}"'.strip()
+                _add_query(
+                    inventory,
+                    seen,
+                    next_index,
+                    "official",
+                    q,
+                    "official_public_health_agency",
+                    official_priority,
+                    requirement.get("reason")
+                    or "Find target jurisdiction official weekly surveillance report.",
+                    expected_fields,
+                )
+            for hint in title_hints[:5]:
+                q = f'site:{domain} "{hint}" "{year}"'.strip()
+                _add_query(
+                    inventory,
+                    seen,
+                    next_index,
+                    "official",
+                    q,
+                    "official_public_health_agency",
+                    official_priority,
+                    requirement.get("reason")
+                    or "Find target jurisdiction official weekly surveillance report.",
+                    expected_fields,
+                )
+            for date_hint in date_hints[-2:]:
+                for term in include_terms[:1] or ["influenza"]:
+                    q = f'site:{domain} "{term}" "{date_hint}"'.strip()
+                    _add_query(
+                        inventory,
+                        seen,
+                        next_index,
+                        "official",
+                        q,
+                        "official_public_health_agency",
+                        official_priority,
+                        requirement.get("reason")
+                        or "Find target jurisdiction official weekly surveillance report.",
+                        expected_fields,
+                    )
+            for term in include_terms[:2] or ["influenza"]:
+                q = (
+                    f'site:{domain} "{term}" "Week-{week}" "{year}"'
+                ).strip()
+                _add_query(
+                    inventory,
+                    seen,
+                    next_index,
+                    "official",
+                    q,
+                    "official_public_health_agency",
+                    official_priority,
+                    requirement.get("reason")
+                    or "Find target jurisdiction official weekly surveillance report.",
+                    expected_fields,
+                )
+            q = (
+                f'site:{domain} "respiratory disease surveillance" '
+                f'"Week-{week}" "{year}"'
+            ).strip()
+            _add_query(
+                inventory,
+                seen,
+                next_index,
+                "official",
+                q,
+                "official_public_health_agency",
+                official_priority,
+                requirement.get("reason")
+                or "Find target jurisdiction official weekly surveillance report.",
                 expected_fields,
             )
 
@@ -1996,21 +2333,6 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
         )
 
     inventory_dicts = [q.model_dump() for q in inventory]
-    agentic_source_plan = state.get("agentic_source_plan")
-    source_planning_agent_summary = dict(
-        state.get("source_planning_agent_summary")
-        or {
-            "llm_source_planning_enabled": llm_clients.llm_source_planning_enabled(),
-            "status": "not_run",
-            "agent_query_count": 0,
-            "agent_query_added_count": 0,
-            "agent_candidate_hint_count": 0,
-            "warnings": ["executable_source_planning_node_not_run"],
-        }
-    )
-    planned_query_count = len(
-        (agentic_source_plan or {}).get("planned_queries") or []
-    )
     executable_query_added_count = _append_executable_plan_queries(
         inventory_dicts, seen, agentic_source_plan
     )
@@ -2019,13 +2341,8 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
             "agent_query_count": planned_query_count,
             "agent_query_added_count": executable_query_added_count,
             "query_strategy_consumed_executable_plan": bool(agentic_source_plan),
+            "deterministic_query_template_suppressed": False,
         }
-    )
-    localized_summary = state.get("localized_source_planning_summary") or (
-        (state.get("executable_source_plan_summary") or {}).get(
-            "localized_source_planning"
-        )
-        or {}
     )
     if localized_summary:
         source_planning_agent_summary[
@@ -2033,32 +2350,7 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
         ] = localized_summary
 
     # Group into the backward-compatible SearchQuerySet structure.
-    official_source_queries = [
-        item["query"] for item in inventory_dicts
-        if item.get("source_type") == "official_public_health_agency"
-    ]
-    literature_queries = [
-        item["query"] for item in inventory_dicts
-        if item.get("source_type") == "peer_reviewed_literature"
-    ]
-    news_and_report_queries = [
-        item["query"] for item in inventory_dicts
-        if item.get("source_type") in (
-            "news_and_situation_report",
-            "international_organization_report",
-        )
-    ]
-    database_queries = [
-        item["query"] for item in inventory_dicts
-        if item.get("source_type") == "structured_database"
-    ]
-
-    query_set = SearchQuerySet(
-        official_source_queries=official_source_queries,
-        literature_queries=literature_queries,
-        news_and_report_queries=news_and_report_queries,
-        database_queries=database_queries,
-    )
+    query_set = _search_query_set_from_inventory(inventory_dicts)
 
     trace = append_trace(
         state,
@@ -2084,6 +2376,7 @@ def query_strategy_builder(state: DataCollectionState) -> dict:
     return {
         "search_queries": query_set.model_dump(),
         "search_query_inventory": inventory_dicts,
+        "evidence_strategy_plan": agentic_source_plan,
         "localized_source_planning_summary": localized_summary,
         "source_planning_agent_summary": source_planning_agent_summary,
         "collection_trace": trace,

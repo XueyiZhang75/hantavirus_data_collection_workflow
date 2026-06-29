@@ -255,6 +255,45 @@ def test_run_pydantic_structured_llm_uses_provider_native(monkeypatch):
     )
 
 
+def test_run_pydantic_structured_llm_passes_langsmith_run_metadata(monkeypatch):
+    captured = {}
+
+    class FakeStructuredModel:
+        def invoke(self, messages, config=None):
+            captured["config"] = config
+            return source_planning_agent.SourcePlanningOutput(
+                proposed_search_queries=[
+                    {"query": '"hantavirus" "Virginia" official data'}
+                ]
+            )
+
+    class FakeChatModel:
+        def with_structured_output(self, schema_model):
+            assert schema_model is source_planning_agent.SourcePlanningOutput
+            return FakeStructuredModel()
+
+    monkeypatch.setattr(
+        llm_clients, "build_chat_model", lambda settings=None: FakeChatModel()
+    )
+    monkeypatch.setenv("HDC_TRACE_SESSION_ID", "trace_session")
+    monkeypatch.setenv("HDC_TRACE_ID", "trace-123")
+    monkeypatch.setenv("LANGSMITH_PROJECT", "hdc-workflow-demo")
+
+    result = llm_clients.run_pydantic_structured_llm(
+        system_prompt="system",
+        user_prompt="user",
+        schema_model=source_planning_agent.SourcePlanningOutput,
+        model="fake-model",
+    )
+
+    assert result["_structured_output_mode"] == "provider_native"
+    assert captured["config"]["run_name"] == "llm.SourcePlanningOutput"
+    assert "hdc-llm" in captured["config"]["tags"]
+    assert captured["config"]["metadata"]["session_id"] == "trace_session"
+    assert captured["config"]["metadata"]["trace_id"] == "trace-123"
+    assert captured["config"]["metadata"]["langsmith_project"] == "hdc-workflow-demo"
+
+
 def test_source_planning_prompt_requires_json_only_with_skeleton():
     prompt_text = source_planning_agent._load_prompt_text()
 
@@ -457,6 +496,223 @@ def test_source_critic_agent_mocked_assessment_annotates_registry(monkeypatch):
     assert entry.get("screening_decision")
     assert entry.get("source_role")
     assert result["source_routing_summary"]["llm_semantic_leakage_count"] == 1
+
+
+def test_direct_collection_source_critic_skips_context_when_target_official_exists():
+    registry = [
+        {
+            "source_id": "src_ny_target_week",
+            "canonical_url": (
+                "https://www.health.ny.gov/diseases/communicable/influenza/"
+                "surveillance/2024-2025/archive/2024-11-02_flu_report.pdf"
+            ),
+            "title": "New York State Influenza Surveillance Report",
+            "publisher": "New York State Department of Health",
+            "discovery_method": "live_search_result",
+            "source_type": "official_public_health_agency",
+            "must_fetch": True,
+        },
+        {
+            "source_id": "src_cdc_context",
+            "canonical_url": "https://www.cdc.gov/fluview/surveillance/2025-week-04.html",
+            "title": "CDC FluView 2025 Week 04",
+            "publisher": "CDC",
+            "discovery_method": "live_search_result",
+            "source_type": "official_public_health_agency",
+        },
+        {
+            "source_id": "src_instagram",
+            "canonical_url": "https://www.instagram.com/reel/DTeGGvXgj32/",
+            "title": "Instagram reel",
+            "publisher": "Instagram",
+            "discovery_method": "live_search_result",
+            "source_type": "social_media",
+        },
+    ]
+
+    selected, skipped, summary = source_screening_module._select_llm_source_critic_candidates(
+        registry,
+        allowlist=None,
+        max_sources=10,
+        collection_mode="direct_collection",
+    )
+
+    assert selected == set()
+    assert skipped["src_ny_target_week"] == "target_official_must_fetch_skips_llm_source_critic"
+    assert skipped["src_cdc_context"] == "direct_target_official_fast_path_skips_source_critic"
+    assert skipped["src_instagram"] == "direct_target_official_fast_path_skips_source_critic"
+    assert summary["direct_target_official_fast_path"] is True
+
+
+def test_source_critic_node_uses_state_collection_mode_and_coverage_before_llm(monkeypatch):
+    calls: list[str] = []
+
+    def mock_assess(source_entry, collection_spec, screening_policy, source_role_policy):  # noqa: ARG001
+        calls.append(str(source_entry.get("source_id")))
+        return {
+            "source_id": source_entry.get("source_id"),
+            "proposed_source_role": "data_source",
+            "proposed_screening_decision": "include",
+            "credibility_level": "high",
+            "credibility_reason": "Mocked source critic assessment.",
+            "expected_extractable_fields": ["tests_positive"],
+            "semantic_leakage_risk": False,
+            "context_only_risk": False,
+            "validation_candidate_risk": False,
+            "needs_human_review": False,
+            "confidence": 0.8,
+            "reasoning_summary": "Mocked.",
+        }
+
+    monkeypatch.setenv("HDC_ENABLE_LLM_SOURCE_CRITIC", "true")
+    monkeypatch.setenv("HDC_ENABLE_LLM_SOURCE_IDENTITY", "false")
+    monkeypatch.setattr(
+        source_screening_module, "assess_source_with_llm", mock_assess
+    )
+    state = {
+        "structured_task": {
+            "disease": "FLU",
+            "location": "United States",
+            "start_date": "2024-09-29",
+            "end_date": "2024-10-05",
+            "collection_mode": "direct_collection",
+        },
+        "collection_spec": {
+            "disease": "FLU",
+            "geography": "United States",
+            "start_date": "2024-09-29",
+            "end_date": "2024-10-05",
+            "collection_mode": "direct_collection",
+        },
+        "source_registry": [
+            {
+                "source_id": "src_cdc_week_40_2024",
+                "canonical_url": "https://www.cdc.gov/fluview/surveillance/2024-week-40.html",
+                "title": "CDC FluView Week 40, 2024",
+                "publisher": "CDC",
+                "source_type": "official_public_health_agency",
+                "status": "screened",
+                "screening_decision": "include",
+                "source_role": "data_source",
+                "final_screening_decision": "include_for_content_fetch",
+                "ready_for_content_fetch": True,
+            },
+            {
+                "source_id": "src_cdc_week_40_2025",
+                "canonical_url": "https://www.cdc.gov/fluview/surveillance/2025-week-40.html",
+                "title": "CDC FluView Week 40, 2025",
+                "publisher": "CDC",
+                "source_type": "official_public_health_agency",
+                "status": "screened",
+                "screening_decision": "include",
+                "source_role": "data_source",
+                "final_screening_decision": "include_for_content_fetch",
+                "ready_for_content_fetch": True,
+            },
+        ],
+        "human_review_queue": [],
+        "collection_trace": [],
+    }
+
+    result = source_screening_module.source_critic_and_uncertainty_routing(state)
+
+    assert calls == []
+    assert result["source_coverage_audit"]["coverage_status"] in {
+        "target_official_source_discovered_not_fetched",
+        "target_official_source_parsed",
+    }
+    assert result["source_critic_selection_summary"]["collection_mode"] == "direct_collection"
+    assert result["source_critic_selection_summary"]["direct_target_official_fast_path"] is True
+    assert result["direct_fast_path_summary"]["target_source_count"] == 1
+    assert result["direct_fast_path_summary"]["critic_skipped_source_count"] >= 2
+
+
+def test_direct_collection_verified_target_skips_identity_and_credibility_llm(monkeypatch):
+    identity_calls: list[str] = []
+    credibility_calls: list[str] = []
+
+    def fake_identity(**kwargs):
+        identity_calls.append(str(kwargs["source_entry"].get("source_id")))
+        return {}
+
+    def fake_credibility(**kwargs):
+        credibility_calls.append(str(kwargs.get("user_prompt") or ""))
+        raise AssertionError("verified target sources should not call credibility LLM")
+
+    monkeypatch.setenv("HDC_ENABLE_LLM_SOURCE_IDENTITY", "true")
+    monkeypatch.setenv("HDC_ENABLE_LLM_SOURCE_CREDIBILITY", "true")
+    monkeypatch.setenv("HDC_ENABLE_LLM_SOURCE_CRITIC", "true")
+    monkeypatch.setattr(
+        "hdc_workflow.source_identity.assess_source_identity_with_llm",
+        fake_identity,
+    )
+    monkeypatch.setattr(
+        "hdc_workflow.source_credibility.llm_clients.run_pydantic_structured_llm",
+        fake_credibility,
+    )
+    state = {
+        "structured_task": {
+            "disease": "FLU",
+            "location": "United States",
+            "start_date": "2024-09-29",
+            "end_date": "2024-10-05",
+            "collection_mode": "direct_collection",
+        },
+        "collection_spec": {
+            "disease": "FLU",
+            "geography": "United States",
+            "start_date": "2024-09-29",
+            "end_date": "2024-10-05",
+            "collection_mode": "direct_collection",
+        },
+        "source_registry": [
+            {
+                "source_id": "src_cdc_week_40_2024",
+                "canonical_url": "https://www.cdc.gov/fluview/surveillance/2024-week-40.html",
+                "title": "CDC FluView Week 40, 2024",
+                "publisher": "CDC",
+                "source_type": "official_public_health_agency",
+                "status": "screened",
+                "screening_decision": "include",
+                "source_role": "data_source",
+                "final_screening_decision": "include_for_content_fetch",
+                "ready_for_content_fetch": True,
+                "must_fetch": True,
+                "coverage_requirement_ids": ["req_cdc_week_40"],
+            },
+            {
+                "source_id": "src_context_news",
+                "canonical_url": "https://example-news.test/flu-week-40-context",
+                "title": "News context about flu season",
+                "publisher": "Example News",
+                "source_type": "news_media",
+                "status": "screened",
+                "screening_decision": "include",
+                "source_role": "context_source",
+                "source_role_final": "context_source",
+                "triage_role": "context_only",
+                "target_fit_status": "context_only",
+                "final_screening_decision": "include_for_context_only",
+                "ready_for_content_fetch": False,
+            }
+        ],
+        "human_review_queue": [],
+        "collection_trace": [],
+    }
+
+    result = source_screening_module.source_critic_and_uncertainty_routing(state)
+
+    assert identity_calls == []
+    assert credibility_calls == []
+    fast_path = result["direct_fast_path_summary"]
+    assert fast_path["identity_llm_assessed_source_count"] == 0
+    assert fast_path["source_credibility_llm_assessed_count"] == 0
+    assert fast_path["identity_llm_skipped_reason_counts"] == {
+        "direct_target_official_fast_path_skips_source_identity": 2
+    }
+    assert fast_path["credibility_llm_skipped_reason_counts"] == {
+        "direct_target_official_fast_path_skips_source_credibility": 2
+    }
 
 
 def test_llm_source_critic_cannot_override_validation_reserved(monkeypatch):

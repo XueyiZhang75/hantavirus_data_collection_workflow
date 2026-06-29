@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _SRC = _PROJECT_ROOT / "src"
 if str(_SRC) not in sys.path:
@@ -225,6 +227,28 @@ def test_llm_disease_intelligence_success_and_failure_fallback(monkeypatch):
     assert "llm_disease_intelligence_failed_curated_fallback" in (
         fallback["disease_intelligence"]["warnings"]
     )
+
+
+def test_required_llm_disease_intelligence_failure_stops_product_workflow(monkeypatch):
+    from hdc_workflow import llm_clients
+    from hdc_workflow.nodes.task_scope import (
+        disease_intelligence_builder,
+        task_intake_and_scope_planning,
+    )
+
+    monkeypatch.setenv("HDC_ENABLE_LLM_DISEASE_INTELLIGENCE", "true")
+    monkeypatch.setenv("HDC_DISEASE_INTELLIGENCE_FORCE_LLM", "true")
+    monkeypatch.setenv("HDC_DISEASE_INTELLIGENCE_FALLBACK_TO_CURATED", "false")
+
+    def mock_failure(**kwargs):
+        raise RuntimeError("mock required disease intelligence LLM failure")
+
+    monkeypatch.setattr(llm_clients, "run_pydantic_structured_llm", mock_failure)
+    state = _state_for("Orthoebolavirus zairense", "Democratic Republic of the Congo", "2022", "2026")
+    state.update(task_intake_and_scope_planning(state))
+
+    with pytest.raises(RuntimeError, match="disease intelligence LLM required"):
+        disease_intelligence_builder(state)
 
 
 def test_query_terms_differ_by_disease():

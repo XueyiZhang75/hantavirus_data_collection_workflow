@@ -10,11 +10,13 @@ from __future__ import annotations
 import re
 from collections import Counter
 
+from ..claim_corroboration import run_claim_corroboration
 from ..config import load_cross_source_consistency_policy, load_record_linking_policy
 from ..anomaly_detection import detect_anomalies
 from ..human_review_application import has_human_review_decision_input
 from ..validation_source_compatibility import (
     INCOMPATIBLE_DISABLED_STATUS,
+    LIVE_VALIDATION_PENDING_STATUS,
     NO_COMPATIBLE_STATUS,
     resolve_task_compatible_validation_records,
 )
@@ -2321,6 +2323,37 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
     linked_events = list(state.get("linked_events") or [])
     event_clusters = list(state.get("event_clusters") or [])
     raw_validation_records = list(state.get("validation_records") or [])
+    source_by_id = {
+        str(source.get("source_id")): source
+        for source in (state.get("source_registry") or [])
+        if isinstance(source, dict) and source.get("source_id")
+    }
+
+    def _with_source_metadata(record: dict) -> dict:
+        if not isinstance(record, dict):
+            return record
+        source = source_by_id.get(str(record.get("source_id"))) or {}
+        if not source:
+            return record
+        out = dict(record)
+        for key in (
+            "source_role_final",
+            "source_type_final",
+            "actual_publisher",
+            "authority_bucket",
+            "publisher_type",
+            "jurisdiction_scope",
+            "primary_vs_secondary",
+            "page_function",
+        ):
+            if out.get(key) in (None, "") and source.get(key) not in (None, ""):
+                out[key] = source.get(key)
+        return out
+
+    normalized_records = [_with_source_metadata(record) for record in normalized_records]
+    raw_validation_records = [
+        _with_source_metadata(record) for record in raw_validation_records
+    ]
     if state.get("validation_source_compatibility_summary") is not None:
         active_validation_records = list(state.get("active_validation_records") or [])
         inactive_validation_records = list(
@@ -2333,6 +2366,7 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
         resolved_validation = resolve_task_compatible_validation_records(
             validation_records=raw_validation_records,
             state_or_task_context=state,
+            validation_mode=state.get("validation_mode"),
         )
         active_validation_records = list(
             resolved_validation.get("active_validation_records") or []
@@ -2343,6 +2377,92 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
         validation_source_compatibility_summary = dict(
             resolved_validation.get("validation_source_compatibility_summary") or {}
         )
+    validation_mode = str(
+        state.get("validation_mode")
+        or validation_source_compatibility_summary.get("validation_mode")
+        or "held_out_file"
+    )
+    if validation_mode == "live_cross_source":
+        def _is_live_validation_candidate(record: dict) -> bool:
+            role = (record.get("source_role_final") or "").strip().lower()
+            bucket = (record.get("authority_bucket") or "").strip().lower()
+            source_type = (record.get("source_type_final") or "").strip().lower()
+            if role == "validation":
+                return True
+            if bucket in {
+                "official_authority",
+                "structured_database",
+                "academic_source",
+            }:
+                return _has_case_or_death_data(record)
+            return source_type in {
+                "national_public_health_agency",
+                "international_public_health_agency",
+                "structured_database",
+                "academic_or_peer_reviewed_source",
+            } and _has_case_or_death_data(record)
+
+        live_validation_records = [
+            {
+                **dict(record),
+                "source_role_final": "validation",
+                "live_validation_source_role_derivation_reason": (
+                    "explicit_validation_role"
+                    if (record.get("source_role_final") or "").strip().lower()
+                    == "validation"
+                    else "authoritative_live_source"
+                ),
+            }
+            for record in normalized_records
+            if _is_live_validation_candidate(record)
+        ]
+        if live_validation_records:
+            raw_validation_records = list(raw_validation_records) + [
+                record
+                for record in live_validation_records
+                if record.get("record_id")
+                not in {
+                    existing.get("record_id")
+                    for existing in raw_validation_records
+                    if isinstance(existing, dict)
+                }
+            ]
+            active_validation_records = list(live_validation_records)
+            inactive_validation_records = list(inactive_validation_records)
+            validation_source_compatibility_summary = {
+                **validation_source_compatibility_summary,
+                "validation_mode": "live_cross_source",
+                "validation_records_source": "live_fetched_records",
+                "validation_records_path": None,
+                "validation_records_path_used": None,
+                "validation_records_loaded": True,
+                "validation_records_enabled": True,
+                "compatibility_status": "compatible",
+                "compatibility_reason": (
+                    "Task-compatible validation records were derived from "
+                    "live-fetched validation sources."
+                ),
+                "validation_record_count": len(raw_validation_records),
+                "active_validation_record_count": len(active_validation_records),
+                "inactive_validation_record_count": len(inactive_validation_records),
+                "validation_compatible_record_count": len(active_validation_records),
+                "validation_incompatible_record_count": len(
+                    inactive_validation_records
+                ),
+            }
+        else:
+            validation_source_compatibility_summary = {
+                **validation_source_compatibility_summary,
+                "validation_mode": "live_cross_source",
+                "validation_records_source": "none",
+                "validation_records_path": None,
+                "validation_records_path_used": None,
+                "compatibility_status": LIVE_VALIDATION_PENDING_STATUS,
+                "compatibility_reason": (
+                    "Live validation limited: no compatible validation source "
+                    "was found in this run."
+                ),
+            }
     validation_records = list(active_validation_records)
     validation_compatibility_status = (
         validation_source_compatibility_summary.get("compatibility_status")
@@ -2353,6 +2473,7 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
         in {
             NO_COMPATIBLE_STATUS,
             INCOMPATIBLE_DISABLED_STATUS,
+            LIVE_VALIDATION_PENDING_STATUS,
         }
     )
     existing_conflicts = list(state.get("conflicts") or [])
@@ -2647,6 +2768,14 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
             comparable_candidates: list[tuple[dict, str, str]] = []
             not_comparable_candidates: list[tuple[dict, str]] = []
             for right in validation_records:
+                if (
+                    left.get("record_id")
+                    and left.get("record_id") == right.get("record_id")
+                ) or (
+                    left.get("source_id")
+                    and left.get("source_id") == right.get("source_id")
+                ):
+                    continue
                 comparability, reason = _records_comparable_for_validation(left, right)
                 if comparability == "comparable":
                     comparable_candidates.append((right, comparability, reason))
@@ -2919,6 +3048,33 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
         item.model_dump() for item in new_review_items
     ]
 
+    claim_state = dict(state)
+    claim_state.update(
+        {
+            "normalized_records": annotated_records,
+            "linked_events": updated_events,
+            "event_clusters": event_clusters,
+            "validation_cases": validation_builder["cases"],
+            "validation_comparisons": validation_builder["comparisons"],
+            "validation_results": validation_builder["results"],
+            "validation_records": raw_validation_records,
+            "active_validation_records": active_validation_records,
+            "inactive_validation_records": inactive_validation_records,
+            "conflicts": combined_conflict_dicts,
+            "human_review_queue": human_review_queue,
+        }
+    )
+    claim_result = run_claim_corroboration(claim_state)
+    annotated_records = claim_result.get("normalized_records") or annotated_records
+    claim_review_items = []
+    for item in claim_result.get("human_review_items") or []:
+        review_id = item.get("review_id")
+        if review_id in existing_review_ids:
+            continue
+        existing_review_ids.add(review_id)
+        claim_review_items.append(item)
+    human_review_queue = human_review_queue + claim_review_items
+
     summary = {
         "input_linked_event_count": len(linked_events),
         "input_normalized_record_count": len(normalized_records),
@@ -2930,6 +3086,12 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
         "events_requiring_human_review_count": events_requiring_human_review_count,
         "records_with_conflicts_count": records_with_conflicts_count,
         "human_review_conflict_count": len(new_review_items),
+        "claim_human_review_item_count": len(claim_review_items),
+        "claim_count": len(claim_result.get("claims") or []),
+        "claim_comparison_count": len(claim_result.get("claim_comparisons") or []),
+        "corroborated_event_count": len(
+            claim_result.get("corroborated_events") or []
+        ),
         "conflict_field_counts": dict(conflict_field_counter),
         "conflict_type_counts": dict(conflict_type_counter),
         "severity_counts": dict(severity_counter),
@@ -3015,6 +3177,10 @@ def cross_source_consistency_check(state: DataCollectionState) -> dict:
         "validation_summary": validation_summary,
         "trusted_source_validation_summary": trusted_source_validation_summary,
         "cross_source_validation_summary": cross_source_validation_summary,
+        "claims": claim_result.get("claims") or [],
+        "claim_comparisons": claim_result.get("claim_comparisons") or [],
+        "corroborated_events": claim_result.get("corroborated_events") or [],
+        "corroboration_summary": claim_result.get("corroboration_summary") or {},
         "conflicts": combined_conflict_dicts,
         "human_review_queue": human_review_queue,
         "cross_source_consistency_summary": summary,
@@ -3026,6 +3192,7 @@ def quality_gate_routing(state: DataCollectionState) -> dict:
     """Route to human_review if any review items are pending, else finalize."""
 
     anomaly_output = detect_anomalies(state)
+    human_review_enabled = bool(state.get("human_review_enabled", True))
     existing_queue = list(state.get("human_review_queue") or [])
     existing_review_ids = {
         item.get("review_id")
@@ -3039,7 +3206,13 @@ def quality_gate_routing(state: DataCollectionState) -> dict:
         existing_review_ids.add(item.get("review_id"))
         anomaly_review_items.append(item)
     queue = existing_queue + anomaly_review_items
-    if queue:
+    if not human_review_enabled:
+        route = "finalize"
+        message = (
+            "Human review disabled; preserving review flags as audit metadata "
+            "and routing to final_data_package_builder."
+        )
+    elif queue:
         route = "human_review"
         message = (
             f"Human review required: {len(queue)} item(s) in human_review_queue."
@@ -3056,6 +3229,7 @@ def quality_gate_routing(state: DataCollectionState) -> dict:
         message=message,
         metadata={
             "current_route": route,
+            "human_review_enabled": human_review_enabled,
             "human_review_queue_size": len(queue),
             "anomaly_result_count": (
                 anomaly_output.get("anomaly_summary") or {}

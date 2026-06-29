@@ -19,6 +19,7 @@ dependencies = [
     "python-dotenv",
     "requests",
     "beautifulsoup4",
+    "pypdf",
     "pandas",
     "pytest",
     "rich",
@@ -27,6 +28,25 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "langgraph-cli[inmem]",
+]
+visualization = [
+    "streamlit",
+    "plotly",
+    "nbformat",
+    "nbconvert",
+    "ipywidgets",
+]
+langflow-demo = [
+    "langflow",
+    "fastapi",
+    "uvicorn",
+]
+langflow-deep-demo = [
+    "langflow",
+    "fastapi",
+    "uvicorn",
+    "langgraph-cli[inmem]",
+    "langsmith",
 ]
 
 [project.scripts]

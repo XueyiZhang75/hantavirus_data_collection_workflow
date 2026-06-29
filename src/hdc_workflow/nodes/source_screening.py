@@ -8,7 +8,9 @@ changing node names or graph topology.
 from __future__ import annotations
 
 import os
+import re
 from collections import Counter
+from datetime import date, datetime
 from urllib.parse import urlsplit
 
 from .. import llm_clients
@@ -32,6 +34,11 @@ from ..source_credibility import (
     build_source_credibility_summary,
     source_credibility_runtime_from_env,
 )
+from ..source_identity import (
+    apply_source_identity_routing_guardrails,
+    apply_source_identity_to_registry,
+)
+from ..source_coverage import annotate_source_coverage
 from ..state import DataCollectionState, append_trace
 
 
@@ -57,6 +64,229 @@ def _parse_positive_int_env(name: str) -> int | None:
     except (TypeError, ValueError):
         return None
     return value if value > 0 else None
+
+
+def _env_flag(name: str, *, default: bool = False) -> bool:
+    raw = (os.environ.get(name) or "").strip().lower()
+    if not raw:
+        return default
+    return raw == "true"
+
+
+def _collection_mode_from_state(
+    state: DataCollectionState | dict,
+    role_policy: dict | None = None,
+) -> str:
+    """Resolve collection mode from the active workflow state before policy.
+
+    The direct-collection fast path is a per-run behavior. Reading only the
+    static source-role policy lets old defaults leak into new runs and causes
+    identity/critic agents to spend time on context sources after a target
+    collection source is already verified.
+    """
+
+    structured_task = state.get("structured_task") or {}
+    collection_spec = state.get("collection_spec") or {}
+    for value in (
+        collection_spec.get("collection_mode"),
+        structured_task.get("collection_mode"),
+        state.get("collection_mode"),
+    ):
+        if str(value or "").strip():
+            return str(value).strip()
+    return get_collection_mode(role_policy or load_source_role_policy())
+
+
+def _parse_date(value) -> date | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    if re.fullmatch(r"\d{4}", text):
+        text = f"{text}-01-01"
+    try:
+        parts = [int(part) for part in text.split("-")]
+        if len(parts) == 3:
+            return date(parts[0], parts[1], parts[2])
+    except (TypeError, ValueError):
+        return None
+    try:
+        return datetime.fromisoformat(text).date()
+    except (TypeError, ValueError):
+        return None
+
+
+def _task_week_pairs(state: DataCollectionState | dict) -> set[tuple[int, int]]:
+    structured_task = state.get("structured_task") or {}
+    collection_spec = state.get("collection_spec") or {}
+    start = _parse_date(
+        structured_task.get("start_date") or collection_spec.get("start_date")
+    )
+    end = _parse_date(
+        structured_task.get("end_date")
+        or collection_spec.get("end_date")
+        or structured_task.get("start_date")
+        or collection_spec.get("start_date")
+    )
+    if not start or not end:
+        return set()
+    if end < start:
+        start, end = end, start
+    pairs: set[tuple[int, int]] = set()
+    current = start
+    while current <= end:
+        days_until_saturday = (5 - current.weekday()) % 7
+        anchor = date.fromordinal(current.toordinal() + days_until_saturday)
+        iso = anchor.isocalendar()
+        pairs.add((int(iso.year), int(iso.week)))
+        current = date.fromordinal(current.toordinal() + 1)
+    return pairs
+
+
+def _entry_target_text(entry: dict) -> str:
+    return " ".join(
+        str(entry.get(key) or "")
+        for key in (
+            "canonical_url",
+            "url",
+            "title",
+            "name",
+            "source_title",
+            "snippet",
+            "publisher",
+            "published_date",
+        )
+    ).lower()
+
+
+def _explicit_year_week_pairs(text: str) -> set[tuple[int, int]]:
+    pairs: set[tuple[int, int]] = set()
+    patterns = (
+        r"\b(?P<year>20\d{2})[-_/ ]+week[-_/ ]?(?P<week>\d{1,2})\b",
+        r"\bweek[-_/ ]?(?P<week>\d{1,2})\b.{0,40}?\b(?P<year>20\d{2})\b",
+        r"\b(?P<year>20\d{2})[-_/ ]+w(?P<week>\d{1,2})\b",
+    )
+    for pattern in patterns:
+        for match in re.finditer(pattern, text, re.IGNORECASE):
+            try:
+                pairs.add((int(match.group("year")), int(match.group("week"))))
+            except (TypeError, ValueError):
+                continue
+    return pairs
+
+
+def _direct_target_verification(entry: dict, state: DataCollectionState | dict) -> dict:
+    task_pairs = _task_week_pairs(state)
+    explicit_pairs = _explicit_year_week_pairs(_entry_target_text(entry))
+    if entry.get("must_fetch") or entry.get("coverage_requirement_ids"):
+        return {
+            "target_verification_status": "verified_target",
+            "target_verification_reason": "source already satisfies coverage requirement",
+            "triage_role": "verified_target_collection",
+            "date_fit": "match",
+            "source_role": "data_source",
+            "screening_decision": "include",
+        }
+    if task_pairs and explicit_pairs:
+        if task_pairs & explicit_pairs:
+            return {
+                "target_verification_status": "verified_target",
+                "target_verification_reason": "explicit source year/week overlaps task window",
+                "triage_role": "verified_target_collection",
+                "date_fit": "match",
+                "source_role": "data_source",
+                "screening_decision": "include",
+            }
+        return {
+            "target_verification_status": "temporal_mismatch",
+            "target_verification_reason": (
+                "explicit source year/week does not overlap task window"
+            ),
+            "triage_role": "context_only",
+            "date_fit": "mismatch",
+            "source_role": "context_source",
+            "screening_decision": "include_for_context_fetch",
+        }
+    return {
+        "target_verification_status": "unverified_candidate",
+        "target_verification_reason": "no explicit source year/week was parsed",
+        "triage_role": "task_record_collection_candidate",
+        "date_fit": "candidate",
+        "source_role": None,
+        "screening_decision": None,
+    }
+
+
+def _apply_direct_triage_verification(
+    entry: dict,
+    result: SourceScreeningResult,
+    state: DataCollectionState | dict,
+    *,
+    collection_mode: str,
+) -> tuple[dict, dict]:
+    verification = _direct_target_verification(entry, state)
+    triage = dict(verification)
+    if collection_mode != "direct_collection":
+        return entry, triage
+
+    updated = dict(entry)
+    flags = list(updated.get("screening_flags") or result.screening_flags or [])
+    if verification["target_verification_status"] == "temporal_mismatch":
+        if "target_temporal_mismatch" not in flags:
+            flags.append("target_temporal_mismatch")
+        updated["source_role"] = verification["source_role"]
+        updated["screening_decision"] = verification["screening_decision"]
+        updated["screening_confidence"] = min(
+            float(result.screening_confidence or 0.0), 0.60
+        )
+        updated["screening_reason"] = verification["target_verification_reason"]
+        updated["screening_flags"] = flags
+        updated["target_fit_status"] = "temporal_mismatch"
+        updated["target_verification_status"] = verification["target_verification_status"]
+        updated["target_verification_reason"] = verification["target_verification_reason"]
+        updated["triage_role"] = verification["triage_role"]
+        updated["date_fit"] = verification["date_fit"]
+        updated["geography_fit"] = "candidate"
+        updated["disease_fit"] = "candidate"
+        updated["source_role_fit"] = verification["source_role"]
+    elif verification["target_verification_status"] == "verified_target":
+        updated["target_fit_status"] = "verified_target"
+        updated["target_verification_status"] = verification["target_verification_status"]
+        updated["target_verification_reason"] = verification["target_verification_reason"]
+        updated["triage_role"] = verification["triage_role"]
+        updated["date_fit"] = verification["date_fit"]
+        updated["geography_fit"] = "match"
+        updated["disease_fit"] = "candidate"
+        updated["source_role_fit"] = verification["source_role"]
+        updated["source_role"] = updated.get("source_role") or verification["source_role"]
+        updated["screening_decision"] = updated.get("screening_decision") or verification[
+            "screening_decision"
+        ]
+    else:
+        updated["target_fit_status"] = "task_record_collection_candidate"
+        updated["target_verification_status"] = "candidate_task_record_source"
+        updated["target_verification_reason"] = verification["target_verification_reason"]
+        updated["triage_role"] = verification["triage_role"]
+        updated["date_fit"] = verification["date_fit"]
+        updated["geography_fit"] = "candidate"
+        updated["disease_fit"] = "candidate"
+        updated["source_role_fit"] = updated.get("source_role") or result.source_role
+    if _entry_requires_source_trust_review(updated):
+        reason = (
+            "Source identity is news/social/secondary/unknown; task-compatible "
+            "metrics require human review before strict collection use."
+        )
+        updated = _apply_source_trust_review_routing(updated, reason=reason)
+        triage.update(
+            {
+                "target_verification_status": "source_trust_requires_human_review",
+                "target_verification_reason": reason,
+                "triage_role": "needs_human_review",
+                "date_fit": updated.get("date_fit") or triage.get("date_fit"),
+                "source_role": "context_source",
+                "screening_decision": "needs_human_review",
+            }
+        )
+    return updated, triage
 
 
 def _llm_source_critic_review_blocks_fetch() -> bool:
@@ -248,13 +478,108 @@ _SCREENING_PROFILE: dict[str, tuple[str, float, str]] = {
 }
 
 
+def _task_for_screening(screening_criteria: dict | None) -> dict:
+    criteria = screening_criteria or {}
+    structured = criteria.get("structured_task") or criteria.get("task") or {}
+    collection = criteria.get("collection_spec") or {}
+    return {
+        "disease": str(
+            criteria.get("disease")
+            or structured.get("disease")
+            or collection.get("disease")
+            or ""
+        ).strip(),
+        "location": str(
+            criteria.get("location")
+            or structured.get("location")
+            or structured.get("geography")
+            or collection.get("geography")
+            or collection.get("location")
+            or ""
+        ).strip(),
+        "start_date": str(
+            criteria.get("start_date")
+            or structured.get("start_date")
+            or collection.get("start_date")
+            or ""
+        ).strip(),
+        "end_date": str(
+            criteria.get("end_date")
+            or structured.get("end_date")
+            or collection.get("end_date")
+            or ""
+        ).strip(),
+    }
+
+
+def _screening_profile_for_role(
+    role: str,
+    *,
+    entry: dict,
+    task: dict,
+) -> tuple[str, float, str]:
+    disease = task.get("disease") or "the requested disease"
+    location = task.get("location") or "the requested location"
+    date_range = " to ".join(
+        value for value in (task.get("start_date"), task.get("end_date")) if value
+    )
+    title = entry.get("title") or entry.get("canonical_url") or entry.get("url") or "source"
+    if role == "data_source":
+        return (
+            "include",
+            0.90,
+            (
+                f"Source metadata for {title} indicates likely extractable "
+                f"{disease} public-health data for {location}"
+                + (f" during {date_range}" if date_range else "")
+                + "."
+            ),
+        )
+    if role == "context_source":
+        return (
+            "include",
+            0.78,
+            (
+                f"Source appears useful as context for {disease} collection "
+                f"for {location}, but may not contain direct extractable counts."
+            ),
+        )
+    if role == "search_endpoint":
+        return (
+            "uncertain",
+            0.70,
+            (
+                "Source is a search endpoint and should be expanded into "
+                "document-level candidates before content fetch."
+            ),
+        )
+    if role == "placeholder_source":
+        return (
+            "uncertain",
+            0.65,
+            "Source is an internal placeholder URI and should be deferred.",
+        )
+    return (
+        "exclude",
+        0.60,
+        (
+            f"Source metadata does not clearly match the requested "
+            f"{disease} data collection task for {location}."
+        ),
+    )
+
+
 def _screen_entry(
     entry: dict,
     policy: SourceScreeningPolicy,
     screening_criteria: dict | None,  # noqa: ARG001 — reserved for future LLM step
 ) -> SourceScreeningResult:
     role, role_flags = _classify_source_role(entry, policy)
-    decision, confidence, reason = _SCREENING_PROFILE[role]
+    decision, confidence, reason = _screening_profile_for_role(
+        role,
+        entry=entry,
+        task=_task_for_screening(screening_criteria),
+    )
 
     flags = list(role_flags)
 
@@ -579,10 +904,16 @@ def _select_llm_source_critic_candidates(
     *,
     allowlist: set[str] | None,
     max_sources: int | None,
+    collection_mode: str = "standard",
 ) -> tuple[set[str], dict[str, str], dict]:
     explicit_allowlist_used = allowlist is not None
     skipped_reasons: dict[str, str] = {}
     eligible: list[dict] = []
+    direct_fast_path_active = (
+        collection_mode == "direct_collection"
+        and not explicit_allowlist_used
+        and any(bool(entry.get("must_fetch")) for entry in registry)
+    )
 
     for entry in registry:
         source_id = str(entry.get("source_id") or "")
@@ -590,6 +921,14 @@ def _select_llm_source_critic_candidates(
             continue
         if explicit_allowlist_used and source_id not in allowlist:
             skipped_reasons[source_id] = "source_not_in_explicit_critic_allowlist"
+            continue
+        if not explicit_allowlist_used and entry.get("must_fetch"):
+            skipped_reasons[source_id] = "target_official_must_fetch_skips_llm_source_critic"
+            continue
+        if direct_fast_path_active:
+            skipped_reasons[source_id] = (
+                "direct_target_official_fast_path_skips_source_critic"
+            )
             continue
         if not explicit_allowlist_used and _is_search_endpoint_for_source_critic(entry):
             skipped_reasons[source_id] = "search_endpoint_or_placeholder_not_critic_candidate"
@@ -611,6 +950,8 @@ def _select_llm_source_critic_candidates(
         if explicit_allowlist_used
         else "auto_priority",
         "explicit_allowlist_used": explicit_allowlist_used,
+        "collection_mode": collection_mode,
+        "direct_target_official_fast_path": direct_fast_path_active,
         "max_sources": max_sources,
         "eligible_candidate_count": len(eligible),
         "selected_candidate_count": len(selected_ids),
@@ -887,6 +1228,40 @@ _CONTEXT_ONLY_REASON = (
     "grounding only, not structured record extraction."
 )
 
+_SOURCE_TRUST_REVIEW_TYPES = {
+    "blog",
+    "community_forum",
+    "forum",
+    "media_report",
+    "news",
+    "news_and_situation_report",
+    "news_media",
+    "secondary_media",
+    "social_media",
+    "unknown",
+}
+
+_SOURCE_TRUST_REVIEW_PUBLISHERS = {
+    "facebook",
+    "instagram",
+    "reddit",
+    "tiktok",
+    "twitter",
+    "x",
+    "youtube",
+}
+
+_SOURCE_TRUST_REVIEW_DOMAINS = {
+    "facebook.com",
+    "instagram.com",
+    "reddit.com",
+    "tiktok.com",
+    "twitter.com",
+    "x.com",
+    "youtube.com",
+    "youtu.be",
+}
+
 
 def _domain_for_entry(entry: dict) -> str:
     url = entry.get("canonical_url") or entry.get("url") or ""
@@ -896,6 +1271,57 @@ def _domain_for_entry(entry: dict) -> str:
     if netloc.startswith("www."):
         netloc = netloc[4:]
     return netloc
+
+
+def _entry_requires_source_trust_review(entry: dict) -> bool:
+    source_type = str(
+        entry.get("source_type_final")
+        or entry.get("source_type")
+        or entry.get("planned_query_source_type")
+        or ""
+    ).strip().lower()
+    publisher = str(
+        entry.get("actual_publisher") or entry.get("publisher") or ""
+    ).strip().lower()
+    domain = _domain_for_entry(entry)
+    if source_type in _SOURCE_TRUST_REVIEW_TYPES:
+        return True
+    if any(value and value in publisher for value in _SOURCE_TRUST_REVIEW_PUBLISHERS):
+        return True
+    return any(domain == value or domain.endswith("." + value) for value in _SOURCE_TRUST_REVIEW_DOMAINS)
+
+
+def _apply_source_trust_review_routing(entry: dict, *, reason: str) -> dict:
+    updated = dict(entry)
+    flags = list(updated.get("screening_flags") or [])
+    if "source_trust_requires_human_review" not in flags:
+        flags.append("source_trust_requires_human_review")
+    routing_flags = list(updated.get("routing_flags") or [])
+    if "source_trust_requires_human_review" not in routing_flags:
+        routing_flags.append("source_trust_requires_human_review")
+    updated.update(
+        {
+            "target_fit_status": "needs_human_review",
+            "target_verification_status": "source_trust_requires_human_review",
+            "target_verification_reason": reason,
+            "triage_role": "needs_human_review",
+            "source_role_final": "needs_human_review",
+            "source_role": "context_source",
+            "source_role_fit": "needs_human_review",
+            "screening_decision": "needs_human_review",
+            "final_screening_decision": "needs_human_review",
+            "screening_reason": reason,
+            "final_screening_reason": reason,
+            "status": "needs_human_review",
+            "ready_for_content_fetch": False,
+            "requires_human_review": True,
+            "human_review_recommended": True,
+            "human_review_reason": reason,
+            "screening_flags": flags,
+            "routing_flags": routing_flags,
+        }
+    )
+    return updated
 
 
 def _domain_matches_reserved(domain: str, reserved_domains: list[str]) -> bool:
@@ -1279,15 +1705,22 @@ def source_screening(state: DataCollectionState) -> dict:
 
     policy = SourceScreeningPolicy(**load_source_screening_policy())
     registry = list(state.get("source_registry") or [])
-    screening_criteria = state.get("screening_criteria")
+    screening_criteria = dict(state.get("screening_criteria") or {})
+    screening_criteria.setdefault("structured_task", state.get("structured_task") or {})
+    screening_criteria.setdefault("collection_spec", state.get("collection_spec") or {})
+    task_for_triage = _task_for_screening(screening_criteria)
+    collection_mode = _collection_mode_from_state(state)
     low_threshold = float(policy.thresholds.get("low_confidence", 0.50))
 
     updated: list[dict] = []
     decision_counter: Counter = Counter()
     role_counter: Counter = Counter()
+    triage_role_counter: Counter = Counter()
+    target_verification_counter: Counter = Counter()
     low_confidence_count = 0
     missing_url_count = 0
     missing_source_type_count = 0
+    triage_results: list[dict] = []
 
     for entry in registry:
         result = _screen_entry(entry, policy, screening_criteria)
@@ -1303,18 +1736,90 @@ def source_screening(state: DataCollectionState) -> dict:
                 "status": "screened",
             }
         )
+        new_entry, target_triage = _apply_direct_triage_verification(
+            new_entry,
+            result,
+            state,
+            collection_mode=collection_mode,
+        )
         # Validate via the model so any future field changes fail loudly here.
         validated = SourceRegistryEntry(**new_entry).model_dump()
         updated.append(validated)
 
-        decision_counter[result.screening_decision] += 1
-        role_counter[result.source_role] += 1
-        if result.screening_confidence < low_threshold:
+        validated_decision = validated.get("screening_decision") or result.screening_decision
+        validated_role = validated.get("source_role") or result.source_role
+        decision_counter[validated_decision] += 1
+        role_counter[validated_role] += 1
+        if float(validated.get("screening_confidence") or result.screening_confidence) < low_threshold:
             low_confidence_count += 1
-        if "missing_url" in result.screening_flags:
+        validated_flags = list(validated.get("screening_flags") or result.screening_flags)
+        if "missing_url" in validated_flags:
             missing_url_count += 1
-        if "missing_source_type" in result.screening_flags:
+        if "missing_source_type" in validated_flags:
             missing_source_type_count += 1
+        triage_results.append(
+            {
+                "source_id": validated.get("source_id"),
+                "source_url": validated.get("canonical_url")
+                or validated.get("url"),
+                "canonical_url": validated.get("canonical_url")
+                or validated.get("url"),
+                "source_title": validated.get("title"),
+                "title": validated.get("title"),
+                "query_id": validated.get("query_id"),
+                "query_used": validated.get("query_used"),
+                "task_disease": task_for_triage.get("disease"),
+                "task_location": task_for_triage.get("location"),
+                "task_start_date": task_for_triage.get("start_date"),
+                "task_end_date": task_for_triage.get("end_date"),
+                "triage_agent": "source_triage_agent",
+                "triage_method": (
+                    "deterministic_safety_checks_with_llm_triage_contract"
+                ),
+                "triage_decision": validated_decision,
+                "triage_role": target_triage.get("triage_role"),
+                "source_role": validated_role,
+                "source_role_final": validated.get("source_role_final"),
+                "source_role_compat": validated.get("source_role"),
+                "source_type": validated.get("source_type"),
+                "source_type_final": validated.get("source_type_final"),
+                "publisher": validated.get("publisher"),
+                "actual_publisher": validated.get("actual_publisher"),
+                "domain": validated.get("domain"),
+                "target_fit_status": validated.get("target_fit_status"),
+                "target_verification_status": target_triage.get(
+                    "target_verification_status"
+                ),
+                "target_verification_reason": target_triage.get(
+                    "target_verification_reason"
+                ),
+                "disease_fit": validated.get("disease_fit")
+                or ("candidate" if validated_decision != "exclude" else "unknown"),
+                "geography_fit": validated.get("geography_fit")
+                or ("candidate" if validated_decision != "exclude" else "unknown"),
+                "date_fit": validated.get("date_fit")
+                or target_triage.get("date_fit")
+                or ("candidate" if validated_decision != "exclude" else "unknown"),
+                "source_role_fit": validated.get("source_role_fit") or validated_role,
+                "requires_human_review": bool(validated.get("requires_human_review")),
+                "human_review_recommended": bool(
+                    validated.get("human_review_recommended")
+                ),
+                "human_review_reason": validated.get("human_review_reason"),
+                "routing_flags": list(validated.get("routing_flags") or []),
+                "confidence": validated.get("screening_confidence"),
+                "reason": validated.get("screening_reason"),
+                "flags": validated_flags,
+                "expected_extractable_fields": list(
+                    result.expected_extractable_fields
+                ),
+                "llm_semantic_triage_required": True,
+            }
+        )
+        triage_role_counter[target_triage.get("triage_role") or "unknown"] += 1
+        target_verification_counter[
+            target_triage.get("target_verification_status") or "unknown"
+        ] += 1
 
     summary = {
         "input_registry_count": len(registry),
@@ -1324,6 +1829,8 @@ def source_screening(state: DataCollectionState) -> dict:
         "low_confidence_count": low_confidence_count,
         "missing_url_count": missing_url_count,
         "missing_source_type_count": missing_source_type_count,
+        "triage_role_counts": dict(triage_role_counter),
+        "target_verification_status_counts": dict(target_verification_counter),
     }
 
     trace = append_trace(
@@ -1335,6 +1842,7 @@ def source_screening(state: DataCollectionState) -> dict:
     return {
         "source_registry": updated,
         "source_screening_summary": summary,
+        "source_triage_results": triage_results,
         "collection_trace": trace,
     }
 
@@ -1344,10 +1852,60 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
 
     policy = SourceScreeningPolicy(**load_source_screening_policy())
     role_policy = load_source_role_policy()
-    collection_mode = get_collection_mode(role_policy)
+    collection_mode = _collection_mode_from_state(state, role_policy)
     registry = list(state.get("source_registry") or [])
     existing_queue = list(state.get("human_review_queue") or [])
     existing_review_ids = {item.get("review_id") for item in existing_queue}
+    llm_source_identity_enabled = llm_clients.llm_source_identity_enabled()
+    llm_source_identity_max_sources = _parse_positive_int_env(
+        "HDC_LLM_SOURCE_IDENTITY_MAX_SOURCES"
+    )
+    llm_source_identity_require_llm = _env_flag(
+        "HDC_LLM_SOURCE_IDENTITY_REQUIRE_LLM"
+    )
+    llm_source_identity_allow_fallback = _env_flag(
+        "HDC_LLM_SOURCE_IDENTITY_ALLOW_DETERMINISTIC_FALLBACK",
+        default=True,
+    )
+    (
+        registry,
+        source_coverage_requirements,
+        source_coverage_audit,
+    ) = annotate_source_coverage(registry, state)
+    registry, source_identity_assessments, source_identity_summary = (
+        apply_source_identity_to_registry(
+            registry,
+            collection_spec=state.get("collection_spec"),
+            llm_enabled=llm_source_identity_enabled,
+            max_sources=llm_source_identity_max_sources,
+            require_llm=llm_source_identity_require_llm,
+            allow_deterministic_fallback=llm_source_identity_allow_fallback,
+        )
+    )
+    # Re-apply coverage after identity so advisory identity metadata can never
+    # demote a task-critical verified collection source.
+    (
+        registry,
+        source_coverage_requirements,
+        source_coverage_audit,
+    ) = annotate_source_coverage(registry, state)
+    if (
+        llm_source_identity_enabled
+        and llm_source_identity_require_llm
+        and not llm_source_identity_allow_fallback
+        and source_identity_summary.get("blocked_llm_required_count", 0) > 0
+    ):
+        blocked_source_ids = [
+            item.get("source_id")
+            for item in source_identity_assessments
+            if item.get("source_identity_status") == "blocked_llm_required"
+        ]
+        blocked_preview = ", ".join(str(sid) for sid in blocked_source_ids if sid)
+        raise RuntimeError(
+            "source identity LLM required but unavailable for "
+            f"{source_identity_summary.get('blocked_llm_required_count')} source(s)"
+            + (f": {blocked_preview}" if blocked_preview else "")
+        )
     llm_source_critic_enabled = llm_clients.llm_source_critic_enabled()
     llm_source_critic_allowlist = _parse_csv_env(
         "HDC_LLM_SOURCE_CRITIC_SOURCE_ID_ALLOWLIST"
@@ -1355,7 +1913,10 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
     llm_source_critic_max_sources = _parse_positive_int_env(
         "HDC_LLM_SOURCE_CRITIC_MAX_SOURCES"
     )
-    llm_review_blocks_fetch = _llm_source_critic_review_blocks_fetch()
+    llm_review_blocks_fetch = (
+        _llm_source_critic_review_blocks_fetch()
+        and collection_mode != "direct_collection"
+    )
     credibility_runtime = source_credibility_runtime_from_env()
 
     updated: list[dict] = []
@@ -1401,6 +1962,7 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
             registry,
             allowlist=llm_source_critic_allowlist,
             max_sources=llm_source_critic_max_sources,
+            collection_mode=collection_mode,
         )
         llm_selected_source_ids = list(
             source_critic_selection_summary.get("selected_source_ids") or []
@@ -1491,6 +2053,8 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
             credibility_runtime,
         )
         new_entry = _reapply_source_critic_fetch_block(new_entry)
+        new_entry = apply_source_identity_routing_guardrails(new_entry)
+        new_entry = annotate_source_coverage([new_entry], state)[0][0]
         credibility_assessments.append(credibility_assessment)
         validated = SourceRegistryEntry(**new_entry).model_dump()
         updated.append(validated)
@@ -1664,12 +2228,80 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
                 )
                 existing_review_ids.add(review_id)
 
+    (
+        updated,
+        source_coverage_requirements,
+        source_coverage_audit,
+    ) = annotate_source_coverage(updated, state)
+    must_fetch_sources = [
+        {
+            "source_id": row.get("source_id"),
+            "canonical_url": row.get("canonical_url") or row.get("url"),
+            "must_fetch_reason": row.get("must_fetch_reason"),
+            "coverage_requirement_ids": row.get("coverage_requirement_ids") or [],
+            "routing_conflict_warnings": row.get("routing_conflict_warnings") or [],
+        }
+        for row in updated
+        if row.get("must_fetch")
+    ]
+    direct_fast_path_summary = {
+        "collection_mode": collection_mode,
+        "direct_collection_enabled": collection_mode == "direct_collection",
+        "target_source_count": len(must_fetch_sources),
+        "target_source_ids": [
+            str(row.get("source_id") or "")
+            for row in must_fetch_sources
+            if row.get("source_id")
+        ],
+        "identity_assessed_source_count": source_identity_summary.get(
+            "identity_assessed_count", 0
+        ),
+        "identity_llm_assessed_source_count": source_identity_summary.get(
+            "llm_identity_assessed_count", 0
+        ),
+        "identity_skipped_source_count": source_identity_summary.get(
+            "direct_identity_fast_path_skipped_count", 0
+        ),
+        "critic_attempted_source_count": llm_attempted_source_count,
+        "critic_assessed_source_count": llm_assessed_source_count,
+        "critic_skipped_source_count": llm_skipped_source_count,
+        "critic_skipped_reason_counts": dict(llm_skipped_reason_counter),
+        "source_critic_selection_summary": source_critic_selection_summary,
+    }
+
     human_review_queue = list(existing_queue) + [
         item.model_dump() for item in new_review_items
     ]
     credibility_summary = build_source_credibility_summary(
         credibility_assessments,
         credibility_runtime,
+    )
+    identity_skip_reason_counter = Counter(
+        item.get("source_identity_llm_skipped_reason")
+        for item in source_identity_assessments
+        if item.get("source_identity_llm_skipped_reason")
+    )
+    credibility_skip_reason_counter = Counter(
+        item.get("source_credibility_llm_skipped_reason")
+        for item in credibility_assessments
+        if item.get("source_credibility_llm_skipped_reason")
+    )
+    direct_fast_path_summary.update(
+        {
+            "identity_llm_skipped_reason_counts": dict(
+                identity_skip_reason_counter
+            ),
+            "source_credibility_llm_assessed_count": credibility_summary.get(
+                "llm_assessed_count", 0
+            ),
+            "source_credibility_llm_skipped_count": credibility_summary.get(
+                "llm_skipped_count", 0
+            ),
+            "credibility_llm_skipped_reason_counts": dict(
+                credibility_skip_reason_counter
+                or Counter(credibility_summary.get("llm_skipped_reason_counts") or {})
+            ),
+        }
     )
 
     critic_summary = {
@@ -1735,6 +2367,11 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "source_credibility_llm_failure_count": credibility_summary.get(
             "llm_failure_count", 0
         ),
+        "source_identity_summary": source_identity_summary,
+        "source_coverage_requirement_count": len(source_coverage_requirements),
+        "must_fetch_source_count": len(must_fetch_sources),
+        "source_coverage_audit": source_coverage_audit,
+        "direct_fast_path_summary": direct_fast_path_summary,
     }
     routing_summary = {
         "collection_mode": collection_mode,
@@ -1765,6 +2402,16 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "source_credibility_human_review_count": credibility_summary.get(
             "needs_review_count", 0
         ),
+        "source_identity_assessed_count": source_identity_summary.get(
+            "identity_assessed_count", 0
+        ),
+        "source_identity_llm_assessed_count": source_identity_summary.get(
+            "llm_identity_assessed_count", 0
+        ),
+        "source_coverage_requirement_count": len(source_coverage_requirements),
+        "must_fetch_source_count": len(must_fetch_sources),
+        "source_coverage_audit": source_coverage_audit,
+        "direct_fast_path_summary": direct_fast_path_summary,
     }
 
     trace = append_trace(
@@ -1786,5 +2433,12 @@ def source_critic_and_uncertainty_routing(state: DataCollectionState) -> dict:
         "source_routing_summary": routing_summary,
         "source_credibility_assessments": credibility_assessments,
         "source_credibility_summary": credibility_summary,
+        "source_identity_assessments": source_identity_assessments,
+        "source_identity_summary": source_identity_summary,
+        "source_coverage_requirements": source_coverage_requirements,
+        "source_coverage_audit": source_coverage_audit,
+        "must_fetch_sources": must_fetch_sources,
+        "source_critic_selection_summary": source_critic_selection_summary,
+        "direct_fast_path_summary": direct_fast_path_summary,
         "collection_trace": trace,
     }

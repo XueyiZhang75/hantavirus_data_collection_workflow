@@ -1848,6 +1848,26 @@ def test_quality_gate_routes_to_human_review_when_queue_nonempty():
     assert result.get("current_route") == "human_review"
 
 
+def test_quality_gate_bypasses_human_review_when_disabled():
+    node = _quality_gate_node()
+    state = {
+        "human_review_enabled": False,
+        "human_review_queue": [
+            {
+                "review_id": "review_conflict_conf_001",
+                "item_type": "cross_source_conflict",
+                "priority": "high",
+            }
+        ],
+        "collection_trace": [],
+    }
+    result = node(state)
+    assert result.get("current_route") == "finalize"
+    assert len(result.get("human_review_queue") or []) == 1
+    trace = result.get("collection_trace") or []
+    assert trace[-1]["metadata"]["human_review_enabled"] is False
+
+
 def test_quality_gate_routes_to_finalize_when_no_review():
     node = _quality_gate_node()
     state = {"human_review_queue": [], "collection_trace": []}

@@ -17,19 +17,12 @@ advice or official surveillance.
 Key project documents:
 
 - [Final product target](docs/final_product_target.md)
-- [Current state audit](docs/current_state_audit.md)
-- [Live baseline report](docs/live_baseline_report.md)
+- [User guide](docs/user_guide.md)
 - [Structured task input](docs/structured_task_input.md)
 - [Disease intelligence layer](docs/disease_intelligence_layer.md)
 - [Generic profile/schema setup](docs/profile_schema_setup.md)
 - [Executable source planning](docs/executable_source_planning.md)
 - [Real source discovery](docs/real_source_discovery.md)
-- [Stage 0 report](docs/stage_reports/STAGE_0_REPORT.md)
-- [Stage 1 report](docs/stage_reports/STAGE_1_REPORT.md)
-- [Stage 2 report](docs/stage_reports/STAGE_2_REPORT.md)
-- [Stage 3 report](docs/stage_reports/STAGE_3_REPORT.md)
-- [Stage 4 report](docs/stage_reports/STAGE_4_REPORT.md)
-- [Stage 5 report](docs/stage_reports/STAGE_5_REPORT.md)
 
 Controlled source-search execution is available: planned queries from the
 executable source plan can run through fixture or live provider adapters when
@@ -63,6 +56,12 @@ optional session id. Record fields are fixed by the workflow schema, so normal
 users do not need to decide extraction columns. After the input phase, it runs
 the full real workflow with live search, live fetch, and LLM stages enabled by
 default. It does not print API keys and does not fall back to fixture data.
+The default interactive and visual mode is `direct_collection`: official
+public-health sources and task-compatible surveillance records are prioritized
+for the main `final_dataset`, while heavier validation, anomaly review, and
+human-review logic are recorded as diagnostics instead of blocking the primary
+collection result. Use `--audit-mode` on the interactive script when you need
+the older full audit behavior.
 
 Example direct run without prompts:
 
@@ -109,7 +108,95 @@ LLM stages in config or with CLI flags. Never put real keys in config files.
 Important artifacts include `collection/final_package.json`,
 `collection/final_dataset.csv`, `collection/final_dataset_post_review.json`,
 `diagnostics/validation_results.json`, `diagnostics/anomaly_results.json`,
-`diagnostics/human_review_audit_trail.json`, and the HTML workflow console.
+`diagnostics/human_review_audit_trail.json`,
+`diagnostics/source_coverage_audit.json`,
+`diagnostics/official_extraction_queue.json`,
+`diagnostics/official_extraction_failures.json`,
+`diagnostics/extraction_budget_by_source.json`,
+`diagnostics/direct_collection_summary.json`, the runtime event files
+(`diagnostics/run_events.ndjson`, `diagnostics/run_status.json`,
+`diagnostics/node_status.json`), and the HTML workflow console.
+
+To inspect a run while it is still executing, use the default Rich terminal
+status or read the event files from the session directory. The Streamlit viewer
+is optional:
+
+```powershell
+python -m pip install -e .[visualization]
+streamlit run scripts/live_workflow_dashboard.py -- --session-dir outputs/sessions/<session_id>
+```
+
+For the local visual demo shell, use the optional Langflow visual demo. Langflow
+is the main demo interface: it submits the task to a local HDC demo API, then
+the mirrored HDC nodes on the canvas wait for the real workflow nodes to run and
+return per-node status, duration, payload summaries, tool summaries, LLM
+summaries, and final artifact links. It does not replace the HDC LangGraph
+workflow or mutate the final package schema.
+
+```powershell
+python -m pip install -e .[langflow-demo]
+python scripts\start_langflow_demo.py
+```
+
+The startup script waits until both the local API and Langflow are ready, imports
+the bundled flow automatically, and opens the flow page. If auto-import fails,
+import this file manually:
+
+```text
+integrations/langflow/flows/hdc_deep_visual_demo_flow.json
+```
+
+Use `HDC Workflow Runner` for the free-text `User Request` plus disease,
+location, date range, provider, and model, but start the demo by pressing Play
+on `HDC Final Results - Run Full Workflow`. That final node builds the whole
+Langflow chain once. Each `HDC Workflow Node Inspector` waits for its matching
+real workflow node to complete before returning, and its output Data/Message
+contains the real node status, real duration, input/output summaries, recent
+events, tool summary, LLM summary, and optional trace URL. Langflow card timing
+is component build timing; use the Node Details output and Final Timeline for
+real HDC workflow timing.
+
+For the main interactive visual path:
+
+```powershell
+python scripts\run_visual_workflow.py
+```
+
+This prompts for disease, location, exact dates such as `2024-5-1` to
+`2024-5-3`, session id, and user request. It then opens a newly imported,
+session-specific prefilled Langflow flow; use that newly opened URL instead of
+older Langflow tabs, then press Play on `HDC Final Results - Run Full Workflow`
+to start and watch the real workflow chain. Add `--quick-test-mode` when you want lower search/fetch/LLM budgets
+for smoke tests without changing normal full-run defaults.
+
+### Deep visual demo
+
+For optional LangSmith/LangGraph Studio tracing, use the deep startup script:
+
+```powershell
+python -m pip install -e .[langflow-deep-demo]
+$env:LANGSMITH_API_KEY = [Environment]::GetEnvironmentVariable("LANGSMITH_API_KEY", "User")
+python scripts\start_langflow_deep_demo.py
+```
+
+The deep demo requires `LANGSMITH_API_KEY` and defaults to
+`LANGSMITH_PROJECT=hdc-workflow-demo`. Optional LangSmith workspace/region
+settings such as `LANGSMITH_WORKSPACE_ID` and `LANGSMITH_ENDPOINT` are read from
+the shell. LLM and search keys, such as `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
+and `TAVILY_API_KEY`, are still configured the same way as normal live runs.
+
+The normal Langflow visual demo does not require LangSmith. The deep startup
+script keeps the same Langflow canvas but also starts optional Studio/tracing
+services. `HDC Final Results - Run Full Workflow` may include Studio and LangSmith trace links when
+those services are configured.
+
+LangGraph Studio shows the real graph structure and reproducible graph entry
+point. LangSmith stores the deep trace. Full debug tracing can include prompts,
+LLM outputs, source snippets, search/fetch summaries, and tool span summaries.
+
+For a research-facing replay artifact, add `--write-run-notebook` to a
+configured run or interactive run to write
+`workflow_replay_notebook.ipynb` inside the session directory.
 
 Generate a safe starting config:
 

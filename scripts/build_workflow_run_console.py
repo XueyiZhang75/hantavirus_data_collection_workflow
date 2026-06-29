@@ -109,6 +109,8 @@ def _initial_state() -> dict:
         ),
         "source_candidates": [],
         "source_registry": [],
+        "source_identity_assessments": [],
+        "source_identity_summary": None,
         "documents": [],
         "evidence_chunks": [],
         "raw_records": [],
@@ -292,6 +294,10 @@ def user_facing_run_status(run_quality_summary: dict | None) -> str:
             "FAILED QUALITY GATE: records were produced but none passed final "
             "quality gates."
         ),
+        "no_primary_case_dataset_records": (
+            "COMPLETED WITH NO PRIMARY CASE DATASET RECORDS: workflow completed, "
+            "but no primary case records were accepted into final_dataset."
+        ),
         "failed_source_relevance": (
             "FAILED SOURCE RELEVANCE: workflow completed but source relevance "
             "gates blocked accepted records."
@@ -301,16 +307,22 @@ def user_facing_run_status(run_quality_summary: dict | None) -> str:
             "records did not pass task relevance gates."
         ),
         "validation_limited_no_compatible_source": (
-            "VALIDATION LIMITED: no task-compatible held-out validation source "
+            "VALIDATION LIMITED: no task-compatible validation source "
             "was available."
         ),
     }
     text = mapping.get(str(status), f"STATUS: {status or 'unknown'}")
     if summary.get("validation_limited"):
-        text += (
-            " Held-out validation was limited because no task-compatible "
-            "validation source was available."
-        )
+        if summary.get("validation_mode") == "live_cross_source":
+            text += (
+                " Live cross-source validation was limited because this run "
+                "did not find a task-compatible validation source."
+            )
+        else:
+            text += (
+                " Held-out validation was limited because no task-compatible "
+                "validation source was available."
+            )
     return text
 
 
@@ -447,6 +459,28 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
     if not isinstance(run_summary, dict):
         run_summary = {}
     run_summary = _sanitize_workflow_artifact(run_summary)
+    interpretive_report_summary = _read_json_file(
+        run_output_dir / "workflow_interpretive_report_summary.json"
+    )
+    if not isinstance(interpretive_report_summary, dict):
+        interpretive_report_summary = {}
+    interpretive_report_summary = _sanitize_workflow_artifact(
+        interpretive_report_summary
+    )
+    workflow_visualization_summary = _read_json_file(
+        run_output_dir
+        / "workflow_visualization"
+        / "workflow_visualization_summary.json"
+    )
+    if not isinstance(workflow_visualization_summary, dict):
+        workflow_visualization_summary = _read_json_file(
+            diagnostics_dir / "workflow_visualization_summary.json"
+        )
+    if not isinstance(workflow_visualization_summary, dict):
+        workflow_visualization_summary = {}
+    workflow_visualization_summary = _sanitize_workflow_artifact(
+        workflow_visualization_summary
+    )
 
     records = _list_or_empty(package.get("final_dataset"))
     final_dataset_pre_quality_gate = list(
@@ -455,6 +489,25 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
     final_dataset_post_review = list(package.get("final_dataset_post_review") or [])
     quarantined_records = list(package.get("quarantined_records") or [])
     pending_review_records = list(package.get("pending_review_records") or [])
+    non_primary_observations = list(package.get("non_primary_observations") or [])
+    final_case_dataset = list(package.get("final_case_dataset") or [])
+    zero_case_statements = list(package.get("zero_case_statements") or [])
+    exposure_monitoring_records = list(
+        package.get("exposure_monitoring_records") or []
+    )
+    surveillance_summary_records = list(
+        package.get("surveillance_summary_records") or []
+    )
+    outbreak_summary_records = list(package.get("outbreak_summary_records") or [])
+    context_records = list(package.get("context_records") or [])
+    unclassified_observation_records = list(
+        package.get("unclassified_observation_records") or []
+    )
+    observation_type_dataset_summary = (
+        package.get("observation_type_dataset_summary")
+        or _summary_value(workflow_summaries, "observation_type_dataset_summary")
+        or {}
+    )
     record_inclusion_decisions = list(package.get("record_inclusion_decisions") or [])
     run_quality_summary = (
         package.get("run_quality_summary")
@@ -501,6 +554,11 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         diagnostics_dir,
         workflow_summaries,
         "source_search_execution_summary",
+    )
+    iterative_source_discovery_summary = _diagnostic_summary(
+        diagnostics_dir,
+        workflow_summaries,
+        "iterative_source_discovery_summary",
     )
     localized_source_planning_summary = _diagnostic_summary(
         diagnostics_dir,
@@ -563,6 +621,28 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
         "final_dataset_pre_quality_gate": final_dataset_pre_quality_gate,
         "quarantined_records": quarantined_records,
         "pending_review_records": pending_review_records,
+        "non_primary_observations": non_primary_observations,
+        "final_case_dataset": final_case_dataset,
+        "global_outbreak_event_dataset": package.get(
+            "global_outbreak_event_dataset"
+        )
+        or [],
+        "regional_surveillance_dataset": package.get(
+            "regional_surveillance_dataset"
+        )
+        or [],
+        "country_year_aggregate_dataset": package.get(
+            "country_year_aggregate_dataset"
+        )
+        or [],
+        "official_alert_dataset": package.get("official_alert_dataset") or [],
+        "zero_case_statements": zero_case_statements,
+        "exposure_monitoring_records": exposure_monitoring_records,
+        "surveillance_summary_records": surveillance_summary_records,
+        "outbreak_summary_records": outbreak_summary_records,
+        "context_records": context_records,
+        "unclassified_observation_records": unclassified_observation_records,
+        "observation_type_dataset_summary": observation_type_dataset_summary,
         "record_inclusion_decisions": record_inclusion_decisions,
         "run_quality_summary": run_quality_summary,
         "final_dataset_quality_summary": final_dataset_quality_summary,
@@ -578,6 +658,7 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
             workflow_summaries, "source_planning_agent_summary"
         ),
         "source_search_execution_summary": source_search_summary,
+        "iterative_source_discovery_summary": iterative_source_discovery_summary,
         "source_discovery_summary": _summary_value(
             workflow_summaries, "source_discovery_summary"
         ),
@@ -650,6 +731,8 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
             workflow_summaries, "final_dataset_quality_summary"
         )
         or final_dataset_quality_summary,
+        "interpretive_report_summary": interpretive_report_summary,
+        "workflow_visualization_summary": workflow_visualization_summary,
         "finalization_summary": _summary_value(
             workflow_summaries, "finalization_summary"
         ),
@@ -662,6 +745,8 @@ def _load_current_workflow_result(run_output_dir: Path) -> dict | None:
             "run_quality_summary": run_quality_summary,
             "final_dataset_quality_summary": final_dataset_quality_summary,
             "run_summary": run_summary,
+            "interpretive_report_summary": interpretive_report_summary,
+            "workflow_visualization_summary": workflow_visualization_summary,
         },
     }
 
@@ -1000,6 +1085,8 @@ def _stage_payload(result: dict) -> list[dict]:
             "state_writes": [
                 "source_credibility_assessments",
                 "source_credibility_summary",
+                "source_identity_assessments",
+                "source_identity_summary",
                 "source_registry.source_role_final",
             ],
             "trace": trace.get("source_screening", {}),
@@ -1009,6 +1096,10 @@ def _stage_payload(result: dict) -> list[dict]:
                 ),
                 "source_credibility_assessments": _sample(
                     result.get("source_credibility_assessments"), 6
+                ),
+                "source_identity_summary": result.get("source_identity_summary"),
+                "source_identity_assessments": _sample(
+                    result.get("source_identity_assessments"), 8
                 ),
                 "source_registry_sample": _sample(result.get("source_registry"), 6),
             },
@@ -1197,6 +1288,16 @@ def _report_payload(result: dict) -> dict:
     package = result.get("final_data_package") or {}
     collection_spec = result.get("collection_spec") or {}
     workflow_result = result.get("workflow_run_result") or {}
+    interpretive_report_summary = (
+        result.get("interpretive_report_summary")
+        or workflow_result.get("interpretive_report_summary")
+        or {}
+    )
+    workflow_visualization_summary = (
+        result.get("workflow_visualization_summary")
+        or workflow_result.get("workflow_visualization_summary")
+        or {}
+    )
     live_fetch_summary = workflow_result.get("live_fetch_summary") or {}
     document_parse_summary = (
         result.get("document_parse_summary")
@@ -1208,11 +1309,16 @@ def _report_payload(result: dict) -> dict:
     )
     llm_replay_summary = workflow_result.get("llm_replay_summary") or {}
     source_search_summary = result.get("source_search_execution_summary") or {}
+    iterative_source_discovery_summary = (
+        result.get("iterative_source_discovery_summary") or {}
+    )
     localized_source_planning_summary = (
         result.get("localized_source_planning_summary") or {}
     )
     source_critic_summary = result.get("source_critic_summary") or {}
     source_credibility_summary = result.get("source_credibility_summary") or {}
+    source_identity_summary = result.get("source_identity_summary") or {}
+    source_identity_assessments = result.get("source_identity_assessments") or []
     disease_relevance_summary = result.get("disease_relevance_summary") or {}
     validation_source_compatibility_summary = (
         result.get("validation_source_compatibility_summary") or {}
@@ -1225,6 +1331,41 @@ def _report_payload(result: dict) -> dict:
     final_dataset_pre_quality_gate = result.get("final_dataset_pre_quality_gate") or []
     quarantined_records = result.get("quarantined_records") or []
     pending_review_records = result.get("pending_review_records") or []
+    non_primary_observations = result.get("non_primary_observations") or []
+    final_case_dataset = result.get("final_case_dataset") or package.get(
+        "final_case_dataset"
+    ) or []
+    global_outbreak_event_dataset = result.get(
+        "global_outbreak_event_dataset"
+    ) or package.get("global_outbreak_event_dataset") or []
+    regional_surveillance_dataset = result.get(
+        "regional_surveillance_dataset"
+    ) or package.get("regional_surveillance_dataset") or []
+    country_year_aggregate_dataset = result.get(
+        "country_year_aggregate_dataset"
+    ) or package.get("country_year_aggregate_dataset") or []
+    official_alert_dataset = result.get("official_alert_dataset") or package.get(
+        "official_alert_dataset"
+    ) or []
+    zero_case_statements = result.get("zero_case_statements") or package.get(
+        "zero_case_statements"
+    ) or []
+    exposure_monitoring_records = result.get(
+        "exposure_monitoring_records"
+    ) or package.get("exposure_monitoring_records") or []
+    surveillance_summary_records = result.get(
+        "surveillance_summary_records"
+    ) or package.get("surveillance_summary_records") or []
+    outbreak_summary_records = result.get("outbreak_summary_records") or package.get(
+        "outbreak_summary_records"
+    ) or []
+    context_records = result.get("context_records") or package.get("context_records") or []
+    unclassified_observation_records = result.get(
+        "unclassified_observation_records"
+    ) or package.get("unclassified_observation_records") or []
+    observation_type_dataset_summary = result.get(
+        "observation_type_dataset_summary"
+    ) or package.get("observation_type_dataset_summary") or {}
     record_inclusion_decisions = result.get("record_inclusion_decisions") or []
     run_quality_summary = result.get("run_quality_summary") or {}
     final_dataset_quality_summary = result.get("final_dataset_quality_summary") or {}
@@ -1275,6 +1416,17 @@ def _report_payload(result: dict) -> dict:
             "search_derived_candidates": source_search_summary.get(
                 "candidate_from_search_count"
             ),
+            "iterative_source_discovery_enabled": (
+                iterative_source_discovery_summary.get(
+                    "iterative_source_discovery_enabled"
+                )
+            ),
+            "iterative_search_iterations": iterative_source_discovery_summary.get(
+                "search_iteration_count"
+            ),
+            "iterative_stop_decision": iterative_source_discovery_summary.get(
+                "stop_decision"
+            ),
             "truth_label": (
                 f"Current session task: {collection_spec.get('disease')} / "
                 f"{collection_spec.get('geography')} / "
@@ -1297,6 +1449,9 @@ def _report_payload(result: dict) -> dict:
         "counts": {
             "trace_nodes": len(result.get("collection_trace") or []),
             "sources": len(result.get("source_registry") or []),
+            "source_identity_assessments": source_identity_summary.get(
+                "identity_assessed_count", 0
+            ),
             "documents": len(result.get("documents") or []),
             "evidence_chunks": len(chunks),
             "records": len(records),
@@ -1304,6 +1459,30 @@ def _report_payload(result: dict) -> dict:
             "pre_quality_records": len(final_dataset_pre_quality_gate),
             "quarantined_records": len(quarantined_records),
             "pending_review_records": len(pending_review_records),
+            "non_primary_observations": len(non_primary_observations),
+            "final_case_dataset": len(final_case_dataset),
+            "global_outbreak_event_dataset": len(global_outbreak_event_dataset),
+            "regional_surveillance_dataset": len(regional_surveillance_dataset),
+            "country_year_aggregate_dataset": len(country_year_aggregate_dataset),
+            "official_alert_dataset": len(official_alert_dataset),
+            "zero_case_statements": len(zero_case_statements),
+            "exposure_monitoring_records": len(exposure_monitoring_records),
+            "surveillance_summary_records": len(surveillance_summary_records),
+            "outbreak_summary_records": len(outbreak_summary_records),
+            "context_records": len(context_records),
+            "unclassified_observation_records": len(unclassified_observation_records),
+            "primary_case_dataset_eligible": run_quality_summary.get(
+                "primary_case_dataset_eligible_count",
+                final_dataset_quality_summary.get(
+                    "primary_case_dataset_eligible_count", 0
+                ),
+            ),
+            "corroborated_primary_case_events": run_quality_summary.get(
+                "corroborated_primary_case_event_count",
+                final_dataset_quality_summary.get(
+                    "corroborated_primary_case_event_count", 0
+                ),
+            ),
             "linked_events": len(result.get("linked_events") or []),
             "event_clusters": len(result.get("event_clusters") or []),
             "duplicate_clusters": len(result.get("duplicate_clusters") or []),
@@ -1318,9 +1497,16 @@ def _report_payload(result: dict) -> dict:
             "rejected_incompatible_records": disease_relevance_summary.get(
                 "rejected_incompatible_record_count", 0
             ),
+            "iterative_search_iterations": iterative_source_discovery_summary.get(
+                "search_iteration_count", 0
+            ),
+            "iterative_llm_refinement_calls": iterative_source_discovery_summary.get(
+                "llm_refinement_call_count", 0
+            ),
         },
         "route": result.get("current_route"),
         "source_search": source_search_summary,
+        "iterative_source_discovery": iterative_source_discovery_summary,
         "localized_source_planning": localized_source_planning_summary,
         "source_critic": source_critic_summary,
         "source_credibility": {
@@ -1329,17 +1515,43 @@ def _report_payload(result: dict) -> dict:
                 result.get("source_credibility_assessments"), 6
             ),
         },
+        "source_identity": {
+            "summary": source_identity_summary,
+            "assessment_sample": _sample(source_identity_assessments, 8),
+        },
         "disease_relevance": disease_relevance_summary,
         "run_quality": {
             "summary": run_quality_summary,
             "final_dataset_quality_summary": final_dataset_quality_summary,
+            "observation_type_dataset_summary": observation_type_dataset_summary,
+            "final_case_dataset_sample": _sample(final_case_dataset, 8),
+            "global_outbreak_event_dataset_sample": _sample(
+                global_outbreak_event_dataset, 8
+            ),
+            "regional_surveillance_dataset_sample": _sample(
+                regional_surveillance_dataset, 8
+            ),
+            "country_year_aggregate_dataset_sample": _sample(
+                country_year_aggregate_dataset, 8
+            ),
+            "official_alert_dataset_sample": _sample(official_alert_dataset, 8),
+            "zero_case_statements_sample": _sample(zero_case_statements, 8),
+            "exposure_monitoring_records_sample": _sample(
+                exposure_monitoring_records, 8
+            ),
+            "context_records_sample": _sample(context_records, 8),
             "record_inclusion_decisions_sample": _sample(
                 record_inclusion_decisions, 10
             ),
             "quarantined_records_sample": _sample(quarantined_records, 8),
             "pending_review_records_sample": _sample(pending_review_records, 8),
+            "non_primary_observations_sample": _sample(
+                non_primary_observations, 8
+            ),
             "pre_quality_records_sample": _sample(final_dataset_pre_quality_gate, 8),
         },
+        "interpretive_report": interpretive_report_summary,
+        "workflow_visualization": workflow_visualization_summary,
         "fetch_parse": {
             "live_fetch_summary": live_fetch_summary,
             "document_parse_summary": document_parse_summary,
@@ -1388,15 +1600,68 @@ def _report_payload(result: dict) -> dict:
             "llm_call_succeeded": llm_replay_summary.get("llm_call_succeeded"),
         },
         "key_artifact_paths": {
+            "workflow_interpretive_report_chinese.md": "workflow_interpretive_report_chinese.md",
+            "workflow_interpretive_report.md": "workflow_interpretive_report.md",
+            "workflow_interpretive_report_summary.json": "workflow_interpretive_report_summary.json",
+            "workflow_visualization/index.html": "workflow_visualization/index.html",
+            "workflow_visualization/workflow_timeline.html": "workflow_visualization/workflow_timeline.html",
+            "workflow_visualization/evidence_flow_graph.html": "workflow_visualization/evidence_flow_graph.html",
+            "workflow_visualization/claim_comparison_cards.html": "workflow_visualization/claim_comparison_cards.html",
+            "workflow_visualization/dataset_decision_flow.html": "workflow_visualization/dataset_decision_flow.html",
+            "workflow_visualization/human_review_workflow.html": "workflow_visualization/human_review_workflow.html",
+            "workflow_visualization/workflow_visualization_summary.json": "workflow_visualization/workflow_visualization_summary.json",
+            "human_review/human_review_priority_summary.json": "human_review/human_review_priority_summary.json",
+            "human_review/human_review_priority_summary.md": "human_review/human_review_priority_summary.md",
+            "human_review/top_review_items.csv": "human_review/top_review_items.csv",
+            "human_review/top_review_items.json": "human_review/top_review_items.json",
+            "human_review/review_decision_template.json": "human_review/review_decision_template.json",
+            "human_review/review_decision_prefill.json": "human_review/review_decision_prefill.json",
+            "human_review/review_decision_prefill.csv": "human_review/review_decision_prefill.csv",
+            "human_review/review_packet_index.json": "human_review/review_packet_index.json",
+            "human_review/review_action_guide.md": "human_review/review_action_guide.md",
             "collection/final_dataset.csv": "collection/final_dataset.csv",
             "collection/final_dataset_pre_quality_gate.csv": "collection/final_dataset_pre_quality_gate.csv",
             "collection/quarantined_records.csv": "collection/quarantined_records.csv",
             "collection/pending_review_records.csv": "collection/pending_review_records.csv",
+            "collection/non_primary_observations.csv": "collection/non_primary_observations.csv",
+            "collection/non_primary_observations.json": "collection/non_primary_observations.json",
+            "collection/final_case_dataset.csv": "collection/final_case_dataset.csv",
+            "collection/global_outbreak_event_dataset.csv": "collection/global_outbreak_event_dataset.csv",
+            "collection/regional_surveillance_dataset.csv": "collection/regional_surveillance_dataset.csv",
+            "collection/country_year_aggregate_dataset.csv": "collection/country_year_aggregate_dataset.csv",
+            "collection/official_alert_dataset.csv": "collection/official_alert_dataset.csv",
+            "collection/zero_case_statements.csv": "collection/zero_case_statements.csv",
+            "collection/exposure_monitoring_records.csv": "collection/exposure_monitoring_records.csv",
+            "collection/surveillance_summary_records.csv": "collection/surveillance_summary_records.csv",
+            "collection/outbreak_summary_records.csv": "collection/outbreak_summary_records.csv",
+            "collection/context_records.csv": "collection/context_records.csv",
+            "collection/unclassified_observation_records.csv": "collection/unclassified_observation_records.csv",
+            "collection/observation_type_dataset_summary.json": "collection/observation_type_dataset_summary.json",
             "collection/final_dataset_post_review.csv": "collection/final_dataset_post_review.csv",
             "collection/record_inclusion_decisions.json": "collection/record_inclusion_decisions.json",
             "diagnostics/run_quality_summary.json": "diagnostics/run_quality_summary.json",
             "diagnostics/final_dataset_quality_summary.json": "diagnostics/final_dataset_quality_summary.json",
+            "diagnostics/non_primary_observations.json": "diagnostics/non_primary_observations.json",
+            "diagnostics/final_case_dataset.json": "diagnostics/final_case_dataset.json",
+            "diagnostics/global_outbreak_event_dataset.json": "diagnostics/global_outbreak_event_dataset.json",
+            "diagnostics/regional_surveillance_dataset.json": "diagnostics/regional_surveillance_dataset.json",
+            "diagnostics/country_year_aggregate_dataset.json": "diagnostics/country_year_aggregate_dataset.json",
+            "diagnostics/official_alert_dataset.json": "diagnostics/official_alert_dataset.json",
+            "diagnostics/zero_case_statements.json": "diagnostics/zero_case_statements.json",
+            "diagnostics/exposure_monitoring_records.json": "diagnostics/exposure_monitoring_records.json",
+            "diagnostics/surveillance_summary_records.json": "diagnostics/surveillance_summary_records.json",
+            "diagnostics/outbreak_summary_records.json": "diagnostics/outbreak_summary_records.json",
+            "diagnostics/context_records.json": "diagnostics/context_records.json",
+            "diagnostics/unclassified_observation_records.json": "diagnostics/unclassified_observation_records.json",
+            "diagnostics/observation_type_dataset_summary.json": "diagnostics/observation_type_dataset_summary.json",
             "diagnostics/source_critic_summary.json": "diagnostics/source_critic_summary.json",
+            "diagnostics/source_identity_summary.json": "diagnostics/source_identity_summary.json",
+            "diagnostics/source_identity_assessments.json": "diagnostics/source_identity_assessments.json",
+            "diagnostics/iterative_source_discovery_summary.json": "diagnostics/iterative_source_discovery_summary.json",
+            "diagnostics/search_iteration_plans.json": "diagnostics/search_iteration_plans.json",
+            "diagnostics/search_iteration_observations.json": "diagnostics/search_iteration_observations.json",
+            "diagnostics/search_refinement_decisions.json": "diagnostics/search_refinement_decisions.json",
+            "diagnostics/iterative_search_queries.json": "diagnostics/iterative_search_queries.json",
             "diagnostics/disease_relevance_summary.json": "diagnostics/disease_relevance_summary.json",
             "diagnostics/validation_source_compatibility_summary.json": "diagnostics/validation_source_compatibility_summary.json",
             "diagnostics/workflow_summaries.json": "diagnostics/workflow_summaries.json",
@@ -1873,6 +2138,8 @@ def _build_html(result: dict) -> str:
             <p>${{esc(RUN.recommended_user_message || quality.recommended_user_message || "")}}</p>
             <p><strong>run_quality_status:</strong> <code>${{esc(quality.run_quality_status)}}</code></p>
             <p><strong>final_dataset_mode:</strong> <code>${{esc(quality.final_dataset_mode)}}</code></p>
+            <p><strong>primary_case_dataset_status:</strong> <code>${{esc(quality.primary_case_dataset_status)}}</code></p>
+            ${{quality.no_primary_case_dataset_records ? `<p><strong>Warning:</strong> no primary case dataset records were accepted; non-primary observations are preserved separately.</p>` : ""}}
           </article>
           <article class="artifact">
             <h4>Current task</h4>
@@ -1889,6 +2156,9 @@ def _build_html(result: dict) -> str:
         ["Pre-quality-gate records", counts.pre_quality_records],
         ["Quarantined records", counts.quarantined_records],
         ["Pending-review records", counts.pending_review_records],
+        ["Non-primary observations", counts.non_primary_observations],
+        ["Primary-case eligible accepted", counts.primary_case_dataset_eligible],
+        ["Corroborated primary case events", counts.corroborated_primary_case_events],
         ["Post-review records", counts.final_dataset_post_review],
         ["Normalized records", counts.records],
       ];
@@ -1899,7 +2169,9 @@ def _build_html(result: dict) -> str:
         <div class="artifact-grid" style="margin-top:12px;">
           <div class="artifact"><h4>Run quality summary</h4><pre>${{pretty(quality)}}</pre></div>
           <div class="artifact"><h4>Final dataset quality summary</h4><pre>${{pretty(RUN.run_quality?.final_dataset_quality_summary || {{}})}}</pre></div>
+          <div class="artifact"><h4>Interpretive report summary</h4><pre>${{pretty(RUN.interpretive_report || {{}})}}</pre></div>
           <div class="artifact"><h4>Quarantined records sample</h4><pre>${{pretty(RUN.run_quality?.quarantined_records_sample || [])}}</pre></div>
+          <div class="artifact"><h4>Non-primary observations sample</h4><pre>${{pretty(RUN.run_quality?.non_primary_observations_sample || [])}}</pre></div>
           <div class="artifact"><h4>Record inclusion decisions sample</h4><pre>${{pretty(RUN.run_quality?.record_inclusion_decisions_sample || [])}}</pre></div>
         </div>
       `;
@@ -1922,6 +2194,7 @@ def _build_html(result: dict) -> str:
       const labels = [
         ["trace_nodes", "Trace nodes"],
         ["sources", "Sources"],
+        ["source_identity_assessments", "Source identity assessments"],
         ["documents", "Documents"],
         ["evidence_chunks", "Evidence chunks"],
         ["accepted_records", "Accepted records"],
@@ -1929,6 +2202,9 @@ def _build_html(result: dict) -> str:
         ["pre_quality_records", "Pre-quality records"],
         ["quarantined_records", "Quarantined"],
         ["pending_review_records", "Pending review"],
+        ["non_primary_observations", "Non-primary observations"],
+        ["primary_case_dataset_eligible", "Primary-case eligible accepted"],
+        ["corroborated_primary_case_events", "Corroborated primary case events"],
         ["linked_events", "Linked events"],
         ["event_clusters", "Event clusters"],
         ["duplicate_clusters", "Duplicate clusters"],
@@ -1939,11 +2215,15 @@ def _build_html(result: dict) -> str:
         ["applied_review_decisions", "Applied review decisions"],
         ["final_dataset_post_review", "Post-review records"],
         ["rejected_incompatible_records", "Disease-mismatch rejected records"],
+        ["iterative_search_iterations", "Iterative search iterations"],
+        ["iterative_llm_refinement_calls", "Iterative LLM refinement calls"],
       ];
       document.getElementById("metrics").innerHTML = labels.map(([key, label]) => `
         <div class="metric"><span>${{label}}</span><strong>${{esc(RUN.counts[key])}}</strong></div>
       `).join("")
         + `<div class="metric"><span>Run quality</span><strong>${{esc(RUN.run_quality?.summary?.run_quality_status)}}</strong></div>`
+        + `<div class="metric"><span>Primary-case dataset status</span><strong>${{esc(RUN.run_quality?.summary?.primary_case_dataset_status)}}</strong></div>`
+        + `<div class="metric"><span>Iterative stop decision</span><strong>${{esc(RUN.iterative_source_discovery?.stop_decision)}}</strong></div>`
         + `<div class="metric"><span>Route</span><strong>${{esc(RUN.route)}}</strong></div>`;
     }}
     function renderStageList() {{
@@ -2090,6 +2370,10 @@ def _build_static_html(result: dict) -> str:
             _metric_card("Documents", _count(result, "documents"), "fixture + offline stubs"),
             _metric_card("Evidence chunks", _count(result, "evidence_chunks"), "可追踪证据块"),
             _metric_card("Records", _count(result, "normalized_records"), "结构化数据记录"),
+            _metric_card("Final case dataset", _count(result, "final_case_dataset"), "primary case records"),
+            _metric_card("Zero-case", _count(result, "zero_case_statements"), "no-case statements"),
+            _metric_card("Exposure monitoring", _count(result, "exposure_monitoring_records"), "monitoring observations"),
+            _metric_card("Context", _count(result, "context_records"), "background/context records"),
             _metric_card("Linked events", _count(result, "linked_events"), "事件级聚合"),
             _metric_card("Event clusters", _count(result, "event_clusters"), "duplicate-aware event clusters"),
             _metric_card("Duplicate clusters", _count(result, "duplicate_clusters"), "non-countable duplicate groups"),
@@ -2457,12 +2741,18 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
     task = report_payload.get("task") or {}
     collection_spec = task.get("collection_spec") or {}
     source_search_summary = report_payload.get("source_search") or {}
+    iterative_source_discovery_summary = (
+        report_payload.get("iterative_source_discovery") or {}
+    )
     localized_source_planning_summary = (
         report_payload.get("localized_source_planning") or {}
     )
     source_critic_summary = report_payload.get("source_critic") or {}
     source_credibility_summary = (
         report_payload.get("source_credibility", {}).get("summary") or {}
+    )
+    source_identity_summary = (
+        report_payload.get("source_identity", {}).get("summary") or {}
     )
     disease_relevance_summary = report_payload.get("disease_relevance") or {}
     validation_source_compatibility_summary = (
@@ -2476,6 +2766,7 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
         report_payload.get("run_quality", {}).get("final_dataset_quality_summary")
         or {}
     )
+    interpretive_report_summary = report_payload.get("interpretive_report") or {}
     key_artifact_paths = report_payload.get("key_artifact_paths") or {}
     summary = {
         "html_path": str(html_path),
@@ -2510,6 +2801,26 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
             "pre_quality_records": counts.get("pre_quality_records", 0),
             "quarantined_records": counts.get("quarantined_records", 0),
             "pending_review_records": counts.get("pending_review_records", 0),
+            "non_primary_observations": counts.get("non_primary_observations", 0),
+            "final_case_dataset": counts.get("final_case_dataset", 0),
+            "zero_case_statements": counts.get("zero_case_statements", 0),
+            "exposure_monitoring_records": counts.get(
+                "exposure_monitoring_records", 0
+            ),
+            "surveillance_summary_records": counts.get(
+                "surveillance_summary_records", 0
+            ),
+            "outbreak_summary_records": counts.get("outbreak_summary_records", 0),
+            "context_records": counts.get("context_records", 0),
+            "unclassified_observation_records": counts.get(
+                "unclassified_observation_records", 0
+            ),
+            "primary_case_dataset_eligible": counts.get(
+                "primary_case_dataset_eligible", 0
+            ),
+            "corroborated_primary_case_events": counts.get(
+                "corroborated_primary_case_events", 0
+            ),
             "final_dataset_post_review": counts.get("final_dataset_post_review", 0),
             "linked_events": counts.get("linked_events", _count(result, "linked_events")),
             "event_clusters": counts.get("event_clusters", _count(result, "event_clusters")),
@@ -2526,11 +2837,44 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
             "rejected_incompatible_records": disease_relevance_summary.get(
                 "rejected_incompatible_record_count", 0
             ),
+            "iterative_search_iterations": counts.get(
+                "iterative_search_iterations", 0
+            ),
+            "iterative_llm_refinement_calls": counts.get(
+                "iterative_llm_refinement_calls", 0
+            ),
         },
         "accepted_record_count": counts.get("accepted_records", 0),
         "pre_quality_record_count": counts.get("pre_quality_records", 0),
         "quarantined_record_count": counts.get("quarantined_records", 0),
         "pending_review_record_count": counts.get("pending_review_records", 0),
+        "non_primary_observation_count": counts.get("non_primary_observations", 0),
+        "final_case_dataset_count": counts.get("final_case_dataset", 0),
+        "zero_case_statement_count": counts.get("zero_case_statements", 0),
+        "exposure_monitoring_record_count": counts.get(
+            "exposure_monitoring_records", 0
+        ),
+        "surveillance_summary_record_count": counts.get(
+            "surveillance_summary_records", 0
+        ),
+        "outbreak_summary_record_count": counts.get("outbreak_summary_records", 0),
+        "context_record_count": counts.get("context_records", 0),
+        "unclassified_observation_count": counts.get(
+            "unclassified_observation_records", 0
+        ),
+        "observation_type_dataset_summary": (
+            report_payload.get("observation_type_dataset_summary") or {}
+        ),
+        "primary_case_dataset_eligible_count": counts.get(
+            "primary_case_dataset_eligible", 0
+        ),
+        "corroborated_primary_case_event_count": counts.get(
+            "corroborated_primary_case_events", 0
+        ),
+        "primary_case_dataset_status": run_quality_summary.get(
+            "primary_case_dataset_status"
+        )
+        or final_dataset_quality_summary.get("primary_case_dataset_status"),
         "post_review_record_count": counts.get("final_dataset_post_review", 0),
         "current_route": result.get("current_route"),
         "contains_synthetic_data": _contains_synthetic_data(
@@ -2543,6 +2887,16 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
             else source_search_summary.get("search_enabled")
         ),
         "source_search_execution_summary": source_search_summary,
+        "iterative_source_discovery_summary": iterative_source_discovery_summary,
+        "iterative_search_iteration_count": iterative_source_discovery_summary.get(
+            "search_iteration_count", 0
+        ),
+        "iterative_llm_refinement_call_count": iterative_source_discovery_summary.get(
+            "llm_refinement_call_count", 0
+        ),
+        "iterative_search_stop_decision": iterative_source_discovery_summary.get(
+            "stop_decision"
+        ),
         "localized_source_planning_summary": localized_source_planning_summary,
         "source_critic_summary": source_critic_summary,
         "selected_search_derived_fetch_count": live_fetch_summary.get(
@@ -2579,6 +2933,16 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
         "source_credibility_needs_review_count": source_credibility_summary.get(
             "needs_review_count"
         ),
+        "source_identity_assessed_source_count": source_identity_summary.get(
+            "identity_assessed_count"
+        ),
+        "llm_source_identity_assessed_source_count": source_identity_summary.get(
+            "llm_identity_assessed_count"
+        ),
+        "source_identity_warning_counts": source_identity_summary.get(
+            "warning_counts"
+        )
+        or {},
         "disease_relevance_summary": disease_relevance_summary,
         "validation_source_compatibility_summary": (
             validation_source_compatibility_summary
@@ -2586,6 +2950,18 @@ def build_report(output_dir: Path, run_output_dir: Path | None = None) -> dict:
         "run_quality_status": run_quality_summary.get("run_quality_status"),
         "run_quality_summary": run_quality_summary,
         "final_dataset_quality_summary": final_dataset_quality_summary,
+        "interpretive_report_summary": interpretive_report_summary,
+        "interpretive_one_sentence_conclusion_zh": interpretive_report_summary.get(
+            "one_sentence_conclusion_zh"
+        ),
+        "interpretive_one_sentence_conclusion_en": interpretive_report_summary.get(
+            "one_sentence_conclusion_en"
+        ),
+        "interpretive_suitable_as_final_epidemiological_dataset": (
+            interpretive_report_summary.get(
+                "suitable_as_final_epidemiological_dataset"
+            )
+        ),
         "key_artifact_paths": key_artifact_paths,
     }
     summary_path.write_text(

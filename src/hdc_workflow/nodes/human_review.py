@@ -22,6 +22,7 @@ from ..models import (
     HumanReviewPacket,
     HumanReviewPolicy,
 )
+from ..run_events import emit_workflow_progress
 from ..state import DataCollectionState, append_trace
 
 _FIXED_REVIEW_TIMESTAMP = "2026-05-25T00:00:00Z"
@@ -299,6 +300,14 @@ def human_review(state: DataCollectionState) -> dict:
     policy = HumanReviewPolicy(**load_human_review_policy())
     incoming_queue = list(state.get("human_review_queue") or [])
     decisions = _decision_map(state)
+    emit_workflow_progress(
+        "human_review",
+        "human review queue processing started",
+        {
+            "input_review_item_count": len(incoming_queue),
+            "decision_count": len(decisions),
+        },
+    )
     invalid_decision_count = sum(
         1
         for raw in (state.get("human_review_decisions") or [])
@@ -387,6 +396,19 @@ def human_review(state: DataCollectionState) -> dict:
     )
     summary["decision_application_rejected_count"] = app_summary.get(
         "decisions_rejected_count", 0
+    )
+    emit_workflow_progress(
+        "human_review",
+        "human review summary ready",
+        {
+            "output_review_item_count": len(processed),
+            "pending_count": pending,
+            "reviewed_count": reviewed,
+            "requires_follow_up_count": follow_up,
+            "deferred_count": deferred,
+            "decision_applied_count": decision_applied,
+            "item_type_counts": dict(item_type_counter),
+        },
     )
 
     trace = append_trace(

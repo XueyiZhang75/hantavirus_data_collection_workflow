@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -48,6 +49,12 @@ def llm_source_credibility_enabled() -> bool:
     """True only if HDC_ENABLE_LLM_SOURCE_CREDIBILITY is explicitly true."""
 
     return _env_flag("HDC_ENABLE_LLM_SOURCE_CREDIBILITY")
+
+
+def llm_source_identity_enabled() -> bool:
+    """True only if HDC_ENABLE_LLM_SOURCE_IDENTITY is explicitly true."""
+
+    return _env_flag("HDC_ENABLE_LLM_SOURCE_IDENTITY")
 
 
 def llm_disease_intelligence_enabled() -> bool:
@@ -142,6 +149,33 @@ def build_chat_model(settings: dict | None = None):
             temperature=settings["temperature"],
         )
     raise ValueError(f"Unsupported provider: {provider}")
+
+
+def _langsmith_runnable_config(run_name: str, *, stage: str) -> dict:
+    settings = get_llm_settings()
+    metadata = {
+        "session_id": os.environ.get("HDC_TRACE_SESSION_ID"),
+        "trace_id": os.environ.get("HDC_TRACE_ID"),
+        "langsmith_project": os.environ.get("LANGSMITH_PROJECT"),
+        "llm_provider": settings.get("provider"),
+        "llm_model": settings.get("model"),
+        "hdc_stage": stage,
+    }
+    return {
+        "run_name": run_name,
+        "tags": ["hdc-workflow", "hdc-llm", stage],
+        "metadata": {key: value for key, value in metadata.items() if value},
+    }
+
+
+def _invoke_with_config(runnable: Any, messages: list, config: dict) -> Any:
+    try:
+        return runnable.invoke(messages, config=config)
+    except TypeError as exc:
+        # Some tests and lightweight fakes implement invoke(messages) only.
+        if "config" not in str(exc) and "positional" not in str(exc):
+            raise
+        return runnable.invoke(messages)
 
 
 def _message_content(result) -> str:
@@ -279,7 +313,14 @@ def run_structured_llm_json(
         },
         {"role": "user", "content": user_prompt},
     ]
-    result = chat_model.invoke(messages)
+    result = _invoke_with_config(
+        chat_model,
+        messages,
+        _langsmith_runnable_config(
+            f"llm.{expected_schema_name}",
+            stage=expected_schema_name,
+        ),
+    )
     if isinstance(result, dict):
         return result
     return _parse_json_object(_message_content(result))
@@ -307,7 +348,14 @@ def run_pydantic_structured_llm(
     provider_error: Exception | None = None
     try:
         structured_model = chat_model.with_structured_output(schema_model)
-        result = structured_model.invoke(messages)
+        result = _invoke_with_config(
+            structured_model,
+            messages,
+            _langsmith_runnable_config(
+                f"llm.{schema_model.__name__}",
+                stage=schema_model.__name__,
+            ),
+        )
         payload = _model_to_dict(result, schema_model)
         payload["_structured_output_mode"] = "provider_native"
         return payload
@@ -345,23 +393,38 @@ def _build_llm_messages(chunk: dict, policy: LLMStructuredExtractionPolicy) -> l
         + "\n\nRequired output rules:\n"
         + _format_required_rules(policy)
     )
-    user_text = "\n".join(
+    user_parts = [
+        f"source_id: {chunk.get('source_id')}",
+        f"source_url: {chunk.get('source_url')}",
+        f"source_type: {chunk.get('source_type')}",
+        f"title: {chunk.get('title')}",
+        f"publisher: {chunk.get('publisher')}",
+        f"supporting_chunk_id: {chunk.get('chunk_id')}",
+        f"fetch_purpose: {chunk.get('fetch_purpose')}",
+        f"chunk_kind: {chunk.get('chunk_kind')}",
+        f"data_types: {chunk.get('data_types')}",
+        f"context_types: {chunk.get('context_types')}",
+    ]
+    if chunk.get("task_acceptance_contract"):
+        user_parts.extend(
+            [
+                "",
+                "Task acceptance contract:",
+                json.dumps(
+                    chunk.get("task_acceptance_contract"),
+                    ensure_ascii=True,
+                    sort_keys=True,
+                ),
+            ]
+        )
+    user_parts.extend(
         [
-            f"source_id: {chunk.get('source_id')}",
-            f"source_url: {chunk.get('source_url')}",
-            f"source_type: {chunk.get('source_type')}",
-            f"title: {chunk.get('title')}",
-            f"publisher: {chunk.get('publisher')}",
-            f"supporting_chunk_id: {chunk.get('chunk_id')}",
-            f"fetch_purpose: {chunk.get('fetch_purpose')}",
-            f"chunk_kind: {chunk.get('chunk_kind')}",
-            f"data_types: {chunk.get('data_types')}",
-            f"context_types: {chunk.get('context_types')}",
             "",
             "Evidence chunk text:",
             chunk.get("text") or "",
         ]
     )
+    user_text = "\n".join(user_parts)
     return [
         {"role": "system", "content": system_text},
         {"role": "user", "content": user_text},
@@ -381,7 +444,14 @@ def extract_chunk_with_llm(
     model = build_chat_model()
     structured_model = model.with_structured_output(LLMExtractionOutput)
     messages = _build_llm_messages(chunk, policy)
-    result = structured_model.invoke(messages)
+    result = _invoke_with_config(
+        structured_model,
+        messages,
+        _langsmith_runnable_config(
+            "llm.LLMExtractionOutput",
+            stage="structured_extraction",
+        ),
+    )
     if isinstance(result, LLMExtractionOutput):
         return result
     if isinstance(result, dict):

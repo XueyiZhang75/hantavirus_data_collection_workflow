@@ -45,6 +45,7 @@ from hdc_workflow.models import (  # noqa: E402
     LLMExtractedRecord,
     LLMExtractionOutput,
     LLMStructuredExtractionPolicy,
+    PublicHealthRecord,
     RecordLinkingPolicy,
     RecordNormalizationPolicy,
     SeedSourceCatalog,
@@ -84,6 +85,55 @@ def test_hantavirus_record_rejects_negative_deaths():
             disease="Hantavirus disease",
             deaths=-2,
         )
+
+
+def test_public_health_record_accepts_generic_metric_fields():
+    record = PublicHealthRecord(
+        record_id="metric_1",
+        disease="Seasonal influenza",
+        metric_name="nssp_ed_visit_percent",
+        metric_value=0.2,
+        metric_unit="percent",
+        metric_category="ed_visit_percent",
+        metric_denominator="emergency_department_visits",
+        metric_period_start="2024-09-29",
+        metric_period_end="2024-10-05",
+    )
+
+    assert record.metric_name == "nssp_ed_visit_percent"
+    assert record.metric_value == 0.2
+    assert record.metric_unit == "percent"
+    assert record.metric_category == "ed_visit_percent"
+    assert record.metric_denominator == "emergency_department_visits"
+    assert record.metric_period_end == "2024-10-05"
+
+
+def test_public_health_record_rejects_negative_generic_metric_value():
+    with pytest.raises(ValidationError):
+        PublicHealthRecord(
+            record_id="metric_negative",
+            disease="Seasonal influenza",
+            metric_name="clinical_lab_positive_count",
+            metric_value=-1,
+            metric_unit="count",
+        )
+
+
+def test_llm_extracted_record_accepts_generic_metric_fields():
+    record = LLMExtractedRecord(
+        disease="Seasonal influenza",
+        country="United States of America",
+        metric_name="clinical_lab_positive_count",
+        metric_value=56,
+        metric_unit="count",
+        metric_category="lab_positive_count",
+        metric_period_start="2024-09-29",
+        metric_period_end="2024-10-05",
+    )
+
+    assert record.metric_name == "clinical_lab_positive_count"
+    assert record.metric_value == 56
+    assert record.metric_category == "lab_positive_count"
 
 
 def test_disease_profile_loads_from_config():
@@ -350,9 +400,30 @@ def test_config_loads_final_package_policy():
     field_order = policy_dict.get("final_dataset_field_order") or []
     assert "record_id" in field_order
     assert "source_url" in field_order
+    for field in [
+        "metric_name",
+        "metric_value",
+        "metric_unit",
+        "metric_category",
+        "metric_denominator",
+        "metric_period_start",
+        "metric_period_end",
+    ]:
+        assert field in field_order
     summary_fields = policy_dict.get("workflow_summary_fields") or []
     assert "human_review_summary" in summary_fields
-    assert "final_dataset" in (policy_dict.get("exportable_sections") or [])
+    exportable_sections = policy_dict.get("exportable_sections") or []
+    assert "final_dataset" in exportable_sections
+    for field in [
+        "task_acceptance_contract",
+        "evidence_strategy_plan",
+        "source_triage_results",
+        "chunk_relevance_assessments",
+        "record_task_fit_assessments",
+        "collection_decision_summary",
+    ]:
+        assert field in summary_fields
+        assert field in exportable_sections
 
 
 def test_final_package_policy_model_validates():
