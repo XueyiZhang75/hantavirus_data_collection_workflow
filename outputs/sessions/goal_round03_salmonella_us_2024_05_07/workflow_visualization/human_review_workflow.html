@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 58,
+  &quot;prioritized_review_item_count&quot;: 58,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 4,
+    &quot;P1_high&quot;: 22,
+    &quot;P2_medium&quot;: 0,
+    &quot;P3_low&quot;: 32
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;conflicting_claims_review&quot;: 1,
+    &quot;validation_conflict_review&quot;: 3,
+    &quot;claim_corroboration_review&quot;: 9,
+    &quot;source_identity_review&quot;: 10,
+    &quot;source_credibility_review&quot;: 1,
+    &quot;outside_scope_review&quot;: 1,
+    &quot;anomaly_review&quot;: 1,
+    &quot;general_review&quot;: 32
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_claim_corroboration_conflict_corr_event_001</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_001 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bea...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_001&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_10ccb06f620d_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_33733b13ba13_003_deaths&quot;,
+    &quot;claim_rec_src_search_33733b13ba13_004_observation&quot;,
+    &quot;claim_rec_src_search_051378e10a24_001_observation&quot;,
+    &quot;claim_rec_src_search_051378e10a24_002_observation&quot;,
+    &quot;claim_rec_src_search_10ccb06f620d_003_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_10ccb06f620d_004_cases_probable&quot;,
+    &quot;claim_rec_src_search_10ccb06f620d_002_hospitalizations&quot;,
+    &quot;claim_rec_src_search_3b86862864f7_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_3b86862864f7_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_3b86862864f7_002_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_3b86862864f7_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_33733b13ba13_002_hospitalizations&quot;,
+    &quot;claim_rec_src_search_8207a084046e_001_hospitalizations&quot;,
+    &quot;claim_rec_src_search_33733b13ba13_001_cases_unspecified&quot;,
+    &quot;src_search_10ccb06f620d&quot;,
+    &quot;src_search_3b86862864f7&quot;,
+    &quot;src_search_33733b13ba13&quot;,
+    &quot;src_search_051378e10a24&quot;,
+    &quot;src_search_8207a084046e&quot;,
+    &quot;corr_event_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_10ccb06f620d_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_33733b13ba13_003_deaths&quot;,
+    &quot;claim_rec_src_search_33733b13ba13_004_observation&quot;,
+    &quot;claim_rec_src_search_051378e10a24_001_observation&quot;,
+    &quot;claim_rec_src_search_051378e10a24_002_observation&quot;,
+    &quot;claim_rec_src_search_10ccb06f620d_003_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_10ccb06f620d_004_cases_probable&quot;,
+    &quot;claim_rec_src_search_10ccb06f620d_002_hospitalizations&quot;,
+    &quot;claim_rec_src_search_3b86862864f7_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_3b86862864f7_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_3b86862864f7_002_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_3b86862864f7_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_33733b13ba13_002_hospitalizations&quot;,
+    &quot;claim_rec_src_search_8207a084046e_001_hospitalizations&quot;,
+    &quot;claim_rec_src_search_33733b13ba13_001_cases_unspecified&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_10ccb06f620d&quot;,
+    &quot;src_search_3b86862864f7&quot;,
+    &quot;src_search_33733b13ba13&quot;,
+    &quot;src_search_051378e10a24&quot;,
+    &quot;src_search_8207a084046e&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Salmonella&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-05-01-2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_001 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bea...&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+  &quot;source_title&quot;: &quot;Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024  | MMWR&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_001&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_10ccb06f620d&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_004</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_004 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United Stat...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_004&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_10ccb06f620d&quot;,
+    &quot;event_003&quot;,
+    &quot;anom_004&quot;,
+    &quot;val_result_018&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_10ccb06f620d&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_003&quot;
+  ],
+  &quot;disease&quot;: &quot;Salmonella&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-05-01-2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_004 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United Stat...&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;![](/TemplatePackage/4.0/assets/imgs/uswds/us_flag_small.png) ![](/TemplatePackage/4.0/assets/imgs/uswds/icon-dot-gov.svg) **Official websites use .gov** A .gov website belongs to an official government organization in the United States. ![](/TemplatePackage/4.0/assets/imgs/uswds/icon-https.svg) **Secure .gov websites use HTTPS** A lock ( ) or https:// means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ![CDC Logo](/TemplatePackage/4.0/assets/imgs/logo/logo-notext.svg) ![CDC Logo](/TemplatePackage/4.0/assets/imgs/logo/logo-notext.svg) # Reoccurring *Salmonella* Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024 *Weekly* / August 21, 2025 / 74(31);474–479 Lingzi Xiaoli, PhD1; Paula Huth, MPH2; Cassandra Sherma...&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+  &quot;source_title&quot;: &quot;Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024  | MMWR&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_004&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_10ccb06f620d&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources may use different case definitions or reporting categories.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_005</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_005 - FoodNet 2024 Preliminary Data | FoodNet | CDC</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_005&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_3b86862864f7&quot;,
+    &quot;event_009&quot;,
+    &quot;anom_005&quot;,
+    &quot;val_result_025&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_3b86862864f7&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_009&quot;
+  ],
+  &quot;disease&quot;: &quot;Salmonella&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-05-01-2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_005 - FoodNet 2024 Preliminary Data | FoodNet | CDC&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;Among 9,219 *Salmonella* infections reported, 7,314 (79%) infections had positive culture results.&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/foodnet/reports/preliminary-data.html&quot;,
+  &quot;source_title&quot;: &quot;FoodNet 2024 Preliminary Data | FoodNet | CDC&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_005&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_3b86862864f7&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/foodnet/reports/preliminary-data.html&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources may use different case definitions or reporting categories.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_003</h2><p><strong>P0_critical</strong> claim_corroboration_review</p><p>claim corroboration review - review_anomaly_anom_003 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United Stat...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_003&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 96,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_10ccb06f620d&quot;,
+    &quot;event_002&quot;,
+    &quot;anom_003&quot;,
+    &quot;val_result_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_10ccb06f620d&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_002&quot;
+  ],
+  &quot;disease&quot;: &quot;Salmonella&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-05-01-2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_anomaly_anom_003 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United Stat...&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;Bearded dragons have been linked to *Salmonella* outbreaks, including a 2012–2014 *Salmonella* Cotham outbreak involving 160 patients in 35 states.&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+  &quot;source_title&quot;: &quot;Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024  | MMWR&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;confirm_scope_or_reject_record&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_003&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_10ccb06f620d&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Stage 10 validation marked record outside requested scope: outside_time_window&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_003</h2><p><strong>P1_high</strong> validation_conflict_review</p><p>validation conflict review - review_duplicate_event_003 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United S...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_003&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 94,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_10ccb06f620d_003&quot;,
+    &quot;rec_src_search_10ccb06f620d_004&quot;,
+    &quot;event_003&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_10ccb06f620d_003&quot;,
+    &quot;rec_src_search_10ccb06f620d_004&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_003&quot;
+  ],
+  &quot;disease&quot;: &quot;Salmonellosis (non-typhoidal Salmonella)&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-21&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_duplicate_event_003 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United S...&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;![](/TemplatePackage/4.0/assets/imgs/uswds/us_flag_small.png) ![](/TemplatePackage/4.0/assets/imgs/uswds/icon-dot-gov.svg) **Official websites use .gov** A .gov website belongs to an official government organization in the United States. ![](/TemplatePackage/4.0/assets/imgs/uswds/icon-https.svg) **Secure .gov websites use HTTPS** A lock ( ) or https:// means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ![CDC Logo](/TemplatePackage/4.0/assets/imgs/logo/logo-notext.svg) ![CDC Logo](/TemplatePackage/4.0/assets/imgs/logo/logo-notext.svg) # Reoccurring *Salmonella* Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024 *Weekly* / August 21, 2025 / 74(31);474–479 Lingzi Xiaoli, PhD1; Paula Huth, MPH2; Cassandra Sherma...&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+  &quot;source_title&quot;: &quot;Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024  | MMWR&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the linked artifacts and only then edit a decision file if needed.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_003&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record period 2024-01-11 to 2024-12-10 is too broad for requested task window 2024-05-01 to 2024-07-31&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_10ccb06f620d&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+    &quot;evidence_quote&quot;: &quot;![](/TemplatePackage/4.0/assets/imgs/uswds/us_flag_small.png) ![](/TemplatePackage/4.0/assets/imgs/uswds/icon-dot-gov.svg) **Official websites use .gov** A .gov website belongs to an official government organization in the United States. ![](/TemplatePackage/4.0/assets/imgs/uswds/icon-https.svg) **Secure .gov websites use HTTPS** A lock ( ) or https:// means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ![CDC Logo](/TemplatePackage/4.0/assets/imgs/logo/logo-notext.svg) ![CDC Logo](/TemplatePackage/4.0/assets/imgs/logo/logo-notext.svg) # Reoccurring *Salmonella* Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024 *Weekly* / August 21, 2025 / 74(31);474–479 Lingzi Xiaoli, PhD1; Paula Huth, MPH2; Cassandra Sherma...&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_10ccb06f620d_001&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: same event key but count values conflict&quot;
+  }
+}</pre></article><article class='card'><h2>review_claim_corroboration_review_corr_event_002</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_claim_corroboration_review_corr_event_002 - FoodNet 2024 Preliminary Data | FoodNet | CDC</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_review_corr_event_002&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 92,
+  &quot;issue_type&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_3b86862864f7_004_cases_unspecified&quot;,
+    &quot;src_search_3b86862864f7&quot;,
+    &quot;corr_event_002&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_3b86862864f7_004_cases_unspecified&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_3b86862864f7&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Salmonella&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-05-01-2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_claim_corroboration_review_corr_event_002 - FoodNet 2024 Preliminary Data | FoodNet | CDC&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;Primary case claim has no independent corroborating source.&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/foodnet/reports/preliminary-data.html&quot;,
+  &quot;source_title&quot;: &quot;FoodNet 2024 Preliminary Data | FoodNet | CDC&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_review_corr_event_002&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_3b86862864f7&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/foodnet/reports/preliminary-data.html&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Primary case claim has no independent corroborating source.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_15fc5f8d47e2</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_15fc5f8d47e2 - Food for Thought 2025 - PIRG</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_15fc5f8d47e2&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_15fc5f8d47e2&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_15fc5f8d47e2&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Salmonella&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-05-01-2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_15fc5f8d47e2 - Food for Thought 2025 - PIRG&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://pirg.org/edfund/resources/food-for-thought-2025&quot;,
+  &quot;source_title&quot;: &quot;Food for Thought 2025 - PIRG&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;news_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_15fc5f8d47e2&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_15fc5f8d47e2&quot;,
+    &quot;source_url&quot;: &quot;https://pirg.org/edfund/resources/food-for-thought-2025&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;PIRG (Public Interest Research Group) is an advocacy and consumer watchdog organization, not a public health surveillance agency. The domain pirg.org carries moderate name recognition but low epidemiological authority for Salmonella case/outbreak data. The title \&quot;Food for Thought 2025\&quot; is a policy/advocacy report framing, not a surveillance or situation report. The document title year (2025) is misaligned with the collection time window (2024-05-01 to 2024-07-31), raising a temporal provenance concern. No target disease terms (Salmonella, salmonellosis, non-typhoidal Salmonella) were found in source metadata, and the disease relevance score is very low (0.20). The source was discovered via a live search result rather than a curated source list, and the publisher field is null, reducing provenance confidence. The independence score (0.42) is below threshold, consistent with an advocacy-origin document that may present selectively framed food safety statistics. The deterministic screener and critic disagree on role assignment (flag: screening_and_critic_disagree), which warrants advisory caution. The role hint and deterministic assignment of \&quot;context\&quot; is appropriate: this source should not be used as a primary case count or outbreak data source. If accessed, it may provide background on food safety policy or aggregate recall statistics, but any numerical claims would require cross-validation against CDC DFWED, FDA, or USDA FSIS primary sources. The missing publisher field and advocacy framing together elevate the risk of selectively reported or non-primary data being mistaken for surveillance figures.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_58ef4c36918e</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_58ef4c36918e - Food Recalls in 2024: Revealing the Statistics - FSNS</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_58ef4c36918e&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_58ef4c36918e&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_58ef4c36918e&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Salmonella&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-05-01-2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_58ef4c36918e - Food Recalls in 2024: Revealing the Statistics - FSNS&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://fsns.com/food-recalls-in-2024-revealing-the-statistics&quot;,
+  &quot;source_title&quot;: &quot;Food Recalls in 2024: Revealing the Statistics - FSNS&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;news_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_58ef4c36918e&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_58ef4c36918e&quot;,
+    &quot;source_url&quot;: &quot;https://fsns.com/food-recalls-in-2024-revealing-the-statistics&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;FSNS (fsns.com) appears to be a food safety and nutrition services commercial entity, not an official public health agency or peer-reviewed outlet. The page title (\&quot;Food Recalls in 2024: Revealing the Statistics\&quot;) is statistical/aggregative in nature and does not directly name Salmonella as the subject disease, yielding a very low disease relevance score (0.20) with zero target disease terms found in metadata. The authority score is modest (0.48), reflecting a non-governmental, commercially oriented domain. The independence score is low (0.42) and the publisher field is null, both of which reduce confidence in editorial independence and provenance transparency. The risk penalty (0.22) is meaningful. While the page may contain recall statistics that are tangentially relevant to Salmonella food safety context, it is not a primary epidemiological data source and should not be used for case, death, or hospitalization counts. The deterministic screener and critic disagree (flag: screening_and_critic_disagree), which warrants advisory caution. The source is appropriate only as background context, if at all, and any figures cited must be cross-validated against FDA, USDA FSIS, or CDC primary sources before use.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_793a8dd9911b</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_793a8dd9911b - Outbreak Investigation of Salmonella: Cucumbers (November 20...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_793a8dd9911b&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_793a8dd9911b&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_793a8dd9911b&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Salmonella&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-05-01-2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_793a8dd9911b - Outbreak Investigation of Salmonella: Cucumbers (November 20...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.fda.gov/food/outbreaks-foodborne-illness/outbreak-investigation-salmonella-cucumbers-november-2024&quot;,
+  &quot;source_title&quot;: &quot;Outbreak Investigation of Salmonella: Cucumbers (November 2024) | FDA&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;news_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_793a8dd9911b&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_793a8dd9911b&quot;,
+    &quot;source_url&quot;: &quot;https://www.fda.gov/food/outbreaks-foodborne-illness/outbreak-investigation-salmonella-cucumbers-november-2024&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;This source is a live search result pointing to an FDA.gov outbreak investigation page for Salmonella linked to cucumbers, dated November 2024. The domain authority is very high (fda.gov, 0.95) and disease relevance is strong (0.95, confirmed Salmonella match). However, several factors constrain its utility for this specific collection task:\n\n1. **Temporal mismatch**: The page title explicitly states \&quot;November 2024,\&quot; while the collection window is 2024-05-01 to 2024-07-31. This is the primary driver of reduced relevance — the outbreak investigation page may describe an event outside the target window entirely, or may contain retrospective case data that partially overlaps. This is the most significant advisory concern.\n\n2. **Role assignment tension**: The deterministic system assigned `context` role, but the domain is a primary authoritative public health source (FDA). The contradiction between `official_public_health_authority` and `secondary_news_or_media_source` flags — both present simultaneously — indicates a classification conflict that warrants LLM review. The `screening_and_critic_disagree` flag confirms this.\n\n3. **Missing publisher field**: While the domain is unambiguously FDA, the null publisher field is a minor provenance gap that should be resolved during extraction.\n\n4. **Geographic granularity**: Score of 0.58 suggests the page likely reports national-level aggregate data without subnational breakdown, limiting its utility for locality-level required fields.\n\n5. **Source type mismatch**: Classified as `news_and_situation_report` despite originating from fda.gov. FDA outbreak investigation pages are typically official public health agency outputs and should likely be reclassified as `official_public_health_agency` — this reclassification would elevate its priority tier in the collection spec.\n\n6. **Data signal present but unverified**: Three data signals were detected in metadata, but no snippet is available. The actual page content has not been retrieved, so case counts, dates, and locations cannot be confirmed from metadata alone.\n\n**Advisory role suggestion**: Upgrade from `context` to `primary` if page content confirms case data falling within the 2024-05-01 to 2024-07-31 window upon retrieval. Retain as `context` if the outbreak is confirmed to be entirely post-July 2024. Human review is recommended to resolve the temporal overlap ambiguity and the source_type misclassification before extraction proceeds.&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_004</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_duplicate_event_004 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United S...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_004&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 84,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_10ccb06f620d_002&quot;,
+    &quot;event_004&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_10ccb06f620d_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_004&quot;
+  ],
+  &quot;disease&quot;: &quot;Salmonellosis (non-typhoidal Salmonella)&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_duplicate_event_004 - Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United S...&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;| ****Hospitalization (n = 24)**** | |&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+  &quot;source_title&quot;: &quot;Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024  | MMWR&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;final_case_dataset&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open claims, claim comparisons, and corroborated events.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_004&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record passed deterministic run quality gates&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_10ccb06f620d&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+    &quot;evidence_quote&quot;: &quot;| ****Hospitalization (n = 24)**** | |&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_10ccb06f620d_019&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_differ&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

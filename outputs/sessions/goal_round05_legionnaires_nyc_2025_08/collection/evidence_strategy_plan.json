@@ -1,0 +1,787 @@
+{
+  "plan_id": "exec_source_plan_legionnaires_disease_new_york_city_2025_08_01_2025_08_31",
+  "disease": "Legionnaires' disease",
+  "location": "New York City",
+  "time_window": "2025-08-01-2025-08-31",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "llm_plan_augments_deterministic_base_with_disease_specific_queries",
+    "legionnaires_disease_is_seasonally_elevated_in_summer_months_increasing_nyc_outbreak_probability_in_august_2025",
+    "cooling_tower_regulation_enforcement_is_key_nyc_specific_signal_to_monitor",
+    "nyc_dohmh_is_primary_authoritative_source_for_local_legionella_surveillance"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify NYC DOHMH official reports, press releases, health alerts, and surveillance summaries reporting Legionnaires' disease cases, deaths, hospitalizations, and outbreak investigations in New York City during August 2025.",
+      "source_role_hint": "collection",
+      "rationale": "NYC DOHMH is the primary authoritative source for Legionnaires' disease surveillance in New York City, including cooling tower outbreak investigations, case counts by borough, and health alerts issued under Local Law 77.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify New York State Department of Health (NYSDOH) communicable disease reports, Legionella surveillance data, and outbreak notifications covering New York City for August 2025.",
+      "source_role_hint": "collection",
+      "rationale": "NYSDOH maintains statewide Legionella surveillance and publishes communicable disease reports that include NYC-level data, serving as a secondary official collection source.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify CDC Legionella surveillance reports, MMWR articles, and outbreak investigation reports referencing New York City cases or clusters in August 2025.",
+      "source_role_hint": "collection",
+      "rationale": "CDC publishes MMWR outbreak reports and national Legionella surveillance summaries that may include NYC-specific case counts and epidemiological details.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_collection_004",
+      "objective": "Identify NYC Open Data portal datasets and NYC DOHMH data dashboards containing Legionella or Legionnaires' disease case-level or aggregate data for 2025.",
+      "source_role_hint": "collection",
+      "rationale": "NYC Open Data hosts structured public health datasets including communicable disease surveillance data that may contain extractable Legionella case records for August 2025.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify WHO Disease Outbreak News (DON), PAHO, or ECDC reports referencing Legionnaires' disease activity in New York City or the United States during August 2025 for independent validation.",
+      "source_role_hint": "validation",
+      "rationale": "International organization reports provide independent aggregate counts that can be compared against NYC DOHMH and NYSDOH collection records to detect discrepancies.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify ProMED-mail or HealthMap alerts referencing Legionnaires' disease outbreaks or clusters in New York City during August 2025.",
+      "source_role_hint": "validation",
+      "rationale": "ProMED and HealthMap aggregate official and news-based outbreak signals and can serve as independent validation cross-references for NYC Legionella events.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify NYC DOHMH cooling tower inspection and enforcement records, Legionella water testing results, and Local Law 77 compliance reports for August 2025.",
+      "source_role_hint": "context",
+      "rationale": "Cooling tower inspection data provides environmental context for Legionella outbreaks in NYC, helping interpret case cluster locations and outbreak source attribution without directly yielding human case counts.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify peer-reviewed literature on Legionnaires' disease case definitions, NYC-specific epidemiology, and seasonal patterns to support count semantics interpretation.",
+      "source_role_hint": "context",
+      "rationale": "Literature on NYC Legionella epidemiology and case definitions helps normalize extracted counts (confirmed vs. probable vs. suspected) and interpret reporting lag patterns.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_collection_support_001",
+      "objective": "Identify reputable news reports from major NYC outlets (NY Times, NY Post, Gothamist, NY Daily News, Crain's NY) covering Legionnaires' disease outbreaks or case surges in New York City during August 2025.",
+      "source_role_hint": "collection_support",
+      "rationale": "News reports often provide early outbreak signals, borough-level location details, and case/death counts citing official sources, supporting collection when official reports are delayed.",
+      "priority": 5
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag sources with ambiguous geographic scope (NYC vs. NYS vs. national), unclear count semantics (cumulative vs. newly reported), or validation leakage risk for human review.",
+      "source_role_hint": "human_review",
+      "rationale": "Sources aggregating NYC data within broader state or national totals, or sources with unclear reporting periods, require human judgment before extraction to avoid miscounting.",
+      "priority": 4
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_nyc_dohmh",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "NYC Department of Health and Mental Hygiene (NYC DOHMH) is the primary local authority for Legionnaires' disease surveillance in New York City. DOHMH issues health alerts, outbreak investigation reports, cooling tower enforcement notices, and annual communicable disease summaries. Under NYC Local Law 77, DOHMH maintains a cooling tower registry and conducts mandatory inspections, making it the definitive source for NYC Legionella case and outbreak data.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "dohmh_health_alerts_may_not_be_indexed_by_standard_search_engines",
+        "annual_reports_may_lag_real_time_by_months"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_nysdoh",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "New York State Department of Health (NYSDOH) publishes statewide communicable disease reports and Legionella surveillance data that include NYC-level breakdowns. NYSDOH also issues outbreak notifications and maintains the statewide Legionella case registry.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "nysdoh_reports_may_aggregate_nyc_within_broader_state_totals_requiring_geographic_disaggregation"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_cdc",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC publishes MMWR outbreak investigation reports, national Legionella surveillance summaries, and Legionella outbreak database entries that may include NYC-specific case counts and epidemiological details for August 2025.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "mmwr_publication_lag_may_mean_august_2025_events_not_yet_published",
+        "national_aggregates_must_be_disaggregated_to_nyc_level"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_nyc_open_data",
+      "source_type": "structured_database",
+      "role_hint": "collection",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "NYC Open Data portal hosts structured public health datasets including the NYC DOHMH communicable disease surveillance data and Legionella cooling tower inspection records. These datasets may contain extractable case-level or aggregate Legionella records for August 2025.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "dataset_update_frequency_may_lag_real_time",
+        "data_may_require_api_query_or_csv_download_not_standard_web_search"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_international_org",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "WHO Disease Outbreak News, PAHO, and ECDC may publish situation reports or outbreak notifications referencing Legionnaires' disease activity in New York City or the United States during August 2025, providing independent validation counts.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "who_don_typically_covers_large_or_unusual_outbreaks_only",
+        "ecdc_coverage_of_us_events_may_be_limited"
+      ]
+    },
+    {
+      "source_category_id": "cat_006_promed_healthmap",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "ProMED-mail and HealthMap aggregate official and news-based outbreak signals globally and have historically reported NYC Legionella outbreaks. These sources provide independent validation cross-references.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "promed_reports_cite_secondary_sources_requiring_provenance_tracing"
+      ]
+    },
+    {
+      "source_category_id": "cat_007_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Peer-reviewed studies on NYC Legionella epidemiology, case definitions, seasonal patterns, and outbreak investigations provide context for interpreting extracted counts and normalizing case classification semantics.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "august_2025_events_unlikely_to_have_peer_reviewed_publications_within_the_same_month",
+        "historical_literature_useful_for_context_only"
+      ]
+    },
+    {
+      "source_category_id": "cat_008_news_media",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Major NYC news outlets (NY Times, NY Post, Gothamist, NY Daily News, Crain's NY Business, NBC New York, ABC7 NY) frequently report on Legionnaires' disease outbreaks citing DOHMH officials, providing early signals, borough-level location details, and case/death counts before official reports are published.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "news_counts_may_be_preliminary_or_unverified",
+        "secondary_source_provenance_must_be_traced_to_official_origin"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"Legionnaires disease New York City 2025\" cases deaths public health New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Legionnaires disease New York City 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"Legionella outbreak NYC 2025\" cases deaths public health New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Legionella outbreak NYC 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"Legionnaires disease New York City 2025\" outbreak report surveillance New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Legionnaires disease New York City 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"Legionella outbreak NYC 2025\" outbreak report surveillance New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Legionella outbreak NYC 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"Legionnaires disease New York City 2025\" epidemiology cases deaths New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "Legionnaires disease New York City 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"Legionella outbreak NYC 2025\" epidemiology cases deaths New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "Legionella outbreak NYC 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"Legionnaires disease New York City 2025\" surveillance dataset cases deaths New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Legionnaires disease New York City 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"Legionella outbreak NYC 2025\" surveillance dataset cases deaths New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Legionella outbreak NYC 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"Legionnaires disease New York City 2025\" outbreak report cases deaths New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Legionnaires disease New York City 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"Legionella outbreak NYC 2025\" outbreak report cases deaths New York City 2025-08-01-2025-08-31 2025",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Legionella outbreak NYC 2025"
+      ],
+      "location_terms_used": [
+        "New York City"
+      ],
+      "time_terms_used": [
+        "2025-08-01-2025-08-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

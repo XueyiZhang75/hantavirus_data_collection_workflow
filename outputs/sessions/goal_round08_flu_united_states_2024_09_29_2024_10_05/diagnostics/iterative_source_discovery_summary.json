@@ -1,0 +1,106 @@
+{
+  "iterative_source_discovery_enabled": true,
+  "llm_iterative_planning_enabled": true,
+  "search_iteration_count": 2,
+  "llm_refinement_call_count": 2,
+  "total_queries_planned": 8,
+  "total_queries_executed": 6,
+  "total_raw_results": 48,
+  "total_candidates_created": 42,
+  "stop_decision": "stop_sufficient",
+  "stop_reason": "Max iterations (2) reached. Sufficient authoritative sources identified across CDC (national), MSDH (subnational/Mississippi), PAHO (international validation), ECDC (independent international corroboration), and news/specialist outlets. All planned queries from both iterations have been executed. No remaining query slots are available.",
+  "final_coverage_assessment": "Coverage is good for the task window. National-level U.S. influenza surveillance data for MMWR Week 40 (Sep 29–Oct 5, 2024) is anchored by the CDC FluView report, which provides virological breakdown (56 influenza A viruses; 55.8% H1N1pdm09, 44.2% H3N2), percent positivity stability, ED visit trends, and a note on two H5 human cases in California. Subnational coverage is partially addressed by the Mississippi MSDH Week 40 PDF (ILI rate 2.8%, up from 2.3% prior week). PAHO Week 40 bulletin provides regional context for North America. ECDC CDTR covers the exact date range. News/specialist outlets (cidrap, contagionlive, reuters, etc.) are present in the accepted candidate pool and may yield additional evidence quotes. Gaps remain for: (a) explicit hospitalization counts (FluSurv-NET quantitative rates not confirmed in snippets); (b) confirmed deaths for the specific week; (c) subnational data beyond Mississippi. These gaps are consistent with the nature of early-season Week 40 data, where activity is at low/baseline levels and detailed hospitalization/mortality tables may not yet be populated.",
+  "final_trustworthiness_assessment": "High. The primary source (CDC FluView 2024-week-40.html) is from the gold-standard U.S. influenza surveillance system on the cdc.gov domain. The MSDH PDF is from an official state health department (msdh.ms.gov) with explicit Week 40 dating. PAHO (paho.org) is an authoritative WHO regional office. ECDC (ecdc.europa.eu) is an authoritative EU public health agency. News/specialist sources (cidrap.umn.edu, reuters.com, contagionlive.com) are credible secondary sources. Low-trust results (facebook.com, wikipedia, statista) are present in the accepted pool but should be deprioritized or excluded during evidence extraction. The JMIR and PMC articles are peer-reviewed but cover prior seasons, not the specific task window.",
+  "final_gap_assessment": null,
+  "selected_query_ids": [
+    "it1_q1",
+    "it1_q2",
+    "it2_q1",
+    "it2_q2",
+    "it2_q3",
+    "it2_q4"
+  ],
+  "skipped_query_ids": [
+    "it1_q3",
+    "it1_q4"
+  ],
+  "skipped_query_count": 2,
+  "warnings": [],
+  "status": "completed",
+  "target_verification_required": true,
+  "verified_target_source_count": 1,
+  "verified_target_source_ids": [
+    "src_search_ff1cee7a6f74"
+  ],
+  "target_source_miss_reasons": [
+    "https://www.cdc.gov/fluview/surveillance/2025-week-40.html has explicit year/week [(2025, 40)] outside expected years [2024] and weeks [40]",
+    "https://www.cdc.gov/fluview/surveillance/2025-week-51.html has explicit year/week [(2025, 51)] outside expected years [2024] and weeks [40]",
+    "https://www.cdc.gov/fluview/surveillance/2025-week-49.html has explicit year/week [(2025, 49)] outside expected years [2024] and weeks [40]",
+    "https://www.cdc.gov/fluview/surveillance/2025-week-53.html has explicit year/week [(2025, 53), (2026, 53)] outside expected years [2024] and weeks [40]",
+    "https://www.cdc.gov/fluview/surveillance/2025-week-46.html has explicit year/week [(2025, 46)] outside expected years [2024] and weeks [40]",
+    "https://www.cdc.gov/fluview/surveillance/2025-week-34.html has explicit year/week [(2025, 34)] outside expected years [2024] and weeks [40]",
+    "https://www.cdc.gov/fluview/surveillance/past-reports.html mentions a week but no verified task week/date match was found",
+    "https://www.cdc.gov/fluview/index.html mentions a week but no verified task week/date match was found",
+    "https://www.cdc.gov/flu/whats-new/2025-2026-influenza-activity.html lacks verified target date/week evidence",
+    "https://www.cdc.gov/mmwr/volumes/74/wr/mm7406a2.htm lacks verified target date/week evidence",
+    "https://www.cdc.gov/flu-burden/php/surveillance/in-season-severity.html mentions a week but no verified task week/date match was found",
+    "https://www.cdc.gov/flu/whats-new/flu-summary-2023-2024.html lacks verified target date/week evidence",
+    "https://www.cdc.gov/fluview/surveillance/2025-week-31.html has explicit year/week [(2025, 31)] outside expected years [2024] and weeks [40]",
+    "https://www.cdc.gov/fluview/surveillance/2024-week-52.html has explicit year/week [(2024, 52)] outside expected years [2024] and weeks [40]",
+    "https://msdh.ms.gov/page/resources/20794.pdf is not a target collection source (role_hint=validation)",
+    "https://publichealth.jmir.org/2024/1/e54340 is not a target collection source (role_hint=validation)",
+    "https://www.ecdc.europa.eu/en/publications-data/communicable-disease-threats-report-28-september-4-october-2024-week-40 is not a target collection source (role_hint=validation)",
+    "https://applications.emro.who.int/docs/WHOEMCSR844E-eng.pdf is not a target collection source (role_hint=validation)",
+    "https://ourworldindata.org/influenza is not a target collection source (role_hint=validation)",
+    "https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/respiratory-viruses is not a target collection source (role_hint=validation)",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC11542548 is not a target collection source (role_hint=validation)",
+    "https://www.paho.org/en/documents/regional-update-influenza-and-other-respiratory-viruses-epidemiological-week-40-11 is not a target collection source (role_hint=validation)",
+    "https://globalhealthreports.health.ny.gov/sites/default/files/2025-02/Global%20Health%20Update%202.13.25%20-%20Final.pdf is not a target collection source (role_hint=validation)",
+    "https://www.paho.org/en/documents/regional-update-influenza-and-other-respiratory-viruses-epidemiological-week-40-10 is not a target collection source (role_hint=validation)",
+    "https://iris.paho.org/items/140b795e-3059-4856-a4fe-5da1f97193ee is not a target collection source (role_hint=validation)",
+    "https://www.paho.org/en/influenza-situation-report is not a target collection source (role_hint=validation)",
+    "https://www.paho.org/en/technical-reports?page=6 is not a target collection source (role_hint=validation)",
+    "https://www.facebook.com/kaieteurnewsonline/posts/the-pan-american-health-organisation-paho-has-issued-a-briefing-note-updating-co/1466895658597947 is not a target collection source (role_hint=validation)",
+    "https://en.wikipedia.org/wiki/2024%E2%80%932025_United_States_flu_season lacks verified target date/week evidence",
+    "https://www.cidrap.umn.edu/influenza-general/us-data-highlight-severity-2024-25-flu-season mentions a week but no verified task week/date match was found",
+    "https://www.cdc.gov/flu-burden/php/data-vis-vac/2024-2025-prevented.html lacks verified target date/week evidence",
+    "https://www.facebook.com/groups/467721200417375/posts/2160023257853819 lacks verified target date/week evidence",
+    "https://nnph.org/files/phd/communicable-diseases/flu_reports/weekly-reports/Historic_data/2023-2024%20Season%20Summary.pdf mentions a week but no verified task week/date match was found",
+    "https://www.contagionlive.com/view/2024-to-2025-us-influenza-season-sets-record-hospitalization-rate lacks verified target date/week evidence",
+    "https://www.statista.com/statistics/861113/estimated-number-of-flu-cases-us lacks verified target date/week evidence",
+    "https://globalbiodefense.com/2025/09/24/last-flu-season-saw-highest-u-s-hospitalization-rates-in-over-a-decade mentions a week but no verified task week/date match was found",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC12425177 lacks verified target date/week evidence",
+    "https://www.infectioncontroltoday.com/view/influenza-affects-the-us-seasonally lacks verified target date/week evidence",
+    "https://www.reuters.com/business/healthcare-pharmaceuticals/us-cdc-says-2025-26-flu-season-moderately-severe-cases-hit-11-million-2026-01-05 mentions a week but no verified task week/date match was found",
+    "https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html mentions a week but no verified task week/date match was found",
+    "https://nnph.org/files/phd/communicable-diseases/flu_reports/weekly-reports/Historic_data/2024-25/Week%2010%202024-2025.pdf mentions a week but no verified task week/date match was found"
+  ],
+  "target_evidence_requirements": {
+    "required": true,
+    "disease": "influenza",
+    "location": "united states",
+    "start_date": "2024-09-29",
+    "end_date": "2024-10-05",
+    "expected_years": [
+      2024
+    ],
+    "expected_weeks": [
+      40
+    ],
+    "expected_date_hints": [
+      "2024-09-29",
+      "2024-09-30",
+      "2024-10-01",
+      "2024-10-02",
+      "2024-10-03",
+      "2024-10-04",
+      "2024-10-05"
+    ],
+    "accepted_authority_hints": [
+      "cdc.gov",
+      "department of health",
+      ".gov",
+      "public health"
+    ]
+  }
+}

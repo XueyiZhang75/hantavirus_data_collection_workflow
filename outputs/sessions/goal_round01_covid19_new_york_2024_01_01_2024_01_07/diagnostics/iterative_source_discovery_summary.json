@@ -1,0 +1,37 @@
+{
+  "iterative_source_discovery_enabled": true,
+  "llm_iterative_planning_enabled": true,
+  "search_iteration_count": 2,
+  "llm_refinement_call_count": 2,
+  "total_queries_planned": 8,
+  "total_queries_executed": 8,
+  "total_raw_results": 58,
+  "total_candidates_created": 35,
+  "stop_decision": "stop_sufficient",
+  "stop_reason": "Maximum iterations (2) reached. All planned queries across both iterations have been executed (8 of 10 max total queries used). The search has successfully identified the authoritative source domains and specific dataset candidates across all three primary reporting channels (CDC federal, NYSDOH state, NYC DOHMH city) that are most likely to contain COVID-19 case, death, and hospitalization data for New York for the week of 2024-01-01 to 2024-01-07. No numeric values have been confirmed in snippets (snippets are landing-page metadata only, not row-level data), but the correct source candidates for downstream data extraction have been identified. Further search is unlikely to surface new authoritative sources not already represented in the candidate set, and the iteration and query bounds prohibit additional searches.",
+  "final_coverage_assessment": "Coverage is structurally complete across the three primary reporting tiers for New York COVID-19 surveillance: (1) Federal/CDC tier: CDC weekly cases and deaths by state (pwn4-m3yp), CDC weekly cases and deaths by county (yviw-z6j5), CDC case surveillance public use data with geography (n8mc-b4w4), NCHS provisional mortality by week (r8kw-7aab), and CDC community levels by county (3nnm-4jni) — all on data.cdc.gov. (2) New York State tier: NYSDOH COVID-19 data hub and weekly hospitalization dashboard (coronavirus.health.ny.gov), NYSDOH open data portal (health.data.ny.gov). (3) New York City tier: NYC DOHMH data archive (nyc.gov), NYC Open Data portal (data.cityofnewyork.us), and NYC DOHMH GitHub (github.com/nychealth/coronavirus-data, surfaced in iteration 2). The target fields of cases_confirmed, deaths, hospitalizations, date_reported, subnational_location, and locality are all addressable from these sources. The fields cases_probable, cases_suspected, and cases_unspecified may not be separately reported post-PHE (after May 2023), but this is a data availability constraint, not a search gap. No numeric evidence quotes have been confirmed in snippets, as all returned snippets are dataset landing pages rather than row-level data — this is expected and is a downstream extraction task, not a search failure.",
+  "final_trustworthiness_assessment": "All primary source candidates are from official government domains: data.cdc.gov (federal CDC), coronavirus.health.ny.gov and health.data.ny.gov (New York State DOH), nyc.gov and data.cityofnewyork.us (New York City DOHMH). These are the highest-trust tier for epidemiological surveillance data. The github.com result is the nychealth/coronavirus-data repository, which is the official NYC DOHMH open-source data repository — also high trust. No low-trust sources (social media, non-official aggregators) are in the primary candidate set. Worldometers and JHU coronavirus tracker appeared in results but JHU tracker was discontinued in March 2023 and Worldometers stopped updating in April 2024 — these are not recommended as primary sources for the target week. The Facebook post (OCPHealth) is county-level and not New York State or NYC — low priority. The NCBI PMC article covers October 2023–April 2024 hospitalization rates across 12 states and may provide corroborating context but not week-specific New York figures.",
+  "final_gap_assessment": null,
+  "selected_query_ids": [
+    "i1_q1",
+    "i1_q2",
+    "i1_q3",
+    "i1_q4",
+    "i2_q1",
+    "i2_q2",
+    "i2_q3",
+    "i2_q4"
+  ],
+  "skipped_query_ids": [],
+  "skipped_query_count": 0,
+  "warnings": [],
+  "status": "completed",
+  "target_verification_required": false,
+  "verified_target_source_count": 0,
+  "verified_target_source_ids": [],
+  "target_source_miss_reasons": [],
+  "target_evidence_requirements": {
+    "required": false,
+    "reason": "non_influenza_task"
+  }
+}

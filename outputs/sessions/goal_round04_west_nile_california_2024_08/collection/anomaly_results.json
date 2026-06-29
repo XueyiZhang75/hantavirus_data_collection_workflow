@@ -1,0 +1,567 @@
+[
+  {
+    "anomaly_id": "anom_001",
+    "anomaly_type": "deaths_without_case_reference",
+    "anomaly_unit": "record",
+    "severity": "low",
+    "record_id": "rec_src_search_0d4e7ec87258_002",
+    "event_cluster_id": null,
+    "validation_result_id": null,
+    "source_id": "src_search_0d4e7ec87258",
+    "compared_field": "deaths",
+    "disease": "West Nile Virus Disease",
+    "location": "Illinois",
+    "date_or_period": "2024-08-31",
+    "source_ids": [
+      "src_search_0d4e7ec87258"
+    ],
+    "source_urls": [
+      "https://abcnews.com/US/health-officials-report-3-west-nile-virus-deaths/story?id=113256243"
+    ],
+    "evidence_summary": "Earlier this week, health officials in Illinois announced the first death in the state from West Nile virus after a Lake County resident in their 80s had an onset of symptoms in mid-August and died soon after.",
+    "observed_value": 1.0,
+    "expected_or_reference_value": null,
+    "threshold": null,
+    "reason": "deaths present but no comparable case count is available",
+    "recommended_action": "human_review",
+    "needs_human_review": false,
+    "human_review_reason": null,
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "insufficient_case_reference"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_002",
+    "anomaly_type": "deaths_without_case_reference",
+    "anomaly_unit": "record",
+    "severity": "low",
+    "record_id": "rec_src_search_0d4e7ec87258_003",
+    "event_cluster_id": null,
+    "validation_result_id": null,
+    "source_id": "src_search_0d4e7ec87258",
+    "compared_field": "deaths",
+    "disease": "West Nile Virus Disease",
+    "location": "Illinois",
+    "date_or_period": "2024-08-31",
+    "source_ids": [
+      "src_search_0d4e7ec87258"
+    ],
+    "source_urls": [
+      "https://abcnews.com/US/health-officials-report-3-west-nile-virus-deaths/story?id=113256243"
+    ],
+    "evidence_summary": "There were six West Nile virus deaths recorded in Illinois in 2023.",
+    "observed_value": 6.0,
+    "expected_or_reference_value": null,
+    "threshold": null,
+    "reason": "deaths present but no comparable case count is available",
+    "recommended_action": "human_review",
+    "needs_human_review": false,
+    "human_review_reason": null,
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "insufficient_case_reference"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_003",
+    "anomaly_type": "abrupt_spike_simple_threshold",
+    "anomaly_unit": "record",
+    "severity": "medium",
+    "record_id": "rec_src_search_fc3322f3069f_001",
+    "event_cluster_id": null,
+    "validation_result_id": null,
+    "source_id": "src_search_fc3322f3069f",
+    "compared_field": "case_count",
+    "disease": "West Nile Virus Disease",
+    "location": "California",
+    "date_or_period": "2024-08-31",
+    "source_ids": [
+      "src_search_fc3322f3069f"
+    ],
+    "source_urls": [
+      "https://westnile.ca.gov"
+    ],
+    "evidence_summary": "| **Human cases (fatal)** | 3 (0) | 791 (32) | 880 (21) | 278 (9) | 382 (22) | 446 (15) | 112 (5) | 112 (6) | 159 (9) | 480 (23) | 387 (19) | 842 (34) | 800 (55) | 461 (21) | 556 (44) | 217 (11) | 225 (6) | 214 (15) | 129 (12) | 209 (15) | 433 (20) | 132 (12) | 116 (11) | 0 (0) | 8,364 (417) |",
+    "observed_value": 8364.0,
+    "expected_or_reference_value": 289.0,
+    "threshold": 10.0,
+    "reason": "case count is a simple-threshold spike over prior comparable records",
+    "recommended_action": "review_possible_spike_or_count_semantics",
+    "needs_human_review": true,
+    "human_review_reason": "case count is a simple-threshold spike over prior comparable records",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_004",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_020",
+    "validation_result_id": "val_result_004",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "California",
+    "date_or_period": "2023 to same point as Bulletin #29",
+    "source_ids": [
+      "src_search_a39e4fa28013"
+    ],
+    "source_urls": [
+      "https://westnile.ca.gov/download?download_id=5061"
+    ],
+    "evidence_summary": "No. Human Cases 286 98",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "California",
+      "date_or_period": "2023 to same point as Bulletin #29"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_time_window"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_005",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_009",
+    "validation_result_id": "val_result_008",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "United States",
+    "date_or_period": "2024",
+    "source_ids": [
+      "src_search_0d4e7ec87258"
+    ],
+    "source_urls": [
+      "https://abcnews.com/US/health-officials-report-3-west-nile-virus-deaths/story?id=113256243"
+    ],
+    "evidence_summary": "There have been 289 human West Nile virus disease cases in 2024, according to the [CDC](https://www.cdc.gov/west-nile-virus/data-maps/current-year-data.html).",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "United States",
+      "date_or_period": "2024"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_geography",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_geography",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_geography"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_006",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_018",
+    "validation_result_id": "val_result_009",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "Illinois",
+    "date_or_period": "2024",
+    "source_ids": [
+      "src_search_0d4e7ec87258"
+    ],
+    "source_urls": [
+      "https://abcnews.com/US/health-officials-report-3-west-nile-virus-deaths/story?id=113256243"
+    ],
+    "evidence_summary": "Earlier this week, health officials in Illinois announced the first death in the state from West Nile virus after a Lake County resident in their 80s had an onset of symptoms in mid-August and died soon after.",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "Illinois",
+      "date_or_period": "2024"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_geography",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_geography",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_geography"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_007",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_017",
+    "validation_result_id": "val_result_010",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "Illinois",
+    "date_or_period": "2023",
+    "source_ids": [
+      "src_search_0d4e7ec87258"
+    ],
+    "source_urls": [
+      "https://abcnews.com/US/health-officials-report-3-west-nile-virus-deaths/story?id=113256243"
+    ],
+    "evidence_summary": "There were six West Nile virus deaths recorded in Illinois in 2023.",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "Illinois",
+      "date_or_period": "2023"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_geography;outside_time_window",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_geography;outside_time_window",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_geography",
+      "outside_time_window"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_008",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_019",
+    "validation_result_id": "val_result_011",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "Wisconsin",
+    "date_or_period": "annual average",
+    "source_ids": [
+      "src_search_0d4e7ec87258"
+    ],
+    "source_urls": [
+      "https://abcnews.com/US/health-officials-report-3-west-nile-virus-deaths/story?id=113256243"
+    ],
+    "evidence_summary": "An average of 18 cases of illness from West Nile virus are reported in Wisconsin every year, according to DHS officials.",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "Wisconsin",
+      "date_or_period": "annual average"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: insufficient_scope_information;outside_geography",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: insufficient_scope_information;outside_geography",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_geography",
+      "insufficient_scope_information"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_009",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_006",
+    "validation_result_id": "val_result_017",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "California",
+    "date_or_period": "cumulative 2025 through 2025 season to date",
+    "source_ids": [
+      "src_search_be93a6fa0503"
+    ],
+    "source_urls": [
+      "https://westnile.ca.gov/download?download_id=5147"
+    ],
+    "evidence_summary": "Butte (1), Kern (3), and Tulare (1) . In 2025, 22 human cases of WNV disease have been reported from 8",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "California",
+      "date_or_period": "cumulative 2025 through 2025 season to date"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_time_window"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_010",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_001",
+    "validation_result_id": "val_result_018",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "California",
+    "date_or_period": "neuroinvasive cumulative 2025 through 2025 season to date",
+    "source_ids": [
+      "src_search_be93a6fa0503"
+    ],
+    "source_urls": [
+      "https://westnile.ca.gov/download?download_id=5147"
+    ],
+    "evidence_summary": "counties. Of the 22 cases, 19 ( 86%) had neuroinvasive disease and 1 ( 5%) was fatal. The median age of",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "California",
+      "date_or_period": "neuroinvasive cumulative 2025 through 2025 season to date"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_time_window"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_011",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_003",
+    "validation_result_id": "val_result_019",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "California",
+    "date_or_period": "asymptomatic blood donors cumulative 2025 through 2025 season to date",
+    "source_ids": [
+      "src_search_be93a6fa0503"
+    ],
+    "source_urls": [
+      "https://westnile.ca.gov/download?download_id=5147"
+    ],
+    "evidence_summary": "onset ranged from June 6 to August 18 . In addition to the 22 cases of WNV disease , 3 asymptomatic",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "California",
+      "date_or_period": "asymptomatic blood donors cumulative 2025 through 2025 season to date"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_time_window"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_012",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_023",
+    "validation_result_id": "val_result_021",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "California",
+    "date_or_period": "2025 year-to-date (as of bulletin week)",
+    "source_ids": [
+      "src_search_be93a6fa0503"
+    ],
+    "source_urls": [
+      "https://westnile.ca.gov/download?download_id=5147"
+    ],
+    "evidence_summary": "No. Human Cases 27 22",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "California",
+      "date_or_period": "2025 year-to-date (as of bulletin week)"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_time_window"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_013",
+    "anomaly_type": "out_of_scope_count_bearing_record",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_010",
+    "validation_result_id": "val_result_023",
+    "source_id": null,
+    "compared_field": "task_scope",
+    "disease": "West Nile Virus Disease",
+    "location": "California",
+    "date_or_period": "2020",
+    "source_ids": [
+      "src_search_99932da268a1"
+    ],
+    "source_urls": [
+      "https://www.vdci.net/blog/2024-mosquito-borne-disease-year-in-review"
+    ],
+    "evidence_summary": "California (123)",
+    "observed_value": {
+      "disease": "West Nile Virus Disease",
+      "location": "California",
+      "date_or_period": "2020"
+    },
+    "expected_or_reference_value": {
+      "disease": "West Nile virus",
+      "location": "California",
+      "time_window": [
+        2024,
+        2024
+      ]
+    },
+    "threshold": null,
+    "reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "recommended_action": "confirm_scope_or_reject_record",
+    "needs_human_review": true,
+    "human_review_reason": "Stage 10 validation marked record outside requested scope: outside_time_window",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "outside_time_window"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  }
+]

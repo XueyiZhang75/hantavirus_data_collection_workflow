@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 41,
+  &quot;prioritized_review_item_count&quot;: 41,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 0,
+    &quot;P1_high&quot;: 13,
+    &quot;P2_medium&quot;: 0,
+    &quot;P3_low&quot;: 28
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;source_identity_review&quot;: 12,
+    &quot;source_credibility_review&quot;: 1,
+    &quot;general_review&quot;: 28
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_source_credibility_src_search_b11655490f96</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_b11655490f96 - How did COVID-19 affect people in New York? | USAFacts</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_b11655490f96&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_b11655490f96&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_b11655490f96&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_b11655490f96 - How did COVID-19 affect people in New York? | USAFacts&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://usafacts.org/answers/how-did-covid-19-affect-people-in-the-us/state/new-york&quot;,
+  &quot;source_title&quot;: &quot;How did COVID-19 affect people in New York? | USAFacts&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;news_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_b11655490f96&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_b11655490f96&quot;,
+    &quot;source_url&quot;: &quot;https://usafacts.org/answers/how-did-covid-19-affect-people-in-the-us/state/new-york&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;USAFacts (usafacts.org) is a non-partisan, non-profit data aggregation platform that compiles government statistics from official sources such as the CDC, NYSDOH, and Census Bureau. It is not itself an official public health agency, but it draws from authoritative upstream sources and is generally transparent about provenance. For this task, several factors limit its utility as a primary collection source:\n\n1. **Authority gap**: USAFacts is a secondary aggregator, not an official public health agency. Its authority score (0.48) reflects this — it does not generate original surveillance data. For a task requiring primary case/death/hospitalization counts with verbatim evidence quotes, the upstream official source (NYSDOH or NYC DOHMH) is strongly preferred.\n\n2. **Independence concern**: The platform aggregates and may reformat official data, introducing potential for lag, rounding, or granularity loss. The independence score (0.42) and the `independence_unclear` flag reinforce that the data lineage from raw official reports to USAFacts presentation is not fully transparent.\n\n3. **Temporal granularity risk**: The target window is a narrow 7-day period (2024-01-01 to 2024-01-07). USAFacts typically presents cumulative or broad trend data rather than week-specific incident counts. This significantly limits its ability to satisfy `date_reported`, `cases_confirmed`, and incident-level required fields for the target window.\n\n4. **Missing publisher metadata**: The `publisher` field is null, which is a minor but notable provenance gap in the source record itself.\n\n5. **Screening/critic disagreement flag**: The `screening_and_critic_disagree` risk flag warrants attention — this suggests internal pipeline signals are not fully aligned on this source&#x27;s role, which is a reason for advisory caution even if human review was not triggered deterministically.\n\n6. **Positive signals**: Disease relevance is high (0.95), geographic match is strong (New York, 0.95), and provenance score is reasonable (0.85), indicating the page is topically and geographically on-target. It may serve well as a context or corroboration source, or as a pointer to upstream official data.\n\n**Advisory recommendation**: Retain as `context` role only. Do not use as a primary collection source for incident-level case, death, or hospitalization counts for the 2024-01-01 to 2024-01-07 window. Prioritize NYSDOH and NYC DOHMH dashboards as primary sources. If USAFacts data is cited, the evidence_quote must be verbatim and the upstream source it cites should be independently verified and separately recorded. Human review is recommended given the screening/critic disagreement flag and the narrow time window granularity risk.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_d5900bb8aa62</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_d5900bb8aa62 - COVID-19 pandemic in the United States - Wikipedia</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_d5900bb8aa62&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_d5900bb8aa62&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_d5900bb8aa62&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_d5900bb8aa62 - COVID-19 pandemic in the United States - Wikipedia&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://en.wikipedia.org/wiki/COVID-19_pandemic_in_the_United_States&quot;,
+  &quot;source_title&quot;: &quot;COVID-19 pandemic in the United States - Wikipedia&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;secondary_aggregator&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_d5900bb8aa62&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_d5900bb8aa62&quot;,
+    &quot;source_url&quot;: &quot;https://en.wikipedia.org/wiki/COVID-19_pandemic_in_the_United_States&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;This source is the English Wikipedia article on the COVID-19 pandemic in the United States. While Wikipedia is a well-known, high-provenance reference (provenance_score=0.85) and the article is clearly disease-relevant (disease_relevance_score=0.95), it is fundamentally a secondary, crowd-edited synthesis source and is not an authoritative public health data publisher. Several structural weaknesses make it unsuitable as a primary collection source for this task:\n\n1. **Authority deficit**: authority_score=0.48 reflects that Wikipedia is not an official public health agency, international organization, structured database, or peer-reviewed literature — all of which rank above news_and_situation_report in the collection_spec source_priority hierarchy.\n2. **Geographic granularity mismatch**: The article covers the entire United States (geographic_granularity_score=0.58); the task requires New York-specific, sub-weekly data for 2024-01-01 to 2024-01-07. Wikipedia is unlikely to contain the required subnational, time-windowed incident counts.\n3. **Independence concern**: independence_score=0.42 and the flag `independence_unclear` are significant — Wikipedia aggregates and synthesizes from other sources, meaning any data extracted would be at least one step removed from the original authoritative source, violating the collection_spec requirement for verbatim evidence_quote from primary sources.\n4. **Data granularity limitations**: data_granularity_score=0.68 suggests the article is unlikely to contain the required structured fields (cases_confirmed, cases_probable, cases_suspected, hospitalizations, deaths) at the weekly resolution needed.\n5. **Screening/critic disagreement**: The flag `screening_and_critic_disagree` warrants advisory caution — the deterministic pipeline itself flagged internal inconsistency in role assessment.\n6. **Missing publisher**: `publisher=null` is a metadata gap that reduces traceability.\n\nThe deterministic pipeline correctly assigned this source to the `context` role. The LLM advisory concurs and adds emphasis: this source should not be used for direct data extraction. It may serve only as a navigational aid to identify primary sources (e.g., NYSDOH, NYC DOHMH, CDC).&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_f1a19efce8d2</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_f1a19efce8d2 - New York State COVID update on Thursday, Jan. 20 - Facebook</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_f1a19efce8d2&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_f1a19efce8d2&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_f1a19efce8d2&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_f1a19efce8d2 - New York State COVID update on Thursday, Jan. 20 - Facebook&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.facebook.com/wten.albany/posts/new-york-state-covid-update-on-thursday-jan-20/10166417185515195&quot;,
+  &quot;source_title&quot;: &quot;New York State COVID update on Thursday, Jan. 20 - Facebook&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;social_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_f1a19efce8d2&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_f1a19efce8d2&quot;,
+    &quot;source_url&quot;: &quot;https://www.facebook.com/wten.albany/posts/new-york-state-covid-update-on-thursday-jan-20/10166417185515195&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;This source is a Facebook post from WTEN Albany (a local TV news station), not a primary public health authority. While the post is topically relevant to COVID-19 in New York and the title references a state-level update, several structural credibility concerns apply: (1) The domain is facebook.com — a social media platform — meaning the content is not hosted on a verifiable news or government domain, and the post may be a summary, paraphrase, or partial relay of official data rather than the original report. (2) The publisher field is null, which prevents direct verification of the originating news organization from metadata alone. (3) The title references \&quot;Thursday, Jan. 20,\&quot; which does not fall within the target collection window of 2024-01-01 to 2024-01-07, raising a temporal alignment concern. (4) The independence score (0.42) is low, suggesting the source likely derives its data from official sources (e.g., NYSDOH) rather than generating original surveillance data. (5) No snippet is available, so the actual data content cannot be assessed from metadata. (6) The deterministic screener and critic disagree (flag: screening_and_critic_disagree), which is a meaningful signal warranting LLM advisory review. Taken together, this source may provide contextual background but is unlikely to yield primary, citable, verbatim epidemiological data suitable for the required_fields of this collection task. The date mismatch is the most critical concern for direct collection use.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_000e4ff17a91</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_000e4ff17a91 - GitHub - nychealth/coronavirus-data: This repository contain...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_000e4ff17a91&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_000e4ff17a91&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_000e4ff17a91&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_000e4ff17a91 - GitHub - nychealth/coronavirus-data: This repository contain...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://github.com/nychealth/coronavirus-data&quot;,
+  &quot;source_title&quot;: &quot;GitHub - nychealth/coronavirus-data: This repository contains data on Coronavirus Disease 2019 (COVID-19) in New York City (NYC), from the NYC Department of Health and Mental Hygiene. · GitHub&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_000e4ff17a91&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_000e4ff17a91&quot;,
+    &quot;source_url&quot;: &quot;https://github.com/nychealth/coronavirus-data&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_0af03f2493e8</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_0af03f2493e8 - COVID-19 Daily Counts of Cases, Hospitalizations, and ...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_0af03f2493e8&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_0af03f2493e8&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_0af03f2493e8&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_0af03f2493e8 - COVID-19 Daily Counts of Cases, Hospitalizations, and ...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;http://catalog.data.gov/dataset/covid-19-daily-counts-of-cases-hospitalizations-and-deaths&quot;,
+  &quot;source_title&quot;: &quot;COVID-19 Daily Counts of Cases, Hospitalizations, and ...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_0af03f2493e8&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_0af03f2493e8&quot;,
+    &quot;source_url&quot;: &quot;http://catalog.data.gov/dataset/covid-19-daily-counts-of-cases-hospitalizations-and-deaths&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_478ca202141b</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_478ca202141b - United States COVID - Coronavirus Statistics - Worldometer</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_478ca202141b&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_478ca202141b&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_478ca202141b&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_478ca202141b - United States COVID - Coronavirus Statistics - Worldometer&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.worldometers.info/coronavirus/country/us&quot;,
+  &quot;source_title&quot;: &quot;United States COVID - Coronavirus Statistics - Worldometer&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_478ca202141b&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_478ca202141b&quot;,
+    &quot;source_url&quot;: &quot;https://www.worldometers.info/coronavirus/country/us&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_58fde24d715b</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_58fde24d715b - Track Covid-19 in the U.S.: Latest Data and Maps - ny times</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_58fde24d715b&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_58fde24d715b&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_58fde24d715b&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_58fde24d715b - Track Covid-19 in the U.S.: Latest Data and Maps - ny times&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.nytimes.com/interactive/2023/us/covid-cases.html&quot;,
+  &quot;source_title&quot;: &quot;Track Covid-19 in the U.S.: Latest Data and Maps - ny times&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;news_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_58fde24d715b&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_58fde24d715b&quot;,
+    &quot;source_url&quot;: &quot;https://www.nytimes.com/interactive/2023/us/covid-cases.html&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_5ce266c03958</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_5ce266c03958 - COVID | NYC Open Data</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_5ce266c03958&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_5ce266c03958&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_5ce266c03958&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_5ce266c03958 - COVID | NYC Open Data&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://data.cityofnewyork.us/Health/COVID/y5z2-enr7&quot;,
+  &quot;source_title&quot;: &quot;COVID | NYC Open Data&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_5ce266c03958&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_5ce266c03958&quot;,
+    &quot;source_url&quot;: &quot;https://data.cityofnewyork.us/Health/COVID/y5z2-enr7&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_650359dcfc71</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_650359dcfc71 - COVID-19 Daily Counts of Cases, Hospitalizations, and Deaths</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_650359dcfc71&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_650359dcfc71&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_650359dcfc71&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_650359dcfc71 - COVID-19 Daily Counts of Cases, Hospitalizations, and Deaths&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://data.cityofnewyork.us/Health/COVID-19-Daily-Counts-of-Cases-Hospitalizations-an/rc75-m7u3&quot;,
+  &quot;source_title&quot;: &quot;COVID-19 Daily Counts of Cases, Hospitalizations, and Deaths&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_650359dcfc71&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_650359dcfc71&quot;,
+    &quot;source_url&quot;: &quot;https://data.cityofnewyork.us/Health/COVID-19-Daily-Counts-of-Cases-Hospitalizations-an/rc75-m7u3&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_68678448bb04</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_68678448bb04 - New York - COVID-19 Overview - Johns Hopkins</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_68678448bb04&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_68678448bb04&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_68678448bb04&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;COVID-19&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-01-07&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_68678448bb04 - New York - COVID-19 Overview - Johns Hopkins&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://coronavirus.jhu.edu/region/us/new-york&quot;,
+  &quot;source_title&quot;: &quot;New York - COVID-19 Overview - Johns Hopkins&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_68678448bb04&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_68678448bb04&quot;,
+    &quot;source_url&quot;: &quot;https://coronavirus.jhu.edu/region/us/new-york&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

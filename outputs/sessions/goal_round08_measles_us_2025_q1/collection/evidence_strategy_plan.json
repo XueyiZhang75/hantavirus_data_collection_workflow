@@ -1,0 +1,744 @@
+{
+  "plan_id": "exec_source_plan_measles_united_states_2025_01_01_2025_03_31",
+  "disease": "Measles",
+  "location": "United States",
+  "time_window": "2025-01-01-2025-03-31",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "llm_enhanced_query_set_generated",
+    "excluded_terms_enforced_rubella_roseola_varicella_german_measles",
+    "validation_leakage_risk_flagged_for_human_review"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify CDC official surveillance pages, MMWR reports, and CDC measles case count tables reporting confirmed, probable, or suspected Measles cases and deaths in the United States during 2025-01-01 to 2025-03-31.",
+      "source_role_hint": "collection",
+      "rationale": "CDC is the primary national public health authority for Measles surveillance in the US. Their MMWR weekly reports, measles case count pages, and outbreak investigation reports are the highest-priority extractable collection sources.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify state and local health department outbreak alerts, press releases, and situation reports for Measles cases in US states and territories during Q1 2025.",
+      "source_role_hint": "collection",
+      "rationale": "State health departments (e.g., Texas DSHS, New York DOH, California CDPH) issue outbreak alerts and case counts that may predate or supplement CDC national aggregates, providing subnational_location and locality granularity.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify NNDSS (National Notifiable Diseases Surveillance System) data tables or exports for Measles (Rubeola) in the United States for weeks covering 2025-01-01 to 2025-03-31.",
+      "source_role_hint": "collection",
+      "rationale": "NNDSS is the authoritative structured surveillance dataset for nationally notifiable diseases including Measles in the US, providing weekly case counts by jurisdiction.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify WHO and PAHO situation reports or disease surveillance bulletins that include Measles case counts for the United States or the Americas region covering Q1 2025.",
+      "source_role_hint": "validation",
+      "rationale": "WHO and PAHO independently aggregate Measles data from member states including the US, providing an independent validation source against CDC-reported figures.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify structured open-data sources (e.g., HealthData.gov, CDC open data portal, Our World in Data) with Measles case or death counts for the United States in 2025.",
+      "source_role_hint": "validation",
+      "rationale": "Structured databases provide machine-readable counts that can be compared against extracted records from official narrative sources for cross-validation.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify CDC case definitions, CSTE position statements, and clinical guidance documents for Measles (Rubeola) applicable to 2025 US surveillance.",
+      "source_role_hint": "context",
+      "rationale": "Case definitions determine whether counts are confirmed, probable, or suspected. Understanding the operative case definition is essential for correct field mapping and count semantics.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify peer-reviewed literature or preprints describing Measles epidemiology, outbreak investigations, or surveillance findings in the United States in 2025.",
+      "source_role_hint": "context",
+      "rationale": "Published outbreak investigations may contain granular case counts, hospitalization rates, and demographic breakdowns not available in surveillance summaries.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_collection_support_001",
+      "objective": "Identify reputable news reports (Reuters, AP, NPR, ProMED) covering Measles outbreaks or case counts in the United States during January–March 2025.",
+      "source_role_hint": "collection_support",
+      "rationale": "News reports may surface early outbreak signals, state-level case counts, or death reports that precede official agency publication, and can guide targeted official source retrieval.",
+      "priority": 5
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag any sources that report Measles-like illness without laboratory confirmation, mix Measles with Rubella or Roseola counts, or report vaccine adverse events only (VAERS) without confirmed case data.",
+      "source_role_hint": "human_review",
+      "rationale": "Sources conflating excluded disease terms (rubella, roseola, German measles, varicella) or reporting only VAERS events without case confirmation must be quarantined and reviewed before extraction.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_review_002",
+      "objective": "Flag sources with ambiguous count semantics (cumulative vs. newly reported, annual vs. Q1-only) or reporting periods substantially broader than 2025-01-01 to 2025-03-31 for human review.",
+      "source_role_hint": "human_review",
+      "rationale": "Cumulative annual counts or multi-year aggregates may not be attributable to the Q1 2025 task window without additional decomposition, requiring human judgment.",
+      "priority": 3
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_cdc_official",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC is the primary US national public health authority. CDC measles case count pages (cdc.gov/measles), MMWR weekly/early release reports, and outbreak investigation reports are the highest-priority extractable sources for confirmed, probable, and suspected Measles cases and deaths in the US during Q1 2025.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "cdc_page_structure_may_change",
+        "mmwr_reports_may_lag_outbreak_by_weeks",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_state_local_health_depts",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "State health departments (Texas DSHS, New York DOH, California CDPH, Florida DOH, etc.) and county/local health departments issue outbreak alerts, press releases, and situation reports with subnational and locality-level Measles case counts that may predate CDC national aggregates.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "50_states_plus_territories_require_broad_search",
+        "press_releases_may_not_be_indexed",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_nndss",
+      "source_type": "structured_database",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "NNDSS (National Notifiable Diseases Surveillance System) provides weekly Measles case counts by US jurisdiction. CDC publishes NNDSS tables at wonder.cdc.gov and in MMWR. This is the authoritative structured surveillance dataset for nationally notifiable diseases including Measles.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "nndss_data_may_have_reporting_lag",
+        "weekly_tables_may_require_aggregation_to_q1",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_who_paho",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "WHO and PAHO independently aggregate Measles surveillance data from member states including the US. WHO measles surveillance data, PAHO epidemiological alerts, and WHO disease outbreak news provide independent validation against CDC-reported figures.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "who_paho_data_may_lag_cdc_by_weeks_to_months",
+        "regional_aggregates_may_not_isolate_us_counts",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_structured_open_data",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Structured open-data portals (HealthData.gov, CDC open data API, Our World in Data, Project Tycho) may provide machine-readable Measles case or death counts for the US in 2025, enabling cross-validation against extracted narrative records.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "open_data_portals_may_lag_real_time_reporting",
+        "data_may_not_yet_cover_q1_2025",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_006_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Peer-reviewed outbreak investigations, epidemiological studies, and MMWR reports (treated as literature) may contain granular case counts, hospitalization rates, demographic breakdowns, and case definitions for Measles in the US in 2025.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "publication_lag_may_mean_q1_2025_studies_not_yet_published",
+        "preprints_require_additional_quality_screening",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_007_news_situation_reports",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Reputable news outlets (Reuters, AP, NPR, ProMED-mail, CIDRAP) and situation reports may surface early outbreak signals, state-level case counts, or death reports during Q1 2025 that precede official agency publication, guiding targeted official source retrieval.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "news_counts_may_be_unverified_or_preliminary",
+        "risk_of_conflating_measles_with_rubella_or_roseola",
+        "requires_later_search_result_screening_and_exclusion_term_check"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"measles cases United States 2025\" cases deaths public health United States 2025-01-01-2025-03-31 2025",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles cases United States 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"measles outbreak US 2025\" cases deaths public health United States 2025-01-01-2025-03-31 2025",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles outbreak US 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"measles cases United States 2025\" outbreak report surveillance United States 2025-01-01-2025-03-31 2025",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles cases United States 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"measles outbreak US 2025\" outbreak report surveillance United States 2025-01-01-2025-03-31 2025",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles outbreak US 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"measles cases United States 2025\" epidemiology cases deaths United States 2025-01-01-2025-03-31 2025",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "measles cases United States 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"measles outbreak US 2025\" epidemiology cases deaths United States 2025-01-01-2025-03-31 2025",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "measles outbreak US 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"measles cases United States 2025\" surveillance dataset cases deaths United States 2025-01-01-2025-03-31 2025",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles cases United States 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"measles outbreak US 2025\" surveillance dataset cases deaths United States 2025-01-01-2025-03-31 2025",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles outbreak US 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"measles cases United States 2025\" outbreak report cases deaths United States 2025-01-01-2025-03-31 2025",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles cases United States 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"measles outbreak US 2025\" outbreak report cases deaths United States 2025-01-01-2025-03-31 2025",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles outbreak US 2025"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-03-31",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

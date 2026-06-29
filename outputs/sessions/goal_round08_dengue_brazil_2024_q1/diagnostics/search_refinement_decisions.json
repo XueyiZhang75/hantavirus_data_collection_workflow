@@ -1,0 +1,223 @@
+[
+  {
+    "iteration_index": 1,
+    "decision": "continue_search",
+    "decision_reason": "Iteration 1 returned strong broad coverage of the 2024 Brazil dengue season but the top results are predominantly full-year 2024 or post-Q1 snapshots (e.g., October 2024, December 2024, full-year totals). The single confirmed Q1-specific result (gov.br Boletim Epidemiológico vol.55 no.11, referencing SE4/2024 with ~260k probable cases) is promising but covers only one early bulletin. Critical gaps remain: (1) no Q1-specific (Jan–Mar 2024) national cumulative case/death/hospitalization snapshot with confirmed+probable+suspected breakdown; (2) no PAHO situation report dated within Q1 2024 (the PAHO results found are from October 2024); (3) no state-level (subnational) Q1 2024 data beyond a partial Minas Gerais snippet with unclear dates; (4) no hospitalization counts for Q1 2024; (5) no ProMED/ECDC Q1-specific posts confirmed. The Minas Gerais state bulletin (saude.mg.gov.br) and InfoDengue platform appeared but without Q1-specific evidence quotes. Iteration 2 must target: (a) additional Brazilian MoH bulletins specifically covering SE1–SE13 (weeks 1–13 of 2024, i.e., Jan–Mar); (b) PAHO epidemiological alerts or situation reports published in Q1 2024 (Jan–Mar); (c) high-burden state secretariat bulletins (São Paulo, Rio de Janeiro, Goiás, Distrito Federal) for subnational Q1 data; (d) hospitalization data from Brazilian MoH or state sources. This is the final permitted iteration (max_iterations=2), so queries must be maximally targeted.",
+    "coverage_assessment": "Partial. Iteration 1 identified the correct source types (Brazilian MoH gov.br bulletins, PAHO, state secretariats, InfoDengue) and confirmed the disease/location fit. However, the evidence snippets retrieved are predominantly full-year 2024 or post-Q1 figures. Only one result (gov.br Boletim vol.55 no.11) explicitly references a Q1 2024 epidemiological week (SE4), and its snippet is truncated. The PAHO results are from October 2024, not Q1. State-level Q1 data is absent except for a partial Minas Gerais snippet with ambiguous dates. Hospitalization counts and case-classification breakdowns (confirmed/probable/suspected) for Q1 are not yet evidenced in the snippets. The InfoDengue platform appeared but without Q1-specific data in the snippet.",
+    "source_diversity_assessment": "Good diversity of source types already identified: official Brazilian MoH (gov.br), state health secretariat (saude.mg.gov.br), international org (paho.org, reliefweb.int), academic surveillance platform (info.dengue.mat.br, pmc.ncbi.nlm.nih.gov), official news agency (agenciabrasil.ebc.com.br), and ECDC (ecdc.europa.eu). Missing: PAHO Q1-specific situation reports, additional high-burden state secretariats (SP, RJ, GO, DF), and ProMED Q1 posts. Iteration 2 should add these without duplicating already-found domains.",
+    "trustworthiness_assessment": "High for gov.br and paho.org sources already identified. The Boletim Epidemiológico on gov.br is the gold-standard Brazilian official source. saude.mg.gov.br is the Minas Gerais state health secretariat — authoritative for subnational data. InfoDengue (info.dengue.mat.br) is a peer-reviewed academic surveillance platform with FIOCRUZ/FGV backing — reliable for weekly case estimates. PAHO results are authoritative but the ones found are post-Q1. agenciabrasil.ebc.com.br is the official Brazilian government news agency — acceptable secondary source citing MoH figures. Lower-trust sources (youtube.com, beaconbio.org, dengue.com, worldmosquitoprogram.org) should not be used as primary evidence for numeric fields.",
+    "disease_location_time_fit_assessment": "Disease fit: Excellent — all results are dengue-specific. Location fit: Excellent — all results are Brazil-specific. Time fit: POOR for most top results — the majority of snippets reference full-year 2024 totals, October 2024 snapshots, or 2025 comparisons. Only the gov.br Boletim vol.55 no.11 explicitly references SE4/2024 (late January 2024). Iteration 2 must explicitly target Q1 2024 (SE1–SE13, January–March 2024) with bulletin numbers, epidemiological week ranges, and month-specific Portuguese terminology to improve time-window fit.",
+    "corroboration_potential_assessment": "Strong corroboration potential exists if Q1-specific Brazilian MoH bulletins (SE1–SE13) and PAHO Q1 situation reports are retrieved. The gov.br Boletim vol.55 no.11 snippet already provides a partial Q1 anchor (SE4, ~260k probable cases). Additional bulletins covering SE8–SE13 would allow triangulation of cumulative Q1 totals. State-level data from SP, RJ, GO, DF secretariats would corroborate subnational breakdowns. ECDC (already in result set) may provide an independent cross-check if its Q1 content is accessible.",
+    "next_query_batch": [
+      {
+        "query_id": "q2_001",
+        "query": "dengue Brasil semana epidemiológica 2024 boletim casos óbitos internações janeiro fevereiro março SE1 SE13 situação epidemiológica",
+        "provider_channel": "official_site_search",
+        "query_rationale": "Targets Brazilian MoH/SVS weekly epidemiological bulletins using 'semana epidemiológica' (SE) terminology and the SE1–SE13 range corresponding to Q1 2024 (January–March). Adding 'internações' (hospitalizations) increases the chance of retrieving bulletins that include hospitalization counts. This is the highest-priority gap: Q1-specific national cumulative figures with case classification and hospitalization breakdowns.",
+        "expected_source_type_or_evidence": "Brazilian MoH/SVS Boletim Epidemiológico covering SE1–SE13 of 2024 with national cumulative dengue case counts (confirmed, probable, suspected), deaths, and hospitalizations broken down by epidemiological week and state",
+        "expected_trust_signal": "gov.br domain, SVS authorship, bulletin volume/number referencing SE1–SE13 of 2024, SINAN/InfoDengue data citation",
+        "language": "pt",
+        "target_disease_terms": [
+          "dengue"
+        ],
+        "target_location_terms": [
+          "Brasil",
+          "Brazil"
+        ],
+        "time_terms": [
+          "2024",
+          "SE1",
+          "SE13",
+          "janeiro",
+          "fevereiro",
+          "março",
+          "primeiro trimestre"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "q1_001 — iteration 1 retrieved gov.br Boletim vol.55 no.11 referencing SE4/2024 but Q1-complete bulletin with SE1–SE13 data not yet confirmed; adding 'internações' and SE range to improve time-window and field coverage",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_suspected",
+          "cases_unspecified",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "q2_002",
+        "query": "PAHO dengue Brazil epidemiological alert situation report February March 2024 cases deaths outbreak",
+        "provider_channel": "official_site_search",
+        "query_rationale": "Iteration 1 PAHO results were from October 2024, not Q1. PAHO published specific epidemiological alerts for the Brazil dengue outbreak in February–March 2024 given the record-breaking scale. Explicitly targeting February and March 2024 with 'epidemiological alert' terminology should retrieve the Q1-specific PAHO documents that were missed in iteration 1.",
+        "expected_source_type_or_evidence": "PAHO epidemiological alert or situation report published in February or March 2024 specifically addressing the Brazil dengue outbreak with Q1 case and death counts",
+        "expected_trust_signal": "paho.int or who.int domain, document dated February–March 2024, official epidemiological alert format with Brazil-specific quantitative data",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue"
+        ],
+        "target_location_terms": [
+          "Brazil",
+          "Brasil",
+          "Americas"
+        ],
+        "time_terms": [
+          "February 2024",
+          "March 2024",
+          "Q1 2024",
+          "2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "q1_002 — PAHO results from iteration 1 were October 2024 alerts, not Q1 2024; this query explicitly targets the February–March 2024 period when PAHO would have issued alerts for the Brazil outbreak peak",
+        "query_type": "domain_limited",
+        "source_type": "international_organization_report",
+        "role_hint": "validation",
+        "priority": 2,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "cases_suspected",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "q2_003",
+        "query": "dengue 2024 casos óbitos primeiro trimestre São Paulo Minas Gerais Rio de Janeiro Goiás Distrito Federal secretaria saúde boletim",
+        "provider_channel": "official_site_search",
+        "query_rationale": "Subnational (state-level) Q1 2024 data is a critical gap. The five highest-burden states in 2024 (São Paulo, Minas Gerais, Rio de Janeiro, Goiás, Distrito Federal) each have state health secretariats publishing their own epidemiological bulletins. Targeting all five in a single query with Q1 terminology ('primeiro trimestre') maximises retrieval of state-level case/death breakdowns for the subnational_location and locality fields.",
+        "expected_source_type_or_evidence": "State health secretariat (Secretaria de Saúde) epidemiological bulletins from São Paulo, Minas Gerais, Rio de Janeiro, Goiás, or Distrito Federal with Q1 2024 dengue case and death counts at state or municipality level",
+        "expected_trust_signal": "State gov.br subdomains (saude.sp.gov.br, saude.mg.gov.br, saude.rj.gov.br, saude.go.gov.br, saude.df.gov.br), official bulletin authorship, SINAN data citation, dates within Q1 2024",
+        "language": "pt",
+        "target_disease_terms": [
+          "dengue"
+        ],
+        "target_location_terms": [
+          "São Paulo",
+          "Minas Gerais",
+          "Rio de Janeiro",
+          "Goiás",
+          "Distrito Federal",
+          "Brasil"
+        ],
+        "time_terms": [
+          "2024",
+          "primeiro trimestre",
+          "janeiro",
+          "fevereiro",
+          "março"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection_support",
+        "priority": 3,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_suspected",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "q2_004",
+        "query": "dengue Brazil 2024 Q1 cases deaths hospitalizations ProMED ECDC rapid risk assessment January February March confirmed probable",
+        "provider_channel": "web_search",
+        "query_rationale": "Iteration 1 retrieved an ECDC result but without Q1-specific content confirmed in the snippet. ProMED posts from January–March 2024 would have archived the Brazil dengue outbreak with quantitative data and primary source citations. ECDC may have published a rapid risk assessment in early 2024. Adding 'hospitalizations' and 'confirmed probable' to the query increases the chance of retrieving sources with case-classification and hospitalization breakdowns — the two most underrepresented target fields in iteration 1 results.",
+        "expected_source_type_or_evidence": "ProMED mail archive posts from January–March 2024 referencing Brazil dengue with case/death counts; ECDC rapid risk assessment or technical report on Brazil dengue Q1 2024; HealthMap event records with Q1 2024 Brazil dengue data",
+        "expected_trust_signal": "ProMED archive post number and date within Q1 2024; ECDC document on ecdc.europa.eu dated Q1 2024; HealthMap event ID with Brazil dengue Q1 2024 data",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue"
+        ],
+        "target_location_terms": [
+          "Brazil"
+        ],
+        "time_terms": [
+          "January 2024",
+          "February 2024",
+          "March 2024",
+          "Q1 2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "q1_004 — iteration 1 retrieved ecdc.europa.eu result but Q1-specific content not confirmed in snippet; ProMED Q1 posts not yet found; adding hospitalization and case-classification terms to improve field coverage",
+        "query_type": "general_web",
+        "source_type": "structured_database",
+        "role_hint": "validation",
+        "priority": 4,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_suspected",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ]
+      }
+    ],
+    "stop_reason": null,
+    "warnings": [
+      "This is the final permitted iteration (iteration_index=2, max_iterations=2). All 4 queries must be maximally targeted to fill the most critical remaining gaps.",
+      "Most iteration 1 results cover full-year 2024 or post-Q1 periods — evidence quotes must be carefully checked against reporting dates before populating target fields.",
+      "The gov.br Boletim Epidemiológico vol.55 no.11 snippet references SE4/2024 (~260k probable cases) but the full bulletin likely covers a broader period — the bulletin number and date must be verified against the actual document.",
+      "Brazilian MoH bulletins for Q1 2024 may be numbered vol.55 no.1 through no.13 (one per epidemiological week); targeting specific bulletin numbers or the 'situação epidemiológica' page may yield more Q1-specific results.",
+      "Hospitalization data in Brazil is tracked via DATASUS/SIH-SUS; a targeted query for 'internações dengue 2024 primeiro trimestre' may be needed.",
+      "PAHO published specific epidemiological alerts for Brazil dengue in February–March 2024 given the outbreak scale — these are not yet in the result set and should be targeted explicitly.",
+      "The saude.mg.gov.br snippet dates (22/06) suggest a June bulletin, not Q1 — state-level Q1 data for Minas Gerais may require a more specific query targeting January–March bulletins."
+    ]
+  },
+  {
+    "iteration_index": 2,
+    "decision": "stop_sufficient",
+    "decision_reason": "Two full iterations (8 queries total) have been executed, reaching the max_iterations=2 bound. The accumulated candidate pool now covers all critical source types and contains meaningful Q1 2024-specific evidence. Key achievements: (1) Brazilian MoH/SVS official bulletin (gov.br, vol.55 no.11) with SE4/2024 probable case count (~260k) is in the candidate set; (2) PAHO Epidemiological Update dated 29 March 2024 (paho.org) explicitly covers EW 12 of 2024 with Americas-wide figures including Brazil — this is a confirmed Q1 2024 document; (3) ScienceDirect article reports 1,978,372 suspected cases and 656 deaths through EW 11 of 2024 — directly within Q1; (4) State-level sources identified: saude.df.gov.br (Distrito Federal bulletin with 2024 weekly curve), saude.sp.gov.br (São Paulo statistical data page with 2024 monthly/weekly CSV), saude.mg.gov.br (Minas Gerais bulletin), dengue.pr.gov.br (Paraná bulletin index); (5) InfoDengue platform (info.dengue.mat.br) identified as a structured database for state-level Q1 data retrieval; (6) Agência Brasil and COFEN news sources provide full-year 2024 context with subnational incidence rankings. The remaining gaps (hospitalization counts, confirmed/probable/suspected breakdown at national level for the full Q1 window, and municipality-level data) are unlikely to be resolved by additional web search queries given the high duplicate rate in iteration 2 (50% duplicates) and the fact that the most granular data resides in paginated official portals and downloadable CSVs that require direct access rather than search. Further queries would likely return the same domains with diminishing new evidence. The max_iterations limit has been reached and the evidence base is sufficient for the collection workflow to proceed with the identified candidate sources.",
+    "coverage_assessment": "ADEQUATE FOR COLLECTION WORKFLOW. National-level Q1 2024 coverage: confirmed via PAHO 29 March 2024 update (EW 12 data, Americas-wide with Brazil as dominant contributor), MoH bulletin (SE4/2024 ~260k probable cases), and ScienceDirect article (EW 11: 1,978,372 suspected cases, 656 deaths). Subnational coverage: state-level bulletin portals identified for DF, SP, MG, PR; InfoDengue platform available for all states. Full-year 2024 context available from Agência Brasil and COFEN. Gaps remaining: (1) hospitalization counts not yet confirmed in any snippet — likely in MoH bulletins or DATASUS but not surfaced in snippets; (2) confirmed/probable/suspected national breakdown for the full Q1 window (SE1–SE13) not yet in a single confirmed snippet; (3) municipality-level data not yet surfaced. These gaps are addressable by the collection workflow through direct access to the identified candidate URLs rather than additional search queries.",
+    "source_diversity_assessment": "GOOD diversity across source types: (1) Official national agency — gov.br MoH/SVS bulletin; (2) International organization — paho.org epidemiological update (Q1 2024 confirmed); (3) Official state agencies — saude.df.gov.br, saude.sp.gov.br, saude.mg.gov.br, dengue.pr.gov.br; (4) Structured surveillance database — info.dengue.mat.br; (5) Peer-reviewed literature — sciencedirect.com, pmc.ncbi.nlm.nih.gov; (6) Official news agency — agenciabrasil.ebc.com.br; (7) Professional health body — cofen.gov.br. Geographic diversity: national (Brazil) + 4 states (DF, SP, MG, PR). Temporal diversity: Q1-specific (PAHO 29 Mar 2024, MoH SE4 bulletin, ScienceDirect EW11) + full-year context sources.",
+    "trustworthiness_assessment": "HIGH for primary candidates. gov.br (MoH/SVS bulletin): highest authority, official Brazilian surveillance system. paho.org (29 March 2024 epidemiological update): confirmed Q1 2024 document from authoritative international body. saude.df.gov.br, saude.sp.gov.br, saude.mg.gov.br, dengue.pr.gov.br: official state health secretariat domains. sciencedirect.com article: peer-reviewed, cites SINAN/official data. info.dengue.mat.br: established academic-government surveillance platform. agenciabrasil.ebc.com.br: official Brazilian government news agency. MEDIUM for journalmbr.com.br (newer journal, lower impact). LOW/EXCLUDED: youtube.com, facebook.com, dengue.com (non-authoritative for numeric data).",
+    "disease_location_time_fit_assessment": "GOOD fit overall. Disease: all candidates are dengue-specific. Location: all candidates are Brazil-specific or include Brazil as primary subject. Time window fit: PAHO 29 March 2024 update (EW 12 = ~24 March 2024) is squarely within Q1 2024; ScienceDirect article covers through EW 11 (~17 March 2024); MoH bulletin references SE4/2024 (~28 Jan 2024). State bulletins (DF SE 24, MG 22/06) are post-Q1 but contain historical weekly curves that include Q1 data. Full-year 2024 sources (Agência Brasil, COFEN) are outside Q1 but provide context and subnational rankings. The collection workflow must carefully filter evidence quotes to the Q1 2024 window when using post-Q1 sources.",
+    "corroboration_potential_assessment": "STRONG corroboration potential. The PAHO 29 March 2024 update (EW 12: 3,578,414 Americas cases) and the ScienceDirect article (EW 11: 1,978,372 Brazil suspected cases, 656 deaths) provide two independent Q1-specific quantitative anchors that can be cross-validated. The MoH bulletin (SE4: ~260k probable cases) provides an early-Q1 data point consistent with the trajectory implied by the EW 11/12 figures. State-level sources (DF, SP, MG, PR) can corroborate subnational contributions to national totals. The 2025 MoH comparison article (1.6 million cases in first two months of 2024 vs. 493k in 2025) provides an additional indirect Q1 2024 national estimate. These sources collectively enable triangulation of Q1 2024 national case and death counts.",
+    "next_query_batch": [],
+    "stop_reason": "max_iterations_reached_with_sufficient_coverage: Two iterations completed (8 queries executed). The candidate pool contains: (a) a confirmed Q1 2024 PAHO epidemiological update (29 March 2024, EW 12 data); (b) a Brazilian MoH/SVS bulletin referencing SE4/2024 with ~260k probable cases; (c) a peer-reviewed article with EW 11 2024 figures (1,978,372 suspected cases, 656 deaths); (d) state-level official bulletin portals for Distrito Federal, São Paulo, Minas Gerais, and Paraná; (e) InfoDengue structured database. The 50% duplicate rate in iteration 2 signals search saturation. Additional queries are unlikely to yield new authoritative Q1-specific sources beyond what has already been identified.",
+    "warnings": [
+      "max_iterations=2 has been reached; no further search iterations are possible within the defined bounds.",
+      "The PAHO 29 March 2024 epidemiological update covers the Americas region broadly — the collection workflow must extract Brazil-specific figures from within the document, which may require direct document access.",
+      "The ScienceDirect article (EW 11 figures: 1,978,372 suspected cases, 656 deaths) is a peer-reviewed publication and may have a publication date later than Q1 2024 — the data period (through EW 11) is within Q1 but the article itself may be a retrospective analysis; evidence quotes must specify the data period, not the publication date.",
+      "The Distrito Federal bulletin (saude.df.gov.br) covers through SE 24 (mid-June 2024), not Q1 only — the collection workflow must extract Q1-specific figures from the weekly curve shown in Figure 1 of that document.",
+      "Hospitalization counts (internações) were not confirmed in any snippet across both iterations — this field may require direct access to DATASUS/SIH-SUS or specific MoH bulletin tables not surfaced in search snippets.",
+      "The MoH bulletin vol.55 no.11 references SE4/2024 (~260k probable cases) but the full bulletin likely covers a broader period — the bulletin number and exact reporting period must be verified against the actual document before populating target fields.",
+      "50% duplicate rate in iteration 2 confirms search saturation; additional queries on the same topic would likely return the same URLs with no new evidence.",
+      "Municipality-level (locality) data was not surfaced in any snippet — this granularity may only be available through direct access to InfoDengue platform or SINAN microdata, which are interactive databases not retrievable via web search snippets."
+    ]
+  }
+]

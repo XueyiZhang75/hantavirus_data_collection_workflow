@@ -1,0 +1,1345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agentic Search Timeline</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Agentic Search Timeline</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><article class='card'><h2>PLAN</h2><pre>{
+  &quot;card_type&quot;: &quot;PLAN&quot;,
+  &quot;title&quot;: &quot;Search plan&quot;,
+  &quot;summary&quot;: {
+    &quot;planned_query_count&quot;: 10,
+    &quot;iterative_search_enabled&quot;: true
+  }
+}</pre></article><article class='card'><h2>SEARCH iteration 1</h2><pre>{
+  &quot;card_type&quot;: &quot;SEARCH iteration 1&quot;,
+  &quot;queries&quot;: [
+    {
+      &quot;query_id&quot;: &quot;i1_q1&quot;,
+      &quot;query&quot;: &quot;New York COVID-19 weekly cases deaths hospitalizations January 2024 site:health.ny.gov OR site:nyc.gov&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_probable&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Directly targets NYSDOH (health.ny.gov) and NYC DOHMH (nyc.gov) official surveillance pages for COVID-19 weekly data in January 2024. These agencies publish weekly COVID-19 reports with confirmed cases, deaths, and hospitalizations broken down by date and geography. Using site: operators maximizes precision for official New York public health sources.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;Official NYSDOH or NYC DOHMH weekly COVID-19 surveillance report or dashboard page for January 2024&quot;,
+      &quot;expected_trust_signal&quot;: &quot;Government domain (.ny.gov or nyc.gov), official agency authorship, dated weekly report&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;COVID-19&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New York&quot;,
+        &quot;New York State&quot;,
+        &quot;New York City&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;January 2024&quot;,
+        &quot;week ending&quot;,
+        &quot;2024-01-07&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;i1_q1&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;i1_q2&quot;,
+      &quot;query&quot;: &quot;CDC COVID Data Tracker New York State cases deaths hospitalizations week January 2024&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;CDC COVID Data Tracker (cdc.gov) is the primary federal aggregator of state-level COVID-19 surveillance data including confirmed cases, deaths, and hospitalizations. It covers New York State and publishes weekly metrics. This query targets the CDC tracker specifically for New York in January 2024, which is likely to yield case counts, death counts, and hospitalization admissions for the target week.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;CDC COVID Data Tracker state-level weekly summary for New York, January 2024&quot;,
+      &quot;expected_trust_signal&quot;: &quot;Federal government domain (cdc.gov), CDC authorship, weekly epidemiological data&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;COVID-19&quot;,
+        &quot;SARS-CoV-2&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New York&quot;,
+        &quot;New York State&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;January 2024&quot;,
+        &quot;week of January 1 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;i1_q2&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;i1_q3&quot;,
+      &quot;query&quot;: &quot;New York COVID-19 cases deaths hospitalizations \&quot;January 2024\&quot; weekly surveillance report NYSDOH OR \&quot;New York State Department of Health\&quot;&quot;,
+      &quot;provider_channel&quot;: &quot;web_search&quot;,
+      &quot;query_type&quot;: &quot;general_web&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 2,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;subnational_location&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_probable&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Broadens the official agency search beyond site: operators to catch NYSDOH weekly surveillance reports, press releases, or data summaries that may be indexed on third-party aggregators or news sites but originate from NYSDOH. The phrase &#x27;January 2024&#x27; and &#x27;weekly surveillance report&#x27; anchor the time window and report type. Including the full agency name increases recall for official documents.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;NYSDOH weekly COVID-19 surveillance bulletin or press release for the week of January 1–7, 2024&quot;,
+      &quot;expected_trust_signal&quot;: &quot;NYSDOH authorship, official report title, dated January 2024&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;COVID-19&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New York&quot;,
+        &quot;New York State&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;January 2024&quot;,
+        &quot;week of January 1&quot;,
+        &quot;2024-01-07&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;i1_q3&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;i1_q4&quot;,
+      &quot;query&quot;: &quot;COVID-19 New York cases deaths hospitalizations \&quot;week ending\&quot; \&quot;January 2024\&quot; data&quot;,
+      &quot;provider_channel&quot;: &quot;news_search&quot;,
+      &quot;query_type&quot;: &quot;news&quot;,
+      &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+      &quot;role_hint&quot;: &quot;collection_support&quot;,
+      &quot;priority&quot;: 3,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;News sources and situation reports often cite official figures from NYSDOH or CDC for the specific week. The phrase &#x27;week ending&#x27; is standard epidemiological reporting language that appears in both official reports and news coverage. This query targets news articles from January 2024 that report New York COVID-19 metrics, which can provide evidence quotes and corroborate official data, and may surface links to primary official sources.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;News article or situation report citing New York COVID-19 weekly statistics for early January 2024, with direct quotes from official data&quot;,
+      &quot;expected_trust_signal&quot;: &quot;Established news outlet, citation of official NYSDOH or CDC figures, publication date in January 2024&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;COVID-19&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New York&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;January 2024&quot;,
+        &quot;week ending January 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;i1_q4&quot;
+    }
+  ],
+  &quot;plan&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;search_objective&quot;: &quot;Identify authoritative sources reporting COVID-19 cases, deaths, hospitalizations, and related epidemiological metrics for New York State and/or New York City during the week of 2024-01-01 to 2024-01-07, covering all target fields: confirmed/probable/suspected/unspecified cases, deaths, hospitalizations, date reported, and source metadata.&quot;,
+    &quot;search_reasoning&quot;: &quot;The task requires granular weekly COVID-19 surveillance data for New York in early January 2024. The highest-value sources are: (1) official New York State and NYC public health agency dashboards/reports (NYSDOH, NYC DOHMH), which publish weekly or daily surveillance data; (2) CDC&#x27;s COVID Data Tracker, which aggregates state-level data and may include hospitalization metrics; (3) structured open-data repositories (e.g., HealthData.gov, CDC open data) that carry machine-readable time-series for this period. News and literature sources are lower priority for this narrow time window but can corroborate official figures. Given the bounds of max 4 queries per iteration and max 10 total queries across 2 iterations, iteration 1 must prioritize the highest-yield official and structured-data channels. The upstream planned queries are broad and do not target the specific New York agency naming conventions (NYSDOH, NYC DOHMH) or CDC tracker terminology. Refined queries should use agency-specific terms and known reporting cadences (weekly surveillance reports, COVID data tracker) to maximize precision. The date range 2024-01-01–2024-01-07 falls in a period when many jurisdictions had shifted to weekly reporting, so queries should include &#x27;weekly&#x27; and &#x27;January 2024&#x27; as time anchors rather than the hyphenated date string, which is unlikely to appear verbatim in source titles.&quot;,
+    &quot;query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;i1_q1&quot;,
+        &quot;query&quot;: &quot;New York COVID-19 weekly cases deaths hospitalizations January 2024 site:health.ny.gov OR site:nyc.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Directly targets NYSDOH (health.ny.gov) and NYC DOHMH (nyc.gov) official surveillance pages for COVID-19 weekly data in January 2024. These agencies publish weekly COVID-19 reports with confirmed cases, deaths, and hospitalizations broken down by date and geography. Using site: operators maximizes precision for official New York public health sources.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;Official NYSDOH or NYC DOHMH weekly COVID-19 surveillance report or dashboard page for January 2024&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Government domain (.ny.gov or nyc.gov), official agency authorship, dated weekly report&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;,
+          &quot;New York City&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;January 2024&quot;,
+          &quot;week ending&quot;,
+          &quot;2024-01-07&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;i1_q1&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;i1_q2&quot;,
+        &quot;query&quot;: &quot;CDC COVID Data Tracker New York State cases deaths hospitalizations week January 2024&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;CDC COVID Data Tracker (cdc.gov) is the primary federal aggregator of state-level COVID-19 surveillance data including confirmed cases, deaths, and hospitalizations. It covers New York State and publishes weekly metrics. This query targets the CDC tracker specifically for New York in January 2024, which is likely to yield case counts, death counts, and hospitalization admissions for the target week.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC COVID Data Tracker state-level weekly summary for New York, January 2024&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Federal government domain (cdc.gov), CDC authorship, weekly epidemiological data&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;,
+          &quot;SARS-CoV-2&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;January 2024&quot;,
+          &quot;week of January 1 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;i1_q2&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;i1_q3&quot;,
+        &quot;query&quot;: &quot;New York COVID-19 cases deaths hospitalizations \&quot;January 2024\&quot; weekly surveillance report NYSDOH OR \&quot;New York State Department of Health\&quot;&quot;,
+        &quot;provider_channel&quot;: &quot;web_search&quot;,
+        &quot;query_type&quot;: &quot;general_web&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Broadens the official agency search beyond site: operators to catch NYSDOH weekly surveillance reports, press releases, or data summaries that may be indexed on third-party aggregators or news sites but originate from NYSDOH. The phrase &#x27;January 2024&#x27; and &#x27;weekly surveillance report&#x27; anchor the time window and report type. Including the full agency name increases recall for official documents.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;NYSDOH weekly COVID-19 surveillance bulletin or press release for the week of January 1–7, 2024&quot;,
+        &quot;expected_trust_signal&quot;: &quot;NYSDOH authorship, official report title, dated January 2024&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;January 2024&quot;,
+          &quot;week of January 1&quot;,
+          &quot;2024-01-07&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;i1_q3&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;i1_q4&quot;,
+        &quot;query&quot;: &quot;COVID-19 New York cases deaths hospitalizations \&quot;week ending\&quot; \&quot;January 2024\&quot; data&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;News sources and situation reports often cite official figures from NYSDOH or CDC for the specific week. The phrase &#x27;week ending&#x27; is standard epidemiological reporting language that appears in both official reports and news coverage. This query targets news articles from January 2024 that report New York COVID-19 metrics, which can provide evidence quotes and corroborate official data, and may surface links to primary official sources.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;News article or situation report citing New York COVID-19 weekly statistics for early January 2024, with direct quotes from official data&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Established news outlet, citation of official NYSDOH or CDC figures, publication date in January 2024&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;January 2024&quot;,
+          &quot;week ending January 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;i1_q4&quot;
+      }
+    ],
+    &quot;expected_evidence&quot;: [
+      &quot;Weekly COVID-19 case counts (confirmed, probable) for New York State or NYC for the week of 2024-01-01 to 2024-01-07&quot;,
+      &quot;COVID-19 death counts for New York State or NYC for the same week&quot;,
+      &quot;COVID-19 hospitalization admissions or current hospitalizations for New York for the target week&quot;,
+      &quot;Date-stamped official surveillance report or dashboard entry from NYSDOH, NYC DOHMH, or CDC covering this period&quot;,
+      &quot;Evidence quotes from official reports stating case/death/hospitalization figures with geographic and temporal specificity&quot;,
+      &quot;Source URLs pointing to official agency pages or structured datasets&quot;
+    ],
+    &quot;expected_source_characteristics&quot;: [
+      &quot;Official New York State or NYC government domain (.ny.gov, nyc.gov)&quot;,
+      &quot;Federal CDC domain (cdc.gov) with state-level breakdown&quot;,
+      &quot;Weekly or daily epidemiological report format with tabular data&quot;,
+      &quot;Publication or report date within or immediately after the week of 2024-01-01 to 2024-01-07&quot;,
+      &quot;Explicit geographic labeling (New York State, New York City, or county-level)&quot;,
+      &quot;Numeric case, death, and hospitalization fields with case classification (confirmed, probable)&quot;
+    ],
+    &quot;language_or_localization_reasoning&quot;: &quot;All queries are in English. New York is an English-language jurisdiction with no localization requirement. Official agency names (NYSDOH, NYC DOHMH, CDC) are English-language acronyms. No multilingual or transliteration considerations apply. The term &#x27;COVID-19&#x27; is used as the primary disease term as it is the standard designation used by NYSDOH, NYC DOHMH, and CDC in their January 2024 reporting; &#x27;SARS-CoV-2&#x27; is included as a secondary term in the CDC query where it may appear in technical documentation.&quot;,
+    &quot;trust_considerations&quot;: [
+      &quot;Prioritize sources from official government domains (health.ny.gov, nyc.gov, cdc.gov) as highest trust tier&quot;,
+      &quot;NYSDOH and NYC DOHMH are the primary subnational authorities for New York COVID-19 data; their reports supersede news aggregations&quot;,
+      &quot;CDC COVID Data Tracker is the authoritative federal aggregator; state figures in CDC may differ slightly from state-reported figures due to reporting lag — note any discrepancies&quot;,
+      &quot;News sources should only be used to corroborate or locate primary official sources, not as primary evidence for case counts&quot;,
+      &quot;Structured open datasets (HealthData.gov, CDC open data API) are high-trust if they carry official provenance metadata&quot;,
+      &quot;Be alert to the distinction between New York State and New York City — both have separate reporting agencies and the task location &#x27;New York&#x27; may encompass both&quot;,
+      &quot;January 2024 falls after the US federal COVID-19 public health emergency ended (May 2023), so some reporting streams may have changed cadence or been discontinued — verify report continuity&quot;
+    ],
+    &quot;stop_condition_hypothesis&quot;: &quot;Iteration 1 is insufficient on its own; a second iteration will be needed to follow up on structured database and news/situation-report channels if official agency and CDC queries do not return complete hospitalization and case-breakdown data. Stop after iteration 2 if official agency, CDC, and at least one structured database source have been queried.&quot;,
+    &quot;warnings&quot;: [
+      &quot;The upstream planned queries use a hyphenated date string &#x27;2024-01-01-2024-01-07&#x27; that is unlikely to appear verbatim in source titles or metadata — refined queries use natural language time anchors (&#x27;January 2024&#x27;, &#x27;week ending&#x27;) for better recall&quot;,
+      &quot;New York is ambiguous between New York State and New York City — queries and result evaluation must distinguish between NYSDOH (state) and NYC DOHMH (city) reporting&quot;,
+      &quot;Post-PHE (post-May 2023) COVID-19 reporting in the US shifted to reduced frequency and scope; some metrics (e.g., cases_probable, cases_suspected) may no longer be separately reported by January 2024&quot;,
+      &quot;The max_queries_per_iteration bound of 4 is fully consumed in this iteration; iteration 2 should focus on structured database channels (HealthData.gov, CDC open data) and any gaps identified from iteration 1 results&quot;,
+      &quot;Peer-reviewed literature (q_exec_005, q_exec_006) is unlikely to yield data specific to a single week in January 2024 given publication lag — deprioritized to iteration 2 or dropped if bounds are reached&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>OBSERVE iteration 1</h2><pre>{
+  &quot;card_type&quot;: &quot;OBSERVE iteration 1&quot;,
+  &quot;observation&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;executed_query_ids&quot;: [
+      &quot;i1_q1&quot;,
+      &quot;i1_q2&quot;,
+      &quot;i1_q3&quot;,
+      &quot;i1_q4&quot;
+    ],
+    &quot;executed_queries&quot;: [
+      &quot;New York COVID-19 weekly cases deaths hospitalizations January 2024 site:health.ny.gov OR site:nyc.gov&quot;,
+      &quot;CDC COVID Data Tracker New York State cases deaths hospitalizations week January 2024&quot;,
+      &quot;New York COVID-19 cases deaths hospitalizations \&quot;January 2024\&quot; weekly surveillance report NYSDOH OR \&quot;New York State Department of Health\&quot;&quot;,
+      &quot;COVID-19 New York cases deaths hospitalizations \&quot;week ending\&quot; \&quot;January 2024\&quot; data&quot;
+    ],
+    &quot;raw_result_count&quot;: 31,
+    &quot;accepted_candidate_count&quot;: 21,
+    &quot;duplicate_result_count&quot;: 10,
+    &quot;rejected_result_count&quot;: 10,
+    &quot;result_domain_counts&quot;: {
+      &quot;coronavirus.health.ny.gov&quot;: 6,
+      &quot;nyc.gov&quot;: 3,
+      &quot;facebook.com&quot;: 1,
+      &quot;cdc.gov&quot;: 4,
+      &quot;worldometers.info&quot;: 2,
+      &quot;pmc.ncbi.nlm.nih.gov&quot;: 1,
+      &quot;data.cdc.gov&quot;: 1,
+      &quot;rochealthdata.org&quot;: 1,
+      &quot;coronavirus.jhu.edu&quot;: 2,
+      &quot;github.com&quot;: 1,
+      &quot;nytimes.com&quot;: 1,
+      &quot;chautauquacountyny.gov&quot;: 1,
+      &quot;health.ny.gov&quot;: 1,
+      &quot;data.cityofnewyork.us&quot;: 1,
+      &quot;catalog.data.gov&quot;: 2,
+      &quot;data.who.int&quot;: 1,
+      &quot;en.wikipedia.org&quot;: 1,
+      &quot;usafacts.org&quot;: 1
+    },
+    &quot;top_result_summaries&quot;: [
+      {
+        &quot;title&quot;: &quot;Weekly Hospitalization Summary | Department of Health - COVID-19&quot;,
+        &quot;snippet&quot;: &quot;## Weekly Hospitalization Summary by Region. # Weekly Hospitalization Summary. * This dashboard will be updated weekly. * New admissions and total hospitalization data come from the Health Electronic Response Data System (HERDS). Hospitals are required to complete this survey each Wednesday for the prior Sunday – Saturday time period. * As of 10/7/25, these data are reported weekly. Prior to this date, COVID-19 hospitalizations were reported on a daily basis. Historical daily data can be accessed via this Open Data COVID-19 hospitalizations file. * As of 10/13/23, HERDS no longer collects information on COVID patients admitted to the ICU while hospitalized. Historical COVID ICU totals are available via this Open Data COVID-19 hospitalizations file. * Population Data: The 2018 US Census Bridged Race Categories file was used for population estimates for 2020-2022. From 2023 on, the US Census Population and Housing Unit Estimates Program will be used for population estimates. Fatalities by region and county. Scroll back to the top of the page.&quot;,
+        &quot;url&quot;: &quot;https://coronavirus.health.ny.gov/daily-hospitalization-summary&quot;,
+        &quot;domain&quot;: &quot;coronavirus.health.ny.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;COVID-19 Data in New York | Department of Health&quot;,
+        &quot;snippet&quot;: &quot;# COVID-19 Data in New York. ## OVERVIEW Monitoring the Key Aspects of the Epidemic. New York State is closely monitoring the COVID-19 epidemic across data sources related to testing, hospitalization, fatalities, vaccination, and a variety of other topics. The dashboards, reports, and data sources contained below summarize key information on these topics. Positive Tests Over Time Thumbnail. Positive Tests Over Time, by Region and County. Detection levels and changes over time, by facility. Image of the COVID-19 Variant Data Dashboard. COVID-19 Wastewater Variant Data. Variant prevalence over time, by facility. Fatalities by region and county. Image of the Vaccination Progress to Date Dashboard. COVID-19 and Influenza Vaccination Data. Reported COVID-19 and Influenza vaccination rates by county and over time. Image of the Vaccine Demographic Data Dashboard. COVID-19 and Influenza Vaccination Demographics. COVID-19 and Influenza vaccination rates by age, gender, region, and county. Browse, download, and analyze COVID-19-related data from the New York State Department of Health, including testing and hospitalization information.&quot;,
+        &quot;url&quot;: &quot;https://coronavirus.health.ny.gov/covid-19-data-new-york&quot;,
+        &quot;domain&quot;: &quot;coronavirus.health.ny.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;COVID-19: Data Trends and Totals - NYC Health&quot;,
+        &quot;snippet&quot;: &quot;## Promoting and Protecting the City&#x27;s Health. # COVID-19: Data. # Trends and Totals: Archive. ## New Data Pages. See the new Respiratory Virus Data pages for current data and notes. This page shows data on COVID-19 in NYC since the beginning of the pandemic. Below, click a button to view data on trends over time, or cumulative data. The data here show how COVID-19 has affected people in New York City since the city’s first confirmed. These charts shows the daily number of confirmed and probable COVID-19 cases,. These visualizations show cumulative data on COVID-19 in New York City since the city’s. ### Data by ZIP Code. The maps and charts below show counts and rates of cases and deaths by a person&#x27;s ZIP code of residence. The number of reported confirmed cases in a ZIP code may be affected by that. These data show cumulative confirmed case, hospitalization and death rates by. ## Additional Information. ## More Information.&quot;,
+        &quot;url&quot;: &quot;https://www.nyc.gov/site/doh/covid/covid-19-data-totals.page&quot;,
+        &quot;domain&quot;: &quot;nyc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 3,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Respiratory illnesses continue across New York State Widespread ...&quot;,
+        &quot;snippet&quot;: &quot;January 26 35 new hospitalizations❗❗ 1228 active (⬇️21) 11811 total (⬆️129)❗ 10353 recovered (⬆️149) 230 deaths (⬆️1) 174 county residents&quot;,
+        &quot;url&quot;: &quot;https://www.facebook.com/OCPHealth/posts/respiratory-illnesses-continue-across-new-york-statewidespread-flu-covid-19-and-/1298615802293326&quot;,
+        &quot;domain&quot;: &quot;facebook.com&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 4,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Provisional COVID-19 Mortality Surveillance - CDC&quot;,
+        &quot;snippet&quot;: &quot;[Print](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#print). [](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#collapse_2541326a34453b3b446). For data on deaths involving COVID-19 by time-period and jurisdiction, [![Image 6: Socrata icon](https://www.cdc.gov/nchs/images/vsrr/socrata-icon.png) Click here to download](https://data.cdc.gov/dataset/Provisional-COVID-19-Death-Counts-by-Week-Ending-D/r8kw-7aab/). Recent improvements in the timeliness of provisional mortality data suggest that the data are at least 94% complete within 8 weeks of when the death occurred, see [Technical Notes](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#accordion-1-card-1). For data on deaths from 2015-2019, [![Image 7: Socrata icon](https://www.cdc.gov/nchs/images/vsrr/socrata-icon.png) Click here to download](https://data.cdc.gov/dataset/Weekly-counts-of-deaths-from-all-causes-by-jurisdi/9cpv-whbv/), and 2020-present, [![Image 8: Socrata icon](https://www.cdc.gov/nchs/images/vsrr/socrata-icon.png) Click here to download](https://data.cdc.gov/dataset/Provisional-COVID-19-Death-Counts-by-Week-Ending-D/r8kw-7aab/). [](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm \&quot;ref_tech_notes\&quot;)Technical Notes. Source: [National Center for Health Statistics](https://www.cdc.gov/nchs/index.htm). home[COVID-19 Data from NCHS](https://www.cdc.gov/nchs/covid19/index.htm). *   [COVID-19 Death Data and Resources](https://www.cdc.gov/nchs/nvss/covid-19.htm). *   [Reporting and Coding Deaths Due to COVID-19](https://www.cdc.gov/nchs/covid19/coding-and-reporting.htm). *   [COVID-19 Birth Data and Resources](https://www.cdc.gov/nchs/covid19/covid-birth.htm)[plus icon](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#nav-group-bf67a). *   [Provisional Estimates for Selected Maternal and Infant Outcomes by Month, 2018-2021](https://www.cdc.gov/nchs/covid19/technical-notes-outcomes.htm). *   [COVID-19 Data from Selected Hospitals](https://www.cdc.gov/nchs/covid19/nhcs.htm)[plus icon](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#nav-group-f1012). *   [COVID-19 hospital encounters by week](https://www.cdc.gov/nchs/covid19/nhcs/hospital-encounters-by-week.htm). *   [COVID-19 screenings at hospitals by week](https://www.cdc.gov/nchs/covid19/nhcs/hospital-screenings-by-week.htm). *   [In-hospital mortality among confirmed COVID-19 encounters by week](https://www.cdc.gov/nchs/covid19/nhcs/hospital-mortality-by-week.htm). [Contact Us](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#contactUs). [About CDC](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#aboutCDC). [Policies](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#policies). [Languages](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#languages). [Archive](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#archive). [Contact Us](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#mobile-footer-contactUs). [About CDC](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#mobile-footer-aboutCDC). [Policies](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#mobile-footer-policies). [Languages](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#mobile-footer-languages). [Archive](https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm#mobile-footer-archive).&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 5,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;United States COVID - Coronavirus Statistics - Worldometer&quot;,
+        &quot;snippet&quot;: &quot;**NOTE:** As of April 13, 2024, the **Coronavirus Tracker is no longer being updated** due to the unfeasibility of providing statistically valid global totals, as **the majority of countries have now stopped reporting**. Worldometer delivered the **most accurate and timely global statistics** to users and institutions around the world at a time when this was extremely challenging. # United States. # Coronavirus Cases:. Daily Cases Graph - Daily Deaths Graph. | # | USA State | Total Cases | Total Deaths | Total Recovered | Tot Cases/ 1M pop | Deaths/ 1M pop | Population | Source |. | 6 | Ohio | 3,741,277 | 43,896 | 3,684,603 | 320,065 | 3,755 | 11,689,100 | [view by county] [1] [2] [3] |. ### Total Coronavirus Cases in the United States. ### Daily New Cases in the United States. ### Total Coronavirus Deaths in the United States. ### Daily New Deaths in the United States. * First 20 cases in the United States.&quot;,
+        &quot;url&quot;: &quot;https://www.worldometers.info/coronavirus/country/us&quot;,
+        &quot;domain&quot;: &quot;worldometers.info&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 6,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;COVID-19–Associated Hospitalizations Among U.S. Adults Aged ≥18 Years — COVID-NET, 12 States, October 2023–April 2024&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # COVID-19–Associated Hospitalizations Among U.S. Adults Aged ≥18 Years — COVID-NET, 12 States, October 2023–April 2024. Find articles by Christopher A. Data from the COVID-19–Associated Hospitalization Surveillance Network were analyzed to estimate population-based COVID-19–associated hospitalization rates during October 2023–April 2024 and identify demographic and clinical characteristics of adults aged ≥18 years hospitalized with COVID-19. Data from the COVID-19–Associated Hospitalization Surveillance Network (COVID-NET) were analyzed to estimate COVID-19–associated hospitalization rates during October 2023–April 2024 and identify demographic and clinical characteristics of adults aged ≥18 years hospitalized with COVID-19. Cumulative* COVID-19–associated hospitalization**†** rates among adults aged ≥18 years, by age group and surveillance season**§** — COVID-19–Associated Hospitalization Surveillance Network, 12 states,**¶** March 2020–April 2024. Cumulative* age-adjusted COVID-19–associated hospitalization**†** rates among adults aged ≥18 years, by race and ethnicity**§** — COVID-19–Associated Hospitalization Surveillance Network, 12 states,**¶** October 1, 2023–April 27, 2024.&quot;,
+        &quot;url&quot;: &quot;https://pmc.ncbi.nlm.nih.gov/articles/PMC11449267&quot;,
+        &quot;domain&quot;: &quot;pmc.ncbi.nlm.nih.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 7,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Weekly United States COVID-19 Cases and Deaths by State&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. [Browse All Data Topics](https://data.cdc.gov/browse). [Contact Data.CDC.gov Support](mailto:data@cdc.gov). [HHS.GOV](https://www.hhs.gov) [USA.GOV](https://www.usa.gov)  [CDC Website Exit Disclaimer](https://www.cdc.gov). [Centers for Disease Control and Prevention](/). Health Topics[Adult Vaccinations](https://www.cdc.gov/vaccines-adults/recommended-vaccines/index.html)[Alzheimer’s Disease](https://www.cdc.gov/alzheimers-dementia/about/alzheimers.html)[Bullying](https://www.cdc.gov/youth-violence/about/about-bullying.html)[COVID-19](https://www.cdc.gov/covid/prevention/index.html)[Diabetes](https://www.cdc.gov/diabetes/prevention-type-2/index.html)[Fungal Diseases](https://www.cdc.gov/fungal/about/index.html)[Hand, Foot, and Mouth Disease (HFMD)](https://www.cdc.gov/hand-foot-mouth/about/index.html)[Handwashing](https://www.cdc.gov/clean-hands/data-research/facts-stats/)[Healthy Weight](https://www.cdc.gov/healthy-weight-growth/about/tips-for-balancing-food-activity.html)[High Blood Pressure](https://www.cdc.gov/high-blood-pressure/about/index.html)[HIV Testing](https://www.cdc.gov/hiv/testing/index.html)[Lyme Disease](https://www.cdc.gov/lyme/about/index.html)[Overdose Prevention](https://www.cdc.gov/overdose-prevention/prevention/index.html)[Preventing Dengue](https://www.cdc.gov/dengue/prevention/)[Quit Smoking](https://www.cdc.gov/tobacco/tobacco-features/surgeon-generals-report.html)[Respiratory Syncytial Virus Infection (RSV)](https://www.cdc.gov/rsv/about/index.html)[Strep Throat](https://www.cdc.gov/group-a-strep/about/strep-throat.html). Outbreaks[Eggs (Salmonella Outbreak)](https://www.cdc.gov/salmonella/eggs-09-24/index.html)[Meats Sliced at Delis (Listeria Outbreak)](https://www.cdc.gov/listeria/outbreaks/delimeats-7-24.html)[Bearded Dragons (Salmonella Outbreaks)](https://www.cdc.gov/salmonella/cotham-06-24/index.html)[Backyard Poultry (Salmonella Outbreaks)](https://www.cdc.gov/salmonella/backyardpoultry-05-24/index.html)[Measles (2024 Outbreaks)](https://www.cdc.gov/measles/data-research/)[Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)](https://www.cdc.gov/lead-prevention/news/outbreak-applesauce-pouches.html)[Organic Walnuts (E.coli Outbreak)](https://www.cdc.gov/ecoli/outbreaks/organic-walnuts-04-24.html). About CDC[About CDC](https://www.cdc.gov/about/cdc/index.html)[Leadership](https://www.cdc.gov/about/leadership/index.html)[Organization](https://www.cdc.gov/about/organization/index.html)[Advisory Committee to the Director](https://www.cdc.gov/about/advisory-committee-director/index.html)[Speakers Bureau](https://www.cdc.gov/about/speakers/index.html)[CDC Museum](https://www.cdc.gov/museum/index.htm)[Advancing Science and Health Equity](https://www.cdc.gov/about/priorities/index.html)[Moving Forward](https://www.cdc.gov/about/cdc-moving-forward.html)[CDC Foundation](https://www.cdc.gov/about/cdc-foundation.html)[Mission and Org Charts](https://www.cdc.gov/about/divisions-offices/index.html)[Lab Safety](https://www.cdc.gov/labs/strong-lab-safety/index.html)[New CDC.gov](https://www.cdc.gov/about/cdc-moving-forward/newcdc-info.html).&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov/Case-Surveillance/Weekly-United-States-COVID-19-Cases-and-Deaths-by-/pwn4-m3yp&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;COVID-19 Data in New York | Department of Health - NY.Gov&quot;,
+        &quot;snippet&quot;: &quot;# COVID-19 Data in New York. ## OVERVIEW Monitoring the Key Aspects of the Epidemic. New York State is closely monitoring the COVID-19 epidemic across data sources related to testing, hospitalization, fatalities, vaccination, and a variety of other topics. The dashboards, reports, and data sources contained below summarize key information on these topics. Positive Tests Over Time Thumbnail. Positive Tests Over Time, by Region and County. Detection levels and changes over time, by facility. Image of the COVID-19 Variant Data Dashboard. COVID-19 Wastewater Variant Data. Variant prevalence over time, by facility. Fatalities by region and county. Image of the Vaccination Progress to Date Dashboard. COVID-19 and Influenza Vaccination Data. Reported COVID-19 and Influenza vaccination rates by county and over time. Image of the Vaccine Demographic Data Dashboard. COVID-19 and Influenza Vaccination Demographics. COVID-19 and Influenza vaccination rates by age, gender, region, and county. Browse, download, and analyze COVID-19-related data from the New York State Department of Health, including testing and hospitalization information.&quot;,
+        &quot;url&quot;: &quot;https://coronavirus.health.ny.gov/covid-19-data-new-york&quot;,
+        &quot;domain&quot;: &quot;coronavirus.health.ny.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Respiratory Illness Surveillance Dashboard - ROC HEALTH DATA&quot;,
+        &quot;snippet&quot;: &quot;More information on the burden of COVID-19 hospitalizations for all of New York State, by region, can be found via the State of New York&#x27;s Daily Hospitalization&quot;,
+        &quot;url&quot;: &quot;https://rochealthdata.org/influenza-surveillance-dashboard&quot;,
+        &quot;domain&quot;: &quot;rochealthdata.org&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 3,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      }
+    ],
+    &quot;apparent_source_types&quot;: [
+      &quot;news_and_situation_report&quot;,
+      &quot;official_public_health_agency&quot;
+    ],
+    &quot;disease_relevance_signals&quot;: [
+      &quot;COVID-19&quot;
+    ],
+    &quot;location_relevance_signals&quot;: [
+      &quot;New York&quot;
+    ],
+    &quot;evidence_availability_signals&quot;: [
+      &quot;case&quot;,
+      &quot;cases&quot;,
+      &quot;death&quot;,
+      &quot;deaths&quot;,
+      &quot;outbreak&quot;,
+      &quot;surveillance&quot;
+    ],
+    &quot;gaps_identified&quot;: [],
+    &quot;source_quality_concerns&quot;: [
+      &quot;duplicate URLs appeared in search results&quot;
+    ],
+    &quot;notes_for_llm&quot;: [
+      &quot;Observation includes search metadata only; fetched page text is not included.&quot;,
+      &quot;Only provider search results can become source candidates.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>REFINE decision 1</h2><pre>{
+  &quot;card_type&quot;: &quot;REFINE decision 1&quot;,
+  &quot;decision&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;decision&quot;: &quot;continue_search&quot;,
+    &quot;decision_reason&quot;: &quot;Iteration 1 successfully identified the correct authoritative source domains (coronavirus.health.ny.gov, nyc.gov, data.cdc.gov, cdc.gov) and confirmed their relevance to COVID-19 surveillance in New York. However, the search metadata contains only page-level snippets — no numeric case counts, death counts, or hospitalization figures specific to the 2024-01-01 to 2024-01-07 window have been extracted. The NYSDOH hospitalization dashboard, NYC DOHMH data archive, and CDC structured datasets (data.cdc.gov/pwn4-m3yp, NCHS provisional mortality) are confirmed as high-value sources but require more targeted queries to surface time-specific data entries or downloadable dataset references for the target week. Key gaps remain: (1) no confirmed numeric case counts for the target week from any source; (2) no confirmed death counts for the target week; (3) no hospitalization admission figures for the target week; (4) the NYC DOHMH data archive page was found but no week-specific data was surfaced; (5) the CDC open data dataset for weekly cases/deaths by state (data.cdc.gov/pwn4-m3yp) was found but no New York row for week ending 2024-01-06 or 2024-01-07 was confirmed. Iteration 2 must target: (a) the specific CDC open data dataset with a direct query for New York week-ending January 2024; (b) the NYSDOH open data portal for hospitalization time-series; (c) NYC DOHMH GitHub or open data portal for the archived weekly case/death data; (d) a news/situation-report query anchored to the specific week to corroborate official figures and surface evidence quotes.&quot;,
+    &quot;coverage_assessment&quot;: &quot;Iteration 1 achieved good domain-level coverage: NYSDOH (6 results), NYC DOHMH (3 results), CDC (4 results + 1 data.cdc.gov), and supporting sources. However, no result snippet contains numeric epidemiological data specific to the 2024-01-01–2024-01-07 window. All accepted results are dashboard landing pages or general surveillance pages, not time-specific data entries. The target fields cases_confirmed, cases_probable, cases_suspected, cases_unspecified, deaths, and hospitalizations remain unconfirmed with specific values. The date_reported field is also unconfirmed. Coverage of source_url and source_type is partially met (domains identified), but evidence_quote is entirely absent. A second iteration targeting structured dataset endpoints and time-specific report pages is necessary.&quot;,
+    &quot;source_diversity_assessment&quot;: &quot;Iteration 1 returned results from 17 distinct domains. The highest-value domains (coronavirus.health.ny.gov, nyc.gov, cdc.gov, data.cdc.gov) are well-represented. Lower-value domains (facebook.com, worldometers.info, en.wikipedia.org, usafacts.org) were also returned but are lower priority. The CDC open data Socrata endpoint (data.cdc.gov/pwn4-m3yp) for weekly cases/deaths by state is a high-value structured dataset that was identified but not yet queried with time-specific parameters. The NYSDOH open data portal (health.data.ny.gov) was not yet directly queried — this is a gap. NYC DOHMH GitHub (nychealth/coronavirus-data) was not surfaced but is a known high-value structured source for NYC daily/weekly data. Diversity is adequate at the domain level but insufficient at the data-specificity level.&quot;,
+    &quot;trustworthiness_assessment&quot;: &quot;The dominant sources from iteration 1 are official government domains (coronavirus.health.ny.gov, nyc.gov, cdc.gov, data.cdc.gov, health.ny.gov) — highest trust tier. The CDC NCHS provisional mortality page and the CDC open data weekly cases/deaths dataset are authoritative federal sources. The PMC article (COVID-NET) is peer-reviewed but covers a broad period and 12 states, not New York-specific weekly data. Worldometers stopped updating April 2024 and is lower trust for this period. Facebook and Wikipedia are not acceptable as primary evidence sources. The rochealthdata.org source references NYSDOH data and may be useful for corroboration but is not primary. Overall trustworthiness of the candidate pool is high for the official sources identified.&quot;,
+    &quot;disease_location_time_fit_assessment&quot;: &quot;Disease fit: All accepted sources are COVID-19 specific — strong fit. Location fit: NYSDOH and NYC DOHMH sources are New York-specific; CDC sources cover New York as a state-level unit — strong fit. Time fit: This is the critical gap. No result snippet confirms data for the specific week of 2024-01-01 to 2024-01-07. The NYSDOH hospitalization dashboard mentions historical daily data accessible via Open Data file, suggesting the target week&#x27;s data exists but requires a direct dataset query. The CDC weekly cases/deaths dataset (data.cdc.gov/pwn4-m3yp) covers this period by design. The NYC DOHMH data archive page references historical data. Time fit is plausible but unconfirmed — iteration 2 must resolve this.&quot;,
+    &quot;corroboration_potential_assessment&quot;: &quot;The CDC weekly cases/deaths dataset (data.cdc.gov/pwn4-m3yp) can corroborate NYSDOH state-level figures. The NYSDOH hospitalization dashboard can corroborate NYC DOHMH hospitalization data. The NYC DOHMH GitHub data repository (if surfaced) can corroborate nyc.gov dashboard figures with machine-readable weekly data. News sources (nytimes.com was returned in iteration 1) can provide evidence quotes corroborating official figures. The NCHS provisional mortality dataset (data.cdc.gov/r8kw-7aab) can corroborate death counts independently of case surveillance. Corroboration potential is high if iteration 2 successfully surfaces time-specific data from these channels.&quot;,
+    &quot;next_query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;i2_q1&quot;,
+        &quot;query&quot;: &quot;site:data.cdc.gov COVID-19 weekly cases deaths New York state \&quot;week ending\&quot; January 2024&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_rationale&quot;: &quot;The CDC open data Socrata dataset &#x27;Weekly United States COVID-19 Cases and Deaths by State&#x27; (data.cdc.gov/pwn4-m3yp) was confirmed in iteration 1 as a high-value structured source. This query directly targets data.cdc.gov for New York weekly data with the &#x27;week ending&#x27; phrase and January 2024 time anchor, which matches the dataset&#x27;s column naming convention. This is the most direct path to confirmed numeric case and death counts for New York for the target week.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC Socrata open data dataset page or API endpoint for weekly COVID-19 cases and deaths by state, with a New York row for week ending January 6 or January 7, 2024&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Federal government domain (data.cdc.gov), CDC authorship, Socrata structured dataset with state-level weekly rows&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;week ending January 2024&quot;,
+          &quot;January 6 2024&quot;,
+          &quot;January 7 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;i1_q2&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;i2_q2&quot;,
+        &quot;query&quot;: &quot;site:health.data.ny.gov COVID-19 hospitalizations cases January 2024 weekly&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_rationale&quot;: &quot;The NYSDOH open data portal (health.data.ny.gov) is a distinct domain from coronavirus.health.ny.gov and hosts downloadable machine-readable datasets including the COVID-19 hospitalization time-series referenced in the NYSDOH hospitalization dashboard snippet (&#x27;Historical daily data can be accessed via this Open Data COVID-19 hospitalizations file&#x27;). This query directly targets that portal for January 2024 data, which should yield the specific hospitalization counts for the target week.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;NYSDOH open data portal dataset page for COVID-19 hospitalizations or cases with daily/weekly rows covering January 2024, filterable by date&quot;,
+        &quot;expected_trust_signal&quot;: &quot;New York State government domain (health.data.ny.gov), NYSDOH authorship, open data portal with time-series dataset&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;January 2024&quot;,
+          &quot;week ending January 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;i1_q1&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;deaths&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;i2_q3&quot;,
+        &quot;query&quot;: &quot;NYC DOHMH COVID-19 data \&quot;week ending\&quot; \&quot;January 2024\&quot; confirmed cases deaths hospitalizations github OR \&quot;data.cityofnewyork.us\&quot;&quot;,
+        &quot;provider_channel&quot;: &quot;web_search&quot;,
+        &quot;query_rationale&quot;: &quot;NYC DOHMH maintains a GitHub repository (nychealth/coronavirus-data) and a NYC Open Data portal (data.cityofnewyork.us) with machine-readable weekly COVID-19 data including confirmed and probable cases, deaths, and hospitalizations. The data.cityofnewyork.us domain appeared in iteration 1 results. This query targets both channels with the &#x27;week ending&#x27; phrase and January 2024 time anchor to surface the specific NYC weekly data entry for the target period.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;NYC DOHMH GitHub repository file or NYC Open Data dataset with weekly COVID-19 rows for week ending January 2024, containing confirmed/probable case counts, deaths, and hospitalizations for New York City&quot;,
+        &quot;expected_trust_signal&quot;: &quot;NYC DOHMH authorship, official NYC Open Data portal (data.cityofnewyork.us) or nychealth GitHub repository, weekly data with date column matching target week&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York City&quot;,
+          &quot;NYC&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;week ending January 2024&quot;,
+          &quot;January 6 2024&quot;,
+          &quot;January 7 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;i1_q1&quot;,
+        &quot;query_type&quot;: &quot;general_web&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;locality&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;i2_q4&quot;,
+        &quot;query&quot;: &quot;New York COVID-19 \&quot;week ending January 6\&quot; OR \&quot;week ending January 7\&quot; 2024 cases deaths hospitalizations&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_rationale&quot;: &quot;The standard CDC and NYSDOH reporting convention uses &#x27;week ending [date]&#x27; with the Saturday end-date. For the 2024-01-01 to 2024-01-07 window, the week-ending date is January 6 (Saturday) or January 7 (Sunday, depending on the reporting convention). News articles and situation reports from early January 2024 citing official figures often use this exact phrase. This query uses exact phrase matching for both possible week-ending dates to maximize recall of news articles that cite official New York COVID-19 figures for the target week, which can provide evidence quotes and corroborate official data.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;News article or public health situation report from January 2024 citing New York COVID-19 weekly statistics with &#x27;week ending January 6&#x27; or &#x27;week ending January 7&#x27; language, including numeric case, death, or hospitalization figures&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Established news outlet or official agency press release, publication date in January 2024, direct citation of NYSDOH or CDC figures&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;,
+          &quot;New York City&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;week ending January 6 2024&quot;,
+          &quot;week ending January 7 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      }
+    ],
+    &quot;stop_reason&quot;: null,
+    &quot;warnings&quot;: [
+      &quot;No numeric epidemiological values for the target week (2024-01-01 to 2024-01-07) have been confirmed in any result snippet — all iteration 1 results are dashboard landing pages, not time-specific data entries.&quot;,
+      &quot;The NYSDOH open data portal (health.data.ny.gov) was not directly queried in iteration 1 — it is a distinct domain from coronavirus.health.ny.gov and may host downloadable time-series datasets with the target week&#x27;s data.&quot;,
+      &quot;NYC DOHMH GitHub repository (github.com/nychealth/coronavirus-data) was not surfaced in iteration 1 results despite github.com appearing once — a direct query for this repository may yield machine-readable weekly data for the target period.&quot;,
+      &quot;The CDC NCHS provisional mortality Socrata dataset (data.cdc.gov/r8kw-7aab) was referenced in a snippet but not directly queried — it contains week-ending death counts by state and is directly relevant.&quot;,
+      &quot;Post-PHE reporting changes (after May 2023) mean that case counts (confirmed, probable, suspected) may no longer be separately broken out by January 2024 — iteration 2 queries should be flexible about which case classification fields are available.&quot;,
+      &quot;Iteration 2 is the final iteration under the max_iterations=2 bound — all 4 queries must be maximally targeted to fill the remaining gaps in numeric data for the target week.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>SEARCH iteration 2</h2><pre>{
+  &quot;card_type&quot;: &quot;SEARCH iteration 2&quot;,
+  &quot;queries&quot;: [
+    {
+      &quot;query_id&quot;: &quot;i2_q1&quot;,
+      &quot;query&quot;: &quot;site:data.cdc.gov COVID-19 weekly cases deaths New York state \&quot;week ending\&quot; January 2024&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;The CDC open data Socrata dataset &#x27;Weekly United States COVID-19 Cases and Deaths by State&#x27; (data.cdc.gov/pwn4-m3yp) was confirmed in iteration 1 as a high-value structured source. This query directly targets data.cdc.gov for New York weekly data with the &#x27;week ending&#x27; phrase and January 2024 time anchor, which matches the dataset&#x27;s column naming convention. This is the most direct path to confirmed numeric case and death counts for New York for the target week.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;CDC Socrata open data dataset page or API endpoint for weekly COVID-19 cases and deaths by state, with a New York row for week ending January 6 or January 7, 2024&quot;,
+      &quot;expected_trust_signal&quot;: &quot;Federal government domain (data.cdc.gov), CDC authorship, Socrata structured dataset with state-level weekly rows&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;COVID-19&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New York&quot;,
+        &quot;New York State&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;week ending January 2024&quot;,
+        &quot;January 6 2024&quot;,
+        &quot;January 7 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;i1_q2&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;i2_q1&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;i2_q2&quot;,
+      &quot;query&quot;: &quot;site:health.data.ny.gov COVID-19 hospitalizations cases January 2024 weekly&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;subnational_location&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;deaths&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;The NYSDOH open data portal (health.data.ny.gov) is a distinct domain from coronavirus.health.ny.gov and hosts downloadable machine-readable datasets including the COVID-19 hospitalization time-series referenced in the NYSDOH hospitalization dashboard snippet (&#x27;Historical daily data can be accessed via this Open Data COVID-19 hospitalizations file&#x27;). This query directly targets that portal for January 2024 data, which should yield the specific hospitalization counts for the target week.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;NYSDOH open data portal dataset page for COVID-19 hospitalizations or cases with daily/weekly rows covering January 2024, filterable by date&quot;,
+      &quot;expected_trust_signal&quot;: &quot;New York State government domain (health.data.ny.gov), NYSDOH authorship, open data portal with time-series dataset&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;COVID-19&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New York&quot;,
+        &quot;New York State&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;January 2024&quot;,
+        &quot;week ending January 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;i1_q1&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;i2_q2&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;i2_q3&quot;,
+      &quot;query&quot;: &quot;NYC DOHMH COVID-19 data \&quot;week ending\&quot; \&quot;January 2024\&quot; confirmed cases deaths hospitalizations github OR \&quot;data.cityofnewyork.us\&quot;&quot;,
+      &quot;provider_channel&quot;: &quot;web_search&quot;,
+      &quot;query_type&quot;: &quot;general_web&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 2,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;locality&quot;,
+        &quot;subnational_location&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_probable&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;NYC DOHMH maintains a GitHub repository (nychealth/coronavirus-data) and a NYC Open Data portal (data.cityofnewyork.us) with machine-readable weekly COVID-19 data including confirmed and probable cases, deaths, and hospitalizations. The data.cityofnewyork.us domain appeared in iteration 1 results. This query targets both channels with the &#x27;week ending&#x27; phrase and January 2024 time anchor to surface the specific NYC weekly data entry for the target period.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;NYC DOHMH GitHub repository file or NYC Open Data dataset with weekly COVID-19 rows for week ending January 2024, containing confirmed/probable case counts, deaths, and hospitalizations for New York City&quot;,
+      &quot;expected_trust_signal&quot;: &quot;NYC DOHMH authorship, official NYC Open Data portal (data.cityofnewyork.us) or nychealth GitHub repository, weekly data with date column matching target week&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;COVID-19&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New York City&quot;,
+        &quot;NYC&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;week ending January 2024&quot;,
+        &quot;January 6 2024&quot;,
+        &quot;January 7 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;i1_q1&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;i2_q3&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;i2_q4&quot;,
+      &quot;query&quot;: &quot;New York COVID-19 \&quot;week ending January 6\&quot; OR \&quot;week ending January 7\&quot; 2024 cases deaths hospitalizations&quot;,
+      &quot;provider_channel&quot;: &quot;news_search&quot;,
+      &quot;query_type&quot;: &quot;news&quot;,
+      &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+      &quot;role_hint&quot;: &quot;collection_support&quot;,
+      &quot;priority&quot;: 3,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;The standard CDC and NYSDOH reporting convention uses &#x27;week ending [date]&#x27; with the Saturday end-date. For the 2024-01-01 to 2024-01-07 window, the week-ending date is January 6 (Saturday) or January 7 (Sunday, depending on the reporting convention). News articles and situation reports from early January 2024 citing official figures often use this exact phrase. This query uses exact phrase matching for both possible week-ending dates to maximize recall of news articles that cite official New York COVID-19 figures for the target week, which can provide evidence quotes and corroborate official data.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;News article or public health situation report from January 2024 citing New York COVID-19 weekly statistics with &#x27;week ending January 6&#x27; or &#x27;week ending January 7&#x27; language, including numeric case, death, or hospitalization figures&quot;,
+      &quot;expected_trust_signal&quot;: &quot;Established news outlet or official agency press release, publication date in January 2024, direct citation of NYSDOH or CDC figures&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;COVID-19&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New York&quot;,
+        &quot;New York State&quot;,
+        &quot;New York City&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;week ending January 6 2024&quot;,
+        &quot;week ending January 7 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;i2_q4&quot;
+    }
+  ],
+  &quot;plan&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;search_objective&quot;: &quot;Refined follow-up search&quot;,
+    &quot;search_reasoning&quot;: &quot;Iteration 1 successfully identified the correct authoritative source domains (coronavirus.health.ny.gov, nyc.gov, data.cdc.gov, cdc.gov) and confirmed their relevance to COVID-19 surveillance in New York. However, the search metadata contains only page-level snippets — no numeric case counts, death counts, or hospitalization figures specific to the 2024-01-01 to 2024-01-07 window have been extracted. The NYSDOH hospitalization dashboard, NYC DOHMH data archive, and CDC structured datasets (data.cdc.gov/pwn4-m3yp, NCHS provisional mortality) are confirmed as high-value sources but require more targeted queries to surface time-specific data entries or downloadable dataset references for the target week. Key gaps remain: (1) no confirmed numeric case counts for the target week from any source; (2) no confirmed death counts for the target week; (3) no hospitalization admission figures for the target week; (4) the NYC DOHMH data archive page was found but no week-specific data was surfaced; (5) the CDC open data dataset for weekly cases/deaths by state (data.cdc.gov/pwn4-m3yp) was found but no New York row for week ending 2024-01-06 or 2024-01-07 was confirmed. Iteration 2 must target: (a) the specific CDC open data dataset with a direct query for New York week-ending January 2024; (b) the NYSDOH open data portal for hospitalization time-series; (c) NYC DOHMH GitHub or open data portal for the archived weekly case/death data; (d) a news/situation-report query anchored to the specific week to corroborate official figures and surface evidence quotes.&quot;,
+    &quot;query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;i2_q1&quot;,
+        &quot;query&quot;: &quot;site:data.cdc.gov COVID-19 weekly cases deaths New York state \&quot;week ending\&quot; January 2024&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;The CDC open data Socrata dataset &#x27;Weekly United States COVID-19 Cases and Deaths by State&#x27; (data.cdc.gov/pwn4-m3yp) was confirmed in iteration 1 as a high-value structured source. This query directly targets data.cdc.gov for New York weekly data with the &#x27;week ending&#x27; phrase and January 2024 time anchor, which matches the dataset&#x27;s column naming convention. This is the most direct path to confirmed numeric case and death counts for New York for the target week.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC Socrata open data dataset page or API endpoint for weekly COVID-19 cases and deaths by state, with a New York row for week ending January 6 or January 7, 2024&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Federal government domain (data.cdc.gov), CDC authorship, Socrata structured dataset with state-level weekly rows&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;week ending January 2024&quot;,
+          &quot;January 6 2024&quot;,
+          &quot;January 7 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;i1_q2&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;i2_q1&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;i2_q2&quot;,
+        &quot;query&quot;: &quot;site:health.data.ny.gov COVID-19 hospitalizations cases January 2024 weekly&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;deaths&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;The NYSDOH open data portal (health.data.ny.gov) is a distinct domain from coronavirus.health.ny.gov and hosts downloadable machine-readable datasets including the COVID-19 hospitalization time-series referenced in the NYSDOH hospitalization dashboard snippet (&#x27;Historical daily data can be accessed via this Open Data COVID-19 hospitalizations file&#x27;). This query directly targets that portal for January 2024 data, which should yield the specific hospitalization counts for the target week.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;NYSDOH open data portal dataset page for COVID-19 hospitalizations or cases with daily/weekly rows covering January 2024, filterable by date&quot;,
+        &quot;expected_trust_signal&quot;: &quot;New York State government domain (health.data.ny.gov), NYSDOH authorship, open data portal with time-series dataset&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;January 2024&quot;,
+          &quot;week ending January 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;i1_q1&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;i2_q2&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;i2_q3&quot;,
+        &quot;query&quot;: &quot;NYC DOHMH COVID-19 data \&quot;week ending\&quot; \&quot;January 2024\&quot; confirmed cases deaths hospitalizations github OR \&quot;data.cityofnewyork.us\&quot;&quot;,
+        &quot;provider_channel&quot;: &quot;web_search&quot;,
+        &quot;query_type&quot;: &quot;general_web&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;locality&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;NYC DOHMH maintains a GitHub repository (nychealth/coronavirus-data) and a NYC Open Data portal (data.cityofnewyork.us) with machine-readable weekly COVID-19 data including confirmed and probable cases, deaths, and hospitalizations. The data.cityofnewyork.us domain appeared in iteration 1 results. This query targets both channels with the &#x27;week ending&#x27; phrase and January 2024 time anchor to surface the specific NYC weekly data entry for the target period.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;NYC DOHMH GitHub repository file or NYC Open Data dataset with weekly COVID-19 rows for week ending January 2024, containing confirmed/probable case counts, deaths, and hospitalizations for New York City&quot;,
+        &quot;expected_trust_signal&quot;: &quot;NYC DOHMH authorship, official NYC Open Data portal (data.cityofnewyork.us) or nychealth GitHub repository, weekly data with date column matching target week&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York City&quot;,
+          &quot;NYC&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;week ending January 2024&quot;,
+          &quot;January 6 2024&quot;,
+          &quot;January 7 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;i1_q1&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;i2_q3&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;i2_q4&quot;,
+        &quot;query&quot;: &quot;New York COVID-19 \&quot;week ending January 6\&quot; OR \&quot;week ending January 7\&quot; 2024 cases deaths hospitalizations&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;The standard CDC and NYSDOH reporting convention uses &#x27;week ending [date]&#x27; with the Saturday end-date. For the 2024-01-01 to 2024-01-07 window, the week-ending date is January 6 (Saturday) or January 7 (Sunday, depending on the reporting convention). News articles and situation reports from early January 2024 citing official figures often use this exact phrase. This query uses exact phrase matching for both possible week-ending dates to maximize recall of news articles that cite official New York COVID-19 figures for the target week, which can provide evidence quotes and corroborate official data.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;News article or public health situation report from January 2024 citing New York COVID-19 weekly statistics with &#x27;week ending January 6&#x27; or &#x27;week ending January 7&#x27; language, including numeric case, death, or hospitalization figures&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Established news outlet or official agency press release, publication date in January 2024, direct citation of NYSDOH or CDC figures&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;COVID-19&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New York&quot;,
+          &quot;New York State&quot;,
+          &quot;New York City&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;week ending January 6 2024&quot;,
+          &quot;week ending January 7 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;i2_q4&quot;
+      }
+    ],
+    &quot;expected_evidence&quot;: [],
+    &quot;expected_source_characteristics&quot;: [],
+    &quot;language_or_localization_reasoning&quot;: &quot;&quot;,
+    &quot;trust_considerations&quot;: [],
+    &quot;stop_condition_hypothesis&quot;: &quot;&quot;,
+    &quot;warnings&quot;: [
+      &quot;No numeric epidemiological values for the target week (2024-01-01 to 2024-01-07) have been confirmed in any result snippet — all iteration 1 results are dashboard landing pages, not time-specific data entries.&quot;,
+      &quot;The NYSDOH open data portal (health.data.ny.gov) was not directly queried in iteration 1 — it is a distinct domain from coronavirus.health.ny.gov and may host downloadable time-series datasets with the target week&#x27;s data.&quot;,
+      &quot;NYC DOHMH GitHub repository (github.com/nychealth/coronavirus-data) was not surfaced in iteration 1 results despite github.com appearing once — a direct query for this repository may yield machine-readable weekly data for the target period.&quot;,
+      &quot;The CDC NCHS provisional mortality Socrata dataset (data.cdc.gov/r8kw-7aab) was referenced in a snippet but not directly queried — it contains week-ending death counts by state and is directly relevant.&quot;,
+      &quot;Post-PHE reporting changes (after May 2023) mean that case counts (confirmed, probable, suspected) may no longer be separately broken out by January 2024 — iteration 2 queries should be flexible about which case classification fields are available.&quot;,
+      &quot;Iteration 2 is the final iteration under the max_iterations=2 bound — all 4 queries must be maximally targeted to fill the remaining gaps in numeric data for the target week.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>OBSERVE iteration 2</h2><pre>{
+  &quot;card_type&quot;: &quot;OBSERVE iteration 2&quot;,
+  &quot;observation&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;executed_query_ids&quot;: [
+      &quot;i2_q1&quot;,
+      &quot;i2_q2&quot;,
+      &quot;i2_q3&quot;,
+      &quot;i2_q4&quot;
+    ],
+    &quot;executed_queries&quot;: [
+      &quot;site:data.cdc.gov COVID-19 weekly cases deaths New York state \&quot;week ending\&quot; January 2024&quot;,
+      &quot;site:health.data.ny.gov COVID-19 hospitalizations cases January 2024 weekly&quot;,
+      &quot;NYC DOHMH COVID-19 data \&quot;week ending\&quot; \&quot;January 2024\&quot; confirmed cases deaths hospitalizations github OR \&quot;data.cityofnewyork.us\&quot;&quot;,
+      &quot;New York COVID-19 \&quot;week ending January 6\&quot; OR \&quot;week ending January 7\&quot; 2024 cases deaths hospitalizations&quot;
+    ],
+    &quot;raw_result_count&quot;: 27,
+    &quot;accepted_candidate_count&quot;: 14,
+    &quot;duplicate_result_count&quot;: 13,
+    &quot;rejected_result_count&quot;: 13,
+    &quot;result_domain_counts&quot;: {
+      &quot;data.cdc.gov&quot;: 8,
+      &quot;health.data.ny.gov&quot;: 3,
+      &quot;nyc.gov&quot;: 1,
+      &quot;data.cityofnewyork.us&quot;: 2,
+      &quot;coronavirus.health.ny.gov&quot;: 2,
+      &quot;github.com&quot;: 2,
+      &quot;catalog.data.gov&quot;: 1,
+      &quot;coronavirus.jhu.edu&quot;: 2,
+      &quot;cdc.gov&quot;: 2,
+      &quot;en.wikipedia.org&quot;: 1,
+      &quot;facebook.com&quot;: 1,
+      &quot;data.who.int&quot;: 1,
+      &quot;nytimes.com&quot;: 1
+    },
+    &quot;top_result_summaries&quot;: [
+      {
+        &quot;title&quot;: &quot;Weekly United States COVID-19 Cases and Deaths by State&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. [Browse All Data Topics](https://data.cdc.gov/browse). [Contact Data.CDC.gov Support](mailto:data@cdc.gov). [HHS.GOV](https://www.hhs.gov) [USA.GOV](https://www.usa.gov)  [CDC Website Exit Disclaimer](https://www.cdc.gov). [Centers for Disease Control and Prevention](/). Health Topics[Adult Vaccinations](https://www.cdc.gov/vaccines-adults/recommended-vaccines/index.html)[Alzheimer’s Disease](https://www.cdc.gov/alzheimers-dementia/about/alzheimers.html)[Bullying](https://www.cdc.gov/youth-violence/about/about-bullying.html)[COVID-19](https://www.cdc.gov/covid/prevention/index.html)[Diabetes](https://www.cdc.gov/diabetes/prevention-type-2/index.html)[Fungal Diseases](https://www.cdc.gov/fungal/about/index.html)[Hand, Foot, and Mouth Disease (HFMD)](https://www.cdc.gov/hand-foot-mouth/about/index.html)[Handwashing](https://www.cdc.gov/clean-hands/data-research/facts-stats/)[Healthy Weight](https://www.cdc.gov/healthy-weight-growth/about/tips-for-balancing-food-activity.html)[High Blood Pressure](https://www.cdc.gov/high-blood-pressure/about/index.html)[HIV Testing](https://www.cdc.gov/hiv/testing/index.html)[Lyme Disease](https://www.cdc.gov/lyme/about/index.html)[Overdose Prevention](https://www.cdc.gov/overdose-prevention/prevention/index.html)[Preventing Dengue](https://www.cdc.gov/dengue/prevention/)[Quit Smoking](https://www.cdc.gov/tobacco/tobacco-features/surgeon-generals-report.html)[Respiratory Syncytial Virus Infection (RSV)](https://www.cdc.gov/rsv/about/index.html)[Strep Throat](https://www.cdc.gov/group-a-strep/about/strep-throat.html). Outbreaks[Eggs (Salmonella Outbreak)](https://www.cdc.gov/salmonella/eggs-09-24/index.html)[Meats Sliced at Delis (Listeria Outbreak)](https://www.cdc.gov/listeria/outbreaks/delimeats-7-24.html)[Bearded Dragons (Salmonella Outbreaks)](https://www.cdc.gov/salmonella/cotham-06-24/index.html)[Backyard Poultry (Salmonella Outbreaks)](https://www.cdc.gov/salmonella/backyardpoultry-05-24/index.html)[Measles (2024 Outbreaks)](https://www.cdc.gov/measles/data-research/)[Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)](https://www.cdc.gov/lead-prevention/news/outbreak-applesauce-pouches.html)[Organic Walnuts (E.coli Outbreak)](https://www.cdc.gov/ecoli/outbreaks/organic-walnuts-04-24.html). About CDC[About CDC](https://www.cdc.gov/about/cdc/index.html)[Leadership](https://www.cdc.gov/about/leadership/index.html)[Organization](https://www.cdc.gov/about/organization/index.html)[Advisory Committee to the Director](https://www.cdc.gov/about/advisory-committee-director/index.html)[Speakers Bureau](https://www.cdc.gov/about/speakers/index.html)[CDC Museum](https://www.cdc.gov/museum/index.htm)[Advancing Science and Health Equity](https://www.cdc.gov/about/priorities/index.html)[Moving Forward](https://www.cdc.gov/about/cdc-moving-forward.html)[CDC Foundation](https://www.cdc.gov/about/cdc-foundation.html)[Mission and Org Charts](https://www.cdc.gov/about/divisions-offices/index.html)[Lab Safety](https://www.cdc.gov/labs/strong-lab-safety/index.html)[New CDC.gov](https://www.cdc.gov/about/cdc-moving-forward/newcdc-info.html).&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov/Case-Surveillance/Weekly-United-States-COVID-19-Cases-and-Deaths-by-/pwn4-m3yp&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Weekly United States COVID-19 Cases and Deaths by County&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ## Data.CDC.gov. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. Contact Data.CDC.gov Support. HHS.GOV USA.GOV  CDC Website Exit Disclaimer. CDC logoCenters for Disease Control and Prevention. ## Menu. Health TopicsAdult VaccinationsAlzheimer’s DiseaseBullyingCOVID-19DiabetesFungal DiseasesHand, Foot, and Mouth Disease (HFMD)HandwashingHealthy WeightHigh Blood PressureHIV TestingLyme DiseaseOverdose PreventionPreventing DengueQuit SmokingRespiratory Syncytial Virus Infection (RSV)Strep Throat. OutbreaksEggs (Salmonella Outbreak)Meats Sliced at Delis (Listeria Outbreak)Bearded Dragons (Salmonella Outbreaks)Backyard Poultry (Salmonella Outbreaks)Measles (2024 Outbreaks)Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)Organic Walnuts (E.coli Outbreak). About CDCAbout CDCLeadershipOrganizationAdvisory Committee to the DirectorSpeakers BureauCDC MuseumAdvancing Science and Health EquityMoving ForwardCDC FoundationMission and Org ChartsLab SafetyNew CDC.gov.&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov/dataset/Weekly-United-States-COVID-19-Cases-and-Deaths-by-/yviw-z6j5&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;COVID-19 Case Surveillance Public Use Data - Data.CDC.gov&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ## Data.CDC.gov. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. Contact Data.CDC.gov Support. HHS.GOV USA.GOV  CDC Website Exit Disclaimer. CDC logoCenters for Disease Control and Prevention. ## Menu. Health TopicsAdult VaccinationsAlzheimer’s DiseaseBullyingCOVID-19DiabetesFungal DiseasesHand, Foot, and Mouth Disease (HFMD)HandwashingHealthy WeightHigh Blood PressureHIV TestingLyme DiseaseOverdose PreventionPreventing DengueQuit SmokingRespiratory Syncytial Virus Infection (RSV)Strep Throat. OutbreaksEggs (Salmonella Outbreak)Meats Sliced at Delis (Listeria Outbreak)Bearded Dragons (Salmonella Outbreaks)Backyard Poultry (Salmonella Outbreaks)Measles (2024 Outbreaks)Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)Organic Walnuts (E.coli Outbreak). About CDCAbout CDCLeadershipOrganizationAdvisory Committee to the DirectorSpeakers BureauCDC MuseumAdvancing Science and Health EquityMoving ForwardCDC FoundationMission and Org ChartsLab SafetyNew CDC.gov.&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 3,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;COVID-19 Case Surveillance Public Use Data with Geography&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ## Data.CDC.gov. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. Contact Data.CDC.gov Support. HHS.GOV USA.GOV  CDC Website Exit Disclaimer. CDC logoCenters for Disease Control and Prevention. ## Menu. Health TopicsAdult VaccinationsAlzheimer’s DiseaseBullyingCOVID-19DiabetesFungal DiseasesHand, Foot, and Mouth Disease (HFMD)HandwashingHealthy WeightHigh Blood PressureHIV TestingLyme DiseaseOverdose PreventionPreventing DengueQuit SmokingRespiratory Syncytial Virus Infection (RSV)Strep Throat. OutbreaksEggs (Salmonella Outbreak)Meats Sliced at Delis (Listeria Outbreak)Bearded Dragons (Salmonella Outbreaks)Backyard Poultry (Salmonella Outbreaks)Measles (2024 Outbreaks)Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)Organic Walnuts (E.coli Outbreak). About CDCAbout CDCLeadershipOrganizationAdvisory Committee to the DirectorSpeakers BureauCDC MuseumAdvancing Science and Health EquityMoving ForwardCDC FoundationMission and Org ChartsLab SafetyNew CDC.gov.&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 4,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Provisional COVID-19 Deaths: Focus on Ages 0-18 Years | Data | Centers for Disease Control and Prevention&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ## Data.CDC.gov. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. Contact Data.CDC.gov Support. HHS.GOV USA.GOV  CDC Website Exit Disclaimer. CDC logoCenters for Disease Control and Prevention. ## Menu. Health TopicsAdult VaccinationsAlzheimer’s DiseaseBullyingCOVID-19DiabetesFungal DiseasesHand, Foot, and Mouth Disease (HFMD)HandwashingHealthy WeightHigh Blood PressureHIV TestingLyme DiseaseOverdose PreventionPreventing DengueQuit SmokingRespiratory Syncytial Virus Infection (RSV)Strep Throat. OutbreaksEggs (Salmonella Outbreak)Meats Sliced at Delis (Listeria Outbreak)Bearded Dragons (Salmonella Outbreaks)Backyard Poultry (Salmonella Outbreaks)Measles (2024 Outbreaks)Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)Organic Walnuts (E.coli Outbreak). About CDCAbout CDCLeadershipOrganizationAdvisory Committee to the DirectorSpeakers BureauCDC MuseumAdvancing Science and Health EquityMoving ForwardCDC FoundationMission and Org ChartsLab SafetyNew CDC.gov.&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov/National-Center-for-Health-Statistics/Provisional-COVID-19-Deaths-Focus-on-Ages-0-18-Yea/nr4s-juj3&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 5,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Data | Centers for Disease Control and Prevention&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ## Data.CDC.gov. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. Contact Data.CDC.gov Support. HHS.GOV USA.GOV  CDC Website Exit Disclaimer. CDC logoCenters for Disease Control and Prevention. ## Menu. Health TopicsAdult VaccinationsAlzheimer’s DiseaseBullyingCOVID-19DiabetesFungal DiseasesHand, Foot, and Mouth Disease (HFMD)HandwashingHealthy WeightHigh Blood PressureHIV TestingLyme DiseaseOverdose PreventionPreventing DengueQuit SmokingRespiratory Syncytial Virus Infection (RSV)Strep Throat. OutbreaksEggs (Salmonella Outbreak)Meats Sliced at Delis (Listeria Outbreak)Bearded Dragons (Salmonella Outbreaks)Backyard Poultry (Salmonella Outbreaks)Measles (2024 Outbreaks)Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)Organic Walnuts (E.coli Outbreak). About CDCAbout CDCLeadershipOrganizationAdvisory Committee to the DirectorSpeakers BureauCDC MuseumAdvancing Science and Health EquityMoving ForwardCDC FoundationMission and Org ChartsLab SafetyNew CDC.gov.&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 6,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Preliminary U.S. COVID-19 Burden Estimates - Data.CDC.gov&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ## Data.CDC.gov. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. Contact Data.CDC.gov Support. HHS.GOV USA.GOV  CDC Website Exit Disclaimer. CDC logoCenters for Disease Control and Prevention. ## Menu. Health TopicsAdult VaccinationsAlzheimer’s DiseaseBullyingCOVID-19DiabetesFungal DiseasesHand, Foot, and Mouth Disease (HFMD)HandwashingHealthy WeightHigh Blood PressureHIV TestingLyme DiseaseOverdose PreventionPreventing DengueQuit SmokingRespiratory Syncytial Virus Infection (RSV)Strep Throat. OutbreaksEggs (Salmonella Outbreak)Meats Sliced at Delis (Listeria Outbreak)Bearded Dragons (Salmonella Outbreaks)Backyard Poultry (Salmonella Outbreaks)Measles (2024 Outbreaks)Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)Organic Walnuts (E.coli Outbreak). About CDCAbout CDCLeadershipOrganizationAdvisory Committee to the DirectorSpeakers BureauCDC MuseumAdvancing Science and Health EquityMoving ForwardCDC FoundationMission and Org ChartsLab SafetyNew CDC.gov.&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov/Public-Health-Surveillance/Preliminary-U-S-COVID-19-Burden-Estimates/ahrf-yqdt&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 7,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;United States COVID-19 Community Levels by County - Data.CDC.gov&quot;,
+        &quot;snippet&quot;: &quot;An official website of the United States Government. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you&#x27;re on a federal government site. **Secure .gov websites use HTTPS**. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. Share sensitive information only on official, secure websites. ## Data.CDC.gov. A federal government website managed and paid for by the U.S. Centers for Disease Control and Prevention. Contact Data.CDC.gov Support. HHS.GOV USA.GOV  CDC Website Exit Disclaimer. CDC logoCenters for Disease Control and Prevention. ## Menu. Health TopicsAdult VaccinationsAlzheimer’s DiseaseBullyingCOVID-19DiabetesFungal DiseasesHand, Foot, and Mouth Disease (HFMD)HandwashingHealthy WeightHigh Blood PressureHIV TestingLyme DiseaseOverdose PreventionPreventing DengueQuit SmokingRespiratory Syncytial Virus Infection (RSV)Strep Throat. OutbreaksEggs (Salmonella Outbreak)Meats Sliced at Delis (Listeria Outbreak)Bearded Dragons (Salmonella Outbreaks)Backyard Poultry (Salmonella Outbreaks)Measles (2024 Outbreaks)Cinnamon Applesauce Pouches (Lead and Chromium Poisoning)Organic Walnuts (E.coli Outbreak). About CDCAbout CDCLeadershipOrganizationAdvisory Committee to the DirectorSpeakers BureauCDC MuseumAdvancing Science and Health EquityMoving ForwardCDC FoundationMission and Org ChartsLab SafetyNew CDC.gov.&quot;,
+        &quot;url&quot;: &quot;https://data.cdc.gov/Public-Health-Surveillance/United-States-COVID-19-Community-Levels-by-County/3nnm-4jni&quot;,
+        &quot;domain&quot;: &quot;data.cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 8,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;[PDF] Managed Long-Term Care Performance Data 2024 - Measure ...&quot;,
+        &quot;snippet&quot;: &quot;Below is a description of some of the measures included in the 2024 MLTC performance dataset. Measure. Description. Numerator. Denominator. Dataset. Access to.&quot;,
+        &quot;url&quot;: &quot;https://health.data.ny.gov/api/views/cmqt-68bp/files/ad1c747c-f909-497a-bb75-6c64c8c1f4eb?download=true&amp;filename=NYSDOH_MLTC2024_Measures.pdf&quot;,
+        &quot;domain&quot;: &quot;health.data.ny.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;[PDF] Hospital Inpatient Quality Indicators (SPARCS): Beginning 2009&quot;,
+        &quot;snippet&quot;: &quot;“The Inpatient Quality Indicators (IQIs) are a set of measures that provide a perspective on hospital quality of care using hospital administrative data.&quot;,
+        &quot;url&quot;: &quot;https://health.data.ny.gov/api/views/xyfc-qbbr/files/0dd046f5-2e35-4eef-b5eb-eea9c1fc018b?download=true&amp;filename=NYSDOH_IQI_Hospital_Overview.pdf&quot;,
+        &quot;domain&quot;: &quot;health.data.ny.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      }
+    ],
+    &quot;apparent_source_types&quot;: [
+      &quot;news_and_situation_report&quot;,
+      &quot;official_public_health_agency&quot;
+    ],
+    &quot;disease_relevance_signals&quot;: [
+      &quot;COVID-19&quot;
+    ],
+    &quot;location_relevance_signals&quot;: [],
+    &quot;evidence_availability_signals&quot;: [
+      &quot;case&quot;,
+      &quot;cases&quot;,
+      &quot;death&quot;,
+      &quot;deaths&quot;,
+      &quot;outbreak&quot;,
+      &quot;surveillance&quot;
+    ],
+    &quot;gaps_identified&quot;: [],
+    &quot;source_quality_concerns&quot;: [
+      &quot;duplicate URLs appeared in search results&quot;,
+      &quot;returned metadata has weak location-term signal&quot;
+    ],
+    &quot;notes_for_llm&quot;: [
+      &quot;Observation includes search metadata only; fetched page text is not included.&quot;,
+      &quot;Only provider search results can become source candidates.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>REFINE decision 2</h2><pre>{
+  &quot;card_type&quot;: &quot;REFINE decision 2&quot;,
+  &quot;decision&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;decision&quot;: &quot;stop_sufficient&quot;,
+    &quot;decision_reason&quot;: &quot;Both iterations have been fully executed, consuming all 8 planned queries across the 2-iteration maximum. The search has successfully identified the complete set of authoritative source domains for New York COVID-19 surveillance data for the target week (2024-01-01 to 2024-01-07): (1) coronavirus.health.ny.gov — NYSDOH weekly hospitalization dashboard and COVID-19 data hub; (2) data.cdc.gov/Case-Surveillance/Weekly-United-States-COVID-19-Cases-and-Deaths-by-/pwn4-m3yp — CDC weekly cases and deaths by state (confirmed candidate); (3) data.cdc.gov/dataset/Weekly-United-States-COVID-19-Cases-and-Deaths-by-/yviw-z6j5 — CDC weekly cases and deaths by county (new candidate from iteration 2); (4) data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf and /n8mc-b4w4 — CDC case surveillance public use data with geography; (5) data.cdc.gov/National-Center-for-Health-Statistics/Provisional-COVID-19-Death-Counts-by-Week-Ending-D/r8kw-7aab — NCHS provisional mortality by week and jurisdiction (referenced in iteration 1 snippet); (6) health.data.ny.gov — NYSDOH open data portal (COVID-19 hospitalization time-series); (7) nyc.gov/site/doh/covid — NYC DOHMH data archive; (8) data.cityofnewyork.us — NYC Open Data portal. These represent the full authoritative source landscape for this task. No additional search iterations are permitted under the max_iterations=2 bound, and the marginal value of further queries is low given that the correct dataset-level source candidates have been identified across all three primary channels (federal CDC, NYSDOH state, NYC DOHMH city). The downstream collection step must now access these sources directly to extract numeric values for the target week.&quot;,
+    &quot;coverage_assessment&quot;: &quot;Coverage is structurally complete across the three primary reporting tiers for New York COVID-19 surveillance: (1) Federal/CDC tier: CDC weekly cases and deaths by state (pwn4-m3yp), CDC weekly cases and deaths by county (yviw-z6j5), CDC case surveillance public use data with geography (n8mc-b4w4), NCHS provisional mortality by week (r8kw-7aab), and CDC community levels by county (3nnm-4jni) — all on data.cdc.gov. (2) New York State tier: NYSDOH COVID-19 data hub and weekly hospitalization dashboard (coronavirus.health.ny.gov), NYSDOH open data portal (health.data.ny.gov). (3) New York City tier: NYC DOHMH data archive (nyc.gov), NYC Open Data portal (data.cityofnewyork.us), and NYC DOHMH GitHub (github.com/nychealth/coronavirus-data, surfaced in iteration 2). The target fields of cases_confirmed, deaths, hospitalizations, date_reported, subnational_location, and locality are all addressable from these sources. The fields cases_probable, cases_suspected, and cases_unspecified may not be separately reported post-PHE (after May 2023), but this is a data availability constraint, not a search gap. No numeric evidence quotes have been confirmed in snippets, as all returned snippets are dataset landing pages rather than row-level data — this is expected and is a downstream extraction task, not a search failure.&quot;,
+    &quot;source_diversity_assessment&quot;: &quot;Source diversity is adequate across reporting tiers and data types: federal structured datasets (data.cdc.gov, multiple datasets), state dashboard and open data (coronavirus.health.ny.gov, health.data.ny.gov), city dashboard and open data (nyc.gov, data.cityofnewyork.us, github.com/nychealth). The search did not surface news articles with specific numeric quotes for the target week (the news query i2_q4 did not return snippets with week-specific figures), but this is consistent with the post-PHE period when COVID-19 weekly figures received less prominent news coverage. The absence of news corroboration is a minor gap but does not undermine the primary official source coverage. The health.data.ny.gov results returned non-COVID PDFs (MLTC performance data, SPARCS hospital quality indicators), indicating the site: query did not surface the COVID-19 hospitalization open data file directly — the downstream step should search health.data.ny.gov directly for the COVID-19 hospitalization dataset.&quot;,
+    &quot;trustworthiness_assessment&quot;: &quot;All primary source candidates are from official government domains: data.cdc.gov (federal CDC), coronavirus.health.ny.gov and health.data.ny.gov (New York State DOH), nyc.gov and data.cityofnewyork.us (New York City DOHMH). These are the highest-trust tier for epidemiological surveillance data. The github.com result is the nychealth/coronavirus-data repository, which is the official NYC DOHMH open-source data repository — also high trust. No low-trust sources (social media, non-official aggregators) are in the primary candidate set. Worldometers and JHU coronavirus tracker appeared in results but JHU tracker was discontinued in March 2023 and Worldometers stopped updating in April 2024 — these are not recommended as primary sources for the target week. The Facebook post (OCPHealth) is county-level and not New York State or NYC — low priority. The NCBI PMC article covers October 2023–April 2024 hospitalization rates across 12 states and may provide corroborating context but not week-specific New York figures.&quot;,
+    &quot;disease_location_time_fit_assessment&quot;: &quot;Disease fit: All identified sources are COVID-19-specific or include COVID-19 as a primary disease category. Location fit: Sources cover New York State (NYSDOH), New York City (NYC DOHMH), and county-level New York (CDC county dataset, NYC DOHMH GitHub) — the task location &#x27;New York&#x27; is covered at both state and city levels. Time fit: The target week 2024-01-01 to 2024-01-07 falls within the active reporting period for all identified datasets. The CDC weekly datasets use Saturday week-ending dates; for this window, the relevant week-ending date is January 6, 2024 (Saturday). The NYSDOH hospitalization dashboard uses Sunday–Saturday periods reported on Wednesdays. The NCHS provisional mortality dataset uses week-ending dates with a reporting lag of ~8 weeks, so January 2024 data should be present. Post-PHE reporting changes (after May 2023) mean case counts may be less granular, but hospitalization and death data continued to be reported through this period.&quot;,
+    &quot;corroboration_potential_assessment&quot;: &quot;Corroboration potential is moderate-to-high. The CDC weekly cases/deaths by state dataset (pwn4-m3yp) and the NCHS provisional mortality dataset (r8kw-7aab) provide two independent federal sources for deaths. The CDC weekly cases/deaths by county dataset (yviw-z6j5) can corroborate state-level figures at county granularity. NYSDOH and NYC DOHMH provide independent subnational corroboration. The CDC case surveillance public use data (vbim-akqf, n8mc-b4w4) provides individual-level case records that can be aggregated for the target week. Cross-referencing these sources will allow verification of case and death counts. Hospitalization corroboration is available from the NYSDOH hospitalization dashboard (coronavirus.health.ny.gov/daily-hospitalization-summary) and the referenced NYSDOH open data hospitalization file. No news-based numeric corroboration was surfaced, which is a minor gap.&quot;,
+    &quot;next_query_batch&quot;: [],
+    &quot;stop_reason&quot;: &quot;Maximum iterations (2) reached. All planned queries across both iterations have been executed (8 of 10 max total queries used). The search has successfully identified the authoritative source domains and specific dataset candidates across all three primary reporting channels (CDC federal, NYSDOH state, NYC DOHMH city) that are most likely to contain COVID-19 case, death, and hospitalization data for New York for the week of 2024-01-01 to 2024-01-07. No numeric values have been confirmed in snippets (snippets are landing-page metadata only, not row-level data), but the correct source candidates for downstream data extraction have been identified. Further search is unlikely to surface new authoritative sources not already represented in the candidate set, and the iteration and query bounds prohibit additional searches.&quot;,
+    &quot;warnings&quot;: [
+      &quot;No numeric case counts, death counts, or hospitalization figures for the specific target week (2024-01-01 to 2024-01-07) have been confirmed in any search snippet — all returned snippets are dataset landing pages or dashboard overview pages, not row-level data. Downstream extraction must access these sources directly.&quot;,
+      &quot;The health.data.ny.gov site: query returned non-COVID PDFs (MLTC performance data, SPARCS hospital quality indicators) rather than the COVID-19 hospitalization open data file. The downstream step should search health.data.ny.gov directly using the dataset title &#x27;COVID-19 Hospitalizations&#x27; or the dataset ID referenced in the NYSDOH hospitalization dashboard snippet.&quot;,
+      &quot;The CDC weekly cases/deaths by state dataset (pwn4-m3yp) uses Saturday week-ending dates; the relevant row for the target week is &#x27;week ending January 6, 2024&#x27; (not January 7). Downstream extraction should filter on this date.&quot;,
+      &quot;Post-PHE (post-May 2023) reporting: cases_probable, cases_suspected, and cases_unspecified may not be separately reported in CDC or NYSDOH datasets for January 2024. The CDC weekly cases/deaths dataset may report only total new cases without confirmed/probable breakdown.&quot;,
+      &quot;JHU Coronavirus Resource Center (coronavirus.jhu.edu) was discontinued in March 2023 and should not be used as a source for January 2024 data despite appearing in search results.&quot;,
+      &quot;Worldometers COVID tracker stopped updating in April 2024 — it may contain January 2024 data but is a secondary aggregator, not an authoritative primary source.&quot;,
+      &quot;The NYC DOHMH GitHub repository (github.com/nychealth/coronavirus-data) was surfaced in iteration 2 results but no specific file or commit was identified in snippets. The downstream step should access the repository&#x27;s &#x27;trends&#x27; or &#x27;weekly-case-rate&#x27; CSV files for the target week.&quot;,
+      &quot;The max_iterations=2 bound has been reached. No further search iterations are possible under the current task bounds.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>STOP</h2><pre>{
+  &quot;card_type&quot;: &quot;STOP&quot;,
+  &quot;stop_decision&quot;: &quot;stop_sufficient&quot;,
+  &quot;stop_reason&quot;: &quot;Maximum iterations (2) reached. All planned queries across both iterations have been executed (8 of 10 max total queries used). The search has successfully identified the authoritative source domains and specific dataset candidates across all three primary reporting channels (CDC federal, NYSDOH state, NYC DOHMH city) that are most likely to contain COVID-19 case, death, and hospitalization data for New York for the week of 2024-01-01 to 2024-01-07. No numeric values have been confirmed in snippets (snippets are landing-page metadata only, not row-level data), but the correct source candidates for downstream data extraction have been identified. Further search is unlikely to surface new authoritative sources not already represented in the candidate set, and the iteration and query bounds prohibit additional searches.&quot;
+}</pre></article></main>
+</body>
+</html>

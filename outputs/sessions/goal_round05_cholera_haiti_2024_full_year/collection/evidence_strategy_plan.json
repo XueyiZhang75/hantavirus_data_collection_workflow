@@ -1,0 +1,707 @@
+{
+  "plan_id": "exec_source_plan_cholera_haiti_2024_01_01_2024_12_31",
+  "disease": "Cholera",
+  "location": "Haiti",
+  "time_window": "2024-01-01-2024-12-31",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "haiti_mspp_access_may_be_intermittent_verify_domain",
+    "french_creole_language_queries_required_for_local_sources",
+    "gang_violence_and_infrastructure_collapse_may_limit_official_reporting_completeness_2024",
+    "cholera_reemergence_post_2022_context_required_to_distinguish_new_2024_data"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify MSPP (Ministère de la Santé Publique et de la Population) Haiti official cholera bulletins, situation reports, and surveillance data for 2024.",
+      "source_role_hint": "collection",
+      "rationale": "MSPP is the primary national public health authority for Haiti and the authoritative source for subnational cholera case, death, and hospitalization counts. Weekly and monthly bulletins are the highest-priority collection targets.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify PAHO/AMRO cholera situation reports, epidemiological updates, and Haiti-specific cholera data pages for 2024.",
+      "source_role_hint": "collection",
+      "rationale": "PAHO regularly publishes Haiti cholera situation reports with subnational breakdowns, case counts, deaths, and hospitalizations. These are primary collection sources when MSPP data is unavailable or incomplete.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify WHO Global Cholera and AWD Dashboard entries and WHO situation reports covering Haiti for 2024.",
+      "source_role_hint": "collection",
+      "rationale": "WHO publishes global cholera dashboards and country-level situation reports that include Haiti case and death counts, often with temporal granularity useful for the 2024 window.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_collection_004",
+      "objective": "Identify OCHA Haiti humanitarian situation reports and flash updates referencing cholera case or death counts for 2024.",
+      "source_role_hint": "collection",
+      "rationale": "OCHA Haiti publishes humanitarian situation reports that frequently cite cholera figures from MSPP and PAHO, providing additional subnational and temporal granularity.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_collection_005",
+      "objective": "Identify UNICEF Haiti cholera-related situation reports and humanitarian response updates for 2024.",
+      "source_role_hint": "collection",
+      "rationale": "UNICEF Haiti publishes situation reports and humanitarian dashboards that include cholera case and death data, often with departmental breakdowns.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify independent structured databases (e.g., WHO Global Health Observatory, ProMED, HealthMap) with Haiti cholera records for 2024 to use as held-back validation sources.",
+      "source_role_hint": "validation",
+      "rationale": "Structured databases and independent surveillance aggregators provide cross-check data for validating extracted case and death counts without leaking into primary collection.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify MSF (Médecins Sans Frontières) operational reports and cholera treatment center data for Haiti 2024.",
+      "source_role_hint": "validation",
+      "rationale": "MSF operates cholera treatment centers in Haiti and publishes operational data that can serve as an independent validation source for hospitalization and case counts.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify peer-reviewed literature and epidemiological studies on Haiti cholera 2024 for case definition context and count semantics.",
+      "source_role_hint": "context",
+      "rationale": "Peer-reviewed studies provide case definitions, methodology, and epidemiological context needed to correctly interpret and normalize extracted counts (confirmed vs. suspected vs. AWD).",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify WASH cluster reports and acute watery diarrhea (AWD) surveillance summaries for Haiti 2024 to contextualize syndrome-based counts.",
+      "source_role_hint": "context",
+      "rationale": "AWD and WASH cluster reports help distinguish cholera-specific counts from broader diarrheal disease surveillance, critical for correct field mapping.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag sources with ambiguous count semantics (cumulative vs. incident, suspected vs. confirmed) or unclear subnational attribution for human review.",
+      "source_role_hint": "human_review",
+      "rationale": "Haiti cholera reporting in 2024 may mix cumulative totals from the 2022 re-emergence with new 2024 incident counts. Human review is required to resolve temporal and definitional ambiguities.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_review_002",
+      "objective": "Flag any sources where gang violence, infrastructure collapse, or access restrictions may have caused reporting gaps or underreporting in specific departments during 2024.",
+      "source_role_hint": "human_review",
+      "rationale": "Haiti experienced severe security deterioration in 2024, particularly in Ouest/Port-au-Prince. Reporting gaps in affected departments must be flagged rather than silently treated as zero counts.",
+      "priority": 3
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_official_public_health_agency",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "MSPP Haiti is the primary national authority publishing weekly and monthly cholera bulletins with subnational (departmental) case, death, and hospitalization counts. PAHO/AMRO publishes Haiti-specific cholera situation reports with similar granularity. These are the highest-priority extractable collection sources for the 2024 window.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "mspp_website_may_have_intermittent_availability",
+        "french_and_haitian_creole_language_barriers",
+        "2024_security_crisis_may_have_disrupted_official_reporting_in_some_departments"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_international_organization_report",
+      "source_type": "international_organization_report",
+      "role_hint": "collection",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "WHO, OCHA, UNICEF, and MSF publish Haiti cholera situation reports and humanitarian updates that contain extractable case, death, and hospitalization data, often with departmental breakdowns. These serve as both primary collection and cross-validation sources.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "may_cite_mspp_data_requiring_provenance_tracking",
+        "cumulative_vs_incident_count_ambiguity_common"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_structured_database",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "WHO Global Health Observatory, Global Infectious Disease and Epidemiology Network (GIDEON), ProMED, and HealthMap provide structured or semi-structured Haiti cholera records useful for validation cross-checks against collected data.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "may_lag_real_time_reporting",
+        "national_level_aggregates_may_lack_subnational_granularity"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "why_relevant": "Peer-reviewed epidemiological studies on Haiti cholera 2024 provide case definitions, serotype/biotype data, and methodological context for interpreting surveillance counts. May also contain original case series data.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "publication_lag_may_limit_2024_coverage",
+        "preprints_require_additional_quality_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_news_and_situation_report",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Reputable news outlets (Reuters, AP, Le Nouvelliste, AlterPresse) and humanitarian news services (ReliefWeb, IRIN) may contain early outbreak signals, subnational case reports, and situation summaries for Haiti cholera 2024, particularly during periods of official reporting gaps.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "secondary_source_provenance_must_be_traced",
+        "count_accuracy_lower_than_official_sources",
+        "use_only_when_official_sources_unavailable_or_to_flag_gaps"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"cholera Haiti 2024\" cases deaths public health Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "cholera Haiti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"choléra Haïti 2024\" cases deaths public health Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "choléra Haïti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"cholera Haiti 2024\" outbreak report surveillance Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "cholera Haiti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"choléra Haïti 2024\" outbreak report surveillance Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "choléra Haïti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"cholera Haiti 2024\" epidemiology cases deaths Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "cholera Haiti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"choléra Haïti 2024\" epidemiology cases deaths Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "choléra Haïti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"cholera Haiti 2024\" surveillance dataset cases deaths Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "cholera Haiti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"choléra Haïti 2024\" surveillance dataset cases deaths Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "choléra Haïti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"cholera Haiti 2024\" outbreak report cases deaths Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "cholera Haiti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"choléra Haïti 2024\" outbreak report cases deaths Haiti 2024-01-01-2024-12-31 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "choléra Haïti 2024"
+      ],
+      "location_terms_used": [
+        "Haiti"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-12-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

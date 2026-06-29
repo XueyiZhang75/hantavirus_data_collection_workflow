@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workflow Graph Topology</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Workflow Graph Topology</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section><h2>Topology</h2><p>Source: static graph order mirrored from src/hdc_workflow/graph.py</p><table><tr><th>Source</th><th>Target</th><th>Condition</th><th>Route</th></tr><tr><td><code>START</code></td><td><code>task_intake_and_scope_planning</code></td><td></td><td></td></tr><tr><td><code>task_intake_and_scope_planning</code></td><td><code>disease_intelligence_builder</code></td><td></td><td></td></tr><tr><td><code>disease_intelligence_builder</code></td><td><code>profile_and_schema_setup</code></td><td></td><td></td></tr><tr><td><code>profile_and_schema_setup</code></td><td><code>executable_source_planning</code></td><td></td><td></td></tr><tr><td><code>executable_source_planning</code></td><td><code>query_strategy_builder</code></td><td></td><td></td></tr><tr><td><code>query_strategy_builder</code></td><td><code>source_discovery</code></td><td></td><td></td></tr><tr><td><code>source_discovery</code></td><td><code>source_dedup_and_registry</code></td><td></td><td></td></tr><tr><td><code>source_dedup_and_registry</code></td><td><code>source_screening</code></td><td></td><td></td></tr><tr><td><code>source_screening</code></td><td><code>source_critic_and_uncertainty_routing</code></td><td></td><td></td></tr><tr><td><code>source_critic_and_uncertainty_routing</code></td><td><code>content_fetch_and_parse</code></td><td></td><td></td></tr><tr><td><code>content_fetch_and_parse</code></td><td><code>document_quality_check</code></td><td></td><td></td></tr><tr><td><code>document_quality_check</code></td><td><code>evidence_chunking_and_data_presence_flagging</code></td><td></td><td></td></tr><tr><td><code>evidence_chunking_and_data_presence_flagging</code></td><td><code>structured_extraction</code></td><td></td><td></td></tr><tr><td><code>structured_extraction</code></td><td><code>schema_validation_and_repair</code></td><td></td><td></td></tr><tr><td><code>schema_validation_and_repair</code></td><td><code>record_normalization</code></td><td></td><td></td></tr><tr><td><code>record_normalization</code></td><td><code>record_linking</code></td><td></td><td></td></tr><tr><td><code>record_linking</code></td><td><code>cross_source_consistency_check</code></td><td></td><td></td></tr><tr><td><code>cross_source_consistency_check</code></td><td><code>quality_gate_routing</code></td><td></td><td></td></tr><tr><td><code>quality_gate_routing</code></td><td><code>human_review</code></td><td>current_route == human_review</td><td>needs human review</td></tr><tr><td><code>quality_gate_routing</code></td><td><code>final_data_package_builder</code></td><td>current_route != human_review</td><td>finalize</td></tr><tr><td><code>human_review</code></td><td><code>final_data_package_builder</code></td><td></td><td></td></tr><tr><td><code>final_data_package_builder</code></td><td><code>END</code></td><td></td><td></td></tr></table><pre>[
+  &quot;topology is exported from documented graph.py node sequence; no graph topology is mutated.&quot;
+]</pre></section></main>
+</body>
+</html>

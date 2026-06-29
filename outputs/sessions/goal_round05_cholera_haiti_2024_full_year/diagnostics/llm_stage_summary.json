@@ -1,0 +1,184 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-6",
+  "api_key_present": true,
+  "disease_intelligence": {
+    "generation_method": "llm_generated",
+    "disease_standard_name": "Cholera",
+    "query_term_count": 15,
+    "warnings": [
+      "MSPP Haiti bulletins are published in French — bilingual query strategy required.",
+      "Haiti experienced a major cholera resurgence beginning in late 2022; 2024 data must be carefully scoped to avoid inclusion of 2022–2023 cumulative figures.",
+      "Security and access constraints in Haiti (gang activity, displacement) may cause reporting gaps or delays in subnational data for 2024.",
+      "Some MSPP bulletins may not be publicly archived or may have irregular publication schedules — cross-validate with PAHO/WHO sitreps.",
+      "The extraction_record_model is flagged as still hantavirus-named (task_input_warnings) — verify field mappings are correctly applied to cholera schema before extraction.",
+      "source_discovery_not_yet_disease_generic (task_input_warnings) — source discovery logic may need manual override for cholera-specific sources.",
+      "WHO Global Cholera Dashboard may lag behind MSPP primary reporting by days to weeks — use MSPP as primary, WHO/PAHO as validation.",
+      "Locality-level data (commune, quartier) may be sparse or inconsistently reported — flag missing locality as NULL rather than inferring.",
+      "CFR values above 2% in any subnational unit may indicate reporting anomalies or access-constrained areas — flag for review.",
+      "Do not invent or infer source URLs — source_url must be populated only from directly observed source metadata."
+    ],
+    "llm_call_succeeded": true
+  },
+  "source_planning": {
+    "enabled": true,
+    "status": "success",
+    "generation_method": "llm_executable_source_plan",
+    "execution_status": "planned_not_executed",
+    "planned_query_count": 10,
+    "planned_source_category_count": 5,
+    "provider_channel_counts": {
+      "official_site_search": 4,
+      "literature_api": 2,
+      "database_search": 2,
+      "news_search": 2
+    },
+    "agent_query_count": 10,
+    "agent_query_added_count": 10,
+    "candidate_hint_count": 0,
+    "warnings": [
+      "source_plan_created_not_executed_stage4",
+      "source_discovery_execution_not_implemented_stage4",
+      "haiti_mspp_access_may_be_intermittent_verify_domain",
+      "french_creole_language_queries_required_for_local_sources",
+      "gang_violence_and_infrastructure_collapse_may_limit_official_reporting_completeness_2024",
+      "cholera_reemergence_post_2022_context_required_to_distinguish_new_2024_data"
+    ],
+    "failure_type": null,
+    "failure_message": null
+  },
+  "source_critic": {
+    "enabled": true,
+    "attempted_source_count": 0,
+    "assessed_source_count": 0,
+    "skipped_source_count": 42,
+    "blocked_fetch_count": 0,
+    "needs_review_count": 0,
+    "allowed_fetch_count": 0,
+    "context_only_count": 0,
+    "decision_counts": {},
+    "fetch_recommendation_counts": {},
+    "risk_flag_counts": {},
+    "selection": {
+      "selection_mode": "auto_priority",
+      "explicit_allowlist_used": false,
+      "collection_mode": "direct_collection",
+      "direct_target_official_fast_path": true,
+      "max_sources": 4,
+      "eligible_candidate_count": 0,
+      "selected_candidate_count": 0,
+      "skipped_candidate_count": 42,
+      "selected_source_ids": [],
+      "skipped_reason_counts": {
+        "target_official_must_fetch_skips_llm_source_critic": 41,
+        "direct_target_official_fast_path_skips_source_critic": 1
+      }
+    },
+    "allowlist_enabled": false,
+    "max_sources": 4,
+    "review_blocks_fetch": false,
+    "failure_count": 0,
+    "semantic_leakage_count": 0,
+    "human_review_recommended_count": 0
+  },
+  "source_credibility": {
+    "enabled": true,
+    "assessed_source_count": 42,
+    "role_counts": {
+      "excluded": 7,
+      "collection_support": 13,
+      "validation": 15,
+      "context": 2,
+      "collection": 5
+    },
+    "risk_flag_counts": {
+      "official_public_health_authority": 23,
+      "location_relevance_unclear": 2,
+      "source_disease_relevance:insufficient_text": 11,
+      "disease_relevance_unclear": 11,
+      "time_window_match_from_planned_query": 25,
+      "geographic_granularity_unclear": 2,
+      "data_signal_in_source_metadata": 42,
+      "pdf_or_report_likely_medium_readability": 6,
+      "primary_or_authoritative_source": 38,
+      "missing_publisher": 26,
+      "ambiguous_disease": 21,
+      "ambiguous_location": 2,
+      "low_machine_readability": 6,
+      "local_source_matches_task_location": 28,
+      "source_disease_relevance:ambiguous_disease": 10,
+      "ambiguous_disease_signal_in_source_metadata": 10,
+      "source_time_matches_requested_window": 17,
+      "local_or_subnational_granularity": 27,
+      "standard_web_page": 29,
+      "complete_source_provenance": 16,
+      "national_or_international_context": 1,
+      "national_or_international_granularity": 12,
+      "location_match_from_planned_query": 11,
+      "source_disease_relevance:target_disease_match": 21,
+      "source_metadata_matches_requested_disease": 21,
+      "international_organization_authority": 15,
+      "screening_and_critic_disagree": 1,
+      "geographic_mismatch:account_is_OCHA_Ethiopia_not_OCHA_Haiti": 1,
+      "platform_risk:social_media_post_not_a_formal_report": 1,
+      "source_type_label_inflation:labeled_international_organization_report_but_is_x.com_post": 1,
+      "disease_relevance_very_low:score_0.20_no_cholera_terms_found": 1,
+      "false_positive_discovery:haiti_query_returned_ethiopia_account": 1,
+      "ambiguous_disease_signal": 1,
+      "ephemeral_and_unstructured_content": 1,
+      "underlying_report_not_directly_accessible_from_this_url": 1,
+      "do_not_use_as_primary_data_source": 1,
+      "machine_readable_or_structured": 7,
+      "structured_data_source": 4,
+      "independence_unclear": 4,
+      "secondary_news_or_media_source": 2,
+      "context_or_background_only": 2,
+      "task_location_granularity": 1
+    },
+    "llm_assessed_count": 1,
+    "llm_failure_count": 0,
+    "needs_review_count": 10
+  },
+  "source_identity": {
+    "enabled": true,
+    "identity_assessed_count": 42,
+    "llm_identity_assessed_count": 0,
+    "post_fetch_identity_assessed_count": 41,
+    "unknown_publisher_count": 23,
+    "source_type_counts": {
+      "official_public_health_agency": 8,
+      "international_public_health_agency": 15,
+      "unknown": 17,
+      "social_media": 1,
+      "structured_database": 1
+    },
+    "claim_support_role_counts": {
+      "context_only": 10,
+      "primary_case_claim_support": 14,
+      "insufficient_information": 18
+    },
+    "recommended_fetch_use_counts": {
+      "fetch_for_context": 10,
+      "fetch_for_extraction": 14,
+      "fetch_only_after_review": 18
+    },
+    "warning_counts": {
+      "search_provider_not_publisher": 42,
+      "publisher_from_search_metadata_unverified": 42,
+      "actual_publisher_unknown": 26,
+      "direct_target_official_fast_path_skips_source_identity": 42
+    }
+  },
+  "structured_extraction": {
+    "enabled": true,
+    "mode": "llm_structured_output",
+    "eligible_chunk_count": 637,
+    "call_count": 30,
+    "success_count": 30,
+    "error_count": 0,
+    "fallback_count": 0,
+    "raw_record_count": 2,
+    "max_chunks": 30,
+    "error_messages": []
+  }
+}

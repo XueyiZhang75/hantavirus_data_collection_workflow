@@ -1,0 +1,417 @@
+[
+  {
+    "iteration_index": 1,
+    "search_objective": "Identify authoritative sources reporting dengue cases, deaths, hospitalizations, and surveillance data for Florida during June 2025 (2025-06-01 to 2025-06-30), covering all target fields: confirmed/probable/suspected/unspecified cases, deaths, hospitalizations, dates, and subnational/locality breakdowns.",
+    "search_reasoning": "Florida dengue surveillance is primarily reported through the Florida Department of Health (FDOH), which publishes arboviral/mosquito-borne disease surveillance reports and weekly/monthly epidemiological summaries. The CDC ArboNET system also aggregates state-reported arboviral disease data including dengue for the US. For June 2025, the most actionable sources are: (1) FDOH official surveillance pages and disease reports (highest authority for Florida-specific case counts, locality, and date data); (2) CDC dengue surveillance and ArboNET (national aggregator with state-level breakdowns); (3) PAHO/WHO situation reports (international validation, may reference US/Florida data); (4) news and media reports (may surface outbreak alerts or case counts citing official sources). The upstream planned queries use overly rigid date-range strings (e.g., \"2025-06-01-2025-06-30\") that are unlikely to match real document text. This iteration refines queries to use natural language time references (\"June 2025\"), agency-specific terminology (\"arboviral,\" \"mosquito-borne\"), and targeted agency/program names (FDOH, ArboNET, CDC) to maximize retrieval of relevant official documents. The 4-query cap per iteration requires prioritizing: (1) FDOH official surveillance (highest yield, most authoritative), (2) CDC ArboNET/dengue surveillance (national aggregator), (3) PAHO/WHO situation report (international validation), (4) news search (supplementary, may surface case counts or outbreak alerts). Literature queries are deprioritized for iteration 1 as peer-reviewed publications for June 2025 are unlikely to exist yet given publication lag.",
+    "query_batch": [
+      {
+        "query_id": "iter1_q1",
+        "query": "Florida Department of Health dengue arboviral surveillance report June 2025",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_suspected",
+          "cases_unspecified",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "FDOH is the primary authoritative source for Florida dengue case counts, deaths, hospitalizations, and locality data. Targeting FDOH surveillance reports with natural-language time reference 'June 2025' and disease-specific term 'arboviral' (FDOH uses this umbrella term for dengue reporting) maximizes retrieval of the most relevant official documents. This replaces the upstream q_exec_001/q_exec_002 which used an unnatural date-range string unlikely to match document text.",
+        "expected_source_type_or_evidence": "FDOH Arboviral Disease Surveillance report, weekly/monthly epidemiological summary, or disease activity report for June 2025 listing dengue case counts by county or statewide.",
+        "expected_trust_signal": "Florida Department of Health (.fdoh.gov or .myflorida.com domain), official surveillance program authorship, tabular case count data with date ranges.",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue",
+          "arboviral",
+          "mosquito-borne disease"
+        ],
+        "target_location_terms": [
+          "Florida"
+        ],
+        "time_terms": [
+          "June 2025",
+          "2025"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q1"
+      },
+      {
+        "query_id": "iter1_q2",
+        "query": "CDC ArboNET dengue cases Florida 2025 surveillance data",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 2,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "CDC ArboNET is the national arboviral surveillance system that aggregates state-reported dengue data including Florida. CDC also publishes dengue case counts by state. This query targets CDC's dengue surveillance pages and ArboNET data tables, which may include June 2025 Florida case counts, confirmed/probable breakdowns, and deaths. Complements FDOH data and provides cross-validation.",
+        "expected_source_type_or_evidence": "CDC dengue surveillance summary, ArboNET data table, or CDC dengue statistics page showing Florida case counts for 2025 (ideally broken down by month or including June).",
+        "expected_trust_signal": "CDC.gov domain, ArboNET program attribution, tabular state-level case count data.",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue",
+          "DENV",
+          "arboviral"
+        ],
+        "target_location_terms": [
+          "Florida",
+          "United States"
+        ],
+        "time_terms": [
+          "2025",
+          "June 2025"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q2"
+      },
+      {
+        "query_id": "iter1_q3",
+        "query": "PAHO WHO dengue situation report United States Florida June 2025",
+        "provider_channel": "official_site_search",
+        "query_type": "domain_limited",
+        "source_type": "international_organization_report",
+        "role_hint": "validation",
+        "priority": 3,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "PAHO publishes regional dengue situation reports that include US case data, sometimes with state-level breakdowns. These serve as independent validation of FDOH/CDC figures and may contain evidence quotes, case definitions, and hospitalization/death data. Refines upstream q_exec_003/q_exec_004 by using natural language time reference and explicit PAHO/WHO agency names.",
+        "expected_source_type_or_evidence": "PAHO epidemiological alert or dengue situation report for the Americas covering June 2025, referencing US or Florida dengue case counts.",
+        "expected_trust_signal": "PAHO.org or WHO.int domain, official situation report format, epidemiological week references.",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue"
+        ],
+        "target_location_terms": [
+          "Florida",
+          "United States",
+          "Americas"
+        ],
+        "time_terms": [
+          "June 2025",
+          "2025"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q3"
+      },
+      {
+        "query_id": "iter1_q4",
+        "query": "dengue cases Florida June 2025 health department report",
+        "provider_channel": "news_search",
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 4,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_unspecified",
+          "deaths",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "News and media reports may surface dengue case counts, outbreak alerts, or official statements from FDOH or local health departments for June 2025 that are not yet indexed as official documents. Useful for identifying specific localities, dates, and case counts cited from official sources, and for discovering links to primary official reports. Refines upstream q_exec_009 with natural language time reference and without unnatural date-range string.",
+        "expected_source_type_or_evidence": "News article, press release, or health alert from June 2025 reporting dengue cases in Florida, ideally citing FDOH or CDC figures with specific case counts, county-level data, or death/hospitalization information.",
+        "expected_trust_signal": "Bylined journalism citing official health agency sources, press releases from FDOH or county health departments, publication date within June 2025.",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue"
+        ],
+        "target_location_terms": [
+          "Florida"
+        ],
+        "time_terms": [
+          "June 2025",
+          "2025"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q4"
+      }
+    ],
+    "expected_evidence": [
+      "FDOH arboviral/dengue surveillance report with statewide or county-level case counts for June 2025",
+      "CDC ArboNET or CDC dengue statistics page with Florida 2025 case data",
+      "PAHO situation report referencing US/Florida dengue cases for June 2025",
+      "News articles citing official case counts, deaths, or hospitalizations for Florida dengue in June 2025",
+      "Tabular data with confirmed/probable/suspected case breakdowns",
+      "Evidence quotes with specific numbers, dates, and locations"
+    ],
+    "expected_source_characteristics": [
+      "Official Florida state health agency authorship (FDOH)",
+      "CDC national surveillance program (ArboNET)",
+      "International health organization (PAHO/WHO) situation reports",
+      "Publication or report date within or immediately after June 2025",
+      "Quantitative case count data with geographic and temporal specificity",
+      "English-language documents from .gov, .paho.org, or .who.int domains"
+    ],
+    "language_or_localization_reasoning": "All queries are in English. Florida is a US state; all official reporting from FDOH, CDC, and PAHO for this jurisdiction is in English. No Spanish-language queries are needed for this iteration, as the target is US state-level official reporting. Spanish-language queries could be considered in a future iteration only if seeking travel-origin country reports, which is out of scope for this task.",
+    "trust_considerations": [
+      "Prioritize FDOH and CDC as primary authoritative sources for Florida dengue data",
+      "PAHO/WHO reports provide independent international validation",
+      "News sources are supplementary; only accept case counts that cite official agency sources",
+      "Avoid sources that do not specify Florida as the location or that aggregate US data without state breakdown",
+      "Be alert to travel-associated vs. locally-acquired dengue distinctions, which FDOH typically reports separately",
+      "Verify that report dates or data periods overlap with June 2025 (2025-06-01 to 2025-06-30)"
+    ],
+    "stop_condition_hypothesis": "Stop after iteration 1 if queries return FDOH surveillance reports and CDC ArboNET data with quantified case counts, dates, and locality data for June 2025. Proceed to iteration 2 if official agency sources are absent, data is incomplete (e.g., missing deaths/hospitalizations/locality), or only news sources are found without official backing.",
+    "warnings": [
+      "Upstream planned queries used unnatural date-range strings (e.g., '2025-06-01-2025-06-30') unlikely to match real document text — all iteration 1 queries use natural language time references instead",
+      "Peer-reviewed literature queries (upstream q_exec_005/q_exec_006) are deprioritized: publication lag makes June 2025 literature extremely unlikely to exist in iteration 1",
+      "Structured database queries (upstream q_exec_007/q_exec_008) are deferred to iteration 2 if official agency sources are insufficient",
+      "Florida dengue cases are predominantly travel-associated; locally-acquired cases are rarer and may be reported separately — both categories should be captured",
+      "FDOH may use 'arboviral disease' as the umbrella category rather than 'dengue' alone in report titles"
+    ]
+  },
+  {
+    "iteration_index": 2,
+    "search_objective": "Refined follow-up search",
+    "search_reasoning": "Iteration 1 returned strong authoritative signals from floridahealth.gov (7 results including weekly FDOH arbovirus PDFs for weeks 22, 24, 25), epi.ufl.edu (with a June 14, 2025 snapshot citing 85 travel-associated + 1 locally acquired case), and the FDOH surveillance index page. However, critical gaps remain: (1) The FDOH weekly reports retrieved cover weeks 22 (May 31–Jun 6), 24, and 25 — but week 23 (June 7–13) is listed on the FDOH index and not yet confirmed retrieved as a full candidate, and week 26 (June 22–28) is missing from the confirmed June-window PDFs. (2) The epi.ufl.edu snippet references a June 14 snapshot (week 23 data) but the underlying FDOH week 23 PDF is not confirmed retrieved. (3) Deaths and hospitalizations fields are not yet populated from any snippet — a targeted CDC dengue statistics or FDOH disease-specific page may surface these. (4) The FDOH surveillance index (rank 8) lists weeks 22 and 23 explicitly — week 23 PDF URL needs to be targeted directly. (5) CDC.gov returned 6 results but none of the snippets confirm Florida-specific June 2025 case counts with deaths/hospitalizations. A focused iteration 2 targeting the specific missing FDOH weekly PDFs (weeks 23 and 26), CDC dengue US statistics for 2025, and a targeted news/outbreak search for Florida dengue deaths/hospitalizations in June 2025 will close these gaps within the 4-query cap.",
+    "query_batch": [
+      {
+        "query_id": "iter2_q1",
+        "query": "site:floridahealth.gov \"2025-23-arbovirus\" OR \"week 23\" OR \"2025-26-arbovirus\" OR \"week 26\" dengue June 2025",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_unspecified",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "The FDOH surveillance index (rank 8) explicitly lists Week 23 (June 7–13) and Week 22 (May 31–Jun 6). Week 23 PDF and Week 26 PDF (June 22–28) are not confirmed retrieved. These two weekly reports cover the heart of the June 2025 window and are needed to complete the weekly series. Targeting floridahealth.gov with week-number identifiers maximizes retrieval of these specific PDFs.",
+        "expected_source_type_or_evidence": "FDOH weekly arbovirus surveillance PDF for epidemiological week 23 (June 7–13, 2025) and/or week 26 (June 22–28, 2025) with dengue case counts, travel-associated vs. locally acquired breakdown, county-level data.",
+        "expected_trust_signal": "floridahealth.gov domain, PDF filename pattern matching 2025-23 or 2025-26, official FDOH surveillance program authorship.",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue",
+          "arboviral"
+        ],
+        "target_location_terms": [
+          "Florida"
+        ],
+        "time_terms": [
+          "June 2025",
+          "week 23",
+          "week 26",
+          "2025"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q1 — FDOH surveillance index (rank 8) lists week 23 but PDF not confirmed retrieved; week 26 absent from candidates",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q1"
+      },
+      {
+        "query_id": "iter2_q2",
+        "query": "Florida dengue week 23 week 24 week 25 week 26 arbovirus surveillance 2025 PDF",
+        "provider_channel": "web_search",
+        "query_type": "general_web",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 2,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_unspecified",
+          "deaths",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "Broadens the FDOH weekly PDF search across all four epidemiological weeks that fall within June 2025 (weeks 23–26). The site: operator in iter2_q1 may miss PDFs indexed via third-party aggregators or cached versions. This general web query uses week numbers and 'PDF' to surface direct links to the FDOH weekly reports or mirrors (e.g., pascomosquito.org, epi.ufl.edu) that may have cached or linked these specific weekly PDFs.",
+        "expected_source_type_or_evidence": "Direct PDF links or pages referencing FDOH arbovirus surveillance weeks 23–26 for 2025, with dengue case counts per week.",
+        "expected_trust_signal": "floridahealth.gov PDF URLs, or secondary sources (pascomosquito.org, epi.ufl.edu) linking to or summarizing FDOH weekly reports for weeks 23–26.",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue",
+          "arbovirus surveillance"
+        ],
+        "target_location_terms": [
+          "Florida"
+        ],
+        "time_terms": [
+          "June 2025",
+          "week 23",
+          "week 24",
+          "week 25",
+          "week 26"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q1 — weeks 23 and 26 PDFs not confirmed retrieved; week 24 and 25 PDFs present but content gaps remain",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q2"
+      },
+      {
+        "query_id": "iter2_q3",
+        "query": "CDC dengue United States 2025 cases by state Florida confirmed probable deaths hospitalizations",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 3,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "CDC.gov returned 6 results in iteration 1 but no snippet confirmed Florida-specific June 2025 dengue counts with deaths or hospitalizations. CDC publishes dengue case statistics by state (via ArboNET and the dengue statistics page at cdc.gov/dengue). This query targets CDC's state-level breakdown for 2025, which may include Florida confirmed/probable case counts, deaths, and hospitalizations — fields not yet evidenced in any snippet. This is the primary remaining gap for deaths/hospitalizations.",
+        "expected_source_type_or_evidence": "CDC dengue statistics page or ArboNET summary table showing Florida 2025 case counts broken down by confirmed/probable, with deaths and hospitalizations columns.",
+        "expected_trust_signal": "cdc.gov domain, ArboNET or dengue surveillance program attribution, tabular state-level data with case classification and outcome fields.",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue",
+          "DENV",
+          "ArboNET"
+        ],
+        "target_location_terms": [
+          "Florida",
+          "United States"
+        ],
+        "time_terms": [
+          "2025",
+          "June 2025"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q2 — CDC returned 6 results but no Florida-specific June 2025 deaths/hospitalizations confirmed in snippets",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q3"
+      },
+      {
+        "query_id": "iter2_q4",
+        "query": "Florida dengue death hospitalization June 2025 locally acquired travel-associated county",
+        "provider_channel": "news_search",
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 4,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_unspecified",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "Deaths and hospitalizations are not evidenced in any current snippet. News and outbreak reporting sources (e.g., outbreaknewstoday, heraldtribune — both present in iteration 1 results) may have reported on dengue deaths or hospitalizations in Florida during June 2025, particularly for locally acquired cases (which are rarer and more newsworthy). Adding 'locally acquired' and 'county' terms targets the most newsworthy and locality-specific events. This complements the official FDOH/CDC queries and may surface evidence quotes with specific outcome data.",
+        "expected_source_type_or_evidence": "News article or press release from June 2025 reporting dengue death(s) or hospitalization(s) in Florida, citing FDOH or county health department, with specific case counts, county, and date.",
+        "expected_trust_signal": "Bylined journalism with publication date in June 2025, citing FDOH or county health department as source, specific numeric claims for deaths or hospitalizations.",
+        "language": "en",
+        "target_disease_terms": [
+          "dengue"
+        ],
+        "target_location_terms": [
+          "Florida"
+        ],
+        "time_terms": [
+          "June 2025"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q4 — deaths and hospitalizations not evidenced in any snippet; outbreaknewstoday and heraldtribune present in results but content not confirmed",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q4"
+      }
+    ],
+    "expected_evidence": [],
+    "expected_source_characteristics": [],
+    "language_or_localization_reasoning": "",
+    "trust_considerations": [],
+    "stop_condition_hypothesis": "",
+    "warnings": [
+      "Week 23 (June 7–13) FDOH PDF is listed on the FDOH surveillance index but not confirmed as a retrieved candidate — direct URL targeting needed.",
+      "Week 26 (June 22–28) FDOH PDF covers the final week of June 2025 and is absent from current candidates — critical gap.",
+      "Deaths and hospitalizations fields have no confirmed evidence in any snippet — targeted search needed.",
+      "CDC.gov returned 6 results but none confirmed Florida-specific June 2025 dengue counts with deaths/hospitalizations in snippets.",
+      "The 2026 FDOH report (rank 4, floridahealth.gov/fl-arbovirus-report-w6-2026) is out of the June 2025 window and should not be used for June 2025 data.",
+      "PAHO results (4) appear to cover the Americas broadly or other regions — not confirmed to contain Florida-specific data.",
+      "Max iterations is 2 — this is the final iteration; queries must be maximally targeted to close remaining gaps."
+    ]
+  }
+]

@@ -1,0 +1,114 @@
+[
+  {
+    "anomaly_id": "anom_001",
+    "anomaly_type": "deaths_without_case_reference",
+    "anomaly_unit": "record",
+    "severity": "low",
+    "record_id": "rec_src_search_ff1cee7a6f74_007",
+    "event_cluster_id": null,
+    "validation_result_id": null,
+    "source_id": "src_search_ff1cee7a6f74",
+    "compared_field": "deaths",
+    "disease": "Influenza (Seasonal)",
+    "location": "United States",
+    "date_or_period": "2024-10-05",
+    "source_ids": [
+      "src_search_ff1cee7a6f74"
+    ],
+    "source_urls": [
+      "https://www.cdc.gov/fluview/surveillance/2024-week-40.html"
+    ],
+    "evidence_summary": "• No influenza-associated pediatric deaths occurring during the 2024-2025 season were reported to CDC during Week 40.",
+    "observed_value": 0.0,
+    "expected_or_reference_value": null,
+    "threshold": null,
+    "reason": "deaths present but no comparable case count is available",
+    "recommended_action": "human_review",
+    "needs_human_review": false,
+    "human_review_reason": null,
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "insufficient_case_reference"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_002",
+    "anomaly_type": "deaths_without_case_reference",
+    "anomaly_unit": "record",
+    "severity": "low",
+    "record_id": "rec_src_search_ff1cee7a6f74_009",
+    "event_cluster_id": null,
+    "validation_result_id": null,
+    "source_id": "src_search_ff1cee7a6f74",
+    "compared_field": "deaths",
+    "disease": "Influenza (Seasonal)",
+    "location": "United States",
+    "date_or_period": "2024-10-05",
+    "source_ids": [
+      "src_search_ff1cee7a6f74"
+    ],
+    "source_urls": [
+      "https://www.cdc.gov/fluview/surveillance/2024-week-40.html"
+    ],
+    "evidence_summary": "No influenza-associated pediatric deaths occurring during the 2024-2025 season have been reported to CDC.",
+    "observed_value": 0.0,
+    "expected_or_reference_value": null,
+    "threshold": null,
+    "reason": "deaths present but no comparable case count is available",
+    "recommended_action": "human_review",
+    "needs_human_review": false,
+    "human_review_reason": null,
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [
+      "insufficient_case_reference"
+    ],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  },
+  {
+    "anomaly_id": "anom_003",
+    "anomaly_type": "validation_conflict_anomaly",
+    "anomaly_unit": "validation_result",
+    "severity": "high",
+    "record_id": null,
+    "event_cluster_id": "event_005",
+    "validation_result_id": "val_result_018",
+    "source_id": null,
+    "compared_field": "case_definition",
+    "disease": "Influenza (Seasonal)",
+    "location": "United States",
+    "date_or_period": "Week 40, ending October 5, 2024",
+    "source_ids": [
+      "src_search_ff1cee7a6f74"
+    ],
+    "source_urls": [
+      "https://www.cdc.gov/fluview/surveillance/2024-week-40.html"
+    ],
+    "evidence_summary": "• No influenza-associated pediatric deaths occurring during the 2024-2025 season were reported to CDC during Week 40.",
+    "observed_value": [
+      {
+        "record_id": "rec_src_search_ff1cee7a6f74_007",
+        "value": "influenza-associated pediatric deaths"
+      },
+      {
+        "record_id": "rec_src_search_ff1cee7a6f74_008",
+        "value": "ED visits with a discharge diagnosis of influenza (NSSP)"
+      }
+    ],
+    "expected_or_reference_value": null,
+    "threshold": null,
+    "reason": "Validation result is a conflict: Sources may use different case definitions or reporting categories.",
+    "recommended_action": "resolve_validation_conflict",
+    "needs_human_review": true,
+    "human_review_reason": "Validation result is a conflict: Sources may use different case definitions or reporting categories.",
+    "detection_method": "deterministic_anomaly_detection",
+    "warnings": [],
+    "anomaly_status": "open",
+    "review_decision_ids": [],
+    "human_review_audit_ids": []
+  }
+]

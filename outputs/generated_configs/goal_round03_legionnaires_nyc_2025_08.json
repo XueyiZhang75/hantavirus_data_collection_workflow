@@ -1,0 +1,189 @@
+{
+  "profile_name": "legionnaires_disease_new_york_city_2025-08-01_2025-08-31_real_workflow",
+  "description": "Interactive real data collection workflow run. Live search, live fetch, and LLM stages are enabled by default; API keys are read from environment variables.",
+  "workflow": {
+    "collection_mode": "direct_collection",
+    "use_fixture_documents": false
+  },
+  "user_request": "Collect Legionnaires' disease cases, deaths, dates, locations, source URLs, source types, and evidence quotes for New York City from 2025-08-01 to 2025-08-31.",
+  "structured_task": {
+    "disease": "Legionnaires' disease",
+    "location": "New York City",
+    "start_date": "2025-08-01",
+    "end_date": "2025-08-31",
+    "target_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "source_preferences": [
+      "official_public_health_agency",
+      "international_organization_report",
+      "structured_database",
+      "peer_reviewed_literature",
+      "news_and_situation_report"
+    ],
+    "collection_mode": "direct_collection",
+    "user_request": "Collect Legionnaires' disease cases, deaths, dates, locations, source URLs, source types, and evidence quotes for New York City from 2025-08-01 to 2025-08-31.",
+    "run_label": "goal_round03_legionnaires_nyc_2025_08"
+  },
+  "studio": {
+    "port": null,
+    "no_reload": true
+  },
+  "live_web": {
+    "enabled": true,
+    "timeout_seconds": 30
+  },
+  "source_search": {
+    "enabled": true,
+    "mode": "live",
+    "provider": "tavily",
+    "fixture_path": "src/hdc_workflow/resources/search_fixtures/example_search_results.json",
+    "max_queries": 8,
+    "max_results_per_query": 8,
+    "max_total_results": 64,
+    "timeout_seconds": 20,
+    "combine_with_seed_catalog": false,
+    "cache_enabled": true,
+    "provider_channel_allowlist": [
+      "web_search",
+      "official_site_search",
+      "news_search",
+      "literature_api",
+      "database_search"
+    ],
+    "iterative": {
+      "enabled": true,
+      "max_iterations": 2,
+      "max_queries_per_iteration": 4,
+      "max_total_queries": 10,
+      "max_total_results": 50,
+      "require_llm": true,
+      "allow_deterministic_fallback": false,
+      "stop_when_llm_says_sufficient": true,
+      "require_observation_after_each_iteration": true
+    }
+  },
+  "content_fetch": {
+    "fetch_search_derived_sources": true,
+    "max_search_derived_sources": 18,
+    "max_total_sources": 18,
+    "min_credibility_score": 0.55,
+    "allowed_final_roles": [
+      "collection",
+      "validation",
+      "collection_support",
+      "context"
+    ],
+    "allow_needs_review": true,
+    "domain_allowlist": [],
+    "domain_blocklist": [],
+    "max_bytes": 1000000,
+    "parse_pdf_text": true,
+    "parse_tables": true,
+    "store_raw_text": false,
+    "user_agent": "data-collection-workflow/0.1",
+    "content_fixture_map_path": null,
+    "external_fetch": {
+      "enabled": true,
+      "provider_order": [
+        "tavily_extract",
+        "native_requests"
+      ],
+      "tavily_extract": {
+        "format": "markdown",
+        "extract_depth": "advanced",
+        "timeout_seconds": 45,
+        "chunks_per_source": 5
+      },
+      "adaptive_budget": {
+        "max_candidate_urls": 50,
+        "max_fetch_urls": 18,
+        "min_usable_documents": 12,
+        "min_collection_sources": 6,
+        "min_validation_sources": 0,
+        "max_iterations": 2,
+        "stop_when_llm_says_sufficient": true
+      }
+    }
+  },
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "source_planning_enabled": true,
+    "source_critic_enabled": true,
+    "structured_extraction_enabled": true,
+    "max_chunks": 30,
+    "max_tokens": 4096,
+    "fallback_to_rule_based": false,
+    "source_critic": {
+      "max_sources": 4,
+      "review_blocks_fetch": false
+    },
+    "source_credibility": {
+      "enabled": true,
+      "max_sources": 4,
+      "source_id_allowlist": []
+    },
+    "source_identity": {
+      "enabled": true,
+      "max_sources": 16,
+      "post_fetch": true,
+      "require_llm": true,
+      "allow_deterministic_fallback": false
+    },
+    "must_fetch_min_chunks_per_source": 6,
+    "official_extraction_max_chunks": 30
+  },
+  "disease_intelligence": {
+    "llm_enabled": true,
+    "force_llm": true,
+    "fallback_to_curated": true
+  },
+  "anomaly_detection": {
+    "enabled": true,
+    "max_cases_threshold": 1000000,
+    "max_deaths_threshold": 100000,
+    "spike_multiplier": 10,
+    "min_prior_records": 1
+  },
+  "human_review": {
+    "enabled": false,
+    "decisions_path": null,
+    "apply_decisions": false,
+    "require_reviewer_id": true
+  },
+  "validation": {
+    "mode": "diagnostic_only",
+    "held_out_records_path": null,
+    "allow_incompatible_validation_records": false
+  },
+  "source_sets": {
+    "source_id_allowlist_enabled": false,
+    "collection_source_ids": [],
+    "context_source_ids": [],
+    "validation_reserved_source_ids": [],
+    "workflow_source_ids": [],
+    "llm_source_critic_source_ids": []
+  },
+  "output": {
+    "run_output_root": "outputs",
+    "sessionized": true,
+    "session_id": "goal_round03_legionnaires_nyc_2025_08",
+    "auto_build_console": true,
+    "console_output_root": "outputs/workflow_console",
+    "write_latest_alias": true
+  }
+}

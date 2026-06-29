@@ -1,0 +1,16 @@
+# Human Review Workflow
+
+- Review items: `130`
+- Prioritized items: `130`
+- Generated decision templates are not auto-applied.
+
+- `review_claim_corroboration_conflict_corr_event_001`: P0_critical / conflicting claims review - review_claim_corroboration_conflict_corr_event_001 - [PDF] WEEKLY UPDATE - California West Nile Virus
+- `review_claim_corroboration_conflict_corr_event_004`: P0_critical / conflicting claims review - review_claim_corroboration_conflict_corr_event_004 - West Nile virus, spread by mosquitoes, claims a third li...
+- `review_claim_corroboration_conflict_corr_event_005`: P0_critical / conflicting claims review - review_claim_corroboration_conflict_corr_event_005 - West Nile virus, spread by mosquitoes, claims a third li...
+- `review_linking_event_011`: P0_critical / primary case dataset blocker - review_linking_event_011 - What to know about West Nile Virus as cases increase in Northern ...
+- `review_linking_event_012`: P0_critical / primary case dataset blocker - review_linking_event_012 - 3 cases of West Nile Virus confirmed in Fresno County - ABC30
+- `review_linking_event_014`: P0_critical / primary case dataset blocker - review_linking_event_014 - California West Nile Virus Website: Westnile.ca.gov
+- `review_linking_event_015`: P0_critical / primary case dataset blocker - review_linking_event_015 - California West Nile Virus Website: Westnile.ca.gov
+- `review_linking_event_016`: P0_critical / primary case dataset blocker - review_linking_event_016 - What to know about West Nile Virus as cases increase in Northern ...
+- `review_linking_event_023`: P0_critical / primary case dataset blocker - review_linking_event_023 - 3 cases of West Nile Virus confirmed in Fresno County - ABC30
+- `review_linking_event_027`: P0_critical / primary case dataset blocker - review_linking_event_027 - West Nile virus, spread by mosquitoes, claims a third life in the San Joaquin V...

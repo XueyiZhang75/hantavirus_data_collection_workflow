@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workflow Visualization Index</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Workflow Visualization Index</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main>
+<section><h2>Run Status</h2><div class="grid"><div class="metric"><span>Final case dataset</span><strong>0</strong></div><div class="metric"><span>Final dataset</span><strong>0</strong></div><div class="metric"><span>Evidence nodes</span><strong>650</strong></div><div class="metric"><span>Evidence edges</span><strong>107</strong></div><div class="metric"><span>Claim cards</span><strong>0</strong></div><div class="metric"><span>Human review items</span><strong>10</strong></div></div>
+<p><strong>Task:</strong> COVID-19 / New York / 2024-01-01 to 2024-01-07</p>
+<p><strong>run_quality_status:</strong> <code>no_records_extracted</code></p>
+<p><strong>Artifact-only:</strong> <code>true</code>; visualization did not call LLM, search, or fetch.</p>
+</section>
+<section><h2>Visualization Panels</h2><ul><li><a href="workflow_timeline.html">Workflow timeline</a></li><li><a href="workflow_graph_topology.html">Graph topology</a></li><li><a href="agentic_search_timeline.html">Agentic search timeline</a></li><li><a href="evidence_flow_graph.html">Evidence flow graph</a></li><li><a href="claim_comparison_cards.html">Claim comparison cards</a></li><li><a href="dataset_decision_flow.html">Dataset decision flow</a></li><li><a href="human_review_workflow.html">Human review workflow</a></li><li><a href="workflow_visualization_summary.json">Visualization summary JSON</a></li><li><a href="workflow_visualization_manifest.json">Visualization manifest JSON</a></li><li><a href="../workflow_console/hdc_workflow_console.html">Workflow console</a></li><li><a href="../workflow_interpretive_report_chinese.md">Chinese interpretive report</a></li><li><a href="../human_review/review_action_guide.md">Human review action guide</a></li></ul></section>
+<section><h2>Warnings</h2><pre>[
+  &quot;missing optional dict artifact: executable_source_plan_summary&quot;,
+  &quot;missing optional dict artifact: source_planning_agent_summary&quot;,
+  &quot;missing optional list artifact: documents&quot;,
+  &quot;missing optional list artifact: source_search_results&quot;
+]</pre></section>
+<section><h2>Manifest</h2><pre>{
+  &quot;session_id&quot;: &quot;goal_round01_covid19_new_york_2024_01_01_2024_01_07&quot;,
+  &quot;manifest_type&quot;: &quot;workflow_visualization_manifest&quot;,
+  &quot;files&quot;: {
+    &quot;workflow_visualization/index.html&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/index.html&quot;,
+    &quot;workflow_visualization/workflow_visualization_summary.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/workflow_visualization_summary.json&quot;,
+    &quot;workflow_visualization/workflow_visualization_manifest.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/workflow_visualization_manifest.json&quot;,
+    &quot;workflow_visualization/workflow_timeline.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/workflow_timeline.json&quot;,
+    &quot;workflow_visualization/workflow_timeline.md&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/workflow_timeline.md&quot;,
+    &quot;workflow_visualization/workflow_timeline.html&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/workflow_timeline.html&quot;,
+    &quot;workflow_visualization/workflow_graph_topology.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/workflow_graph_topology.json&quot;,
+    &quot;workflow_visualization/workflow_graph_topology.html&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/workflow_graph_topology.html&quot;,
+    &quot;workflow_visualization/agentic_search_timeline.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/agentic_search_timeline.json&quot;,
+    &quot;workflow_visualization/agentic_search_timeline.md&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/agentic_search_timeline.md&quot;,
+    &quot;workflow_visualization/agentic_search_timeline.html&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/agentic_search_timeline.html&quot;,
+    &quot;workflow_visualization/evidence_flow_graph.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/evidence_flow_graph.json&quot;,
+    &quot;workflow_visualization/evidence_flow_graph.html&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/evidence_flow_graph.html&quot;,
+    &quot;workflow_visualization/evidence_flow_table.csv&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/evidence_flow_table.csv&quot;,
+    &quot;workflow_visualization/claim_comparison_cards.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/claim_comparison_cards.json&quot;,
+    &quot;workflow_visualization/claim_comparison_cards.md&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/claim_comparison_cards.md&quot;,
+    &quot;workflow_visualization/claim_comparison_cards.html&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/claim_comparison_cards.html&quot;,
+    &quot;workflow_visualization/dataset_decision_flow.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/dataset_decision_flow.json&quot;,
+    &quot;workflow_visualization/dataset_decision_flow.html&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/dataset_decision_flow.html&quot;,
+    &quot;workflow_visualization/dataset_decision_table.csv&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/dataset_decision_table.csv&quot;,
+    &quot;workflow_visualization/human_review_workflow.json&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/human_review_workflow.json&quot;,
+    &quot;workflow_visualization/human_review_workflow.md&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/human_review_workflow.md&quot;,
+    &quot;workflow_visualization/human_review_workflow.html&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/human_review_workflow.html&quot;,
+    &quot;workflow_visualization/visualization_styles.css&quot;: &quot;C:/Users/zhang/OneDrive - University of Virginia/桌面/FLU/Epidemics-ML/Data_Collection/hantavirus_data_collection_workflow/outputs/sessions/goal_round01_covid19_new_york_2024_01_01_2024_01_07/workflow_visualization/visualization_styles.css&quot;
+  },
+  &quot;generated_from_artifacts_only&quot;: true,
+  &quot;llm_called_for_visualization&quot;: false,
+  &quot;search_called_for_visualization&quot;: false,
+  &quot;fetch_called_for_visualization&quot;: false
+}</pre></section>
+</main>
+</body>
+</html>

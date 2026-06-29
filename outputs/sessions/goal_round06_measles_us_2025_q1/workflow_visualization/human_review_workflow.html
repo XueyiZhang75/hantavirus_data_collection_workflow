@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 119,
+  &quot;prioritized_review_item_count&quot;: 119,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 44,
+    &quot;P1_high&quot;: 46,
+    &quot;P2_medium&quot;: 2,
+    &quot;P3_low&quot;: 27
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;primary_case_dataset_blocker&quot;: 2,
+    &quot;conflicting_claims_review&quot;: 1,
+    &quot;possible_primary_case_evidence&quot;: 34,
+    &quot;validation_conflict_review&quot;: 5,
+    &quot;claim_corroboration_review&quot;: 24,
+    &quot;source_identity_review&quot;: 17,
+    &quot;outside_scope_review&quot;: 7,
+    &quot;source_credibility_review&quot;: 2,
+    &quot;general_review&quot;: 27
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_linking_event_006</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_006 - Measles Cases Surge in 2025: Key Facts and Prevention Tips - PHM</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_006&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 115,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_b285c8bbed4b_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_b285c8bbed4b_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_006 - Measles Cases Surge in 2025: Key Facts and Prevention Tips - PHM&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;Total Cases**: 378&quot;,
+  &quot;source_url&quot;: &quot;https://privatehealth.com/measles-cases-surge-in-2025-key-facts-and-prevention-tips&quot;,
+  &quot;source_title&quot;: &quot;Measles Cases Surge in 2025: Key Facts and Prevention Tips - PHM&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;background_fact_sheet&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_006&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_b285c8bbed4b&quot;,
+    &quot;source_url&quot;: &quot;https://privatehealth.com/measles-cases-surge-in-2025-key-facts-and-prevention-tips&quot;,
+    &quot;evidence_quote&quot;: &quot;Total Cases**: 378&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_b285c8bbed4b_007&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article><article class='card'><h2>review_normalization_rec_src_search_b285c8bbed4b_001</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_normalization_rec_src_search_b285c8bbed4b_001 - Measles Cases Surge in 2025: Key Facts and Preventi...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_normalization_rec_src_search_b285c8bbed4b_001&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 115,
+  &quot;issue_type&quot;: &quot;record_normalization&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_b285c8bbed4b_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_b285c8bbed4b_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_normalization_rec_src_search_b285c8bbed4b_001 - Measles Cases Surge in 2025: Key Facts and Preventi...&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;Total Cases**: 378&quot;,
+  &quot;source_url&quot;: &quot;https://privatehealth.com/measles-cases-surge-in-2025-key-facts-and-prevention-tips&quot;,
+  &quot;source_title&quot;: &quot;Measles Cases Surge in 2025: Key Facts and Prevention Tips - PHM&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;background_fact_sheet&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_normalization_rec_src_search_b285c8bbed4b_001&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_b285c8bbed4b&quot;,
+    &quot;source_url&quot;: &quot;https://privatehealth.com/measles-cases-surge-in-2025-key-facts-and-prevention-tips&quot;,
+    &quot;evidence_quote&quot;: &quot;Total Cases**: 378&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_b285c8bbed4b_007&quot;,
+    &quot;reason&quot;: &quot;Record requires review after normalization: unrecognized_source_type&quot;
+  }
+}</pre></article><article class='card'><h2>review_claim_corroboration_conflict_corr_event_002</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_002 - Over 2K measles cases reported in US in 2025 as ongoing...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_002&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_5155d9022c8b_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b285c8bbed4b_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_cd5fb2750261_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_cd5fb2750261_002_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_3109afb35d90_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_3109afb35d90_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_3109afb35d90_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_3109afb35d90_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_831265159816_045_cases_unspecified&quot;,
+    &quot;src_search_5155d9022c8b&quot;,
+    &quot;src_search_b285c8bbed4b&quot;,
+    &quot;src_search_cd5fb2750261&quot;,
+    &quot;src_search_3109afb35d90&quot;,
+    &quot;src_search_831265159816&quot;,
+    &quot;corr_event_002&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_5155d9022c8b_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b285c8bbed4b_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_cd5fb2750261_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_cd5fb2750261_002_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_3109afb35d90_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_3109afb35d90_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_3109afb35d90_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_3109afb35d90_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_831265159816_045_cases_unspecified&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_5155d9022c8b&quot;,
+    &quot;src_search_b285c8bbed4b&quot;,
+    &quot;src_search_cd5fb2750261&quot;,
+    &quot;src_search_3109afb35d90&quot;,
+    &quot;src_search_831265159816&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-01-01-2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_002 - Over 2K measles cases reported in US in 2025 as ongoing...&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://abc7.com/post/2k-measles-cases-reported-us-2025-ongoing-outbreaks-threaten-elimination-status/18339323&quot;,
+  &quot;source_title&quot;: &quot;Over 2K measles cases reported in US in 2025 as ongoing ... - ABC7&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_002&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_5155d9022c8b&quot;,
+    &quot;source_url&quot;: &quot;https://abc7.com/post/2k-measles-cases-reported-us-2025-ongoing-outbreaks-threaten-elimination-status/18339323&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_001</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_001 - Situation Report #2: Measles in the Americas Region - PAHO/WHO | Pan Americ...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_001&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_8242cbb785a1_001&quot;,
+    &quot;rec_src_search_8242cbb785a1_002&quot;,
+    &quot;event_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_8242cbb785a1_001&quot;,
+    &quot;rec_src_search_8242cbb785a1_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_001&quot;
+  ],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_001 - Situation Report #2: Measles in the Americas Region - PAHO/WHO | Pan Americ...&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;| [Download](/sites/default/files/2026/05/measles-outbreak-situation-report-7may-2026.pdf \&quot;Situation Report #2: Measles in the Americas Region\&quot;) | Between epidemiological weeks (EW) 1 and EW 16 of 2026, countries in the Region of the Americas reported 18,352 confirmed measles cases including 15 deaths. In 2025, 14,503 measles cases were reported, including 32 deaths. This follows a marked rise in cases during 2025, with continued acceleration observed in early 2026. Since the publication of Situation Report No. 1 (EW 12, 2026), an additional 3,887 confirmed cases including six deaths have been reported, reflecting continued expansion of outbreaks in Mexico and Guatemala, sustained transmission in Canada, and newly reported cases in Peru. The highest number of confirmed cases in 2026 hav...&quot;,
+  &quot;source_url&quot;: &quot;https://www.paho.org/en/documents/situation-report-2-measles-americas-region&quot;,
+  &quot;source_title&quot;: &quot;Situation Report #2: Measles in the Americas Region - PAHO/WHO | Pan American Health Organization&quot;,
+  &quot;actual_publisher&quot;: &quot;Pan American Health Organization&quot;,
+  &quot;source_type_final&quot;: &quot;international_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_001&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record geography is broader than requested location United States; record has geographic_scope_type=&#x27;region&#x27;, geographic_scope=&#x27;Americas&#x27;, country=&#x27;United States of America&#x27;&quot;,
+    &quot;record period 2025-01-01 to 2025-12-31 is too broad for requested task window 2025-01-01 to 2025-03-31&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_8242cbb785a1&quot;,
+    &quot;source_url&quot;: &quot;https://www.paho.org/en/documents/situation-report-2-measles-americas-region&quot;,
+    &quot;evidence_quote&quot;: &quot;| [Download](/sites/default/files/2026/05/measles-outbreak-situation-report-7may-2026.pdf \&quot;Situation Report #2: Measles in the Americas Region\&quot;) | Between epidemiological weeks (EW) 1 and EW 16 of 2026, countries in the Region of the Americas reported 18,352 confirmed measles cases including 15 deaths. In 2025, 14,503 measles cases were reported, including 32 deaths. This follows a marked rise in cases during 2025, with continued acceleration observed in early 2026. Since the publication of Situation Report No. 1 (EW 12, 2026), an additional 3,887 confirmed cases including six deaths have been reported, reflecting continued expansion of outbreaks in Mexico and Guatemala, sustained transmission in Canada, and newly reported cases in Peru. The highest number of confirmed cases in 2026 hav...&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_8242cbb785a1_006&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_002</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_002 - Over 2K measles cases reported in US in 2025 as ongoing ... - ABC7</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_002&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_5155d9022c8b_001&quot;,
+    &quot;event_002&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_5155d9022c8b_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_002&quot;
+  ],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_002 - Over 2K measles cases reported in US in 2025 as ongoing ... - ABC7&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;CHICAGO -- The United States reported more than 2,000 measles cases in 2025, federal data shows, a higher annual total than the country has seen in decades.&quot;,
+  &quot;source_url&quot;: &quot;https://abc7.com/post/2k-measles-cases-reported-us-2025-ongoing-outbreaks-threaten-elimination-status/18339323&quot;,
+  &quot;source_title&quot;: &quot;Over 2K measles cases reported in US in 2025 as ongoing ... - ABC7&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_002&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_5155d9022c8b&quot;,
+    &quot;source_url&quot;: &quot;https://abc7.com/post/2k-measles-cases-reported-us-2025-ongoing-outbreaks-threaten-elimination-status/18339323&quot;,
+    &quot;evidence_quote&quot;: &quot;CHICAGO -- The United States reported more than 2,000 measles cases in 2025, federal data shows, a higher annual total than the country has seen in decades.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_5155d9022c8b_007&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_003</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_003 - Measles Update — United States, January 1–April 17, 2025 | MMWR</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_003&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_3109afb35d90_001&quot;,
+    &quot;event_003&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_3109afb35d90_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_003&quot;
+  ],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_003 - Measles Update — United States, January 1–April 17, 2025 | MMWR&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;##### [Return to your place in the text](#F1_up)**FIGURE 1**. **Reported number of confirmed\\* measles cases, by state (N = 800) — United States, January 1–April 17, 2025**&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7414a1.htm&quot;,
+  &quot;source_title&quot;: &quot;Measles Update — United States, January 1–April 17, 2025 | MMWR&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_003&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record as-of date 2025-04-17 is outside requested task window 2025-01-01 to 2025-03-31&quot;,
+    &quot;record period 2025-01-01 to 2025-04-17 is too broad for requested task window 2025-01-01 to 2025-03-31&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_3109afb35d90&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7414a1.htm&quot;,
+    &quot;evidence_quote&quot;: &quot;##### [Return to your place in the text](#F1_up)**FIGURE 1**. **Reported number of confirmed\\* measles cases, by state (N = 800) — United States, January 1–April 17, 2025**&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_3109afb35d90_021&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_004</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_004 - CDC Records Two New Measles Outbreaks — As 2026 Already Outpaces 2025</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_004&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_cd5fb2750261_001&quot;,
+    &quot;event_004&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_cd5fb2750261_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_004&quot;
+  ],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_004 - CDC Records Two New Measles Outbreaks — As 2026 Already Outpaces 2025&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;The CDC confirmed 588 cases in the U.S. as of Jan. 29, meaning there are nearly 26% of last year&#x27;s total cases (2,255) after just one month in 2026.&quot;,
+  &quot;source_url&quot;: &quot;https://www.forbes.com/sites/antoniopequenoiv/2026/01/30/measles-cases-this-year-are-outpacing-2025---the-worst-recent-year-on-record&quot;,
+  &quot;source_title&quot;: &quot;CDC Records Two New Measles Outbreaks — As 2026 Already Outpaces 2025&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_004&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record as-of date 2025-12-31 is outside requested task window 2025-01-01 to 2025-03-31&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_cd5fb2750261&quot;,
+    &quot;source_url&quot;: &quot;https://www.forbes.com/sites/antoniopequenoiv/2026/01/30/measles-cases-this-year-are-outpacing-2025---the-worst-recent-year-on-record&quot;,
+    &quot;evidence_quote&quot;: &quot;The CDC confirmed 588 cases in the U.S. as of Jan. 29, meaning there are nearly 26% of last year&#x27;s total cases (2,255) after just one month in 2026.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_cd5fb2750261_008&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_005</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_005 - Texas Declares Measles Outbreak &#x27;Over&#x27; After 762 Cases, Two Child ...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_005&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_831265159816_045&quot;,
+    &quot;event_005&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_831265159816_045&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_005&quot;
+  ],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_005 - Texas Declares Measles Outbreak &#x27;Over&#x27; After 762 Cases, Two Child ...&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;As of March 14, 2025, CNN data estimates 320 cases in 2025, and “experts say this is probably a severe undercount.”&quot;,
+  &quot;source_url&quot;: &quot;https://respiratory-therapy.com/disorders-diseases/infectious-diseases/other-infections/texas-measles-outbreak-2025&quot;,
+  &quot;source_title&quot;: &quot;Texas Declares Measles Outbreak &#x27;Over&#x27; After 762 Cases, Two Child ...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_005&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_831265159816&quot;,
+    &quot;source_url&quot;: &quot;https://respiratory-therapy.com/disorders-diseases/infectious-diseases/other-infections/texas-measles-outbreak-2025&quot;,
+    &quot;evidence_quote&quot;: &quot;As of March 14, 2025, CNN data estimates 320 cases in 2025, and “experts say this is probably a severe undercount.”&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_831265159816_088&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_006</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_006 - Measles Cases Surge in 2025: Key Facts and Prevention Tips - PHM</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_006&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_b285c8bbed4b_001&quot;,
+    &quot;event_006&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_b285c8bbed4b_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_006&quot;
+  ],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_006 - Measles Cases Surge in 2025: Key Facts and Prevention Tips - PHM&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;Total Cases**: 378&quot;,
+  &quot;source_url&quot;: &quot;https://privatehealth.com/measles-cases-surge-in-2025-key-facts-and-prevention-tips&quot;,
+  &quot;source_title&quot;: &quot;Measles Cases Surge in 2025: Key Facts and Prevention Tips - PHM&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;background_fact_sheet&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_006&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_b285c8bbed4b&quot;,
+    &quot;source_url&quot;: &quot;https://privatehealth.com/measles-cases-surge-in-2025-key-facts-and-prevention-tips&quot;,
+    &quot;evidence_quote&quot;: &quot;Total Cases**: 378&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_b285c8bbed4b_007&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_007</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_007 - Measles Update — United States, January 1–April 17, 2025 | MMWR</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_007&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_3109afb35d90_002&quot;,
+    &quot;rec_src_search_3109afb35d90_003&quot;,
+    &quot;rec_src_search_3109afb35d90_004&quot;,
+    &quot;event_007&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_3109afb35d90_002&quot;,
+    &quot;rec_src_search_3109afb35d90_003&quot;,
+    &quot;rec_src_search_3109afb35d90_004&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_007&quot;
+  ],
+  &quot;disease&quot;: &quot;Measles&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-03-31&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_007 - Measles Update — United States, January 1–April 17, 2025 | MMWR&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;| ****Total measles cases**** | ****800 (100)**** | ****48 (6)**** | ****752 (94)**** |&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7414a1.htm&quot;,
+  &quot;source_title&quot;: &quot;Measles Update — United States, January 1–April 17, 2025 | MMWR&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_007&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record as-of date 2025-04-17 is outside requested task window 2025-01-01 to 2025-03-31&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_3109afb35d90&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7414a1.htm&quot;,
+    &quot;evidence_quote&quot;: &quot;| ****Total measles cases**** | ****800 (100)**** | ****48 (6)**** | ****752 (94)**** |&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_3109afb35d90_023&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

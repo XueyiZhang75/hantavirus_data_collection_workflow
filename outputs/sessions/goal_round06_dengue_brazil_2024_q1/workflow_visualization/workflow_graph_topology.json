@@ -1,0 +1,597 @@
+{
+  "graph_name": "data collection workflow",
+  "source": "static graph order mirrored from src/hdc_workflow/graph.py",
+  "nodes": [
+    {
+      "id": "START",
+      "label": "START",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "terminal",
+      "executed": true,
+      "status": "structural",
+      "summary_counts": {},
+      "artifact_links": []
+    },
+    {
+      "id": "task_intake_and_scope_planning",
+      "label": "Task intake and scope planning",
+      "description": "Turns the user request into structured task scope.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "task_intake_summary.structured_task_present": true,
+        "task_intake_summary.target_field_count": 14,
+        "task_intake_summary.source_preference_count": 5
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "disease_intelligence_builder",
+      "label": "Disease intelligence builder",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "disease_intelligence_summary.alias_count": 5,
+        "disease_intelligence_summary.pathogen_term_count": 8,
+        "disease_intelligence_summary.source_category_count": 5,
+        "disease_intelligence_summary.query_term_count": 13,
+        "disease_intelligence_summary.source_need_count": 18
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "profile_and_schema_setup",
+      "label": "Profile and schema setup",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "profile_schema_summary.core_field_count": 25,
+        "profile_schema_summary.target_field_count": 14,
+        "profile_schema_summary.source_category_count": 5
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "executable_source_planning",
+      "label": "Executable source planning",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "executable_source_plan_summary.target_field_count": 14,
+        "executable_source_plan_summary.llm_enabled": true,
+        "executable_source_plan_summary.objective_count": 10,
+        "executable_source_plan_summary.planned_source_category_count": 7,
+        "executable_source_plan_summary.planned_query_count": 10,
+        "executable_source_plan_summary.risk_count": 2,
+        "source_planning_agent_summary.llm_source_planning_enabled": true,
+        "source_planning_agent_summary.agent_query_count": 10,
+        "source_planning_agent_summary.agent_query_added_count": 10,
+        "source_planning_agent_summary.agent_candidate_hint_count": 0,
+        "source_planning_agent_summary.human_review_recommended": true,
+        "source_planning_agent_summary.query_strategy_consumed_executable_plan": true
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "query_strategy_builder",
+      "label": "Query strategy builder",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {},
+      "artifact_links": []
+    },
+    {
+      "id": "source_discovery",
+      "label": "Source discovery",
+      "description": "Executes configured source discovery and records search-derived candidates.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "source_search_execution_summary.search_enabled": true,
+        "source_search_execution_summary.live_search_enabled": true,
+        "source_search_execution_summary.fixture_search_enabled": false,
+        "source_search_execution_summary.combine_with_seed_catalog": false,
+        "source_search_execution_summary.planned_query_count": 10,
+        "source_search_execution_summary.selected_query_count": 8,
+        "source_search_execution_summary.executed_query_count": 8,
+        "source_search_execution_summary.skipped_query_count": 0,
+        "source_search_execution_summary.raw_search_result_count": 64,
+        "source_search_execution_summary.deduplicated_search_result_count": 48,
+        "source_search_execution_summary.rejected_search_result_count": 16,
+        "source_search_execution_summary.candidate_from_search_count": 48
+      },
+      "artifact_links": [
+        "diagnostics/source_search_execution_summary.json"
+      ]
+    },
+    {
+      "id": "source_dedup_and_registry",
+      "label": "Source dedup and registry",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "source_registry_summary.input_candidate_count": 48,
+        "source_registry_summary.registry_entry_count": 48,
+        "source_registry_summary.duplicate_count": 0,
+        "source_registry_summary.official_report_alias_duplicate_count": 0,
+        "source_registry_summary.search_derived_entry_count": 48
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "source_screening",
+      "label": "Source screening",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "source_screening_summary.input_registry_count": 48,
+        "source_screening_summary.screened_count": 48,
+        "source_screening_summary.low_confidence_count": 0,
+        "source_screening_summary.missing_url_count": 0,
+        "source_screening_summary.missing_source_type_count": 0,
+        "source_credibility_summary.assessed_source_count": 48,
+        "source_credibility_summary.high_credibility_count": 14,
+        "source_credibility_summary.medium_credibility_count": 9,
+        "source_credibility_summary.low_credibility_count": 6,
+        "source_credibility_summary.needs_review_count": 17,
+        "source_credibility_summary.excluded_count": 4,
+        "source_credibility_summary.search_derived_assessed_count": 48
+      },
+      "artifact_links": [
+        "collection/source_registry.json",
+        "diagnostics/source_identity_summary.json"
+      ]
+    },
+    {
+      "id": "source_critic_and_uncertainty_routing",
+      "label": "Source critic and uncertainty routing",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "source_critic_summary.input_registry_count": 48,
+        "source_critic_summary.critic_reviewed_count": 48,
+        "source_critic_summary.agreement_count": 37,
+        "source_critic_summary.disagreement_count": 11,
+        "source_critic_summary.llm_source_critic_enabled": true,
+        "source_critic_summary.attempted_source_count": 0,
+        "source_critic_summary.assessed_source_count": 0,
+        "source_critic_summary.skipped_source_count": 48,
+        "source_critic_summary.failed_source_count": 0,
+        "source_critic_summary.blocked_fetch_count": 0,
+        "source_critic_summary.needs_review_count": 0,
+        "source_critic_summary.allowed_fetch_count": 0
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "content_fetch_and_parse",
+      "label": "Content fetch and parse",
+      "description": "Fetches and parses allowed source documents.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "content_fetch_summary.live_fetch_enabled": true,
+        "content_fetch_summary.fixture_documents_enabled": false,
+        "content_fetch_summary.content_fixture_map_enabled": false,
+        "content_fetch_summary.fixture_document_count": 0,
+        "content_fetch_summary.source_id_allowlist_enabled": false,
+        "content_fetch_summary.search_derived_fetch_enabled": true,
+        "content_fetch_summary.search_derived_input_count": 48,
+        "content_fetch_summary.selected_search_derived_fetch_count": 38,
+        "content_fetch_summary.generated_target_fetch_count": 0,
+        "content_fetch_summary.search_verified_target_fetch_count": 0,
+        "content_fetch_summary.target_unusable_needs_fallback": false,
+        "content_fetch_summary.fallback_search_executed": true
+      },
+      "artifact_links": [
+        "diagnostics/live_fetch_summary.json",
+        "diagnostics/fetch_manifest.json"
+      ]
+    },
+    {
+      "id": "document_quality_check",
+      "label": "Document quality check",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "document_quality_summary.document_count": 38,
+        "document_quality_summary.usable_count": 30,
+        "document_quality_summary.partial_count": 2,
+        "document_quality_summary.offline_stub_count": 0,
+        "document_quality_summary.parse_deferred_count": 0,
+        "document_quality_summary.unusable_count": 6,
+        "document_quality_summary.error_page_document_count": 6,
+        "document_quality_summary.not_task_relevant_count": 0
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "evidence_chunking_and_data_presence_flagging",
+      "label": "Evidence chunking and data presence flagging",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "evidence_chunking_summary.input_document_count": 38,
+        "evidence_chunking_summary.chunkable_document_count": 32,
+        "evidence_chunking_summary.skipped_document_count": 6,
+        "evidence_chunking_summary.text_chunk_count": 343,
+        "evidence_chunking_summary.table_chunk_count": 45,
+        "evidence_chunking_summary.markdown_metric_row_chunk_count": 45,
+        "evidence_chunking_summary.total_chunk_count": 388,
+        "evidence_chunking_summary.context_only_document_count": 0,
+        "evidence_chunking_summary.context_only_chunk_count": 0,
+        "evidence_chunking_summary.disease_mismatch_chunk_count": 13,
+        "data_presence_summary.total_chunk_count": 388,
+        "data_presence_summary.target_data_chunk_count": 364
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "structured_extraction",
+      "label": "Structured extraction",
+      "description": "Extracts structured public-health records from evidence chunks.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "structured_extraction_summary.input_chunk_count": 388,
+        "structured_extraction_summary.target_data_chunk_count": 341,
+        "structured_extraction_summary.extractable_chunk_count": 386,
+        "structured_extraction_summary.raw_record_count": 18,
+        "structured_extraction_summary.skipped_chunk_count": 2,
+        "structured_extraction_summary.llm_enabled": true,
+        "structured_extraction_summary.llm_eligible_chunk_count": 386,
+        "structured_extraction_summary.llm_call_count": 30,
+        "structured_extraction_summary.llm_success_count": 30,
+        "structured_extraction_summary.llm_empty_output_count": 22,
+        "structured_extraction_summary.llm_error_count": 0,
+        "structured_extraction_summary.llm_fallback_count": 0
+      },
+      "artifact_links": [
+        "diagnostics/structured_extraction_summary.json",
+        "diagnostics/raw_records.json"
+      ]
+    },
+    {
+      "id": "schema_validation_and_repair",
+      "label": "Schema validation and repair",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "schema_validation_summary.raw_record_count": 18,
+        "schema_validation_summary.validated_record_count": 18,
+        "schema_validation_summary.rejected_record_count": 0,
+        "schema_validation_summary.needs_review_count": 3,
+        "schema_validation_summary.human_review_item_count": 3,
+        "schema_validation_summary.generic_record_count": 18,
+        "schema_validation_summary.legacy_hantavirus_record_count": 0,
+        "schema_validation_summary.review_required_record_count": 3,
+        "schema_validation_summary.unsupported_target_field_count": 0,
+        "schema_validation_summary.disease_mismatch_rejected_record_count": 0,
+        "schema_validation_summary.disease_uncertain_review_record_count": 0
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "record_normalization",
+      "label": "Record normalization",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "record_normalization_summary.input_validated_record_count": 18,
+        "record_normalization_summary.normalized_record_count": 18,
+        "record_normalization_summary.needs_review_count": 3,
+        "record_normalization_summary.country_normalized_count": 0,
+        "record_normalization_summary.date_normalized_count": 0,
+        "record_normalization_summary.virus_or_syndrome_normalized_count": 5,
+        "record_normalization_summary.case_definition_normalized_count": 7,
+        "record_normalization_summary.source_type_warning_count": 0,
+        "record_normalization_summary.generic_record_count": 18,
+        "record_normalization_summary.legacy_hantavirus_record_count": 0,
+        "record_normalization_summary.review_required_record_count": 3,
+        "record_normalization_summary.unsupported_target_field_count": 0
+      },
+      "artifact_links": [
+        "diagnostics/normalized_records.json"
+      ]
+    },
+    {
+      "id": "record_linking",
+      "label": "Record linking",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "record_linking_summary.input_normalized_record_count": 18,
+        "record_linking_summary.linked_event_count": 15,
+        "record_linking_summary.single_record_event_count": 9,
+        "record_linking_summary.multi_record_event_count": 3,
+        "record_linking_summary.multi_source_event_count": 0,
+        "record_linking_summary.needs_review_event_count": 3,
+        "record_linking_summary.not_linkable_event_count": 0,
+        "record_linking_summary.records_with_linked_event_id_count": 18,
+        "record_linking_summary.human_review_item_count": 8,
+        "record_linking_summary.event_cluster_count": 15,
+        "record_linking_summary.duplicate_cluster_count": 0,
+        "record_linking_summary.countable_record_count": 18
+      },
+      "artifact_links": []
+    },
+    {
+      "id": "cross_source_consistency_check",
+      "label": "Cross-source consistency check",
+      "description": "Compares claims across sources without deciding official truth.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "validation_summary.validation_result_count": 53,
+        "validation_summary.validation_case_count": 53,
+        "validation_summary.validation_comparison_count": 53,
+        "validation_summary.needs_human_review_count": 6,
+        "validation_summary.active_validation_record_count": 0,
+        "validation_summary.inactive_validation_record_count": 0,
+        "validation_summary.validation_record_count": 0,
+        "validation_summary.raw_validation_record_count": 0,
+        "trusted_source_validation_summary.trusted_source_validation_result_count": 18,
+        "trusted_source_validation_summary.trusted_source_comparison_count": 0,
+        "trusted_source_validation_summary.aggregate_comparison_count": 0,
+        "trusted_source_validation_summary.missing_validation_count": 18
+      },
+      "artifact_links": [
+        "diagnostics/claim_comparisons.json",
+        "diagnostics/corroborated_events.json"
+      ]
+    },
+    {
+      "id": "quality_gate_routing",
+      "label": "Quality gate routing",
+      "description": "The run completed technically, but no accepted primary case records reached final_case_dataset.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "run_quality_summary.direct_collection_enabled": true,
+        "run_quality_summary.normalized_record_count": 18,
+        "run_quality_summary.accepted_record_count": 0,
+        "run_quality_summary.primary_case_dataset_eligible_count": 0,
+        "run_quality_summary.accepted_primary_case_record_count": 0,
+        "run_quality_summary.accepted_non_primary_observation_count": 0,
+        "run_quality_summary.task_aware_non_primary_record_count": 0,
+        "run_quality_summary.surveillance_summary_record_count": 9,
+        "run_quality_summary.non_primary_observation_count": 15,
+        "run_quality_summary.corroborated_primary_case_event_count": 0,
+        "run_quality_summary.no_primary_case_dataset_records": true,
+        "run_quality_summary.no_corroborated_primary_case_events": true
+      },
+      "artifact_links": [
+        "diagnostics/run_quality_summary.json",
+        "diagnostics/final_dataset_quality_summary.json"
+      ]
+    },
+    {
+      "id": "human_review",
+      "label": "Human review",
+      "description": "Packages uncertain or high-impact evidence for manual review.",
+      "node_type": "workflow_node",
+      "executed": false,
+      "status": "structural",
+      "summary_counts": {
+        "human_review_application_summary.records_before_review": 18,
+        "human_review_application_summary.records_after_review": 18,
+        "human_review_application_summary.records_excluded_by_review": 0,
+        "human_review_application_summary.records_corrected_by_review": 0,
+        "human_review_application_summary.clusters_modified_by_review": 0,
+        "human_review_application_summary.validation_results_modified_by_review": 0,
+        "human_review_application_summary.sources_modified_by_review": 0,
+        "human_review_application_summary.anomalies_resolved_by_review": 0,
+        "human_review_application_summary.decisions_provided_count": 0,
+        "human_review_application_summary.decisions_applied_count": 0,
+        "human_review_application_summary.decisions_rejected_count": 0,
+        "human_review_application_summary.audit_entry_count": 0
+      },
+      "artifact_links": [
+        "human_review/human_review_priority_summary.json",
+        "human_review/top_review_items.csv"
+      ]
+    },
+    {
+      "id": "final_data_package_builder",
+      "label": "Final data package builder",
+      "description": "Exports auditable datasets, diagnostics, reports, and review artifacts.",
+      "node_type": "workflow_node",
+      "executed": true,
+      "status": "executed",
+      "summary_counts": {
+        "finalization_summary.final_dataset_count": 0,
+        "finalization_summary.final_dataset_pre_quality_gate_count": 18,
+        "finalization_summary.final_dataset_post_review_count": 0,
+        "finalization_summary.quarantined_record_count": 6,
+        "finalization_summary.pending_review_record_count": 12,
+        "finalization_summary.non_primary_observation_count": 11,
+        "finalization_summary.final_case_dataset_count": 0,
+        "finalization_summary.global_outbreak_event_dataset_count": 0,
+        "finalization_summary.regional_surveillance_dataset_count": 0,
+        "finalization_summary.country_year_aggregate_dataset_count": 0,
+        "finalization_summary.official_alert_dataset_count": 0,
+        "finalization_summary.zero_case_statement_count": 0
+      },
+      "artifact_links": [
+        "collection/final_package.json"
+      ]
+    },
+    {
+      "id": "END",
+      "label": "END",
+      "description": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "node_type": "terminal",
+      "executed": true,
+      "status": "structural",
+      "summary_counts": {},
+      "artifact_links": []
+    }
+  ],
+  "edges": [
+    {
+      "source": "START",
+      "target": "task_intake_and_scope_planning",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "task_intake_and_scope_planning",
+      "target": "disease_intelligence_builder",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "disease_intelligence_builder",
+      "target": "profile_and_schema_setup",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "profile_and_schema_setup",
+      "target": "executable_source_planning",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "executable_source_planning",
+      "target": "query_strategy_builder",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "query_strategy_builder",
+      "target": "source_discovery",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "source_discovery",
+      "target": "source_dedup_and_registry",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "source_dedup_and_registry",
+      "target": "source_screening",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "source_screening",
+      "target": "source_critic_and_uncertainty_routing",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "source_critic_and_uncertainty_routing",
+      "target": "content_fetch_and_parse",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "content_fetch_and_parse",
+      "target": "document_quality_check",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "document_quality_check",
+      "target": "evidence_chunking_and_data_presence_flagging",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "evidence_chunking_and_data_presence_flagging",
+      "target": "structured_extraction",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "structured_extraction",
+      "target": "schema_validation_and_repair",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "schema_validation_and_repair",
+      "target": "record_normalization",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "record_normalization",
+      "target": "record_linking",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "record_linking",
+      "target": "cross_source_consistency_check",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "cross_source_consistency_check",
+      "target": "quality_gate_routing",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "quality_gate_routing",
+      "target": "human_review",
+      "condition": "current_route == human_review",
+      "route_label": "needs human review"
+    },
+    {
+      "source": "quality_gate_routing",
+      "target": "final_data_package_builder",
+      "condition": "current_route != human_review",
+      "route_label": "finalize"
+    },
+    {
+      "source": "human_review",
+      "target": "final_data_package_builder",
+      "condition": null,
+      "route_label": null
+    },
+    {
+      "source": "final_data_package_builder",
+      "target": "END",
+      "condition": null,
+      "route_label": null
+    }
+  ],
+  "warnings": [
+    "topology is exported from documented graph.py node sequence; no graph topology is mutated."
+  ]
+}

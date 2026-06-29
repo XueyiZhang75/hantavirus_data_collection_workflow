@@ -1,0 +1,693 @@
+{
+  "plan_id": "exec_source_plan_covid_19_new_york_2024_01_01_2024_01_07",
+  "disease": "COVID-19",
+  "location": "New York",
+  "time_window": "2024-01-01-2024-01-07",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "llm_generated_plan_requires_human_review_before_execution",
+    "no_urls_fetched_or_validated_in_this_stage"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify primary official reporting sources for COVID-19 human cases, deaths, and hospitalizations in New York (state and city) during 2024-01-01 to 2024-01-07.",
+      "source_role_hint": "collection",
+      "rationale": "NYSDOH and NYC DOHMH are the authoritative subnational agencies publishing weekly COVID-19 surveillance data for New York. Their dashboards, weekly reports, and data downloads are the highest-priority extractable collection sources for the target window.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify CDC state-level COVID-19 surveillance data covering New York for the week of 2024-01-01 to 2024-01-07.",
+      "source_role_hint": "collection",
+      "rationale": "CDC publishes state-level COVID-19 case, death, and hospitalization data through its COVID Data Tracker and associated datasets, which may include New York-specific breakdowns for the target window.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify HHS Protect or HealthData.gov structured datasets reporting New York COVID-19 hospitalizations for the target week.",
+      "source_role_hint": "collection",
+      "rationale": "HHS Protect publishes hospital-level and state-level COVID-19 hospitalization data as open structured datasets, which may contain New York records for the target window.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify independent summary or structured sources (e.g., WHO situation reports, PAHO, Our World in Data) to compare against collected New York COVID-19 records.",
+      "source_role_hint": "validation",
+      "rationale": "Held-back or independent aggregator sources support masked validation of case and death counts without contaminating the primary collection pipeline.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify structured open-data portals (e.g., NYC Open Data, New York State Open Data) with COVID-19 datasets covering the target window.",
+      "source_role_hint": "validation",
+      "rationale": "Open data portals may publish machine-readable COVID-19 datasets that can serve as independent validation against official agency narrative reports.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify context sources clarifying COVID-19 case definitions, count semantics (confirmed vs. probable vs. suspected), and reporting period conventions used by New York agencies in early 2024.",
+      "source_role_hint": "context",
+      "rationale": "Case definition and count-type context is essential for correct normalization of extracted records, especially given the transition in COVID-19 reporting frameworks in 2023–2024.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify peer-reviewed literature or preprints reporting New York COVID-19 epidemiology for January 2024 or the surrounding period.",
+      "source_role_hint": "context",
+      "rationale": "Literature sources may provide case definitions, variant context (JN.1 wave), and epidemiological framing useful for interpreting extracted counts.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_collection_support_001",
+      "objective": "Identify reputable news and situation reports covering New York COVID-19 case and death trends during the first week of January 2024.",
+      "source_role_hint": "collection_support",
+      "rationale": "News sources may surface early outbreak signals, reference official figures, or link to official dashboards not yet identified through direct agency searches.",
+      "priority": 5
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag any sources with ambiguous geographic scope (e.g., national aggregates without NY breakdown), unclear count semantics, or validation leakage risk for human review.",
+      "source_role_hint": "human_review",
+      "rationale": "Sources that cannot be clearly assigned to collection or validation, or whose counts cannot be unambiguously attributed to the target window and location, must be flagged before entering extraction.",
+      "priority": 4
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_official_public_health_agency",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "NYSDOH, NYC DOHMH, and CDC are the primary authoritative agencies publishing COVID-19 case, death, and hospitalization surveillance data for New York. NYSDOH publishes weekly COVID-19 reports; NYC DOHMH publishes city-level data; CDC COVID Data Tracker publishes state-level breakdowns. These are the highest-priority extractable collection sources for the 2024-01-01 to 2024-01-07 window.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "dashboard_data_may_be_cumulative_not_weekly",
+        "reporting_lag_may_affect_exact_window_alignment"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_structured_database",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Structured open-data portals such as NYC Open Data, New York State Open Data, HealthData.gov, and HHS Protect publish machine-readable COVID-19 datasets that can serve as independent validation sources. These datasets may include daily or weekly case, death, and hospitalization counts for New York.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "dataset_may_have_been_archived_or_discontinued_post_2023",
+        "column_semantics_require_verification"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_international_organization_report",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "WHO situation reports and PAHO regional updates may include US or New York COVID-19 data for the target window, providing an independent validation layer against official agency figures.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "international_reports_may_only_cover_national_us_totals_not_new_york_specifically"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "why_relevant": "Peer-reviewed studies and preprints covering New York COVID-19 epidemiology in early 2024 (e.g., JN.1 variant wave) provide case definitions, count semantics, and epidemiological context for interpreting extracted records.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "publication_lag_means_january_2024_data_may_not_yet_be_in_literature",
+        "context_role_only_not_primary_collection"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_news_and_situation_report",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Reputable news outlets (e.g., New York Times, AP, local NY outlets) and situation reports may cite official New York COVID-19 figures for the first week of January 2024, providing collection support and pointers to official sources.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "news_figures_may_be_secondary_citations_of_official_data",
+        "verify_original_source_before_extraction"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"COVID-19\" cases deaths public health New York 2024-01-01-2024-01-07 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "COVID-19"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"SARS-CoV-2\" cases deaths public health New York 2024-01-01-2024-01-07 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "SARS-CoV-2"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"COVID-19\" outbreak report surveillance New York 2024-01-01-2024-01-07 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "COVID-19"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"SARS-CoV-2\" outbreak report surveillance New York 2024-01-01-2024-01-07 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "SARS-CoV-2"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"COVID-19\" epidemiology cases deaths New York 2024-01-01-2024-01-07 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "COVID-19"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"SARS-CoV-2\" epidemiology cases deaths New York 2024-01-01-2024-01-07 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "SARS-CoV-2"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"COVID-19\" surveillance dataset cases deaths New York 2024-01-01-2024-01-07 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "COVID-19"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"SARS-CoV-2\" surveillance dataset cases deaths New York 2024-01-01-2024-01-07 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "SARS-CoV-2"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"COVID-19\" outbreak report cases deaths New York 2024-01-01-2024-01-07 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "COVID-19"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"SARS-CoV-2\" outbreak report cases deaths New York 2024-01-01-2024-01-07 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "SARS-CoV-2"
+      ],
+      "location_terms_used": [
+        "New York"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-01-07",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

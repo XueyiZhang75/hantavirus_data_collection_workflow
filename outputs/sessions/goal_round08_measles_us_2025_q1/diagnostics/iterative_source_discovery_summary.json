@@ -1,0 +1,37 @@
+{
+  "iterative_source_discovery_enabled": true,
+  "llm_iterative_planning_enabled": true,
+  "search_iteration_count": 2,
+  "llm_refinement_call_count": 2,
+  "total_queries_planned": 8,
+  "total_queries_executed": 7,
+  "total_raw_results": 49,
+  "total_candidates_created": 34,
+  "stop_decision": "stop_sufficient",
+  "stop_reason": "Maximum iteration limit reached (2/2). Evidence coverage is sufficient: national case counts, subnational (state/county) breakdowns, deaths, hospitalizations, and international cross-validation are all represented in the accepted candidate set. No critical unresolvable gaps remain within the Q1 2025 window.",
+  "final_coverage_assessment": "Coverage is strong across all primary target fields:\n\n1. NATIONAL CASE COUNT (Q1 2025): The MMWR report (mm7414a1, cdc.gov) provides 800 total cases through April 17, 2025, with 82% concentrated in NM/OK/TX. The second MMWR (mm7520a1, cdc.gov) isolates 325 confirmed cases in West Texas specifically for January 20–March 18, 2025 — directly within the Q1 window. The MMWR (mm7523a2, cdc.gov) covers January 29–February 28, 2025 with 207 confirmed Texas cases.\n\n2. DEATHS: Three deaths confirmed nationally (mm7414a1); one death in West Texas during Jan 20–Mar 18 (mm7520a1); Wikipedia snippet corroborates three deaths (two children in Lubbock, one adult in Lea County, NM) — consistent with MMWR figures.\n\n3. HOSPITALIZATIONS: 60 hospitalized in West Texas Jan 20–Mar 18 (mm7520a1, CIDRAP corroboration); 85 total nationally through April 17 (mm7414a1).\n\n4. SUBNATIONAL LOCATIONS: Texas (Gaines County, South Plains/West Texas, Lubbock, Harris/Houston, Rockwall, Travis), New Mexico (Lea County), Oklahoma (linked cases March 11, 2025), Maryland (Howard County) — all documented in accepted candidates.\n\n5. DATES: Outbreak onset January 20–29, 2025; February 28 interim count; March 11 Oklahoma linkage; March 18 Q1 endpoint — all within the 2025-01-01 to 2025-03-31 window.\n\n6. INTERNATIONAL CROSS-VALIDATION: PAHO situation reports (paho.org) surfaced in iteration 2, confirming 2025 US measles activity in the Americas context. PAHO Situation Report #1 (EW 1–12, 2026) references 2025 full-year US data (2,288 cases); these are post-Q1 but provide retrospective validation.\n\n7. SOURCE DIVERSITY: CDC.gov (4 results, including 2 MMWR reports directly covering Q1), CIDRAP (2 results corroborating MMWR), PAHO.org (4 results for international validation), MSK library guide (secondary aggregator with county-level detail), Wikipedia (contextual corroboration), news/clinical outlets (surepoint-er, respiratory-therapy.com for outbreak timeline).\n\nREMAINING MINOR GAPS: (a) No direct DSHS Texas primary press release URL was surfaced (site: operator queries did not return dshs.texas.gov results directly); (b) No NMDOH (nmhealth.org) primary source appeared; (c) No Oklahoma OSDH primary press release. However, these state-level primary sources are referenced within the MMWR reports and MSK guide, and the MMWR data is authoritative enough to satisfy the collection task without requiring the underlying state press releases as separate candidates.",
+  "final_trustworthiness_assessment": "High. The dominant sources are CDC MMWR peer-reviewed surveillance reports (cdc.gov, two directly Q1-relevant reports), CIDRAP (University of Minnesota, citing MMWR), and PAHO (international organization). The MMWR reports carry the highest epidemiological authority for US surveillance data. CIDRAP independently corroborates the MMWR figures. PAHO provides international cross-validation. Secondary sources (Wikipedia, MSK guide, news outlets) are consistent with MMWR figures and add subnational detail. No contradictions between authoritative sources were detected. The surepoint-er.com and respiratory-therapy.com results cite DSHS figures but cover the full outbreak (through August 2025) — they must be used carefully to extract only Q1-relevant data points.",
+  "final_gap_assessment": null,
+  "selected_query_ids": [
+    "iter1_q1",
+    "iter1_q2",
+    "iter1_q3",
+    "iter1_q4",
+    "iter2_q1",
+    "iter2_q2",
+    "iter2_q3",
+    "iter2_q4"
+  ],
+  "skipped_query_ids": [],
+  "skipped_query_count": 0,
+  "warnings": [],
+  "status": "completed",
+  "target_verification_required": false,
+  "verified_target_source_count": 0,
+  "verified_target_source_ids": [],
+  "target_source_miss_reasons": [],
+  "target_evidence_requirements": {
+    "required": false,
+    "reason": "non_influenza_task"
+  }
+}

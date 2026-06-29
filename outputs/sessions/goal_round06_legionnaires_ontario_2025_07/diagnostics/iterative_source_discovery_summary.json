@@ -1,0 +1,37 @@
+{
+  "iterative_source_discovery_enabled": true,
+  "llm_iterative_planning_enabled": true,
+  "search_iteration_count": 2,
+  "llm_refinement_call_count": 2,
+  "total_queries_planned": 8,
+  "total_queries_executed": 8,
+  "total_raw_results": 64,
+  "total_candidates_created": 37,
+  "stop_decision": "stop_sufficient",
+  "stop_reason": "Max iterations reached (2/2). Evidence coverage is sufficient: confirmed case counts at multiple dated snapshots (43 cases/1 death at outbreak declaration ~July 8–11; 66 cases/2 deaths as of July 14; 70 cases/2 deaths as of July 29; outbreak declared over with 70 confirmed cases spanning July 8–August 6), locality (London, Ontario; Middlesex-London Health Unit; southeast London; Victoria Hospital cooling towers), authoritative sources (healthunit.com, publichealthontario.ca, lhsc.on.ca, crisis24.com, ctvnews.ca, cbc.ca, beaconbio.org), and the PHO 2025 annual surveillance PDF as the primary structured evidence source. All target fields (disease, country, subnational_location, locality, date_reported, cases_confirmed, deaths, source_url, source_type, evidence_quote) have candidate evidence. The re-declaration figure (94 cases/4 deaths) and the YouTube CTV clip (August 27, 2025) are post-July but provide final-count context. No further queries are warranted within the allowed bounds.",
+  "final_coverage_assessment": "Strong. The following target fields are covered by at least one accepted candidate source:\n- disease: Legionnaires' disease / Legionellosis — confirmed across all sources.\n- country: Canada — implicit in all Ontario sources.\n- subnational_location: Ontario — confirmed.\n- locality: London, Ontario; Middlesex-London Health Unit area; southeast London; Victoria Hospital — confirmed via healthunit.com, lhsc.on.ca, crisis24.com, ctvnews.ca.\n- date_reported: Multiple dated snapshots within July 2025 — July 8 (outbreak declaration), July 11 (43 cases/1 death per beaconbio), July 14 (66 cases/2 deaths per healthunit.com), July 23 (lhsc.on.ca media statement), July 29 (70 cases/2 deaths per crisis24.com). Outbreak period July 8–August 6 confirmed by healthunit.com search page.\n- cases_confirmed: 43 (July 11), 66 (July 14), 70 (July 29 and final within-outbreak count for July 8–Aug 6 window).\n- deaths: 1 (July 11), 2 (July 14 and July 29). Note: 4 deaths total (re-declaration, August 27) is post-July.\n- hospitalizations: Not explicitly quantified in snippets — this field may remain partially unresolved, but the PHO PDF and full healthunit.com pages are likely to contain this data.\n- source_url: Multiple accepted URLs across healthunit.com, publichealthontario.ca, crisis24.com, lhsc.on.ca, ctvnews.ca, cbc.ca, beaconbio.org.\n- source_type: official_public_health_agency (healthunit.com, publichealthontario.ca, lhsc.on.ca), news_and_situation_report (cbc.ca, ctvnews.ca, crisis24.com), international_organization_report (beaconbio.org).\n- evidence_quote: Available from snippets for all major sources.",
+  "final_trustworthiness_assessment": "High for primary sources. healthunit.com (Middlesex-London Health Unit) is the primary reporting authority and is the most authoritative source for this outbreak. publichealthontario.ca is the provincial surveillance authority. lhsc.on.ca (London Health Sciences Centre) is a credible hospital system source. cbc.ca and ctvnews.ca are established Canadian national/regional broadcasters. crisis24.com is a credible risk intelligence service that cites MLHU as its primary source. beaconbio.org is a disease surveillance aggregator that cites named sources and dates — acceptable as a secondary corroborating source. The beaconbio Toronto 2026 result (out of scope) must be excluded. YouTube clips are lower-trust for structured data but confirm outbreak re-declaration timeline. Reddit, Facebook, and LinkedIn results should be excluded from data extraction.",
+  "final_gap_assessment": null,
+  "selected_query_ids": [
+    "iter1_q1",
+    "iter1_q2",
+    "iter1_q3",
+    "iter1_q4",
+    "iter2_q1",
+    "iter2_q2",
+    "iter2_q3",
+    "iter2_q4"
+  ],
+  "skipped_query_ids": [],
+  "skipped_query_count": 0,
+  "warnings": [],
+  "status": "completed",
+  "target_verification_required": false,
+  "verified_target_source_count": 0,
+  "verified_target_source_ids": [],
+  "target_source_miss_reasons": [],
+  "target_evidence_requirements": {
+    "required": false,
+    "reason": "non_influenza_task"
+  }
+}

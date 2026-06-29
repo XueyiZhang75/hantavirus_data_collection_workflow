@@ -1,0 +1,218 @@
+[
+  {
+    "iteration_index": 1,
+    "search_objective": "Identify authoritative sources reporting Mpox (monkeypox) case counts, deaths, subnational locations, and dates for the Democratic Republic of the Congo during August 2024 (2024-08-01 to 2024-08-31), covering official national/international health agency reports, situation reports, structured surveillance databases, and high-quality news coverage.",
+    "search_reasoning": "The upstream plan contains 10 queries across 5 source-type channels but uses overly rigid quoted phrase constructions (e.g., \"Mpox DRC 2024\" as a literal phrase) that are unlikely to match real document text, and the date-range string \"2024-08-01-2024-08-31\" embedded in query text will not improve recall. The bounds allow only 4 queries in this iteration and 10 total across 2 iterations, so queries must be high-yield and cover the most authoritative source types first. Priority order: (1) WHO situation reports / AFRO regional office — the primary international authoritative source for DRC Mpox weekly/monthly data; (2) DRC Ministry of Health / INRB (Institut National de Recherche Biomédicale) — the national authority, which publishes in French; (3) WHO Disease Outbreak News and PAHO/AFRO dashboards — structured international reporting; (4) News/media aggregation for subnational granularity and corroboration. French-language queries are essential because DRC's national health communications are primarily in French (\"variole du singe\" or \"mpox\" in French). August 2024 was a period of declared Mpox public health emergency of international concern (PHEIC), making WHO AFRO and WHO HQ situation reports especially likely to contain weekly epidemiological data with province-level breakdowns. Literal phrase quotes are relaxed to improve recall; time anchors use natural language (\"August 2024\") rather than hyphenated date strings.",
+    "query_batch": [
+      {
+        "query_id": "iter1_q1",
+        "query": "WHO mpox situation report Democratic Republic Congo August 2024 cases deaths provinces",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "international_organization_report",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_suspected",
+          "deaths",
+          "subnational_location",
+          "evidence_quote",
+          "source_url"
+        ],
+        "query_rationale": "WHO (HQ and AFRO) is the highest-authority international source for DRC Mpox epidemiological data. During August 2024, WHO declared a PHEIC for Mpox clade Ib, making weekly situation reports and disease outbreak news (DON) the most likely sources of confirmed/probable/suspected case counts, deaths, and province-level breakdowns. Targeting 'situation report' and 'provinces' increases the chance of retrieving subnational data needed for the target fields.",
+        "expected_source_type_or_evidence": "WHO AFRO or WHO HQ situation report, disease outbreak news, or epidemiological update PDF/webpage with tabular case counts by province and week",
+        "expected_trust_signal": "who.int domain, AFRO regional office authorship, dated situation report with epidemiological week reference",
+        "language": "en",
+        "target_disease_terms": [
+          "mpox",
+          "monkeypox"
+        ],
+        "target_location_terms": [
+          "Democratic Republic of Congo",
+          "DRC",
+          "Congo"
+        ],
+        "time_terms": [
+          "August 2024",
+          "2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q1"
+      },
+      {
+        "query_id": "iter1_q2",
+        "query": "mpox variole du singe RDC Congo août 2024 cas décès bulletin épidémiologique INRB ministère santé",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 2,
+        "expected_fields": [
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_suspected",
+          "deaths",
+          "subnational_location",
+          "locality",
+          "evidence_quote",
+          "source_url"
+        ],
+        "query_rationale": "DRC's national surveillance bulletins are published in French by the Ministère de la Santé Publique and INRB (Institut National de Recherche Biomédicale). These are the primary national-authority sources for confirmed, probable, and suspected case counts with subnational (province/zone de santé) breakdowns. 'Août 2024' is the French for August 2024. Using both 'variole du singe' (legacy term) and 'mpox' (current WHO-preferred term) maximises recall across older and newer documents.",
+        "expected_source_type_or_evidence": "French-language weekly or monthly epidemiological bulletin (bulletin épidémiologique hebdomadaire/mensuel) from INRB or DRC Ministry of Health with province- or health-zone-level case tables",
+        "expected_trust_signal": "inrb.cd or sante.gouv.cd domain, INRB or Ministère de la Santé authorship, dated bulletin with epidemiological week number",
+        "language": "fr",
+        "target_disease_terms": [
+          "mpox",
+          "variole du singe"
+        ],
+        "target_location_terms": [
+          "RDC",
+          "République Démocratique du Congo",
+          "Congo"
+        ],
+        "time_terms": [
+          "août 2024",
+          "2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q2"
+      },
+      {
+        "query_id": "iter1_q3",
+        "query": "mpox outbreak DRC Congo August 2024 cases deaths clade WHO AFRO epidemiological update weekly",
+        "provider_channel": "web_search",
+        "query_type": "general_web",
+        "source_type": "international_organization_report",
+        "role_hint": "collection",
+        "priority": 3,
+        "expected_fields": [
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "subnational_location",
+          "evidence_quote",
+          "source_url"
+        ],
+        "query_rationale": "Broadens the WHO/AFRO query to capture epidemiological updates, clade-specific reporting (clade I, clade Ib), and any CDC or Africa CDC situation reports published during August 2024. The term 'weekly' targets periodic surveillance summaries most likely to contain the date-windowed case counts needed. 'Clade' is included because August 2024 reporting heavily distinguished clade Ib (DRC-origin) from clade IIb, and documents using this terminology are likely to contain granular DRC data.",
+        "expected_source_type_or_evidence": "WHO AFRO, Africa CDC, or US CDC situation report or epidemiological update with weekly case counts for DRC, ideally with province-level tables",
+        "expected_trust_signal": "afro.who.int, africacdc.org, or cdc.gov domain; dated weekly epidemiological update; explicit case count tables",
+        "language": "en",
+        "target_disease_terms": [
+          "mpox",
+          "clade I",
+          "clade Ib"
+        ],
+        "target_location_terms": [
+          "DRC",
+          "Democratic Republic of Congo",
+          "Congo"
+        ],
+        "time_terms": [
+          "August 2024",
+          "2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q3"
+      },
+      {
+        "query_id": "iter1_q4",
+        "query": "mpox Congo DRC August 2024 cases deaths province site:reliefweb.int OR site:who.int OR site:africacdc.org OR site:ecdc.europa.eu",
+        "provider_channel": "web_search",
+        "query_type": "domain_limited",
+        "source_type": "international_organization_report",
+        "role_hint": "validation",
+        "priority": 4,
+        "expected_fields": [
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_suspected",
+          "deaths",
+          "subnational_location",
+          "evidence_quote",
+          "source_url",
+          "source_type"
+        ],
+        "query_rationale": "ReliefWeb aggregates WHO, OCHA, and NGO situation reports and is a high-yield secondary index for DRC health emergency documents. Combining it with direct WHO, Africa CDC, and ECDC domain restrictions in a single query maximises the chance of surfacing situation reports, flash updates, and epidemiological bulletins that contain August 2024 DRC Mpox data with subnational granularity. ECDC published multi-country rapid risk assessments during the August 2024 PHEIC period that include DRC-specific case tables.",
+        "expected_source_type_or_evidence": "ReliefWeb-hosted WHO/OCHA situation report, ECDC rapid risk assessment, or Africa CDC epidemiological brief with DRC case counts for August 2024",
+        "expected_trust_signal": "reliefweb.int, who.int, africacdc.org, or ecdc.europa.eu domain; document dated within August 2024 or covering epidemiological weeks 31–35 of 2024; explicit numeric case/death counts",
+        "language": "en",
+        "target_disease_terms": [
+          "mpox"
+        ],
+        "target_location_terms": [
+          "DRC",
+          "Congo",
+          "Democratic Republic of Congo"
+        ],
+        "time_terms": [
+          "August 2024",
+          "2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q4"
+      }
+    ],
+    "expected_evidence": [
+      "Weekly or monthly case counts (confirmed, probable, suspected) for DRC Mpox in August 2024 from WHO AFRO situation reports",
+      "Death counts attributed to Mpox in DRC during August 2024",
+      "Province-level (subnational) case and death breakdowns (e.g., Sud-Kivu, Nord-Kivu, Equateur, Sankuru)",
+      "Health-zone-level (locality) data from INRB or DRC Ministry of Health French-language bulletins",
+      "Epidemiological week references (weeks 31–35 of 2024) enabling date_reported field population",
+      "Case classification breakdowns (confirmed vs. probable vs. suspected) from official surveillance",
+      "Clade-specific (clade I / clade Ib) case counts from WHO or Africa CDC",
+      "Hospitalization figures if reported in situation reports",
+      "Evidence quotes with numeric data suitable for direct extraction"
+    ],
+    "expected_source_characteristics": [
+      "WHO AFRO or WHO HQ situation reports or disease outbreak news (DON) dated August 2024, available on who.int or afro.who.int",
+      "INRB (Institut National de Recherche Biomédicale) French-language weekly epidemiological bulletins on inrb.cd",
+      "DRC Ministère de la Santé Publique bulletins on sante.gouv.cd",
+      "Africa CDC epidemiological briefs or situation reports on africacdc.org",
+      "ECDC rapid risk assessments covering the August 2024 Mpox PHEIC on ecdc.europa.eu",
+      "ReliefWeb-aggregated situation reports from WHO, OCHA, or MSF on reliefweb.int",
+      "Documents containing tabular data with province names, case counts, and dates",
+      "Documents referencing epidemiological weeks 31–35 of 2024 (covering August 2024)"
+    ],
+    "language_or_localization_reasoning": "DRC is a French-speaking country. The national health ministry (Ministère de la Santé) and INRB publish surveillance bulletins in French. WHO AFRO also publishes bilingual (English/French) situation reports. Including at least one French-language query targeting \"variole du singe\" or \"mpox\" with \"RDC\" or \"Congo\" and \"août 2024\" is critical to surface national-level surveillance bulletins that English-only queries would miss. WHO and CDC publish English-language situation reports that are also high-yield. The 4-query budget for this iteration is allocated: 2 English (WHO/international + news), 1 French (national/INRB), 1 structured database/dashboard.",
+    "trust_considerations": [
+      "Prefer sources from official international organizations (WHO, Africa CDC, ECDC) or the DRC national health authority (INRB, Ministère de la Santé) over news media for primary case counts",
+      "French-language national bulletins from INRB or the DRC Ministry of Health are the ground-truth source for subnational data and should be weighted highest for locality/province fields",
+      "WHO situation reports and DONs are authoritative for international-facing aggregate counts but may lag national bulletins by 1–2 weeks",
+      "ReliefWeb documents should be traced to their originating agency (WHO, OCHA, etc.) before being treated as primary sources",
+      "News articles may provide corroborating quotes and subnational detail but should not be used as sole evidence for numeric fields",
+      "August 2024 was the period of the WHO PHEIC declaration for Mpox clade Ib; documents from this period are likely to be high-quality and well-dated",
+      "Verify that any case counts cited are specific to August 2024 and not cumulative year-to-date figures unless clearly labeled as monthly totals"
+    ],
+    "stop_condition_hypothesis": "This iteration is insufficient to stop: no queries have been executed yet. The 4 queries planned here cover the highest-priority source channels (WHO international, DRC national French-language, Africa CDC/ECDC domain-limited). If these return WHO AFRO situation reports with province-level August 2024 data AND INRB/Ministry of Health French bulletins with health-zone breakdowns, a second iteration targeting news corroboration and any remaining subnational gaps may still be warranted within the 2-iteration, 10-query budget.",
+    "warnings": [
+      "The upstream planned queries used rigid quoted phrases (e.g., '\"Mpox DRC 2024\"') and embedded hyphenated date strings that are unlikely to match real document text — these have been replaced with natural-language query constructions in this iteration",
+      "The 4-query per iteration limit means only the highest-priority source channels are covered here; news and peer-reviewed literature queries are deferred to iteration 2 if the budget allows",
+      "DRC national health bulletins are primarily in French; English-only searches will miss INRB and Ministry of Health primary sources — the French-language query (iter1_q2) is essential",
+      "August 2024 Mpox data for DRC may be reported in cumulative year-to-date figures in some sources; extractors must verify whether figures represent monthly or cumulative totals",
+      "Province-level data (subnational_location) and health-zone data (locality) may only appear in INRB French bulletins, not in WHO English situation reports — both source types are needed to populate all target fields",
+      "The PHEIC declaration in August 2024 may have caused some sources to publish retrospective or revised figures; date_reported should be cross-checked against the epidemiological week referenced in each document"
+    ]
+  }
+]

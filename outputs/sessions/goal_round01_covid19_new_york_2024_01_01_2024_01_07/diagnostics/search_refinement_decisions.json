@@ -1,0 +1,199 @@
+[
+  {
+    "iteration_index": 1,
+    "decision": "continue_search",
+    "decision_reason": "Iteration 1 successfully identified the correct authoritative source domains (coronavirus.health.ny.gov, nyc.gov, data.cdc.gov, cdc.gov) and confirmed their relevance to COVID-19 surveillance in New York. However, the search metadata contains only page-level snippets — no numeric case counts, death counts, or hospitalization figures specific to the 2024-01-01 to 2024-01-07 window have been extracted. The NYSDOH hospitalization dashboard, NYC DOHMH data archive, and CDC structured datasets (data.cdc.gov/pwn4-m3yp, NCHS provisional mortality) are confirmed as high-value sources but require more targeted queries to surface time-specific data entries or downloadable dataset references for the target week. Key gaps remain: (1) no confirmed numeric case counts for the target week from any source; (2) no confirmed death counts for the target week; (3) no hospitalization admission figures for the target week; (4) the NYC DOHMH data archive page was found but no week-specific data was surfaced; (5) the CDC open data dataset for weekly cases/deaths by state (data.cdc.gov/pwn4-m3yp) was found but no New York row for week ending 2024-01-06 or 2024-01-07 was confirmed. Iteration 2 must target: (a) the specific CDC open data dataset with a direct query for New York week-ending January 2024; (b) the NYSDOH open data portal for hospitalization time-series; (c) NYC DOHMH GitHub or open data portal for the archived weekly case/death data; (d) a news/situation-report query anchored to the specific week to corroborate official figures and surface evidence quotes.",
+    "coverage_assessment": "Iteration 1 achieved good domain-level coverage: NYSDOH (6 results), NYC DOHMH (3 results), CDC (4 results + 1 data.cdc.gov), and supporting sources. However, no result snippet contains numeric epidemiological data specific to the 2024-01-01–2024-01-07 window. All accepted results are dashboard landing pages or general surveillance pages, not time-specific data entries. The target fields cases_confirmed, cases_probable, cases_suspected, cases_unspecified, deaths, and hospitalizations remain unconfirmed with specific values. The date_reported field is also unconfirmed. Coverage of source_url and source_type is partially met (domains identified), but evidence_quote is entirely absent. A second iteration targeting structured dataset endpoints and time-specific report pages is necessary.",
+    "source_diversity_assessment": "Iteration 1 returned results from 17 distinct domains. The highest-value domains (coronavirus.health.ny.gov, nyc.gov, cdc.gov, data.cdc.gov) are well-represented. Lower-value domains (facebook.com, worldometers.info, en.wikipedia.org, usafacts.org) were also returned but are lower priority. The CDC open data Socrata endpoint (data.cdc.gov/pwn4-m3yp) for weekly cases/deaths by state is a high-value structured dataset that was identified but not yet queried with time-specific parameters. The NYSDOH open data portal (health.data.ny.gov) was not yet directly queried — this is a gap. NYC DOHMH GitHub (nychealth/coronavirus-data) was not surfaced but is a known high-value structured source for NYC daily/weekly data. Diversity is adequate at the domain level but insufficient at the data-specificity level.",
+    "trustworthiness_assessment": "The dominant sources from iteration 1 are official government domains (coronavirus.health.ny.gov, nyc.gov, cdc.gov, data.cdc.gov, health.ny.gov) — highest trust tier. The CDC NCHS provisional mortality page and the CDC open data weekly cases/deaths dataset are authoritative federal sources. The PMC article (COVID-NET) is peer-reviewed but covers a broad period and 12 states, not New York-specific weekly data. Worldometers stopped updating April 2024 and is lower trust for this period. Facebook and Wikipedia are not acceptable as primary evidence sources. The rochealthdata.org source references NYSDOH data and may be useful for corroboration but is not primary. Overall trustworthiness of the candidate pool is high for the official sources identified.",
+    "disease_location_time_fit_assessment": "Disease fit: All accepted sources are COVID-19 specific — strong fit. Location fit: NYSDOH and NYC DOHMH sources are New York-specific; CDC sources cover New York as a state-level unit — strong fit. Time fit: This is the critical gap. No result snippet confirms data for the specific week of 2024-01-01 to 2024-01-07. The NYSDOH hospitalization dashboard mentions historical daily data accessible via Open Data file, suggesting the target week's data exists but requires a direct dataset query. The CDC weekly cases/deaths dataset (data.cdc.gov/pwn4-m3yp) covers this period by design. The NYC DOHMH data archive page references historical data. Time fit is plausible but unconfirmed — iteration 2 must resolve this.",
+    "corroboration_potential_assessment": "The CDC weekly cases/deaths dataset (data.cdc.gov/pwn4-m3yp) can corroborate NYSDOH state-level figures. The NYSDOH hospitalization dashboard can corroborate NYC DOHMH hospitalization data. The NYC DOHMH GitHub data repository (if surfaced) can corroborate nyc.gov dashboard figures with machine-readable weekly data. News sources (nytimes.com was returned in iteration 1) can provide evidence quotes corroborating official figures. The NCHS provisional mortality dataset (data.cdc.gov/r8kw-7aab) can corroborate death counts independently of case surveillance. Corroboration potential is high if iteration 2 successfully surfaces time-specific data from these channels.",
+    "next_query_batch": [
+      {
+        "query_id": "i2_q1",
+        "query": "site:data.cdc.gov COVID-19 weekly cases deaths New York state \"week ending\" January 2024",
+        "provider_channel": "official_site_search",
+        "query_rationale": "The CDC open data Socrata dataset 'Weekly United States COVID-19 Cases and Deaths by State' (data.cdc.gov/pwn4-m3yp) was confirmed in iteration 1 as a high-value structured source. This query directly targets data.cdc.gov for New York weekly data with the 'week ending' phrase and January 2024 time anchor, which matches the dataset's column naming convention. This is the most direct path to confirmed numeric case and death counts for New York for the target week.",
+        "expected_source_type_or_evidence": "CDC Socrata open data dataset page or API endpoint for weekly COVID-19 cases and deaths by state, with a New York row for week ending January 6 or January 7, 2024",
+        "expected_trust_signal": "Federal government domain (data.cdc.gov), CDC authorship, Socrata structured dataset with state-level weekly rows",
+        "language": "en",
+        "target_disease_terms": [
+          "COVID-19"
+        ],
+        "target_location_terms": [
+          "New York",
+          "New York State"
+        ],
+        "time_terms": [
+          "week ending January 2024",
+          "January 6 2024",
+          "January 7 2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "i1_q2",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "deaths",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "i2_q2",
+        "query": "site:health.data.ny.gov COVID-19 hospitalizations cases January 2024 weekly",
+        "provider_channel": "official_site_search",
+        "query_rationale": "The NYSDOH open data portal (health.data.ny.gov) is a distinct domain from coronavirus.health.ny.gov and hosts downloadable machine-readable datasets including the COVID-19 hospitalization time-series referenced in the NYSDOH hospitalization dashboard snippet ('Historical daily data can be accessed via this Open Data COVID-19 hospitalizations file'). This query directly targets that portal for January 2024 data, which should yield the specific hospitalization counts for the target week.",
+        "expected_source_type_or_evidence": "NYSDOH open data portal dataset page for COVID-19 hospitalizations or cases with daily/weekly rows covering January 2024, filterable by date",
+        "expected_trust_signal": "New York State government domain (health.data.ny.gov), NYSDOH authorship, open data portal with time-series dataset",
+        "language": "en",
+        "target_disease_terms": [
+          "COVID-19"
+        ],
+        "target_location_terms": [
+          "New York",
+          "New York State"
+        ],
+        "time_terms": [
+          "January 2024",
+          "week ending January 2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "i1_q1",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "hospitalizations",
+          "deaths",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "i2_q3",
+        "query": "NYC DOHMH COVID-19 data \"week ending\" \"January 2024\" confirmed cases deaths hospitalizations github OR \"data.cityofnewyork.us\"",
+        "provider_channel": "web_search",
+        "query_rationale": "NYC DOHMH maintains a GitHub repository (nychealth/coronavirus-data) and a NYC Open Data portal (data.cityofnewyork.us) with machine-readable weekly COVID-19 data including confirmed and probable cases, deaths, and hospitalizations. The data.cityofnewyork.us domain appeared in iteration 1 results. This query targets both channels with the 'week ending' phrase and January 2024 time anchor to surface the specific NYC weekly data entry for the target period.",
+        "expected_source_type_or_evidence": "NYC DOHMH GitHub repository file or NYC Open Data dataset with weekly COVID-19 rows for week ending January 2024, containing confirmed/probable case counts, deaths, and hospitalizations for New York City",
+        "expected_trust_signal": "NYC DOHMH authorship, official NYC Open Data portal (data.cityofnewyork.us) or nychealth GitHub repository, weekly data with date column matching target week",
+        "language": "en",
+        "target_disease_terms": [
+          "COVID-19"
+        ],
+        "target_location_terms": [
+          "New York City",
+          "NYC"
+        ],
+        "time_terms": [
+          "week ending January 2024",
+          "January 6 2024",
+          "January 7 2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "i1_q1",
+        "query_type": "general_web",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 2,
+        "expected_fields": [
+          "disease",
+          "locality",
+          "subnational_location",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "i2_q4",
+        "query": "New York COVID-19 \"week ending January 6\" OR \"week ending January 7\" 2024 cases deaths hospitalizations",
+        "provider_channel": "news_search",
+        "query_rationale": "The standard CDC and NYSDOH reporting convention uses 'week ending [date]' with the Saturday end-date. For the 2024-01-01 to 2024-01-07 window, the week-ending date is January 6 (Saturday) or January 7 (Sunday, depending on the reporting convention). News articles and situation reports from early January 2024 citing official figures often use this exact phrase. This query uses exact phrase matching for both possible week-ending dates to maximize recall of news articles that cite official New York COVID-19 figures for the target week, which can provide evidence quotes and corroborate official data.",
+        "expected_source_type_or_evidence": "News article or public health situation report from January 2024 citing New York COVID-19 weekly statistics with 'week ending January 6' or 'week ending January 7' language, including numeric case, death, or hospitalization figures",
+        "expected_trust_signal": "Established news outlet or official agency press release, publication date in January 2024, direct citation of NYSDOH or CDC figures",
+        "language": "en",
+        "target_disease_terms": [
+          "COVID-19"
+        ],
+        "target_location_terms": [
+          "New York",
+          "New York State",
+          "New York City"
+        ],
+        "time_terms": [
+          "week ending January 6 2024",
+          "week ending January 7 2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 3,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ]
+      }
+    ],
+    "stop_reason": null,
+    "warnings": [
+      "No numeric epidemiological values for the target week (2024-01-01 to 2024-01-07) have been confirmed in any result snippet — all iteration 1 results are dashboard landing pages, not time-specific data entries.",
+      "The NYSDOH open data portal (health.data.ny.gov) was not directly queried in iteration 1 — it is a distinct domain from coronavirus.health.ny.gov and may host downloadable time-series datasets with the target week's data.",
+      "NYC DOHMH GitHub repository (github.com/nychealth/coronavirus-data) was not surfaced in iteration 1 results despite github.com appearing once — a direct query for this repository may yield machine-readable weekly data for the target period.",
+      "The CDC NCHS provisional mortality Socrata dataset (data.cdc.gov/r8kw-7aab) was referenced in a snippet but not directly queried — it contains week-ending death counts by state and is directly relevant.",
+      "Post-PHE reporting changes (after May 2023) mean that case counts (confirmed, probable, suspected) may no longer be separately broken out by January 2024 — iteration 2 queries should be flexible about which case classification fields are available.",
+      "Iteration 2 is the final iteration under the max_iterations=2 bound — all 4 queries must be maximally targeted to fill the remaining gaps in numeric data for the target week."
+    ]
+  },
+  {
+    "iteration_index": 2,
+    "decision": "stop_sufficient",
+    "decision_reason": "Both iterations have been fully executed, consuming all 8 planned queries across the 2-iteration maximum. The search has successfully identified the complete set of authoritative source domains for New York COVID-19 surveillance data for the target week (2024-01-01 to 2024-01-07): (1) coronavirus.health.ny.gov — NYSDOH weekly hospitalization dashboard and COVID-19 data hub; (2) data.cdc.gov/Case-Surveillance/Weekly-United-States-COVID-19-Cases-and-Deaths-by-/pwn4-m3yp — CDC weekly cases and deaths by state (confirmed candidate); (3) data.cdc.gov/dataset/Weekly-United-States-COVID-19-Cases-and-Deaths-by-/yviw-z6j5 — CDC weekly cases and deaths by county (new candidate from iteration 2); (4) data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf and /n8mc-b4w4 — CDC case surveillance public use data with geography; (5) data.cdc.gov/National-Center-for-Health-Statistics/Provisional-COVID-19-Death-Counts-by-Week-Ending-D/r8kw-7aab — NCHS provisional mortality by week and jurisdiction (referenced in iteration 1 snippet); (6) health.data.ny.gov — NYSDOH open data portal (COVID-19 hospitalization time-series); (7) nyc.gov/site/doh/covid — NYC DOHMH data archive; (8) data.cityofnewyork.us — NYC Open Data portal. These represent the full authoritative source landscape for this task. No additional search iterations are permitted under the max_iterations=2 bound, and the marginal value of further queries is low given that the correct dataset-level source candidates have been identified across all three primary channels (federal CDC, NYSDOH state, NYC DOHMH city). The downstream collection step must now access these sources directly to extract numeric values for the target week.",
+    "coverage_assessment": "Coverage is structurally complete across the three primary reporting tiers for New York COVID-19 surveillance: (1) Federal/CDC tier: CDC weekly cases and deaths by state (pwn4-m3yp), CDC weekly cases and deaths by county (yviw-z6j5), CDC case surveillance public use data with geography (n8mc-b4w4), NCHS provisional mortality by week (r8kw-7aab), and CDC community levels by county (3nnm-4jni) — all on data.cdc.gov. (2) New York State tier: NYSDOH COVID-19 data hub and weekly hospitalization dashboard (coronavirus.health.ny.gov), NYSDOH open data portal (health.data.ny.gov). (3) New York City tier: NYC DOHMH data archive (nyc.gov), NYC Open Data portal (data.cityofnewyork.us), and NYC DOHMH GitHub (github.com/nychealth/coronavirus-data, surfaced in iteration 2). The target fields of cases_confirmed, deaths, hospitalizations, date_reported, subnational_location, and locality are all addressable from these sources. The fields cases_probable, cases_suspected, and cases_unspecified may not be separately reported post-PHE (after May 2023), but this is a data availability constraint, not a search gap. No numeric evidence quotes have been confirmed in snippets, as all returned snippets are dataset landing pages rather than row-level data — this is expected and is a downstream extraction task, not a search failure.",
+    "source_diversity_assessment": "Source diversity is adequate across reporting tiers and data types: federal structured datasets (data.cdc.gov, multiple datasets), state dashboard and open data (coronavirus.health.ny.gov, health.data.ny.gov), city dashboard and open data (nyc.gov, data.cityofnewyork.us, github.com/nychealth). The search did not surface news articles with specific numeric quotes for the target week (the news query i2_q4 did not return snippets with week-specific figures), but this is consistent with the post-PHE period when COVID-19 weekly figures received less prominent news coverage. The absence of news corroboration is a minor gap but does not undermine the primary official source coverage. The health.data.ny.gov results returned non-COVID PDFs (MLTC performance data, SPARCS hospital quality indicators), indicating the site: query did not surface the COVID-19 hospitalization open data file directly — the downstream step should search health.data.ny.gov directly for the COVID-19 hospitalization dataset.",
+    "trustworthiness_assessment": "All primary source candidates are from official government domains: data.cdc.gov (federal CDC), coronavirus.health.ny.gov and health.data.ny.gov (New York State DOH), nyc.gov and data.cityofnewyork.us (New York City DOHMH). These are the highest-trust tier for epidemiological surveillance data. The github.com result is the nychealth/coronavirus-data repository, which is the official NYC DOHMH open-source data repository — also high trust. No low-trust sources (social media, non-official aggregators) are in the primary candidate set. Worldometers and JHU coronavirus tracker appeared in results but JHU tracker was discontinued in March 2023 and Worldometers stopped updating in April 2024 — these are not recommended as primary sources for the target week. The Facebook post (OCPHealth) is county-level and not New York State or NYC — low priority. The NCBI PMC article covers October 2023–April 2024 hospitalization rates across 12 states and may provide corroborating context but not week-specific New York figures.",
+    "disease_location_time_fit_assessment": "Disease fit: All identified sources are COVID-19-specific or include COVID-19 as a primary disease category. Location fit: Sources cover New York State (NYSDOH), New York City (NYC DOHMH), and county-level New York (CDC county dataset, NYC DOHMH GitHub) — the task location 'New York' is covered at both state and city levels. Time fit: The target week 2024-01-01 to 2024-01-07 falls within the active reporting period for all identified datasets. The CDC weekly datasets use Saturday week-ending dates; for this window, the relevant week-ending date is January 6, 2024 (Saturday). The NYSDOH hospitalization dashboard uses Sunday–Saturday periods reported on Wednesdays. The NCHS provisional mortality dataset uses week-ending dates with a reporting lag of ~8 weeks, so January 2024 data should be present. Post-PHE reporting changes (after May 2023) mean case counts may be less granular, but hospitalization and death data continued to be reported through this period.",
+    "corroboration_potential_assessment": "Corroboration potential is moderate-to-high. The CDC weekly cases/deaths by state dataset (pwn4-m3yp) and the NCHS provisional mortality dataset (r8kw-7aab) provide two independent federal sources for deaths. The CDC weekly cases/deaths by county dataset (yviw-z6j5) can corroborate state-level figures at county granularity. NYSDOH and NYC DOHMH provide independent subnational corroboration. The CDC case surveillance public use data (vbim-akqf, n8mc-b4w4) provides individual-level case records that can be aggregated for the target week. Cross-referencing these sources will allow verification of case and death counts. Hospitalization corroboration is available from the NYSDOH hospitalization dashboard (coronavirus.health.ny.gov/daily-hospitalization-summary) and the referenced NYSDOH open data hospitalization file. No news-based numeric corroboration was surfaced, which is a minor gap.",
+    "next_query_batch": [],
+    "stop_reason": "Maximum iterations (2) reached. All planned queries across both iterations have been executed (8 of 10 max total queries used). The search has successfully identified the authoritative source domains and specific dataset candidates across all three primary reporting channels (CDC federal, NYSDOH state, NYC DOHMH city) that are most likely to contain COVID-19 case, death, and hospitalization data for New York for the week of 2024-01-01 to 2024-01-07. No numeric values have been confirmed in snippets (snippets are landing-page metadata only, not row-level data), but the correct source candidates for downstream data extraction have been identified. Further search is unlikely to surface new authoritative sources not already represented in the candidate set, and the iteration and query bounds prohibit additional searches.",
+    "warnings": [
+      "No numeric case counts, death counts, or hospitalization figures for the specific target week (2024-01-01 to 2024-01-07) have been confirmed in any search snippet — all returned snippets are dataset landing pages or dashboard overview pages, not row-level data. Downstream extraction must access these sources directly.",
+      "The health.data.ny.gov site: query returned non-COVID PDFs (MLTC performance data, SPARCS hospital quality indicators) rather than the COVID-19 hospitalization open data file. The downstream step should search health.data.ny.gov directly using the dataset title 'COVID-19 Hospitalizations' or the dataset ID referenced in the NYSDOH hospitalization dashboard snippet.",
+      "The CDC weekly cases/deaths by state dataset (pwn4-m3yp) uses Saturday week-ending dates; the relevant row for the target week is 'week ending January 6, 2024' (not January 7). Downstream extraction should filter on this date.",
+      "Post-PHE (post-May 2023) reporting: cases_probable, cases_suspected, and cases_unspecified may not be separately reported in CDC or NYSDOH datasets for January 2024. The CDC weekly cases/deaths dataset may report only total new cases without confirmed/probable breakdown.",
+      "JHU Coronavirus Resource Center (coronavirus.jhu.edu) was discontinued in March 2023 and should not be used as a source for January 2024 data despite appearing in search results.",
+      "Worldometers COVID tracker stopped updating in April 2024 — it may contain January 2024 data but is a secondary aggregator, not an authoritative primary source.",
+      "The NYC DOHMH GitHub repository (github.com/nychealth/coronavirus-data) was surfaced in iteration 2 results but no specific file or commit was identified in snippets. The downstream step should access the repository's 'trends' or 'weekly-case-rate' CSV files for the target week.",
+      "The max_iterations=2 bound has been reached. No further search iterations are possible under the current task bounds."
+    ]
+  }
+]

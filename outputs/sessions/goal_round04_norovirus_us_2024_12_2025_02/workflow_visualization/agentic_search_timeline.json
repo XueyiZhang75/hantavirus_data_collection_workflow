@@ -1,0 +1,1399 @@
+{
+  "timeline_type": "agentic_search_timeline",
+  "planned_query_count": 10,
+  "iterative_search_enabled": true,
+  "iteration_count": 2,
+  "executed_query_count": 8,
+  "raw_result_count": null,
+  "search_derived_candidate_count": 43,
+  "stop_decision": "stop_limits_reached",
+  "stop_reason": "max_iterations reached (iteration_index=2, max_iterations=2); max_total_queries=10 also reached with 8 queries executed across 2 iterations; no further search permitted under task bounds",
+  "cards": [
+    {
+      "card_type": "PLAN",
+      "title": "Search plan",
+      "summary": {
+        "planned_query_count": 10,
+        "iterative_search_enabled": true
+      }
+    },
+    {
+      "card_type": "SEARCH iteration 1",
+      "queries": [
+        {
+          "query_id": "iter1_q1",
+          "query": "CDC NoroSTAT norovirus surveillance 2024 2025 season United States cases outbreaks",
+          "provider_channel": "official_site_search",
+          "query_type": "official_site",
+          "source_type": "official_public_health_agency",
+          "role_hint": "collection",
+          "priority": 1,
+          "expected_fields": [
+            "disease",
+            "country",
+            "subnational_location",
+            "date_reported",
+            "cases_unspecified",
+            "deaths",
+            "hospitalizations",
+            "source_url",
+            "source_type",
+            "evidence_quote"
+          ],
+          "query_rationale": "CDC NoroSTAT is the primary US national norovirus surveillance system. This query directly targets the CDC's seasonal surveillance summary, which is the highest-priority authoritative source for national-level case and outbreak counts. Natural-language phrasing without exact-phrase quoting improves recall over the upstream query formulation.",
+          "expected_source_type_or_evidence": "CDC NoroSTAT weekly surveillance summary or season overview page with outbreak counts, case totals, and trend data for the 2024-2025 norovirus season",
+          "expected_trust_signal": "cdc.gov domain; authored by CDC Division of Viral Diseases; references NORS data",
+          "language": "en",
+          "target_disease_terms": [
+            "norovirus",
+            "NoroSTAT"
+          ],
+          "target_location_terms": [
+            "United States"
+          ],
+          "time_terms": [
+            "2024-2025 season",
+            "2024",
+            "2025"
+          ],
+          "is_follow_up_query": false,
+          "previous_iteration_basis": null,
+          "execution_status": "planned_not_executed",
+          "query_source": "iterative_llm_initial_search_plan",
+          "iteration_index": 1,
+          "iterative_query_id": "iter1_q1"
+        },
+        {
+          "query_id": "iter1_q2",
+          "query": "CDC NORS norovirus outbreak reports United States December 2024 January February 2025 cases hospitalizations deaths",
+          "provider_channel": "database_search",
+          "query_type": "database",
+          "source_type": "structured_database",
+          "role_hint": "collection",
+          "priority": 2,
+          "expected_fields": [
+            "disease",
+            "country",
+            "subnational_location",
+            "locality",
+            "date_reported",
+            "cases_unspecified",
+            "deaths",
+            "hospitalizations",
+            "source_url",
+            "source_type",
+            "evidence_quote"
+          ],
+          "query_rationale": "NORS (National Outbreak Reporting System) is the CDC's structured database for foodborne and enteric disease outbreaks including norovirus. It provides outbreak-level records with subnational location, setting, case counts, hospitalizations, and deaths — directly mapping to the target fields. Querying NORS for the specific months in the task window maximizes coverage of the locality and subnational_location fields.",
+          "expected_source_type_or_evidence": "CDC NORS dashboard or data summary page listing individual norovirus outbreak records with setting, state, case counts, hospitalizations, and deaths for the target date range",
+          "expected_trust_signal": "cdc.gov/nors domain; structured outbreak-level records with state and setting fields",
+          "language": "en",
+          "target_disease_terms": [
+            "norovirus",
+            "NORS",
+            "National Outbreak Reporting System"
+          ],
+          "target_location_terms": [
+            "United States"
+          ],
+          "time_terms": [
+            "December 2024",
+            "January 2025",
+            "February 2025"
+          ],
+          "is_follow_up_query": false,
+          "previous_iteration_basis": null,
+          "execution_status": "planned_not_executed",
+          "query_source": "iterative_llm_initial_search_plan",
+          "iteration_index": 1,
+          "iterative_query_id": "iter1_q2"
+        },
+        {
+          "query_id": "iter1_q3",
+          "query": "norovirus outbreak United States winter 2024 2025 cases deaths state health department report",
+          "provider_channel": "web_search",
+          "query_type": "general_web",
+          "source_type": "official_public_health_agency",
+          "role_hint": "collection",
+          "priority": 3,
+          "expected_fields": [
+            "disease",
+            "country",
+            "subnational_location",
+            "locality",
+            "date_reported",
+            "cases_confirmed",
+            "cases_suspected",
+            "cases_unspecified",
+            "deaths",
+            "hospitalizations",
+            "source_url",
+            "source_type",
+            "evidence_quote"
+          ],
+          "query_rationale": "Because norovirus is not nationally notifiable, subnational outbreak data is primarily reported at the state and local level. This broad web search targets state health department reports and press releases that would populate the subnational_location and locality fields. The query avoids exact-phrase quoting to maximize recall across diverse state agency naming conventions.",
+          "expected_source_type_or_evidence": "State or local health department press releases, epidemiology bulletins, or outbreak investigation reports with specific case counts, dates, and geographic locations within the US",
+          "expected_trust_signal": "State .gov domains (e.g., health.state.xx.us); official press release or epi bulletin format; named public health official quoted",
+          "language": "en",
+          "target_disease_terms": [
+            "norovirus",
+            "norovirus outbreak"
+          ],
+          "target_location_terms": [
+            "United States"
+          ],
+          "time_terms": [
+            "winter 2024",
+            "winter 2025",
+            "December 2024",
+            "January 2025",
+            "February 2025"
+          ],
+          "is_follow_up_query": false,
+          "previous_iteration_basis": null,
+          "execution_status": "planned_not_executed",
+          "query_source": "iterative_llm_initial_search_plan",
+          "iteration_index": 1,
+          "iterative_query_id": "iter1_q3"
+        },
+        {
+          "query_id": "iter1_q4",
+          "query": "norovirus surge outbreak United States 2025 cases hospitalizations news January February",
+          "provider_channel": "news_search",
+          "query_type": "news",
+          "source_type": "news_and_situation_report",
+          "role_hint": "collection_support",
+          "priority": 4,
+          "expected_fields": [
+            "disease",
+            "country",
+            "subnational_location",
+            "locality",
+            "date_reported",
+            "cases_unspecified",
+            "deaths",
+            "hospitalizations",
+            "source_url",
+            "source_type",
+            "evidence_quote"
+          ],
+          "query_rationale": "News sources provide timely coverage of norovirus outbreaks that may precede official surveillance summaries, and often cite official figures that can be traced back to primary sources. The term 'surge' is included because media coverage of norovirus in winter 2024-2025 is likely to use this framing. This query covers the later portion of the time window (Jan-Feb 2025) where news coverage is most likely to be available.",
+          "expected_source_type_or_evidence": "News articles from credible outlets (AP, Reuters, major US newspapers, health news sites) reporting on norovirus case surges, specific outbreak events, or official statistics for the US in the target window, ideally citing CDC or state health department figures",
+          "expected_trust_signal": "Bylined article from established news organization; quotes from CDC spokesperson or state health official; references specific case counts or outbreak numbers",
+          "language": "en",
+          "target_disease_terms": [
+            "norovirus",
+            "norovirus surge",
+            "stomach bug outbreak"
+          ],
+          "target_location_terms": [
+            "United States"
+          ],
+          "time_terms": [
+            "2025",
+            "January 2025",
+            "February 2025"
+          ],
+          "is_follow_up_query": false,
+          "previous_iteration_basis": null,
+          "execution_status": "planned_not_executed",
+          "query_source": "iterative_llm_initial_search_plan",
+          "iteration_index": 1,
+          "iterative_query_id": "iter1_q4"
+        }
+      ],
+      "plan": {
+        "iteration_index": 1,
+        "search_objective": "Identify authoritative sources reporting Norovirus case counts, deaths, hospitalizations, outbreak locations, and dates for the United States during December 2024 through February 2025, covering national surveillance, subnational outbreak reports, and structured databases.",
+        "search_reasoning": "The upstream plan contains 10 queries across 5 source-type channels but uses overly rigid quoted phrase constructions that may suppress relevant results (e.g., exact-phrase matching on \"norovirus outbreak United States 2024 2025\" is unlikely to match real CDC or state health department page titles). The upstream queries also embed date-range strings (e.g., \"2024-12-01-2025-02-28\") directly in query text, which will not match natural-language page content. Given the 4-query-per-iteration cap, this first iteration should prioritize: (1) CDC's NoroSTAT / NORS surveillance system — the primary authoritative structured source for US norovirus outbreak data; (2) CDC's general norovirus surveillance page for the 2024–2025 season; (3) a targeted news/situation-report search for state-level outbreak reports in the Dec 2024–Feb 2025 window; and (4) a WHO/PAHO or ProMED international-organization angle for any US-specific norovirus situation reports. Exact-phrase quoting is relaxed to improve recall. Time terms are expressed as natural-language season descriptors and year ranges rather than ISO date strings. All four queries are independent and can be issued simultaneously.",
+        "query_batch": [
+          {
+            "query_id": "iter1_q1",
+            "query": "CDC NoroSTAT norovirus surveillance 2024 2025 season United States cases outbreaks",
+            "provider_channel": "official_site_search",
+            "query_type": "official_site",
+            "source_type": "official_public_health_agency",
+            "role_hint": "collection",
+            "priority": 1,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "date_reported",
+              "cases_unspecified",
+              "deaths",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ],
+            "query_rationale": "CDC NoroSTAT is the primary US national norovirus surveillance system. This query directly targets the CDC's seasonal surveillance summary, which is the highest-priority authoritative source for national-level case and outbreak counts. Natural-language phrasing without exact-phrase quoting improves recall over the upstream query formulation.",
+            "expected_source_type_or_evidence": "CDC NoroSTAT weekly surveillance summary or season overview page with outbreak counts, case totals, and trend data for the 2024-2025 norovirus season",
+            "expected_trust_signal": "cdc.gov domain; authored by CDC Division of Viral Diseases; references NORS data",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "NoroSTAT"
+            ],
+            "target_location_terms": [
+              "United States"
+            ],
+            "time_terms": [
+              "2024-2025 season",
+              "2024",
+              "2025"
+            ],
+            "is_follow_up_query": false,
+            "previous_iteration_basis": null,
+            "execution_status": "planned_not_executed",
+            "query_source": "iterative_llm_initial_search_plan",
+            "iteration_index": 1,
+            "iterative_query_id": "iter1_q1"
+          },
+          {
+            "query_id": "iter1_q2",
+            "query": "CDC NORS norovirus outbreak reports United States December 2024 January February 2025 cases hospitalizations deaths",
+            "provider_channel": "database_search",
+            "query_type": "database",
+            "source_type": "structured_database",
+            "role_hint": "collection",
+            "priority": 2,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_unspecified",
+              "deaths",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ],
+            "query_rationale": "NORS (National Outbreak Reporting System) is the CDC's structured database for foodborne and enteric disease outbreaks including norovirus. It provides outbreak-level records with subnational location, setting, case counts, hospitalizations, and deaths — directly mapping to the target fields. Querying NORS for the specific months in the task window maximizes coverage of the locality and subnational_location fields.",
+            "expected_source_type_or_evidence": "CDC NORS dashboard or data summary page listing individual norovirus outbreak records with setting, state, case counts, hospitalizations, and deaths for the target date range",
+            "expected_trust_signal": "cdc.gov/nors domain; structured outbreak-level records with state and setting fields",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "NORS",
+              "National Outbreak Reporting System"
+            ],
+            "target_location_terms": [
+              "United States"
+            ],
+            "time_terms": [
+              "December 2024",
+              "January 2025",
+              "February 2025"
+            ],
+            "is_follow_up_query": false,
+            "previous_iteration_basis": null,
+            "execution_status": "planned_not_executed",
+            "query_source": "iterative_llm_initial_search_plan",
+            "iteration_index": 1,
+            "iterative_query_id": "iter1_q2"
+          },
+          {
+            "query_id": "iter1_q3",
+            "query": "norovirus outbreak United States winter 2024 2025 cases deaths state health department report",
+            "provider_channel": "web_search",
+            "query_type": "general_web",
+            "source_type": "official_public_health_agency",
+            "role_hint": "collection",
+            "priority": 3,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_confirmed",
+              "cases_suspected",
+              "cases_unspecified",
+              "deaths",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ],
+            "query_rationale": "Because norovirus is not nationally notifiable, subnational outbreak data is primarily reported at the state and local level. This broad web search targets state health department reports and press releases that would populate the subnational_location and locality fields. The query avoids exact-phrase quoting to maximize recall across diverse state agency naming conventions.",
+            "expected_source_type_or_evidence": "State or local health department press releases, epidemiology bulletins, or outbreak investigation reports with specific case counts, dates, and geographic locations within the US",
+            "expected_trust_signal": "State .gov domains (e.g., health.state.xx.us); official press release or epi bulletin format; named public health official quoted",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "norovirus outbreak"
+            ],
+            "target_location_terms": [
+              "United States"
+            ],
+            "time_terms": [
+              "winter 2024",
+              "winter 2025",
+              "December 2024",
+              "January 2025",
+              "February 2025"
+            ],
+            "is_follow_up_query": false,
+            "previous_iteration_basis": null,
+            "execution_status": "planned_not_executed",
+            "query_source": "iterative_llm_initial_search_plan",
+            "iteration_index": 1,
+            "iterative_query_id": "iter1_q3"
+          },
+          {
+            "query_id": "iter1_q4",
+            "query": "norovirus surge outbreak United States 2025 cases hospitalizations news January February",
+            "provider_channel": "news_search",
+            "query_type": "news",
+            "source_type": "news_and_situation_report",
+            "role_hint": "collection_support",
+            "priority": 4,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_unspecified",
+              "deaths",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ],
+            "query_rationale": "News sources provide timely coverage of norovirus outbreaks that may precede official surveillance summaries, and often cite official figures that can be traced back to primary sources. The term 'surge' is included because media coverage of norovirus in winter 2024-2025 is likely to use this framing. This query covers the later portion of the time window (Jan-Feb 2025) where news coverage is most likely to be available.",
+            "expected_source_type_or_evidence": "News articles from credible outlets (AP, Reuters, major US newspapers, health news sites) reporting on norovirus case surges, specific outbreak events, or official statistics for the US in the target window, ideally citing CDC or state health department figures",
+            "expected_trust_signal": "Bylined article from established news organization; quotes from CDC spokesperson or state health official; references specific case counts or outbreak numbers",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "norovirus surge",
+              "stomach bug outbreak"
+            ],
+            "target_location_terms": [
+              "United States"
+            ],
+            "time_terms": [
+              "2025",
+              "January 2025",
+              "February 2025"
+            ],
+            "is_follow_up_query": false,
+            "previous_iteration_basis": null,
+            "execution_status": "planned_not_executed",
+            "query_source": "iterative_llm_initial_search_plan",
+            "iteration_index": 1,
+            "iterative_query_id": "iter1_q4"
+          }
+        ],
+        "expected_evidence": [
+          "CDC NoroSTAT weekly or seasonal norovirus surveillance summary for 2024-2025 season",
+          "CDC NORS (National Outbreak Reporting System) outbreak records for norovirus December 2024 – February 2025",
+          "State or local health department outbreak investigation reports with case counts and dates",
+          "WHO PAHO or ProMED situation reports referencing US norovirus activity in winter 2024-2025",
+          "News articles citing official case counts, hospitalizations, or deaths from norovirus outbreaks in the US during the target window"
+        ],
+        "expected_source_characteristics": [
+          "Official CDC surveillance pages with tabular or narrative case counts by week or month",
+          "State health department press releases or epidemiology bulletins with subnational location and date",
+          "NORS database query results with outbreak-level records including setting, cases, hospitalizations, deaths",
+          "International organization situation reports (WHO, PAHO) referencing US norovirus burden",
+          "Credible news outlets citing public health officials or official reports with quantified figures"
+        ],
+        "language_or_localization_reasoning": "All queries are in English. The United States is an English-language jurisdiction. CDC, state health departments, and major US news outlets publish exclusively in English for this disease domain. No localization variants are needed for iteration 1.",
+        "trust_considerations": [
+          "CDC NoroSTAT and NORS are the gold-standard US sources for norovirus surveillance — prioritize these",
+          "State health department reports are authoritative for subnational location and locality fields",
+          "News sources are acceptable for collection support but must cite official figures to populate case/death fields",
+          "Peer-reviewed literature is unlikely to cover Dec 2024–Feb 2025 within this time window due to publication lag — deprioritized in iteration 1",
+          "Exact-phrase queries risk missing relevant pages; natural-language queries with key terms preferred for recall"
+        ],
+        "stop_condition_hypothesis": "Iteration 1 is insufficient on its own; a second iteration will be needed to follow up on any specific state-level outbreaks, NORS dataset entries, or hospitalization figures surfaced by iteration 1 results. Stop after iteration 2 if CDC NoroSTAT/NORS, at least one state health department report, and at least one news/situation report with quantified case counts are identified.",
+        "warnings": [
+          "Upstream queries use exact-phrase quoting and ISO date strings embedded in query text — these are reformulated here for better recall",
+          "Norovirus is not nationally notifiable in the US; CDC surveillance relies on voluntary outbreak reporting via NORS, so aggregate national case counts may not be available — subnational outbreak-level data is the primary evidence unit",
+          "The 4-query cap for this iteration requires strict prioritization; literature and structured-database channels are deferred to iteration 2",
+          "Winter 2024-2025 norovirus season may be described using terms like 'stomach bug surge', 'gastroenteritis outbreak', or 'GII.4 Sydney' — follow-up queries in iteration 2 should consider these synonyms if iteration 1 yield is low"
+        ]
+      }
+    },
+    {
+      "card_type": "OBSERVE iteration 1",
+      "observation": {
+        "iteration_index": 1,
+        "executed_query_ids": [
+          "iter1_q1",
+          "iter1_q2",
+          "iter1_q3",
+          "iter1_q4"
+        ],
+        "executed_queries": [
+          "CDC NoroSTAT norovirus surveillance 2024 2025 season United States cases outbreaks",
+          "CDC NORS norovirus outbreak reports United States December 2024 January February 2025 cases hospitalizations deaths",
+          "norovirus outbreak United States winter 2024 2025 cases deaths state health department report",
+          "norovirus surge outbreak United States 2025 cases hospitalizations news January February"
+        ],
+        "raw_result_count": 32,
+        "accepted_candidate_count": 22,
+        "duplicate_result_count": 10,
+        "rejected_result_count": 10,
+        "result_domain_counts": {
+          "contemporarypediatrics.com": 3,
+          "mdedge.com": 1,
+          "cdc.gov": 5,
+          "today.com": 2,
+          "restoredcdc.org": 1,
+          "pmc.ncbi.nlm.nih.gov": 3,
+          "cidrap.umn.edu": 2,
+          "infectiousdiseaseadvisor.com": 1,
+          "researchgate.net": 1,
+          "contagionlive.com": 1,
+          "cbsnews.com": 2,
+          "health.state.mn.us": 1,
+          "facebook.com": 2,
+          "aha.org": 2,
+          "nbcnews.com": 2,
+          "advisory.com": 1,
+          "instagram.com": 1,
+          "youtube.com": 1
+        },
+        "top_result_summaries": [
+          {
+            "title": "CDC: 2024-2025 seasonal norovirus outbreaks up from previous years | Contemporary Pediatrics",
+            "snippet": "Based on reports by NoroSTAT-participating states, the total number of outbreaks in 2024-2025 seasonal year is above the range reported 012–2020 and 2021-2024 seasonal years. From August 1, 2024, through December 11, 2024, there were 495 norovirus outbreaks reported by the Norovirus Sentinel Testing and Tracking(NoroSTAT)-participating states, according to statistics from the CDC's current norovirus season webpage.1. The federal agency noted that the total number of outbreaks in the current 2024-2025 seasonal year is above the range reported for the same time periods during the 2012-2020 and 2021-2024 seasonal years.1. The leading cause of vomiting, diarrhea and foodborne illnesses in the United States, norovirus is a very contagious virus sometimes referred to as the \"stomach flu\" or \"stomach bug,\" though norovirus is not related to the flu. The federal agency defines a norovirus outbreak as the occurrence of 2 or more similar illnesses resulting from a common exposure that is either suspected or laboratory-confirmed to be caused by norovirus.3.",
+            "url": "https://www.contemporarypediatrics.com/view/cdc-2025-seasonal-norovirus-outbreaks-up-previous-years",
+            "domain": "contemporarypediatrics.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 1,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "Highly Contagious Norovirus Cases Spike This Season - MDEdge",
+            "snippet": "Current data from the CDC's NoroSTAT monitoring system show 495 reported outbreaks during the period from August 1, 2024, to December 11, 2024,",
+            "url": "https://mdedge.com/familymedicine/article/272166/emerging-infections/highly-contagious-norovirus-cases-spike-season",
+            "domain": "mdedge.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 2,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "NoroSTAT Data | Norovirus | CDC",
+            "snippet": "A **.gov** website belongs to an official government organization in the United States. A **lock** (  ) or **https://** means you've safely connected to the .gov website. ## About the current norovirus season. ## Graph. ### Number of Suspected or Confirmed Norovirus Outbreaks Reported by NoroSTAT-Participating States Per Week, 2012–2026. This is a graph showing the number of suspected or confirmed norovirus outbreaks reported by NoroSTAT-participating states per week during August 1, 2025 – June 5, 2026. #### What this graph shows:. The total number of suspected and confirmed norovirus outbreaks reported each week to CDC by the state health departments in Colorado, Massachusetts, Michigan, Minnesota, Nebraska, New Hampshire, New Mexico, North Carolina, Ohio, Oregon, South Carolina, Tennessee, Virginia, and Wisconsin through the National Outbreak Reporting System (NORS) by week of illness onset, 2012–2026. ### Graph trends. ## On This Page. ## Norovirus. Norovirus is the leading cause of vomiting and diarrhea, and foodborne illness in the United States.",
+            "url": "https://www.cdc.gov/norovirus/php/reporting/norostat-data.html",
+            "domain": "cdc.gov",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 3,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "Norovirus 2025: How To Stay Safe As Outbreaks Surge In US",
+            "snippet": "The highly contagious gastrointestinal bug**,** which causes sudden and miserable bouts of vomiting and diarrhea, is causing a record number of outbreaks for this time of year. There were 97 suspected and confirmed norovirus outbreaks reported in the U.S. during the week ending Jan. 9 and at least 128 outbreaks the week prior — more than double the number of outbreaks recorded during the same period over the last three years, according to the latest data from the U.S. Centers for Disease Control and Prevention. In fact, norovirus outbreaks in the U.S. in early January reached the highest level for this time of year since 2012, CDC data show. “This year, the number of reported norovirus outbreaks have exceeded the numbers that we’ve seen recently and in the years before the pandemic,” a CDC spokesperson tells TODAY.com. Norovirus is technically a group of viruses, which are the leading cause of acute gastroenteritis, or an inflammation of the stomach and intestines that leads to vomiting, diarrhea and stomach cramps.",
+            "url": "https://www.today.com/health/disease/norovirus-2025-rcna185976",
+            "domain": "today.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 4,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "NoroSTAT Data | Norovirus - Restored CDC",
+            "snippet": "During August 1–December 11, 2024, there were 495 norovirus outbreaks reported by NoroSTAT-participating states. During the same period last",
+            "url": "https://restoredcdc.org/www.cdc.gov/norovirus/php/reporting/norostat-data.html",
+            "domain": "restoredcdc.org",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 5,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "Increasing Predominance of Norovirus GII.17 over GII.4, United States, 2022–2025",
+            "snippet": "An official website of the United States government. A **.gov** website belongs to an official government organization in the United States. A **lock** ( ) or **https://** means you've safely connected to the .gov website. Image 4: NCBI home page. Image 5: PMC search open iconSearch. Image 9: Close Search  Image 10: Search. Image 11: PMC search open iconImage 12: PMC search close ison. Find articles by Leslie Barclay. Find articles by Jan Vinjé. Emerging Infectious Diseases is a publication of the U.S. Government. Norovirus GII.17 outbreaks in the United States increased from <10% during the 2022–23 season to 75% during the 2024–25 season, surpassing the number of GII.4 outbreaks. Ms. Barclay is a microbiologist at the National Calicivirus Laboratory, Viral Gastroenteritis Branch, Division of Viral Diseases, National Center for Immunization and Respiratory Diseases, Centers for Disease Control and Prevention. Dr. Vinjé is a team lead at the National Calicivirus Laboratory, Centers for Disease Control and Prevention.",
+            "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12205451",
+            "domain": "pmc.ncbi.nlm.nih.gov",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 6,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "US norovirus outbreaks are up, CDC data show - CIDRAP",
+            "snippet": "Data released earlier this week by the CDC show that 16 cruise ship norovirus outbreaks were reported in 2024, including 5 in December that",
+            "url": "https://www.cidrap.umn.edu/norovirus/us-norovirus-outbreaks-are-cdc-data-show",
+            "domain": "cidrap.umn.edu",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 7,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "NoroSTAT Data Table | Norovirus | CDC",
+            "snippet": "A **.gov** website belongs to an official government organization in the United States. A **lock** (  ) or **https://** means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Centers for Disease Control and Prevention. # NoroSTAT Data Table. ## Data table. ### Norovirus Outbreaks Reported by State Health Departments by Week of Illness Onset, 2012–2026. | Week | Minimum, 2012-25 | Maximum, 2012-25 | 25th perc, 2012-25 | 75th perc, 2012-25 | 2025-2026 |. | 5-Sep | 0 | 15 | 5 | 10 | 7 |. ## Table notes. The NoroSTAT network includes Colorado, Massachusetts, Michigan, Minnesota, Nebraska, New Hampshire, New Mexico, North Carolina, Ohio, Oregon, South Carolina, Tennessee, Virginia, and Wisconsin. Data from the NoroSTAT network are typically released online on a monthly basis. ## On This Page. ## Norovirus. Norovirus is the leading cause of vomiting and diarrhea, and foodborne illness in the United States. ### Public Health.",
+            "url": "https://www.cdc.gov/norovirus/php/reporting/norostat-data-table.html",
+            "domain": "cdc.gov",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 8,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "CDC: 2024-2025 seasonal norovirus outbreaks up from previous ...",
+            "snippet": "Based on reports by NoroSTAT-participating states, the total number of outbreaks in 2024-2025 seasonal year is above the range reported 012–2020 and 2021-2024 seasonal years. From August 1, 2024, through December 11, 2024, there were 495 norovirus outbreaks reported by the Norovirus Sentinel Testing and Tracking(NoroSTAT)-participating states, according to statistics from the CDC's current norovirus season webpage.1. The federal agency noted that the total number of outbreaks in the current 2024-2025 seasonal year is above the range reported for the same time periods during the 2012-2020 and 2021-2024 seasonal years.1. The leading cause of vomiting, diarrhea and foodborne illnesses in the United States, norovirus is a very contagious virus sometimes referred to as the \"stomach flu\" or \"stomach bug,\" though norovirus is not related to the flu. The federal agency defines a norovirus outbreak as the occurrence of 2 or more similar illnesses resulting from a common exposure that is either suspected or laboratory-confirmed to be caused by norovirus.3.",
+            "url": "https://www.contemporarypediatrics.com/view/cdc-2025-seasonal-norovirus-outbreaks-up-previous-years",
+            "domain": "contemporarypediatrics.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 1,
+            "result_status": "rejected",
+            "rejection_reason": "duplicate_url"
+          },
+          {
+            "title": "Sharp Rise in US Norovirus Cases in December 2024",
+            "snippet": "The data show 91 outbreaks of norovirus during the week of Dec. 5, a sharp rise from the 69 outbreaks recorded the previous week.",
+            "url": "https://www.infectiousdiseaseadvisor.com/news/sharp-rise-in-us-norovirus-cases-in-december-2024",
+            "domain": "infectiousdiseaseadvisor.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 2,
+            "result_status": "accepted",
+            "rejection_reason": null
+          }
+        ],
+        "apparent_source_types": [
+          "news_and_situation_report",
+          "official_public_health_agency",
+          "structured_database"
+        ],
+        "disease_relevance_signals": [
+          "Norovirus"
+        ],
+        "location_relevance_signals": [
+          "United States"
+        ],
+        "evidence_availability_signals": [
+          "case",
+          "cases",
+          "outbreak"
+        ],
+        "gaps_identified": [],
+        "source_quality_concerns": [
+          "duplicate URLs appeared in search results"
+        ],
+        "notes_for_llm": [
+          "Observation includes search metadata only; fetched page text is not included.",
+          "Only provider search results can become source candidates."
+        ]
+      }
+    },
+    {
+      "card_type": "REFINE decision 1",
+      "decision": {
+        "iteration_index": 1,
+        "decision": "continue_search",
+        "decision_reason": "Iteration 1 successfully identified the primary CDC NoroSTAT surveillance pages, several high-quality news/clinical media sources with quantified outbreak counts for December 2024 and January 2025, and one state-level source (Minnesota). However, critical gaps remain: (1) No data covering January–February 2025 weekly outbreak counts beyond the week ending Jan. 9 has been surfaced in snippets; (2) The CDC NORS dashboard for structured outbreak-level records (with subnational location, setting, hospitalizations, deaths) was not directly returned as a result; (3) Only one state health department source (Minnesota) appeared — subnational/locality coverage is thin; (4) CDC cruise ship outbreak data for December 2024 was mentioned in a CIDRAP snippet but not directly sourced; (5) Deaths and hospitalizations fields remain unaddressed by any snippet; (6) The February 2025 portion of the time window has no coverage yet. A second iteration targeting: (a) the CDC NORS dashboard directly, (b) February 2025 norovirus data, (c) additional state-level outbreak reports, and (d) CDC cruise ship/vessel outbreak data will materially improve coverage of the target fields.",
+        "coverage_assessment": "Partial. The Dec 2024 – early Jan 2025 window has good national-level outbreak count coverage via NoroSTAT snippets (495 outbreaks Aug–Dec 11 2024; 91 outbreaks week of Dec 5; 128 outbreaks week prior to Jan 9; 97 outbreaks week ending Jan 9). The Feb 2025 window is entirely uncovered. Subnational/locality coverage is limited to one Minnesota state health department result. Deaths and hospitalizations are not yet evidenced in any snippet. The NORS structured database — the primary source for outbreak-level records with setting, cases, hospitalizations, deaths — was not returned as a direct result despite being queried.",
+        "source_diversity_assessment": "Moderate. Sources span CDC official pages (5 results), clinical/medical media (contemporarypediatrics.com, mdedge.com, infectiousdiseaseadvisor.com, contagionlive.com), general news (today.com, cbsnews.com, nbcnews.com), academic (pmc.ncbi.nlm.nih.gov), and one state health department (health.state.mn.us). Social media (facebook.com, instagram.com, youtube.com) and non-authoritative mirrors (restoredcdc.org) are present but low-value. Missing: direct NORS database results, additional state health department pages, CDC vessel/cruise ship outbreak page, and any WHO/PAHO or ProMED international situation report referencing US norovirus.",
+        "trustworthiness_assessment": "High for CDC-origin results. The cdc.gov NoroSTAT data page and data table are authoritative. Clinical media (contemporarypediatrics.com, mdedge.com, infectiousdiseaseadvisor.com) cite CDC figures directly and are acceptable collection-support sources. CIDRAP (cidrap.umn.edu) is a highly trusted academic public health news outlet. The Minnesota state health department result is authoritative for subnational data. restoredcdc.org is a mirror/archive site — lower trust, should be deprioritized in favor of the primary cdc.gov URL. Social media results are not usable as evidence sources.",
+        "disease_location_time_fit_assessment": "Disease fit: Excellent — all accepted results are norovirus-specific. Location fit: Good for national US level; weak for subnational. Time fit: Partial — December 2024 and early January 2025 are covered; mid-January through February 2025 is not yet evidenced in snippets. The task window ends Feb 28, 2025, so the latter half of the window needs targeted follow-up.",
+        "corroboration_potential_assessment": "Good for national outbreak counts (multiple sources corroborate the 495 Aug–Dec 11 figure and the Jan 9 weekly counts). Weak for subnational, deaths, hospitalizations, and February 2025 data — these fields need additional targeted queries. The PMC article on GII.17 predominance provides virological context but not case/death counts for the target fields.",
+        "next_query_batch": [
+          {
+            "query_id": "iter2_q1",
+            "query": "norovirus outbreaks United States February 2025 cases weekly CDC data",
+            "provider_channel": "news_search",
+            "query_rationale": "The February 2025 portion of the task window (Feb 1–28) is entirely uncovered by iteration 1 results. This query targets news coverage of norovirus activity in February 2025, which is likely to cite CDC weekly NoroSTAT figures for that period. News sources are the fastest path to February 2025 data given the lag in official surveillance summaries.",
+            "expected_source_type_or_evidence": "News articles from February 2025 reporting on norovirus outbreak counts, trends, or specific events in the US, citing CDC or state health department data for that month",
+            "expected_trust_signal": "Bylined article from established news outlet (AP, Reuters, NBC, CBS, CNN, CIDRAP) published in February 2025; cites CDC spokesperson or official weekly count",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "norovirus outbreak",
+              "stomach bug"
+            ],
+            "target_location_terms": [
+              "United States",
+              "US"
+            ],
+            "time_terms": [
+              "February 2025"
+            ],
+            "is_follow_up_query": true,
+            "previous_iteration_basis": "iter1_q4 — iteration 1 news query covered Jan 2025 well but February 2025 data is absent from all returned snippets",
+            "query_type": "news",
+            "source_type": "news_and_situation_report",
+            "role_hint": "collection",
+            "priority": 1,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "date_reported",
+              "cases_unspecified",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ]
+          },
+          {
+            "query_id": "iter2_q2",
+            "query": "CDC NORS National Outbreak Reporting System norovirus 2024 2025 outbreak data hospitalizations deaths setting",
+            "provider_channel": "official_site_search",
+            "query_rationale": "The CDC NORS dashboard is the primary structured source for outbreak-level records including setting (e.g., restaurant, school, long-term care), state, case counts, hospitalizations, and deaths. Despite being queried in iteration 1, no direct NORS dashboard result was returned. This query reformulates the search to target the NORS dashboard or summary page more directly, which is critical for populating the deaths, hospitalizations, subnational_location, and locality fields.",
+            "expected_source_type_or_evidence": "CDC NORS dashboard page or annual/quarterly summary with tabular outbreak records for norovirus in 2024-2025, including columns for state, setting, cases, hospitalizations, deaths",
+            "expected_trust_signal": "cdc.gov/nors domain; structured table with outbreak-level records; CDC Division of Foodborne, Waterborne, and Environmental Diseases authorship",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "NORS",
+              "National Outbreak Reporting System",
+              "enteric disease outbreak"
+            ],
+            "target_location_terms": [
+              "United States"
+            ],
+            "time_terms": [
+              "2024",
+              "2025",
+              "2024-2025"
+            ],
+            "is_follow_up_query": true,
+            "previous_iteration_basis": "iter1_q2 — NORS database query did not return a direct NORS dashboard result; reformulated to improve targeting",
+            "query_type": "official_site",
+            "source_type": "structured_database",
+            "role_hint": "collection",
+            "priority": 2,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_unspecified",
+              "deaths",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ]
+          },
+          {
+            "query_id": "iter2_q3",
+            "query": "norovirus outbreak 2025 state health department cases report school nursing home restaurant",
+            "provider_channel": "web_search",
+            "query_rationale": "Iteration 1 returned only one state health department result (Minnesota). Subnational and locality coverage is a key gap. This query broadens the search to capture state-level outbreak investigation reports across multiple settings (schools, nursing homes, restaurants) — the most common norovirus outbreak settings — which would populate the subnational_location, locality, and setting-specific case count fields. Including setting terms improves recall for state epi bulletins and press releases.",
+            "expected_source_type_or_evidence": "State or county health department press releases, epidemiology bulletins, or outbreak investigation reports from December 2024–February 2025 with specific case counts, dates, and named locations within US states",
+            "expected_trust_signal": "State .gov domains (e.g., health.state.xx.us, doh.xx.gov); official press release or epi bulletin format; named epidemiologist or public health official quoted; specific case counts and dates",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "norovirus outbreak",
+              "gastroenteritis outbreak"
+            ],
+            "target_location_terms": [
+              "United States"
+            ],
+            "time_terms": [
+              "2025",
+              "January 2025",
+              "February 2025",
+              "December 2024"
+            ],
+            "is_follow_up_query": true,
+            "previous_iteration_basis": "iter1_q3 — only one state health department result (Minnesota) returned; this query adds setting terms to improve subnational recall",
+            "query_type": "general_web",
+            "source_type": "official_public_health_agency",
+            "role_hint": "collection",
+            "priority": 3,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_confirmed",
+              "cases_suspected",
+              "cases_unspecified",
+              "deaths",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ]
+          },
+          {
+            "query_id": "iter2_q4",
+            "query": "CDC norovirus cruise ship vessel outbreak December 2024 January February 2025 cases",
+            "provider_channel": "web_search",
+            "query_rationale": "The CIDRAP snippet from iteration 1 mentioned '16 cruise ship norovirus outbreaks reported in 2024, including 5 in December.' CDC's Vessel Sanitation Program (VSP) tracks cruise ship outbreaks separately from NoroSTAT/NORS and publishes outbreak investigation reports with specific case counts, ship names, and dates — directly populating the locality and cases_unspecified fields. This is a distinct and well-documented data channel for norovirus that was not covered in iteration 1.",
+            "expected_source_type_or_evidence": "CDC Vessel Sanitation Program (VSP) outbreak investigation reports or summary page listing cruise ship norovirus outbreaks in December 2024–February 2025 with ship name, case counts, and dates; or CIDRAP/news follow-up citing VSP data",
+            "expected_trust_signal": "cdc.gov/nceh/vsp domain; VSP outbreak investigation report format with ship name, voyage dates, case counts; or CIDRAP article citing VSP data",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "gastroenteritis",
+              "GII"
+            ],
+            "target_location_terms": [
+              "cruise ship",
+              "vessel",
+              "United States"
+            ],
+            "time_terms": [
+              "December 2024",
+              "January 2025",
+              "February 2025",
+              "2024",
+              "2025"
+            ],
+            "is_follow_up_query": true,
+            "previous_iteration_basis": "iter1_q7 (CIDRAP result) — CIDRAP snippet mentioned 5 cruise ship outbreaks in December 2024; CDC VSP is a distinct authoritative channel not yet directly queried",
+            "query_type": "general_web",
+            "source_type": "official_public_health_agency",
+            "role_hint": "collection_support",
+            "priority": 4,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_unspecified",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ]
+          }
+        ],
+        "stop_reason": null,
+        "warnings": [
+          "The CDC NoroSTAT data page snippet shows the graph currently displays 2025-2026 season data, suggesting the page has been updated and the 2024-2025 season data may now be in an archive or historical table — the NoroSTAT data table URL (norostat-data-table.html) is more likely to contain the historical weekly counts needed for the Dec 2024–Feb 2025 window.",
+          "restoredcdc.org is a third-party mirror of CDC content — do not treat as an independent source; use only if the primary cdc.gov URL is inaccessible.",
+          "Deaths from norovirus in the US are rare and may not be reported in surveillance summaries; the deaths field may remain empty or require targeted searches of long-term care facility or cruise ship outbreak reports.",
+          "The 4-query cap for iteration 2 is binding — queries must be strictly prioritized to address the most critical gaps: February 2025 data, NORS structured records, additional state-level outbreaks, and hospitalizations/deaths."
+        ]
+      }
+    },
+    {
+      "card_type": "SEARCH iteration 2",
+      "queries": [
+        {
+          "query_id": "iter2_q1",
+          "query": "norovirus outbreaks United States February 2025 cases weekly CDC data",
+          "provider_channel": "news_search",
+          "query_type": "news",
+          "source_type": "news_and_situation_report",
+          "role_hint": "collection",
+          "priority": 1,
+          "expected_fields": [
+            "disease",
+            "country",
+            "subnational_location",
+            "date_reported",
+            "cases_unspecified",
+            "hospitalizations",
+            "source_url",
+            "source_type",
+            "evidence_quote"
+          ],
+          "query_rationale": "The February 2025 portion of the task window (Feb 1–28) is entirely uncovered by iteration 1 results. This query targets news coverage of norovirus activity in February 2025, which is likely to cite CDC weekly NoroSTAT figures for that period. News sources are the fastest path to February 2025 data given the lag in official surveillance summaries.",
+          "expected_source_type_or_evidence": "News articles from February 2025 reporting on norovirus outbreak counts, trends, or specific events in the US, citing CDC or state health department data for that month",
+          "expected_trust_signal": "Bylined article from established news outlet (AP, Reuters, NBC, CBS, CNN, CIDRAP) published in February 2025; cites CDC spokesperson or official weekly count",
+          "language": "en",
+          "target_disease_terms": [
+            "norovirus",
+            "norovirus outbreak",
+            "stomach bug"
+          ],
+          "target_location_terms": [
+            "United States",
+            "US"
+          ],
+          "time_terms": [
+            "February 2025"
+          ],
+          "is_follow_up_query": true,
+          "previous_iteration_basis": "iter1_q4 — iteration 1 news query covered Jan 2025 well but February 2025 data is absent from all returned snippets",
+          "execution_status": "planned_not_executed",
+          "query_source": "iterative_llm_refinement",
+          "iteration_index": 2,
+          "iterative_query_id": "iter2_q1"
+        },
+        {
+          "query_id": "iter2_q2",
+          "query": "CDC NORS National Outbreak Reporting System norovirus 2024 2025 outbreak data hospitalizations deaths setting",
+          "provider_channel": "official_site_search",
+          "query_type": "official_site",
+          "source_type": "structured_database",
+          "role_hint": "collection",
+          "priority": 2,
+          "expected_fields": [
+            "disease",
+            "country",
+            "subnational_location",
+            "locality",
+            "date_reported",
+            "cases_unspecified",
+            "deaths",
+            "hospitalizations",
+            "source_url",
+            "source_type",
+            "evidence_quote"
+          ],
+          "query_rationale": "The CDC NORS dashboard is the primary structured source for outbreak-level records including setting (e.g., restaurant, school, long-term care), state, case counts, hospitalizations, and deaths. Despite being queried in iteration 1, no direct NORS dashboard result was returned. This query reformulates the search to target the NORS dashboard or summary page more directly, which is critical for populating the deaths, hospitalizations, subnational_location, and locality fields.",
+          "expected_source_type_or_evidence": "CDC NORS dashboard page or annual/quarterly summary with tabular outbreak records for norovirus in 2024-2025, including columns for state, setting, cases, hospitalizations, deaths",
+          "expected_trust_signal": "cdc.gov/nors domain; structured table with outbreak-level records; CDC Division of Foodborne, Waterborne, and Environmental Diseases authorship",
+          "language": "en",
+          "target_disease_terms": [
+            "norovirus",
+            "NORS",
+            "National Outbreak Reporting System",
+            "enteric disease outbreak"
+          ],
+          "target_location_terms": [
+            "United States"
+          ],
+          "time_terms": [
+            "2024",
+            "2025",
+            "2024-2025"
+          ],
+          "is_follow_up_query": true,
+          "previous_iteration_basis": "iter1_q2 — NORS database query did not return a direct NORS dashboard result; reformulated to improve targeting",
+          "execution_status": "planned_not_executed",
+          "query_source": "iterative_llm_refinement",
+          "iteration_index": 2,
+          "iterative_query_id": "iter2_q2"
+        },
+        {
+          "query_id": "iter2_q3",
+          "query": "norovirus outbreak 2025 state health department cases report school nursing home restaurant",
+          "provider_channel": "web_search",
+          "query_type": "general_web",
+          "source_type": "official_public_health_agency",
+          "role_hint": "collection",
+          "priority": 3,
+          "expected_fields": [
+            "disease",
+            "country",
+            "subnational_location",
+            "locality",
+            "date_reported",
+            "cases_confirmed",
+            "cases_suspected",
+            "cases_unspecified",
+            "deaths",
+            "hospitalizations",
+            "source_url",
+            "source_type",
+            "evidence_quote"
+          ],
+          "query_rationale": "Iteration 1 returned only one state health department result (Minnesota). Subnational and locality coverage is a key gap. This query broadens the search to capture state-level outbreak investigation reports across multiple settings (schools, nursing homes, restaurants) — the most common norovirus outbreak settings — which would populate the subnational_location, locality, and setting-specific case count fields. Including setting terms improves recall for state epi bulletins and press releases.",
+          "expected_source_type_or_evidence": "State or county health department press releases, epidemiology bulletins, or outbreak investigation reports from December 2024–February 2025 with specific case counts, dates, and named locations within US states",
+          "expected_trust_signal": "State .gov domains (e.g., health.state.xx.us, doh.xx.gov); official press release or epi bulletin format; named epidemiologist or public health official quoted; specific case counts and dates",
+          "language": "en",
+          "target_disease_terms": [
+            "norovirus",
+            "norovirus outbreak",
+            "gastroenteritis outbreak"
+          ],
+          "target_location_terms": [
+            "United States"
+          ],
+          "time_terms": [
+            "2025",
+            "January 2025",
+            "February 2025",
+            "December 2024"
+          ],
+          "is_follow_up_query": true,
+          "previous_iteration_basis": "iter1_q3 — only one state health department result (Minnesota) returned; this query adds setting terms to improve subnational recall",
+          "execution_status": "planned_not_executed",
+          "query_source": "iterative_llm_refinement",
+          "iteration_index": 2,
+          "iterative_query_id": "iter2_q3"
+        },
+        {
+          "query_id": "iter2_q4",
+          "query": "CDC norovirus cruise ship vessel outbreak December 2024 January February 2025 cases",
+          "provider_channel": "web_search",
+          "query_type": "general_web",
+          "source_type": "official_public_health_agency",
+          "role_hint": "collection_support",
+          "priority": 4,
+          "expected_fields": [
+            "disease",
+            "country",
+            "subnational_location",
+            "locality",
+            "date_reported",
+            "cases_unspecified",
+            "hospitalizations",
+            "source_url",
+            "source_type",
+            "evidence_quote"
+          ],
+          "query_rationale": "The CIDRAP snippet from iteration 1 mentioned '16 cruise ship norovirus outbreaks reported in 2024, including 5 in December.' CDC's Vessel Sanitation Program (VSP) tracks cruise ship outbreaks separately from NoroSTAT/NORS and publishes outbreak investigation reports with specific case counts, ship names, and dates — directly populating the locality and cases_unspecified fields. This is a distinct and well-documented data channel for norovirus that was not covered in iteration 1.",
+          "expected_source_type_or_evidence": "CDC Vessel Sanitation Program (VSP) outbreak investigation reports or summary page listing cruise ship norovirus outbreaks in December 2024–February 2025 with ship name, case counts, and dates; or CIDRAP/news follow-up citing VSP data",
+          "expected_trust_signal": "cdc.gov/nceh/vsp domain; VSP outbreak investigation report format with ship name, voyage dates, case counts; or CIDRAP article citing VSP data",
+          "language": "en",
+          "target_disease_terms": [
+            "norovirus",
+            "gastroenteritis",
+            "GII"
+          ],
+          "target_location_terms": [
+            "cruise ship",
+            "vessel",
+            "United States"
+          ],
+          "time_terms": [
+            "December 2024",
+            "January 2025",
+            "February 2025",
+            "2024",
+            "2025"
+          ],
+          "is_follow_up_query": true,
+          "previous_iteration_basis": "iter1_q7 (CIDRAP result) — CIDRAP snippet mentioned 5 cruise ship outbreaks in December 2024; CDC VSP is a distinct authoritative channel not yet directly queried",
+          "execution_status": "planned_not_executed",
+          "query_source": "iterative_llm_refinement",
+          "iteration_index": 2,
+          "iterative_query_id": "iter2_q4"
+        }
+      ],
+      "plan": {
+        "iteration_index": 2,
+        "search_objective": "Refined follow-up search",
+        "search_reasoning": "Iteration 1 successfully identified the primary CDC NoroSTAT surveillance pages, several high-quality news/clinical media sources with quantified outbreak counts for December 2024 and January 2025, and one state-level source (Minnesota). However, critical gaps remain: (1) No data covering January–February 2025 weekly outbreak counts beyond the week ending Jan. 9 has been surfaced in snippets; (2) The CDC NORS dashboard for structured outbreak-level records (with subnational location, setting, hospitalizations, deaths) was not directly returned as a result; (3) Only one state health department source (Minnesota) appeared — subnational/locality coverage is thin; (4) CDC cruise ship outbreak data for December 2024 was mentioned in a CIDRAP snippet but not directly sourced; (5) Deaths and hospitalizations fields remain unaddressed by any snippet; (6) The February 2025 portion of the time window has no coverage yet. A second iteration targeting: (a) the CDC NORS dashboard directly, (b) February 2025 norovirus data, (c) additional state-level outbreak reports, and (d) CDC cruise ship/vessel outbreak data will materially improve coverage of the target fields.",
+        "query_batch": [
+          {
+            "query_id": "iter2_q1",
+            "query": "norovirus outbreaks United States February 2025 cases weekly CDC data",
+            "provider_channel": "news_search",
+            "query_type": "news",
+            "source_type": "news_and_situation_report",
+            "role_hint": "collection",
+            "priority": 1,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "date_reported",
+              "cases_unspecified",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ],
+            "query_rationale": "The February 2025 portion of the task window (Feb 1–28) is entirely uncovered by iteration 1 results. This query targets news coverage of norovirus activity in February 2025, which is likely to cite CDC weekly NoroSTAT figures for that period. News sources are the fastest path to February 2025 data given the lag in official surveillance summaries.",
+            "expected_source_type_or_evidence": "News articles from February 2025 reporting on norovirus outbreak counts, trends, or specific events in the US, citing CDC or state health department data for that month",
+            "expected_trust_signal": "Bylined article from established news outlet (AP, Reuters, NBC, CBS, CNN, CIDRAP) published in February 2025; cites CDC spokesperson or official weekly count",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "norovirus outbreak",
+              "stomach bug"
+            ],
+            "target_location_terms": [
+              "United States",
+              "US"
+            ],
+            "time_terms": [
+              "February 2025"
+            ],
+            "is_follow_up_query": true,
+            "previous_iteration_basis": "iter1_q4 — iteration 1 news query covered Jan 2025 well but February 2025 data is absent from all returned snippets",
+            "execution_status": "planned_not_executed",
+            "query_source": "iterative_llm_refinement",
+            "iteration_index": 2,
+            "iterative_query_id": "iter2_q1"
+          },
+          {
+            "query_id": "iter2_q2",
+            "query": "CDC NORS National Outbreak Reporting System norovirus 2024 2025 outbreak data hospitalizations deaths setting",
+            "provider_channel": "official_site_search",
+            "query_type": "official_site",
+            "source_type": "structured_database",
+            "role_hint": "collection",
+            "priority": 2,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_unspecified",
+              "deaths",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ],
+            "query_rationale": "The CDC NORS dashboard is the primary structured source for outbreak-level records including setting (e.g., restaurant, school, long-term care), state, case counts, hospitalizations, and deaths. Despite being queried in iteration 1, no direct NORS dashboard result was returned. This query reformulates the search to target the NORS dashboard or summary page more directly, which is critical for populating the deaths, hospitalizations, subnational_location, and locality fields.",
+            "expected_source_type_or_evidence": "CDC NORS dashboard page or annual/quarterly summary with tabular outbreak records for norovirus in 2024-2025, including columns for state, setting, cases, hospitalizations, deaths",
+            "expected_trust_signal": "cdc.gov/nors domain; structured table with outbreak-level records; CDC Division of Foodborne, Waterborne, and Environmental Diseases authorship",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "NORS",
+              "National Outbreak Reporting System",
+              "enteric disease outbreak"
+            ],
+            "target_location_terms": [
+              "United States"
+            ],
+            "time_terms": [
+              "2024",
+              "2025",
+              "2024-2025"
+            ],
+            "is_follow_up_query": true,
+            "previous_iteration_basis": "iter1_q2 — NORS database query did not return a direct NORS dashboard result; reformulated to improve targeting",
+            "execution_status": "planned_not_executed",
+            "query_source": "iterative_llm_refinement",
+            "iteration_index": 2,
+            "iterative_query_id": "iter2_q2"
+          },
+          {
+            "query_id": "iter2_q3",
+            "query": "norovirus outbreak 2025 state health department cases report school nursing home restaurant",
+            "provider_channel": "web_search",
+            "query_type": "general_web",
+            "source_type": "official_public_health_agency",
+            "role_hint": "collection",
+            "priority": 3,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_confirmed",
+              "cases_suspected",
+              "cases_unspecified",
+              "deaths",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ],
+            "query_rationale": "Iteration 1 returned only one state health department result (Minnesota). Subnational and locality coverage is a key gap. This query broadens the search to capture state-level outbreak investigation reports across multiple settings (schools, nursing homes, restaurants) — the most common norovirus outbreak settings — which would populate the subnational_location, locality, and setting-specific case count fields. Including setting terms improves recall for state epi bulletins and press releases.",
+            "expected_source_type_or_evidence": "State or county health department press releases, epidemiology bulletins, or outbreak investigation reports from December 2024–February 2025 with specific case counts, dates, and named locations within US states",
+            "expected_trust_signal": "State .gov domains (e.g., health.state.xx.us, doh.xx.gov); official press release or epi bulletin format; named epidemiologist or public health official quoted; specific case counts and dates",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "norovirus outbreak",
+              "gastroenteritis outbreak"
+            ],
+            "target_location_terms": [
+              "United States"
+            ],
+            "time_terms": [
+              "2025",
+              "January 2025",
+              "February 2025",
+              "December 2024"
+            ],
+            "is_follow_up_query": true,
+            "previous_iteration_basis": "iter1_q3 — only one state health department result (Minnesota) returned; this query adds setting terms to improve subnational recall",
+            "execution_status": "planned_not_executed",
+            "query_source": "iterative_llm_refinement",
+            "iteration_index": 2,
+            "iterative_query_id": "iter2_q3"
+          },
+          {
+            "query_id": "iter2_q4",
+            "query": "CDC norovirus cruise ship vessel outbreak December 2024 January February 2025 cases",
+            "provider_channel": "web_search",
+            "query_type": "general_web",
+            "source_type": "official_public_health_agency",
+            "role_hint": "collection_support",
+            "priority": 4,
+            "expected_fields": [
+              "disease",
+              "country",
+              "subnational_location",
+              "locality",
+              "date_reported",
+              "cases_unspecified",
+              "hospitalizations",
+              "source_url",
+              "source_type",
+              "evidence_quote"
+            ],
+            "query_rationale": "The CIDRAP snippet from iteration 1 mentioned '16 cruise ship norovirus outbreaks reported in 2024, including 5 in December.' CDC's Vessel Sanitation Program (VSP) tracks cruise ship outbreaks separately from NoroSTAT/NORS and publishes outbreak investigation reports with specific case counts, ship names, and dates — directly populating the locality and cases_unspecified fields. This is a distinct and well-documented data channel for norovirus that was not covered in iteration 1.",
+            "expected_source_type_or_evidence": "CDC Vessel Sanitation Program (VSP) outbreak investigation reports or summary page listing cruise ship norovirus outbreaks in December 2024–February 2025 with ship name, case counts, and dates; or CIDRAP/news follow-up citing VSP data",
+            "expected_trust_signal": "cdc.gov/nceh/vsp domain; VSP outbreak investigation report format with ship name, voyage dates, case counts; or CIDRAP article citing VSP data",
+            "language": "en",
+            "target_disease_terms": [
+              "norovirus",
+              "gastroenteritis",
+              "GII"
+            ],
+            "target_location_terms": [
+              "cruise ship",
+              "vessel",
+              "United States"
+            ],
+            "time_terms": [
+              "December 2024",
+              "January 2025",
+              "February 2025",
+              "2024",
+              "2025"
+            ],
+            "is_follow_up_query": true,
+            "previous_iteration_basis": "iter1_q7 (CIDRAP result) — CIDRAP snippet mentioned 5 cruise ship outbreaks in December 2024; CDC VSP is a distinct authoritative channel not yet directly queried",
+            "execution_status": "planned_not_executed",
+            "query_source": "iterative_llm_refinement",
+            "iteration_index": 2,
+            "iterative_query_id": "iter2_q4"
+          }
+        ],
+        "expected_evidence": [],
+        "expected_source_characteristics": [],
+        "language_or_localization_reasoning": "",
+        "trust_considerations": [],
+        "stop_condition_hypothesis": "",
+        "warnings": [
+          "The CDC NoroSTAT data page snippet shows the graph currently displays 2025-2026 season data, suggesting the page has been updated and the 2024-2025 season data may now be in an archive or historical table — the NoroSTAT data table URL (norostat-data-table.html) is more likely to contain the historical weekly counts needed for the Dec 2024–Feb 2025 window.",
+          "restoredcdc.org is a third-party mirror of CDC content — do not treat as an independent source; use only if the primary cdc.gov URL is inaccessible.",
+          "Deaths from norovirus in the US are rare and may not be reported in surveillance summaries; the deaths field may remain empty or require targeted searches of long-term care facility or cruise ship outbreak reports.",
+          "The 4-query cap for iteration 2 is binding — queries must be strictly prioritized to address the most critical gaps: February 2025 data, NORS structured records, additional state-level outbreaks, and hospitalizations/deaths."
+        ]
+      }
+    },
+    {
+      "card_type": "OBSERVE iteration 2",
+      "observation": {
+        "iteration_index": 2,
+        "executed_query_ids": [
+          "iter2_q1",
+          "iter2_q2",
+          "iter2_q3",
+          "iter2_q4"
+        ],
+        "executed_queries": [
+          "norovirus outbreaks United States February 2025 cases weekly CDC data",
+          "CDC NORS National Outbreak Reporting System norovirus 2024 2025 outbreak data hospitalizations deaths setting",
+          "norovirus outbreak 2025 state health department cases report school nursing home restaurant",
+          "CDC norovirus cruise ship vessel outbreak December 2024 January February 2025 cases"
+        ],
+        "raw_result_count": 32,
+        "accepted_candidate_count": 21,
+        "duplicate_result_count": 11,
+        "rejected_result_count": 11,
+        "result_domain_counts": {
+          "cdc.gov": 8,
+          "cbsnews.com": 2,
+          "pmc.ncbi.nlm.nih.gov": 2,
+          "pinellas.floridahealth.gov": 1,
+          "aha.org": 2,
+          "fbplans.com": 1,
+          "contagionlive.com": 1,
+          "contemporarypediatrics.com": 1,
+          "thehill.com": 1,
+          "restoredcdc.org": 1,
+          "health.state.mn.us": 1,
+          "doh.wa.gov": 1,
+          "digicomply.com": 1,
+          "allcarehealth.com": 1,
+          "medicalxpress.com": 1,
+          "foodsafetynews.com": 1,
+          "fox35orlando.com": 1,
+          "globalbiodefense.com": 1,
+          "cruisemapper.com": 1,
+          "youtube.com": 1,
+          "cnn.com": 1,
+          "facebook.com": 1
+        },
+        "top_result_summaries": [
+          {
+            "title": "NoroSTAT Data | Norovirus - CDC",
+            "snippet": "A **.gov** website belongs to an official government organization in the United States. A **lock** (  ) or **https://** means you've safely connected to the .gov website. ## About the current norovirus season. ## Graph. ### Number of Suspected or Confirmed Norovirus Outbreaks Reported by NoroSTAT-Participating States Per Week, 2012–2026. This is a graph showing the number of suspected or confirmed norovirus outbreaks reported by NoroSTAT-participating states per week during August 1, 2025 – June 5, 2026. #### What this graph shows:. The total number of suspected and confirmed norovirus outbreaks reported each week to CDC by the state health departments in Colorado, Massachusetts, Michigan, Minnesota, Nebraska, New Hampshire, New Mexico, North Carolina, Ohio, Oregon, South Carolina, Tennessee, Virginia, and Wisconsin through the National Outbreak Reporting System (NORS) by week of illness onset, 2012–2026. ### Graph trends. ## On This Page. ## Norovirus. Norovirus is the leading cause of vomiting and diarrhea, and foodborne illness in the United States.",
+            "url": "https://www.cdc.gov/norovirus/php/reporting/norostat-data.html",
+            "domain": "cdc.gov",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 1,
+            "result_status": "rejected",
+            "rejection_reason": "duplicate_url"
+          },
+          {
+            "title": "CaliciNet Data | Norovirus | CDC",
+            "snippet": "A **.gov** website belongs to an official government organization in the United States. A **lock** (  ) or **https://** means you've safely connected to the .gov website. ## Confirmed norovirus outbreaks submitted by state. ### September 1, 2025 – May 31, 2026 (n=131). ## Confirmed norovirus outbreaks submitted by genogroup. ## Genotype distribution of norovirus outbreaks. ![Bar chart showing GII.4 Sydney[P16] accounts for 51% of norovirus outbreaks, with all other categories below 23%.](/norovirus/images/genotype-distribution-norovirus-outbreaks_5-31-2026.png). #### Data Table: September 1, 2025 – May 31, 2026 (n=131). #### Data Table: September 1, 2024 – August 31, 2025 (n=411). ## Dual typing for norovirus. Dual typing for norovirus is being implemented by laboratories participating in CaliciNet. Dual typing is RT-PCR amplification of a partial region of both the polymerase gene and the capsid gene (region B-C) in a single reaction for genogroup I or genogroup II noroviruses. ## Norovirus. Norovirus is the leading cause of vomiting and diarrhea, and foodborne illness in the United States.",
+            "url": "https://www.cdc.gov/norovirus/php/reporting/calicinet-data.html",
+            "domain": "cdc.gov",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 2,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "Norovirus cases rise ahead of holiday season, CDC data shows",
+            "snippet": "Norovirus cases have risen in the United States in recent weeks, according to data from the Centers for Disease Control and Prevention. Nearly 14% of tests for the illness came back positive during the week that ended on Nov. 15, according to CDC data. Over 2,700 tests were conducted that week, according to the CDC, meaning that about 380 cases of norovirus were diagnosed in that period. That's more than double the percentage of positive tests recorded about three months ago, when test positivity in the U.S. this year was at its lowest. The week that ended on Aug. 9 saw a 6.53% positivity rate of more than 4,240 tests conducted during that period, according to CDC data. Norovirus, sometimes known as the stomach bug or stomach flu, is the leading cause of vomiting and diarrhea in the United States, according to the CDC. Millions of people are sickened with norovirus every year, the CDC says, and about 2,500 outbreaks of norovirus are reported in the U.S. each year.",
+            "url": "https://www.cbsnews.com/news/norovirus-rise-holiday-season-cdc-data",
+            "domain": "cbsnews.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 3,
+            "result_status": "rejected",
+            "rejection_reason": "duplicate_url"
+          },
+          {
+            "title": "Increasing Predominance of Norovirus GII.17 over GII.4, United ...",
+            "snippet": "An official website of the United States government. A **.gov** website belongs to an official government organization in the United States. A **lock** ( ) or **https://** means you've safely connected to the .gov website. Image 4: NCBI home page. Image 5: PMC search open iconSearch. Image 9: Close Search  Image 10: Search. Image 11: PMC search open iconImage 12: PMC search close ison. Find articles by Leslie Barclay. Find articles by Jan Vinjé. Emerging Infectious Diseases is a publication of the U.S. Government. Norovirus GII.17 outbreaks in the United States increased from <10% during the 2022–23 season to 75% during the 2024–25 season, surpassing the number of GII.4 outbreaks. Ms. Barclay is a microbiologist at the National Calicivirus Laboratory, Viral Gastroenteritis Branch, Division of Viral Diseases, National Center for Immunization and Respiratory Diseases, Centers for Disease Control and Prevention. Dr. Vinjé is a team lead at the National Calicivirus Laboratory, Centers for Disease Control and Prevention.",
+            "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12205451",
+            "domain": "pmc.ncbi.nlm.nih.gov",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 4,
+            "result_status": "rejected",
+            "rejection_reason": "duplicate_url"
+          },
+          {
+            "title": "[PDF] EPI WATCH - Florida Department of Health in Pinellas County",
+            "snippet": "As of January 30, 2025, there were 791 reported norovirus outbreaks in 20252. Using surveillance data like the CDC can help understand the",
+            "url": "https://pinellas.floridahealth.gov/wp-content/uploads/sites/54/2025/05/epi-watch-february-2025.pdf",
+            "domain": "pinellas.floridahealth.gov",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 5,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "Norovirus outbreaks rise across the U.S. | AHA News",
+            "snippet": "There were 91 suspected or confirmed norovirus outbreaks during the week of Dec. 5, according to data from the Centers for Disease Control and Prevention, exceeding any other week in 2024 and the same week in previous years. Measles cases reach 583 in Utah outbreak. The Utah measles outbreak has increased to 583 cases, the state’s Department of Health and Human Services reported April 7. Cases in the Utah measles outbreak have increased to 559, the state’s Department of Health and Human Services reported March 31. South Carolina measles outbreak at 876 cases. The measles outbreak in South Carolina has increased to 876 cases, the state’s Department of Public Health reported Feb. 3. Two AHA guides offer strategies for hospitals and health systems in preparing for public health emergencies and disasters and managing cybersecurity incidents…. The White House Aug. 13 released an executive order directing the Department of Health and Human Services’ Office of the Assistant Secretary for Preparedness….",
+            "url": "https://www.aha.org/news/headline/2025-01-09-norovirus-outbreaks-rise-across-us",
+            "domain": "aha.org",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 6,
+            "result_status": "rejected",
+            "rejection_reason": "duplicate_url"
+          },
+          {
+            "title": "CDC Data Shows Rising Number of Norovirus Outbreaks",
+            "snippet": "# CDC Data Shows Rising Number of Norovirus Outbreaks. Norovirus cases are surging across the United States this winter, with 91 outbreaks reported by state health departments in the week of Dec. 5 alone, according to the Centers for Disease Control and Prevention (CDC). Norovirus cases are surging across the United States this winter, with 91 outbreaks reported by state health departments in the week of Dec. 5 alone, according to the Centers for Disease Control and Prevention (CDC). Each year, about 2,500 norovirus outbreaks are reported in the United States, mostly from November to April. However, this data may not be comprehensive, as health departments are not required to report individual norovirus cases, and doctor’s offices typically don’t test for the virus. A person infected with norovirus usually experiences symptoms within 12 to 48 hours. Norovirus is spread through direct contact with someone who is infected or contaminated surfaces and food. The CDC will continue to monitor norovirus activity.",
+            "url": "https://fbplans.com/cdc-data-shows-rising-number-of-norovirus-outbreaks",
+            "domain": "fbplans.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 7,
+            "result_status": "accepted",
+            "rejection_reason": null
+          },
+          {
+            "title": "Entering Peak Norovirus Season as Cases Rise Across the US",
+            "snippet": "[![Image 23: Broadening the Frontline—Studies Informing the Use of Immunotherapy in Hepatocellular Carcinoma](https://media.thoughtindustries.com/thoughtindustries/image/upload/v1/course-uploads/07c0d4e1-23aa-4e1a-8c5f-f2569da581c0/qjgujs9rx10s-TICatalog750x3612x55.png) Video ## Broadening the Frontline—Studies Informing the Use of Immunotherapy in Hepatocellular Carcinoma Ghassan Abou-Alfa, MD, MBA; Laura Williams Goff, MD, MSCI, MMHC, FASCO; Arndt Vogel, MD, PhD](https://www.gotoper.com/courses/broadening-the-frontlinestudies-informing-the-use-of-immunotherapy-in-hepatocellular-carcinoma?utm_source=contagionlive&utm_medium=article&utm_campaign=cmeDeck). [![Image 183: Optimizing Treatment for Biliary Tract Cancers](https://media.thoughtindustries.com/thoughtindustries/image/upload/v1/course-uploads/07c0d4e1-23aa-4e1a-8c5f-f2569da581c0/9dvo7geewegq-TICatalog750x3612x56.png) Video ## Optimizing Treatment for Biliary Tract Cancers Ghassan Abou-Alfa, MD, MBA; Laura Williams Goff, MD, MSCI, MMHC, FASCO; Arndt Vogel, MD, PhD](https://www.gotoper.com/courses/optimizing-treatment-for-biliary-tract-cancers?utm_source=contagionlive&utm_medium=article&utm_campaign=cmeDeck). [![Image 211: Burst CME™: Staying Informed and Up-To-Date on the Treatment of Lupus Nephritis](https://media.thoughtindustries.com/thoughtindustries/image/upload/v1/course-uploads/07c0d4e1-23aa-4e1a-8c5f-f2569da581c0/gs6jm381dtzu-BurstCME25_Lupus__Part2_TICatalog750x3612x.png) Video ## Burst CME™: Staying Informed and Up-To-Date on the Treatment of Lupus Nephritis Michelle Petri, MD, MPH; Shivani Garg, MD, PhD](https://www.gotoper.com/courses/burst-cme-recognizing-and-treating-lupus-part-2?utm_source=contagionlive&utm_medium=article&utm_campaign=cmeDeck). [![Image 219: The Rise of Novel HER2-Targeting Therapies in GEA: Mechanisms and Clinical Data](https://media.thoughtindustries.com/thoughtindustries/image/upload/v1/course-uploads/07c0d4e1-23aa-4e1a-8c5f-f2569da581c0/kx3v9lqrqrmt-PER_PodSeries_BTC_Pod5_TICatalog750x3612x.png) Video ## The Rise of Novel HER2-Targeting Therapies in GEA: Mechanisms and Clinical Data Rahul Gosain, MD, MBA; Rohit Gosain, MD](https://www.gotoper.com/courses/the-rise-of-novel-her2-targeting-therapies-in-gea-mechanisms-and-clinical-data?utm_source=contagionlive&utm_medium=article&utm_campaign=cmeDeck).",
+            "url": "https://www.contagionlive.com/view/entering-peak-norovirus-season-as-cases-rise-across-the-us",
+            "domain": "contagionlive.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 8,
+            "result_status": "rejected",
+            "rejection_reason": "duplicate_url"
+          },
+          {
+            "title": "NoroSTAT Data | Norovirus - CDC",
+            "snippet": "A **.gov** website belongs to an official government organization in the United States. A **lock** (  ) or **https://** means you've safely connected to the .gov website. ## About the current norovirus season. ## Graph. ### Number of Suspected or Confirmed Norovirus Outbreaks Reported by NoroSTAT-Participating States Per Week, 2012–2026. This is a graph showing the number of suspected or confirmed norovirus outbreaks reported by NoroSTAT-participating states per week during August 1, 2025 – June 5, 2026. #### What this graph shows:. The total number of suspected and confirmed norovirus outbreaks reported each week to CDC by the state health departments in Colorado, Massachusetts, Michigan, Minnesota, Nebraska, New Hampshire, New Mexico, North Carolina, Ohio, Oregon, South Carolina, Tennessee, Virginia, and Wisconsin through the National Outbreak Reporting System (NORS) by week of illness onset, 2012–2026. ### Graph trends. ## On This Page. ## Norovirus. Norovirus is the leading cause of vomiting and diarrhea, and foodborne illness in the United States.",
+            "url": "https://www.cdc.gov/norovirus/php/reporting/norostat-data.html",
+            "domain": "cdc.gov",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 1,
+            "result_status": "rejected",
+            "rejection_reason": "duplicate_url"
+          },
+          {
+            "title": "CDC: 2024-2025 seasonal norovirus outbreaks up from previous ...",
+            "snippet": "Based on reports by NoroSTAT-participating states, the total number of outbreaks in 2024-2025 seasonal year is above the range reported 012–2020 and 2021-2024 seasonal years. From August 1, 2024, through December 11, 2024, there were 495 norovirus outbreaks reported by the Norovirus Sentinel Testing and Tracking(NoroSTAT)-participating states, according to statistics from the CDC's current norovirus season webpage.1. The federal agency noted that the total number of outbreaks in the current 2024-2025 seasonal year is above the range reported for the same time periods during the 2012-2020 and 2021-2024 seasonal years.1. The leading cause of vomiting, diarrhea and foodborne illnesses in the United States, norovirus is a very contagious virus sometimes referred to as the \"stomach flu\" or \"stomach bug,\" though norovirus is not related to the flu. The federal agency defines a norovirus outbreak as the occurrence of 2 or more similar illnesses resulting from a common exposure that is either suspected or laboratory-confirmed to be caused by norovirus.3.",
+            "url": "https://www.contemporarypediatrics.com/view/cdc-2025-seasonal-norovirus-outbreaks-up-previous-years",
+            "domain": "contemporarypediatrics.com",
+            "source": "Tavily",
+            "published_date": null,
+            "rank": 2,
+            "result_status": "rejected",
+            "rejection_reason": "duplicate_url"
+          }
+        ],
+        "apparent_source_types": [
+          "news_and_situation_report",
+          "official_public_health_agency",
+          "structured_database"
+        ],
+        "disease_relevance_signals": [
+          "Norovirus"
+        ],
+        "location_relevance_signals": [
+          "United States"
+        ],
+        "evidence_availability_signals": [
+          "case",
+          "cases",
+          "outbreak",
+          "surveillance"
+        ],
+        "gaps_identified": [],
+        "source_quality_concerns": [
+          "duplicate URLs appeared in search results"
+        ],
+        "notes_for_llm": [
+          "Observation includes search metadata only; fetched page text is not included.",
+          "Only provider search results can become source candidates."
+        ]
+      }
+    },
+    {
+      "card_type": "REFINE decision 2",
+      "decision": {
+        "iteration_index": 2,
+        "decision": "stop_limits_reached",
+        "decision_reason": "The maximum iteration limit of 2 has been reached (max_iterations: 2, max_total_queries: 10). Both iterations have been fully executed (8 queries total across 2 iterations). No further search iterations are permitted under the stated bounds. The current candidate pool is assessed as partially sufficient — key national-level sources have been identified, but several target fields (deaths, hospitalizations, February 2025 weekly counts, NORS structured outbreak records, and broader subnational/locality coverage) remain incompletely addressed. However, the bounds constraint is binding and takes precedence over coverage gaps.",
+        "coverage_assessment": "PARTIAL. National-level outbreak count data is well-covered for December 2024 and early January 2025 via CDC NoroSTAT (495 outbreaks Aug 1–Dec 11 2024; 91 outbreaks week of Dec 5; 128 outbreaks week prior to Jan 9; 97 outbreaks week ending Jan 9) and corroborated by multiple news/clinical media sources. The Florida DOH Pinellas County epi bulletin provides a January 30, 2025 data point (791 reported outbreaks in 2025 as of that date). CaliciNet data covers the Sep 2024–Aug 2025 season (n=411 confirmed outbreaks). However: (1) February 2025 weekly outbreak counts are not directly surfaced in any snippet; (2) deaths and hospitalizations fields are unaddressed by any snippet; (3) NORS structured outbreak-level records with setting, state, and case-level detail were not returned as a direct result; (4) subnational/locality coverage is thin — only Minnesota (iter1) and Florida/Pinellas County (iter2) appeared as state-level sources; (5) CDC Vessel Sanitation Program cruise ship outbreak records for Dec 2024–Feb 2025 were referenced in CIDRAP but not directly sourced.",
+        "source_diversity_assessment": "MODERATE. Source diversity spans: (1) CDC official surveillance pages (NoroSTAT data, NoroSTAT data table, CaliciNet — 3 distinct CDC pages); (2) one state health department epi bulletin (Florida/Pinellas County); (3) one state health department page (Minnesota, from iter1); (4) one academic public health outlet (CIDRAP); (5) multiple clinical/medical news outlets (Contemporary Pediatrics, MDEdge, Infectious Disease Advisor, Contagion Live); (6) general news outlets (CBS News, NBC News, TODAY, AHA News). Geographic diversity is limited — only Florida and Minnesota appeared as named subnational sources. The NORS structured database channel was not successfully reached. Cruise ship/vessel outbreak data was referenced but not directly sourced.",
+        "trustworthiness_assessment": "HIGH for national-level data. CDC NoroSTAT and CaliciNet are gold-standard US surveillance systems (cdc.gov domain, CDC Division of Viral Diseases authorship). The Florida DOH Pinellas County epi bulletin (pinellas.floridahealth.gov) is an authoritative state-level official source. CIDRAP (cidrap.umn.edu) is a highly credible academic public health news outlet. Contemporary Pediatrics, MDEdge, Infectious Disease Advisor, and CBS News are credible secondary sources that cite CDC data directly. The restoredcdc.org mirror and fbplans.com are lower-trust secondary sources and should not be treated as independent evidence. Facebook, YouTube, and Instagram results were appropriately excluded.",
+        "disease_location_time_fit_assessment": "GOOD for disease and location fit; PARTIAL for time window fit. All accepted sources are clearly about Norovirus in the United States. Time window fit: December 2024 data is well-covered (multiple weekly outbreak counts). January 2025 data is partially covered (week ending Jan 9 figures). February 2025 data is absent from all snippets — the Florida DOH bulletin references data 'as of January 30, 2025' which is the closest to February but does not cover February itself. The CaliciNet Sep 2024–Aug 2025 season data spans the full window but is not broken down by month in the snippet. The NoroSTAT data table snippet shows only the 2025-2026 season in the visible portion, suggesting the 2024-2025 historical data requires deeper page navigation not accessible via search metadata alone.",
+        "corroboration_potential_assessment": "GOOD for the data points that were surfaced. The 495 outbreaks (Aug 1–Dec 11, 2024) figure is corroborated by at least 3 independent sources (Contemporary Pediatrics, MDEdge, restoredcdc.org mirror of CDC). The 91 outbreaks (week of Dec 5) figure is corroborated by AHA News and Infectious Disease Advisor. The 97 outbreaks (week ending Jan 9) and 128 outbreaks (prior week) figures appear in TODAY.com citing CDC directly. The Florida DOH figure (791 outbreaks as of Jan 30, 2025) is a single-source data point from an official state agency. The CaliciNet Sep 2024–Aug 2025 season count (n=411) is a single CDC source. Deaths and hospitalizations have zero corroboration — no snippet mentions specific death or hospitalization counts for the target window.",
+        "next_query_batch": [],
+        "stop_reason": "max_iterations reached (iteration_index=2, max_iterations=2); max_total_queries=10 also reached with 8 queries executed across 2 iterations; no further search permitted under task bounds",
+        "warnings": [
+          "LIMITS REACHED: Both max_iterations (2) and max_total_queries (10) bounds are binding. No further search is possible under the stated task constraints.",
+          "February 2025 weekly norovirus outbreak counts were not surfaced in any snippet across both iterations. The Florida DOH Pinellas epi bulletin (Jan 30, 2025 data point) is the closest available evidence but does not cover February 2025 directly.",
+          "Deaths and hospitalizations fields remain entirely unaddressed. Norovirus deaths in the US are rare and typically reported only in long-term care facility or cruise ship outbreak investigations — these records were not returned in either iteration.",
+          "The CDC NoroSTAT data table page (norostat-data-table.html) was returned as a result but its snippet shows only 2025-2026 season data in the visible table header. The 2024-2025 historical weekly counts are likely present in the full page but cannot be confirmed from snippet metadata alone.",
+          "The CDC NORS dashboard was not returned as a direct result in either iteration despite two targeted queries. NORS outbreak-level records (with setting, state, case counts, hospitalizations, deaths) remain unconfirmed as a candidate source.",
+          "CDC Vessel Sanitation Program (VSP) cruise ship outbreak records for Dec 2024–Feb 2025 were referenced in the CIDRAP snippet but the VSP page itself was not returned as a search result.",
+          "restoredcdc.org is a third-party mirror — treat as corroborating only, not as an independent primary source.",
+          "The CaliciNet data snippet references 'September 1, 2024 – August 31, 2025 (n=411)' confirmed outbreaks — this covers the full task window but the breakdown by month or week is not visible in the snippet and cannot be assumed.",
+          "subnational_location and locality fields have thin coverage — only Minnesota and Florida/Pinellas County appeared as named state-level sources across both iterations."
+        ]
+      }
+    },
+    {
+      "card_type": "STOP",
+      "stop_decision": "stop_limits_reached",
+      "stop_reason": "max_iterations reached (iteration_index=2, max_iterations=2); max_total_queries=10 also reached with 8 queries executed across 2 iterations; no further search permitted under task bounds"
+    }
+  ],
+  "final_gap_assessment": null,
+  "generated_from_artifacts_only": true
+}

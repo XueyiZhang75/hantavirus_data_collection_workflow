@@ -1,0 +1,354 @@
+[
+  {
+    "query_id": "iter1_q1",
+    "query": "Texas measles cases 2025 DSHS site:dshs.texas.gov OR site:gov",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Targets the Texas Department of State Health Services (DSHS) directly — the primary subnational authority for Texas measles surveillance. Using site: operator to surface DSHS pages and other .gov domains. Avoids rigid quoted-phrase to improve recall. Expected to return DSHS measles dashboard, press releases, and situation updates with confirmed/probable case counts, death counts, and county-level breakdowns.",
+    "expected_source_type_or_evidence": "Texas DSHS measles surveillance page, DSHS press releases, Texas Health and Human Services measles updates",
+    "expected_trust_signal": "Official .gov domain; DSHS authorship; dated situation reports or dashboards",
+    "language": "en",
+    "target_disease_terms": [
+      "measles",
+      "rubeola"
+    ],
+    "target_location_terms": [
+      "Texas",
+      "DSHS"
+    ],
+    "time_terms": [
+      "2025",
+      "January 2025",
+      "April 2025"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q1"
+  },
+  {
+    "query_id": "iter1_q2",
+    "query": "CDC measles outbreak Texas 2025 cases deaths confirmed site:cdc.gov",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Targets CDC.gov directly for national measles surveillance data that includes Texas state-level breakdowns. CDC publishes weekly measles case counts by state, MMWR outbreak investigation reports, and health advisory notices. The site: operator ensures results come from the authoritative federal source. Expected to yield confirmed/probable case counts, death data, and case classification details.",
+    "expected_source_type_or_evidence": "CDC measles cases and outbreaks page, MMWR reports, CDC health advisories referencing Texas 2025",
+    "expected_trust_signal": "Official CDC.gov domain; MMWR publication; dated surveillance tables",
+    "language": "en",
+    "target_disease_terms": [
+      "measles"
+    ],
+    "target_location_terms": [
+      "Texas",
+      "United States"
+    ],
+    "time_terms": [
+      "2025"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q2"
+  },
+  {
+    "query_id": "iter1_q3",
+    "query": "measles outbreak Texas 2025 cases deaths hospitalizations WHO PAHO situation report",
+    "provider_channel": "official_site_search",
+    "query_type": "domain_limited",
+    "source_type": "international_organization_report",
+    "role_hint": "validation",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Targets WHO and PAHO situation reports that may reference the Texas/US measles outbreak for international surveillance purposes. These reports often include cumulative case and death counts, age distributions, and vaccination coverage context. Useful as a cross-validation layer against DSHS and CDC figures, and may contain data not yet reflected in national dashboards.",
+    "expected_source_type_or_evidence": "WHO Disease Outbreak News, PAHO epidemiological alerts, WHO Weekly Epidemiological Record entries referencing US/Texas measles 2025",
+    "expected_trust_signal": "WHO.int or PAHO.org domain; dated situation report with case count tables",
+    "language": "en",
+    "target_disease_terms": [
+      "measles"
+    ],
+    "target_location_terms": [
+      "Texas",
+      "United States",
+      "Americas"
+    ],
+    "time_terms": [
+      "2025",
+      "January 2025",
+      "April 2025"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q3"
+  },
+  {
+    "query_id": "iter1_q4",
+    "query": "Texas measles outbreak 2025 confirmed cases deaths county hospitalizations",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 3,
+    "expected_fields": [
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Broad news search to capture outbreak announcements, locality-level detail (county names, school or community clusters), hospitalization figures, and death reports that may precede or supplement official dashboard updates. News sources often cite DSHS or CDC figures directly and provide dated evidence quotes. Relaxed phrasing (no rigid quoted phrase) maximizes recall across AP, Reuters, Texas Tribune, local TV affiliates, and health news outlets.",
+    "expected_source_type_or_evidence": "AP, Reuters, Texas Tribune, local Texas TV/newspaper outlets, ProPublica, Stat News — articles citing DSHS or CDC figures",
+    "expected_trust_signal": "Named journalist byline; direct citation of DSHS or CDC spokesperson or data; dateline within Jan–Apr 2025",
+    "language": "en",
+    "target_disease_terms": [
+      "measles"
+    ],
+    "target_location_terms": [
+      "Texas"
+    ],
+    "time_terms": [
+      "2025",
+      "January 2025",
+      "February 2025",
+      "March 2025",
+      "April 2025"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q4"
+  },
+  {
+    "query_id": "iter2_q1",
+    "query": "DSHS Texas measles outbreak death February April 2025 press release site:dshs.texas.gov",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "deaths",
+      "cases_confirmed",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Directly targets the two DSHS death announcement press releases referenced in the DSHS outbreak page snippet: 'Feb. 26 Texas Announces First Death in Measles Outbreak' and 'April 6 Texas Announces Second Death in Measles Outbreak'. These are the primary authoritative sources for death counts within the task window and must be captured as discrete source candidates. Also expected to surface the April 7 DSHS Health Alert on expanded outbreak counties. Site-limiting to dshs.texas.gov maximizes precision.",
+    "expected_source_type_or_evidence": "DSHS press releases dated Feb 26 2025 and Apr 6 2025 announcing measles deaths; DSHS Health Alert dated Apr 7 2025 on expanded outbreak counties",
+    "expected_trust_signal": "Official dshs.texas.gov domain; dated press release with death count and locality (Lubbock/Gaines County area)",
+    "language": "en",
+    "target_disease_terms": [
+      "measles"
+    ],
+    "target_location_terms": [
+      "Texas",
+      "West Texas",
+      "Lubbock",
+      "Gaines County"
+    ],
+    "time_terms": [
+      "February 2025",
+      "April 2025"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q1 — DSHS outbreak page snippet referenced Feb 26 and Apr 6 death press releases not yet captured as discrete candidates",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q1"
+  },
+  {
+    "query_id": "iter2_q2",
+    "query": "CDC measles cases 2025 United States state count Texas tracker weekly",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Targets the CDC national measles case count surveillance table (distinct from MMWR outbreak reports), which tracks confirmed and probable cases by state on a weekly or cumulative basis. This page would provide a cross-validated Texas case count for the full Jan–Apr 2025 window, including any cases not associated with the West Texas outbreak cluster. The MMWR reports cover specific sub-periods; the national tracker covers the full window.",
+    "expected_source_type_or_evidence": "CDC 'Measles Cases and Outbreaks' surveillance page with state-level case count table for 2025; CDC health advisory or situation update referencing Texas cumulative totals",
+    "expected_trust_signal": "Official cdc.gov domain; dated surveillance table with state-level confirmed/probable case counts",
+    "language": "en",
+    "target_disease_terms": [
+      "measles"
+    ],
+    "target_location_terms": [
+      "Texas",
+      "United States"
+    ],
+    "time_terms": [
+      "2025",
+      "January 2025",
+      "April 2025"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q2 — CDC MMWR reports surfaced but national case count tracker page not yet identified as a discrete candidate",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q2"
+  },
+  {
+    "query_id": "iter2_q3",
+    "query": "Texas measles death child Lubbock 2025 Gaines County outbreak cases April",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 2,
+    "expected_fields": [
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "deaths",
+      "cases_confirmed",
+      "cases_unspecified",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Targets news coverage of the two child deaths in Lubbock referenced in the Wikipedia snippet, and the broader April 2025 case escalation. Local outlets (Lubbock Avalanche-Journal, KCBD, Plainview Herald) and wire services (AP, Reuters) would have covered the death announcements with dated evidence quotes, locality detail, and cumulative case counts at time of publication. This fills the news coverage gap for the Feb–Apr 2025 sub-period and provides corroborating evidence quotes for the death and hospitalization fields.",
+    "expected_source_type_or_evidence": "AP or Reuters wire stories on Texas measles deaths; Lubbock Avalanche-Journal or KCBD local coverage; Texas Tribune follow-up articles citing DSHS figures for April 2025",
+    "expected_trust_signal": "Named journalist byline; direct citation of DSHS spokesperson or official case count; dateline Feb–Apr 2025",
+    "language": "en",
+    "target_disease_terms": [
+      "measles"
+    ],
+    "target_location_terms": [
+      "Texas",
+      "Lubbock",
+      "Gaines County",
+      "West Texas"
+    ],
+    "time_terms": [
+      "2025",
+      "February 2025",
+      "March 2025",
+      "April 2025"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q4 — news search returned only 1 Texas Tribune result; death announcement coverage and local outlet reporting not yet captured",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q3"
+  },
+  {
+    "query_id": "iter2_q4",
+    "query": "Texas measles 2025 Mennonite community cases not associated West Texas outbreak Harris County update",
+    "provider_channel": "web_search",
+    "query_type": "general_web",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 3,
+    "expected_fields": [
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_unspecified",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "The DSHS outbreak page snippet references '2025 Texas Measles Cases Not Associated with the Outbreak in West Texas' as a distinct category, and the Harris County DSHS alert (2 confirmed cases, January 2025) represents a separate cluster. The Wikipedia snippet identifies the Mennonite community as the primary affected group. This query targets coverage of non-West-Texas Texas cases (e.g., Harris County, other urban counties) and any DSHS updates distinguishing outbreak-associated vs. non-outbreak cases — important for accurate subnational_location and locality field population across the full task window.",
+    "expected_source_type_or_evidence": "DSHS pages or news articles distinguishing West Texas outbreak cases from sporadic Texas cases; Harris County Public Health updates; coverage of Mennonite community context",
+    "expected_trust_signal": "DSHS or county health department authorship; dated update within Jan–Apr 2025 window; explicit case count breakdown by cluster",
+    "language": "en",
+    "target_disease_terms": [
+      "measles"
+    ],
+    "target_location_terms": [
+      "Texas",
+      "Harris County",
+      "Houston",
+      "West Texas"
+    ],
+    "time_terms": [
+      "2025",
+      "January 2025",
+      "February 2025",
+      "March 2025",
+      "April 2025"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q1 — DSHS outbreak page references non-West-Texas cases as a distinct category; Harris County alert surfaced but broader non-outbreak case coverage not yet captured",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q4"
+  }
+]

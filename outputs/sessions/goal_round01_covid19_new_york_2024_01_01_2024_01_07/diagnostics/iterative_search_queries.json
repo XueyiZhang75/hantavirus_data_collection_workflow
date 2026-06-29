@@ -1,0 +1,344 @@
+[
+  {
+    "query_id": "i1_q1",
+    "query": "New York COVID-19 weekly cases deaths hospitalizations January 2024 site:health.ny.gov OR site:nyc.gov",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Directly targets NYSDOH (health.ny.gov) and NYC DOHMH (nyc.gov) official surveillance pages for COVID-19 weekly data in January 2024. These agencies publish weekly COVID-19 reports with confirmed cases, deaths, and hospitalizations broken down by date and geography. Using site: operators maximizes precision for official New York public health sources.",
+    "expected_source_type_or_evidence": "Official NYSDOH or NYC DOHMH weekly COVID-19 surveillance report or dashboard page for January 2024",
+    "expected_trust_signal": "Government domain (.ny.gov or nyc.gov), official agency authorship, dated weekly report",
+    "language": "en",
+    "target_disease_terms": [
+      "COVID-19"
+    ],
+    "target_location_terms": [
+      "New York",
+      "New York State",
+      "New York City"
+    ],
+    "time_terms": [
+      "January 2024",
+      "week ending",
+      "2024-01-07"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "i1_q1"
+  },
+  {
+    "query_id": "i1_q2",
+    "query": "CDC COVID Data Tracker New York State cases deaths hospitalizations week January 2024",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "CDC COVID Data Tracker (cdc.gov) is the primary federal aggregator of state-level COVID-19 surveillance data including confirmed cases, deaths, and hospitalizations. It covers New York State and publishes weekly metrics. This query targets the CDC tracker specifically for New York in January 2024, which is likely to yield case counts, death counts, and hospitalization admissions for the target week.",
+    "expected_source_type_or_evidence": "CDC COVID Data Tracker state-level weekly summary for New York, January 2024",
+    "expected_trust_signal": "Federal government domain (cdc.gov), CDC authorship, weekly epidemiological data",
+    "language": "en",
+    "target_disease_terms": [
+      "COVID-19",
+      "SARS-CoV-2"
+    ],
+    "target_location_terms": [
+      "New York",
+      "New York State"
+    ],
+    "time_terms": [
+      "January 2024",
+      "week of January 1 2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "i1_q2"
+  },
+  {
+    "query_id": "i1_q3",
+    "query": "New York COVID-19 cases deaths hospitalizations \"January 2024\" weekly surveillance report NYSDOH OR \"New York State Department of Health\"",
+    "provider_channel": "web_search",
+    "query_type": "general_web",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Broadens the official agency search beyond site: operators to catch NYSDOH weekly surveillance reports, press releases, or data summaries that may be indexed on third-party aggregators or news sites but originate from NYSDOH. The phrase 'January 2024' and 'weekly surveillance report' anchor the time window and report type. Including the full agency name increases recall for official documents.",
+    "expected_source_type_or_evidence": "NYSDOH weekly COVID-19 surveillance bulletin or press release for the week of January 1–7, 2024",
+    "expected_trust_signal": "NYSDOH authorship, official report title, dated January 2024",
+    "language": "en",
+    "target_disease_terms": [
+      "COVID-19"
+    ],
+    "target_location_terms": [
+      "New York",
+      "New York State"
+    ],
+    "time_terms": [
+      "January 2024",
+      "week of January 1",
+      "2024-01-07"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "i1_q3"
+  },
+  {
+    "query_id": "i1_q4",
+    "query": "COVID-19 New York cases deaths hospitalizations \"week ending\" \"January 2024\" data",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "News sources and situation reports often cite official figures from NYSDOH or CDC for the specific week. The phrase 'week ending' is standard epidemiological reporting language that appears in both official reports and news coverage. This query targets news articles from January 2024 that report New York COVID-19 metrics, which can provide evidence quotes and corroborate official data, and may surface links to primary official sources.",
+    "expected_source_type_or_evidence": "News article or situation report citing New York COVID-19 weekly statistics for early January 2024, with direct quotes from official data",
+    "expected_trust_signal": "Established news outlet, citation of official NYSDOH or CDC figures, publication date in January 2024",
+    "language": "en",
+    "target_disease_terms": [
+      "COVID-19"
+    ],
+    "target_location_terms": [
+      "New York"
+    ],
+    "time_terms": [
+      "January 2024",
+      "week ending January 2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "i1_q4"
+  },
+  {
+    "query_id": "i2_q1",
+    "query": "site:data.cdc.gov COVID-19 weekly cases deaths New York state \"week ending\" January 2024",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "The CDC open data Socrata dataset 'Weekly United States COVID-19 Cases and Deaths by State' (data.cdc.gov/pwn4-m3yp) was confirmed in iteration 1 as a high-value structured source. This query directly targets data.cdc.gov for New York weekly data with the 'week ending' phrase and January 2024 time anchor, which matches the dataset's column naming convention. This is the most direct path to confirmed numeric case and death counts for New York for the target week.",
+    "expected_source_type_or_evidence": "CDC Socrata open data dataset page or API endpoint for weekly COVID-19 cases and deaths by state, with a New York row for week ending January 6 or January 7, 2024",
+    "expected_trust_signal": "Federal government domain (data.cdc.gov), CDC authorship, Socrata structured dataset with state-level weekly rows",
+    "language": "en",
+    "target_disease_terms": [
+      "COVID-19"
+    ],
+    "target_location_terms": [
+      "New York",
+      "New York State"
+    ],
+    "time_terms": [
+      "week ending January 2024",
+      "January 6 2024",
+      "January 7 2024"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "i1_q2",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "i2_q1"
+  },
+  {
+    "query_id": "i2_q2",
+    "query": "site:health.data.ny.gov COVID-19 hospitalizations cases January 2024 weekly",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "hospitalizations",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "The NYSDOH open data portal (health.data.ny.gov) is a distinct domain from coronavirus.health.ny.gov and hosts downloadable machine-readable datasets including the COVID-19 hospitalization time-series referenced in the NYSDOH hospitalization dashboard snippet ('Historical daily data can be accessed via this Open Data COVID-19 hospitalizations file'). This query directly targets that portal for January 2024 data, which should yield the specific hospitalization counts for the target week.",
+    "expected_source_type_or_evidence": "NYSDOH open data portal dataset page for COVID-19 hospitalizations or cases with daily/weekly rows covering January 2024, filterable by date",
+    "expected_trust_signal": "New York State government domain (health.data.ny.gov), NYSDOH authorship, open data portal with time-series dataset",
+    "language": "en",
+    "target_disease_terms": [
+      "COVID-19"
+    ],
+    "target_location_terms": [
+      "New York",
+      "New York State"
+    ],
+    "time_terms": [
+      "January 2024",
+      "week ending January 2024"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "i1_q1",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "i2_q2"
+  },
+  {
+    "query_id": "i2_q3",
+    "query": "NYC DOHMH COVID-19 data \"week ending\" \"January 2024\" confirmed cases deaths hospitalizations github OR \"data.cityofnewyork.us\"",
+    "provider_channel": "web_search",
+    "query_type": "general_web",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "locality",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "NYC DOHMH maintains a GitHub repository (nychealth/coronavirus-data) and a NYC Open Data portal (data.cityofnewyork.us) with machine-readable weekly COVID-19 data including confirmed and probable cases, deaths, and hospitalizations. The data.cityofnewyork.us domain appeared in iteration 1 results. This query targets both channels with the 'week ending' phrase and January 2024 time anchor to surface the specific NYC weekly data entry for the target period.",
+    "expected_source_type_or_evidence": "NYC DOHMH GitHub repository file or NYC Open Data dataset with weekly COVID-19 rows for week ending January 2024, containing confirmed/probable case counts, deaths, and hospitalizations for New York City",
+    "expected_trust_signal": "NYC DOHMH authorship, official NYC Open Data portal (data.cityofnewyork.us) or nychealth GitHub repository, weekly data with date column matching target week",
+    "language": "en",
+    "target_disease_terms": [
+      "COVID-19"
+    ],
+    "target_location_terms": [
+      "New York City",
+      "NYC"
+    ],
+    "time_terms": [
+      "week ending January 2024",
+      "January 6 2024",
+      "January 7 2024"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "i1_q1",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "i2_q3"
+  },
+  {
+    "query_id": "i2_q4",
+    "query": "New York COVID-19 \"week ending January 6\" OR \"week ending January 7\" 2024 cases deaths hospitalizations",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "The standard CDC and NYSDOH reporting convention uses 'week ending [date]' with the Saturday end-date. For the 2024-01-01 to 2024-01-07 window, the week-ending date is January 6 (Saturday) or January 7 (Sunday, depending on the reporting convention). News articles and situation reports from early January 2024 citing official figures often use this exact phrase. This query uses exact phrase matching for both possible week-ending dates to maximize recall of news articles that cite official New York COVID-19 figures for the target week, which can provide evidence quotes and corroborate official data.",
+    "expected_source_type_or_evidence": "News article or public health situation report from January 2024 citing New York COVID-19 weekly statistics with 'week ending January 6' or 'week ending January 7' language, including numeric case, death, or hospitalization figures",
+    "expected_trust_signal": "Established news outlet or official agency press release, publication date in January 2024, direct citation of NYSDOH or CDC figures",
+    "language": "en",
+    "target_disease_terms": [
+      "COVID-19"
+    ],
+    "target_location_terms": [
+      "New York",
+      "New York State",
+      "New York City"
+    ],
+    "time_terms": [
+      "week ending January 6 2024",
+      "week ending January 7 2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "i2_q4"
+  }
+]

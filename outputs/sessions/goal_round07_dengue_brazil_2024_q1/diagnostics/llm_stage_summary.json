@@ -1,0 +1,176 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-6",
+  "api_key_present": true,
+  "disease_intelligence": {
+    "generation_method": "llm_generated",
+    "disease_standard_name": "Dengue",
+    "query_term_count": 15,
+    "warnings": [
+      "PIPELINE WARNING: task_input_warnings flag 'extraction_record_model_still_hantavirus_named' — verify that the extraction record schema has been updated to Dengue before populating records; do not use a Hantavirus-named model for Dengue data.",
+      "PIPELINE WARNING: task_input_warnings flag 'source_discovery_not_yet_disease_generic' — source discovery module may not yet be tuned for dengue-specific Brazilian sources; manually verify coverage of MS/SVS and SES portals.",
+      "Brazil declared a national public health emergency for dengue in February 2024; Q1 2024 is a high-intensity outbreak period — expect elevated case volumes and frequent bulletin updates.",
+      "Brazilian federal bulletins are published in Portuguese; ensure extraction pipeline handles Portuguese-language tabular data and terminology.",
+      "SINAN microdata may have reporting lag; bulletins published in Q1 2024 may undercount final Q1 totals — note data completeness status when extracting.",
+      "State-level (26 states + DF) data granularity is available and should be captured where possible for subnational_location field.",
+      "PAHO publishes regional dengue updates that include Brazil-specific data — these serve as strong validation sources against national MS/SVS figures.",
+      "Epi week mapping: SE01 2024 = 2024-01-07 to 2024-01-13; SE13 2024 ≈ 2024-03-24 to 2024-03-30 — use this mapping to align date_reported field.",
+      "Do not report source_url as discovered; flag for human or automated source retrieval step downstream."
+    ],
+    "llm_call_succeeded": true
+  },
+  "source_planning": {
+    "enabled": true,
+    "status": "success",
+    "generation_method": "llm_executable_source_plan",
+    "execution_status": "planned_not_executed",
+    "planned_query_count": 10,
+    "planned_source_category_count": 7,
+    "provider_channel_counts": {
+      "official_site_search": 4,
+      "literature_api": 2,
+      "database_search": 2,
+      "news_search": 2
+    },
+    "agent_query_count": 10,
+    "agent_query_added_count": 10,
+    "candidate_hint_count": 0,
+    "warnings": [
+      "source_plan_created_not_executed_stage4",
+      "source_discovery_execution_not_implemented_stage4",
+      "brazil_2024_dengue_epidemic_scale_may_produce_high_volume_subnational_records",
+      "portuguese_language_sources_require_localized_query_coverage",
+      "sinan_datasus_open_data_portals_require_direct_database_access_not_web_search"
+    ],
+    "failure_type": null,
+    "failure_message": null
+  },
+  "source_critic": {
+    "enabled": true,
+    "attempted_source_count": 0,
+    "assessed_source_count": 0,
+    "skipped_source_count": 28,
+    "blocked_fetch_count": 0,
+    "needs_review_count": 0,
+    "allowed_fetch_count": 0,
+    "context_only_count": 0,
+    "decision_counts": {},
+    "fetch_recommendation_counts": {},
+    "risk_flag_counts": {},
+    "selection": {
+      "selection_mode": "auto_priority",
+      "explicit_allowlist_used": false,
+      "collection_mode": "direct_collection",
+      "direct_target_official_fast_path": true,
+      "max_sources": 4,
+      "eligible_candidate_count": 0,
+      "selected_candidate_count": 0,
+      "skipped_candidate_count": 28,
+      "selected_source_ids": [],
+      "skipped_reason_counts": {
+        "target_official_must_fetch_skips_llm_source_critic": 20,
+        "direct_target_official_fast_path_skips_source_critic": 8
+      }
+    },
+    "allowlist_enabled": false,
+    "max_sources": 4,
+    "review_blocks_fetch": false,
+    "failure_count": 0,
+    "semantic_leakage_count": 0,
+    "human_review_recommended_count": 0
+  },
+  "source_credibility": {
+    "enabled": true,
+    "assessed_source_count": 28,
+    "role_counts": {
+      "collection": 6,
+      "context": 9,
+      "validation": 13
+    },
+    "risk_flag_counts": {
+      "official_public_health_authority": 13,
+      "location_relevance_unclear": 13,
+      "source_disease_relevance:target_disease_match": 25,
+      "source_metadata_matches_requested_disease": 25,
+      "source_time_matches_requested_window": 15,
+      "geographic_granularity_unclear": 13,
+      "data_signal_in_source_metadata": 28,
+      "pdf_or_report_likely_medium_readability": 3,
+      "primary_or_authoritative_source": 16,
+      "missing_publisher": 22,
+      "ambiguous_location": 13,
+      "low_machine_readability": 3,
+      "time_window_match_from_planned_query": 13,
+      "standard_web_page": 19,
+      "local_source_matches_task_location": 11,
+      "task_location_granularity": 4,
+      "complete_source_provenance": 6,
+      "context_or_background_only": 2,
+      "screening_and_critic_disagree": 9,
+      "international_organization_authority": 3,
+      "location_match_from_planned_query": 4,
+      "source_disease_relevance:insufficient_text": 1,
+      "disease_relevance_unclear": 1,
+      "national_or_international_granularity": 4,
+      "ambiguous_disease": 2,
+      "secondary_news_or_media_source": 8,
+      "independence_unclear": 11,
+      "low_authority_relevant_source": 5,
+      "source_disease_relevance:ambiguous_disease": 2,
+      "ambiguous_disease_signal_in_source_metadata": 2,
+      "local_or_subnational_granularity": 7,
+      "structured_data_source": 6,
+      "machine_readable_or_structured": 6,
+      "possible_derivative_or_syndicated_source": 1
+    },
+    "llm_assessed_count": 0,
+    "llm_failure_count": 0,
+    "needs_review_count": 6
+  },
+  "source_identity": {
+    "enabled": true,
+    "identity_assessed_count": 28,
+    "llm_identity_assessed_count": 0,
+    "post_fetch_identity_assessed_count": 20,
+    "unknown_publisher_count": 21,
+    "source_type_counts": {
+      "official_public_health_agency": 6,
+      "structured_database": 2,
+      "social_media": 4,
+      "international_public_health_agency": 4,
+      "unknown": 6,
+      "news_media": 4,
+      "secondary_aggregator": 1,
+      "background_fact_sheet": 1
+    },
+    "claim_support_role_counts": {
+      "context_only": 8,
+      "primary_case_claim_support": 5,
+      "insufficient_information": 10,
+      "corroboration_support": 5
+    },
+    "recommended_fetch_use_counts": {
+      "fetch_for_context": 8,
+      "fetch_for_extraction": 10,
+      "fetch_only_after_review": 10
+    },
+    "warning_counts": {
+      "search_provider_not_publisher": 28,
+      "publisher_from_search_metadata_unverified": 28,
+      "actual_publisher_unknown": 22,
+      "direct_target_official_fast_path_skips_source_identity": 28
+    }
+  },
+  "structured_extraction": {
+    "enabled": true,
+    "mode": "llm_structured_output",
+    "eligible_chunk_count": 258,
+    "call_count": 30,
+    "success_count": 30,
+    "error_count": 0,
+    "fallback_count": 0,
+    "raw_record_count": 27,
+    "max_chunks": 30,
+    "error_messages": []
+  }
+}

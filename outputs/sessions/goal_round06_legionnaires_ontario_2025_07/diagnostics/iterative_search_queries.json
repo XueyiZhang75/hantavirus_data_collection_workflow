@@ -1,0 +1,349 @@
+[
+  {
+    "query_id": "iter1_q1",
+    "query": "Legionnaires disease Ontario July 2025 cases outbreak public health",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Targets Public Health Ontario, local health unit websites, and Health Canada pages using natural-language terms without over-rigid quoting. 'July 2025' is more likely to match real document text than a date-range string. Covers both 'Legionnaires disease' and 'outbreak' to capture surveillance bulletins, health alerts, and reportable disease summaries.",
+    "expected_source_type_or_evidence": "Public Health Ontario situation reports, local health unit advisories, Health Canada reportable disease tables, Ontario health alerts",
+    "expected_trust_signal": "Domain from ontario.ca, publichealthontario.ca, canada.ca, or named local health unit (.ca domain); official report language such as 'confirmed cases', 'reportable disease', 'health unit'",
+    "language": "en",
+    "target_disease_terms": [
+      "Legionnaires disease",
+      "Legionella",
+      "Legionellosis"
+    ],
+    "target_location_terms": [
+      "Ontario",
+      "Toronto",
+      "Ottawa",
+      "Hamilton",
+      "London"
+    ],
+    "time_terms": [
+      "July 2025",
+      "2025"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q1"
+  },
+  {
+    "query_id": "iter1_q2",
+    "query": "Legionella outbreak Ontario 2025 cases deaths hospitalizations health unit",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "News outlets (CBC, CTV, Toronto Star, Ottawa Citizen, local Ontario papers) frequently report on Legionella outbreaks with case counts, death tolls, and locality details before official surveillance summaries are published. Using 'health unit' anchors results to Ontario-specific reporting structures. Avoids over-quoted phrases that suppress relevant results.",
+    "expected_source_type_or_evidence": "CBC News, CTV News, Toronto Star, Ottawa Citizen, Hamilton Spectator, or other Ontario regional news articles reporting case counts, deaths, or outbreak investigations",
+    "expected_trust_signal": "Named journalist or news outlet, dateline in July 2025, reference to a named public health official or health unit, specific case or death count",
+    "language": "en",
+    "target_disease_terms": [
+      "Legionella",
+      "Legionnaires disease",
+      "Legionellosis"
+    ],
+    "target_location_terms": [
+      "Ontario"
+    ],
+    "time_terms": [
+      "2025",
+      "July 2025"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q2"
+  },
+  {
+    "query_id": "iter1_q3",
+    "query": "Public Health Ontario Legionellosis reportable disease surveillance 2025",
+    "provider_channel": "database_search",
+    "query_type": "database",
+    "source_type": "structured_database",
+    "role_hint": "validation",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Public Health Ontario publishes reportable disease data through its integrated Public Health Information System (iPHIS) and annual/quarterly infectious disease summaries. 'Legionellosis' is the formal reportable disease name used in Ontario surveillance. This query targets structured data tables or downloadable datasets that may include July 2025 case counts by health unit.",
+    "expected_source_type_or_evidence": "Public Health Ontario infectious disease query (IDQR) tool, Ontario reportable disease data tables, PHAC notifiable disease database entries for Ontario",
+    "expected_trust_signal": "publichealthontario.ca or canada.ca domain, tabular case count data, reference to iPHIS or PHAC notifiable disease surveillance system",
+    "language": "en",
+    "target_disease_terms": [
+      "Legionellosis",
+      "Legionnaires disease",
+      "Legionella"
+    ],
+    "target_location_terms": [
+      "Ontario"
+    ],
+    "time_terms": [
+      "2025"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q3"
+  },
+  {
+    "query_id": "iter1_q4",
+    "query": "ProMED Legionella Ontario Canada 2025",
+    "provider_channel": "web_search",
+    "query_type": "general_web",
+    "source_type": "international_organization_report",
+    "role_hint": "validation",
+    "priority": 4,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "ProMED-mail (Program for Monitoring Emerging Diseases) is an authoritative international disease alert system that frequently posts early signals of Legionella outbreaks in Canada, including Ontario. ProMED posts often cite local health authority statements and include case/death counts. This complements official agency searches and may surface July 2025 alerts not yet indexed in official databases.",
+    "expected_source_type_or_evidence": "ProMED-mail alert post referencing Ontario Legionella cases or outbreak, with case counts and source attribution to a Canadian health authority",
+    "expected_trust_signal": "promedmail.org domain, ISID affiliation, post date in 2025, reference to Ontario health unit or PHAC",
+    "language": "en",
+    "target_disease_terms": [
+      "Legionella",
+      "Legionnaires disease"
+    ],
+    "target_location_terms": [
+      "Ontario",
+      "Canada"
+    ],
+    "time_terms": [
+      "2025"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q4"
+  },
+  {
+    "query_id": "iter2_q1",
+    "query": "Middlesex-London Health Unit Legionnaires disease outbreak update July 2025",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "The Middlesex-London Health Unit (MLHU) is the primary reporting authority for this outbreak. Iteration 1 surfaced only the July 14 status update (66 cases, 2 deaths). MLHU typically publishes multiple dated status updates during an active outbreak (e.g., July 7, July 21, July 28, July 31). This query targets the MLHU news/updates section directly to surface all July 2025 outbreak status pages, which will provide the time-series case and death counts needed for the July 2025 window.",
+    "expected_source_type_or_evidence": "Middlesex-London Health Unit official outbreak status update pages (healthunit.com/news), dated July 2025, with confirmed case counts, death counts, and geographic clustering information",
+    "expected_trust_signal": "healthunit.com domain, dated July 2025, official outbreak language ('cases confirmed', 'fatalities', 'outbreak declared'), reference to Middlesex-London Health Unit medical officer of health",
+    "language": "en",
+    "target_disease_terms": [
+      "Legionnaires disease",
+      "Legionella",
+      "Legionellosis"
+    ],
+    "target_location_terms": [
+      "Middlesex-London",
+      "London Ontario",
+      "Middlesex County"
+    ],
+    "time_terms": [
+      "July 2025",
+      "2025"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q1 returned healthunit.com July 14 update (66 cases, 2 deaths); additional dated updates likely exist",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q1"
+  },
+  {
+    "query_id": "iter2_q2",
+    "query": "London Ontario Legionnaires disease outbreak July 2025 cases deaths London Free Press CTV CBC",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "London, Ontario is the epicenter of the July 2025 outbreak. The London Free Press is the primary local newspaper and would have the most granular dated coverage of the outbreak progression. CTV London and CBC London bureaus also provide local coverage. This query targets local news sources that may have published multiple dated articles with specific case counts, death counts, and source identification details not yet surfaced in iteration 1.",
+    "expected_source_type_or_evidence": "London Free Press, CTV London, CBC London articles dated July 2025 with specific case counts, death counts, outbreak source identification (cooling tower, water system), and quotes from MLHU officials",
+    "expected_trust_signal": "lfpress.com, cbc.ca/london, ctvnews.ca/london domains; dateline July 2025; named MLHU official (e.g., Medical Officer of Health); specific numerical case/death counts",
+    "language": "en",
+    "target_disease_terms": [
+      "Legionnaires disease",
+      "Legionella"
+    ],
+    "target_location_terms": [
+      "London Ontario",
+      "Middlesex-London"
+    ],
+    "time_terms": [
+      "July 2025"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q2 returned ctvnews.ca and cbc.ca results but local London-specific coverage not fully surfaced",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q2"
+  },
+  {
+    "query_id": "iter2_q3",
+    "query": "Legionella Legionnaires Ontario July 2025 PHAC notifiable disease canada.ca",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "validation",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Two canada.ca results were accepted in iteration 1 but not summarized in the top results. PHAC publishes notifiable disease data for Ontario through its national surveillance system. This query targets PHAC's canada.ca pages specifically for Ontario Legionellosis data in 2025, which may include July case counts and provide federal-level corroboration of the MLHU outbreak figures.",
+    "expected_source_type_or_evidence": "PHAC canada.ca notifiable disease surveillance pages or reports for Legionellosis in Ontario 2025, with case counts by province and time period",
+    "expected_trust_signal": "canada.ca domain, PHAC authorship, reference to Ontario case counts, 2025 data",
+    "language": "en",
+    "target_disease_terms": [
+      "Legionellosis",
+      "Legionnaires disease",
+      "Legionella"
+    ],
+    "target_location_terms": [
+      "Ontario",
+      "Canada"
+    ],
+    "time_terms": [
+      "2025",
+      "July 2025"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q3 returned 2 canada.ca results that were accepted but not summarized in top results",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q3"
+  },
+  {
+    "query_id": "iter2_q4",
+    "query": "Middlesex-London Legionnaires outbreak declared over source cooling tower 2025",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 4,
+    "expected_fields": [
+      "disease",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "The CBC snippet states the July London outbreak 'has since been declared over' with 4 deaths and ~100 cases. The beaconbio snippet references a re-declaration with 94 cases and 4 deaths. This query targets the outbreak closure announcement and source identification (likely a cooling tower or water system), which would provide the final case and death counts for the outbreak and confirm whether the outbreak end date falls within or after July 31, 2025. This is critical for accurate date-bounded data collection.",
+    "expected_source_type_or_evidence": "News articles or health unit announcements declaring the Middlesex-London Legionnaires outbreak over, with final case count, death count, and identified source (e.g., cooling tower, building water system)",
+    "expected_trust_signal": "healthunit.com, lfpress.com, cbc.ca, ctvnews.ca domains; reference to outbreak being declared over; final case/death totals; named source of contamination",
+    "language": "en",
+    "target_disease_terms": [
+      "Legionnaires disease",
+      "Legionella"
+    ],
+    "target_location_terms": [
+      "Middlesex-London",
+      "London Ontario"
+    ],
+    "time_terms": [
+      "2025",
+      "July 2025",
+      "August 2025"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "CBC snippet states outbreak 'declared over' with 4 deaths and ~100 cases; beaconbio references re-declaration at 94 cases/4 deaths — final counts and end date need confirmation",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q4"
+  }
+]

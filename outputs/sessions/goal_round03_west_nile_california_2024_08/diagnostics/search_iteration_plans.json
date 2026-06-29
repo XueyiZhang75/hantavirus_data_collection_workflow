@@ -1,0 +1,386 @@
+[
+  {
+    "iteration_index": 1,
+    "search_objective": "Identify authoritative sources reporting West Nile virus human cases, deaths, hospitalizations, and case classifications for California during August 2024 (2024-08-01 to 2024-08-31), covering state-level and county-level data across official public health agencies, surveillance databases, and news/situation reports.",
+    "search_reasoning": "West Nile virus in California is primarily reported through the California Department of Public Health (CDPH) and the California West Nile Virus website (westnile.ca.gov), which publish weekly surveillance summaries including human case counts by county, neuroinvasive vs. non-neuroinvasive classification, deaths, and cumulative totals. The CDC ArboNET system also aggregates state-reported WNV data. County-level health departments (e.g., Los Angeles, Sacramento, Fresno) may issue their own press releases or situation reports. News outlets frequently cite CDPH figures during peak season (July–September). The upstream queries are overly reliant on exact-phrase matching with date-range strings embedded in the query text, which is unlikely to match real page content. This iteration replaces them with cleaner, more realistic queries targeting the known reporting structure: CDPH weekly WNV summaries, the westnile.ca.gov surveillance dashboard, CDC ArboNET, and news coverage. Given the 4-query cap per iteration and 2-iteration max, priority is given to the highest-yield source types: (1) CDPH/westnile.ca.gov official surveillance, (2) CDC ArboNET national database, (3) county health department reports, and (4) news coverage citing official figures. Literature (peer-reviewed) is deprioritized for this narrow 1-month window as publication lag makes 2024 papers unlikely. The language is English only; no localization needed for California.",
+    "query_batch": [
+      {
+        "query_id": "iter1_q1",
+        "query": "West Nile virus California 2024 human cases deaths weekly report site:westnile.ca.gov OR site:cdph.ca.gov",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "hospitalizations",
+          "subnational_location",
+          "locality",
+          "evidence_quote"
+        ],
+        "query_rationale": "The California West Nile Virus website (westnile.ca.gov) and CDPH (cdph.ca.gov) are the primary authoritative sources for weekly WNV human surveillance summaries in California. These pages publish cumulative and weekly case counts, deaths, neuroinvasive disease counts, and county breakdowns. Targeting these domains directly maximizes the chance of retrieving the August 2024 weekly reports.",
+        "expected_source_type_or_evidence": "CDPH or westnile.ca.gov weekly WNV surveillance summary page with tabular case counts by county and week",
+        "expected_trust_signal": "Official California state public health agency domain (.ca.gov); data attributed to CDPH Infectious Disease Branch or Vector-Borne Disease Section",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "2024",
+          "August 2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q1"
+      },
+      {
+        "query_id": "iter1_q2",
+        "query": "West Nile virus California August 2024 human cases neuroinvasive deaths county surveillance",
+        "provider_channel": "web_search",
+        "query_type": "general_web",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 2,
+        "expected_fields": [
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "hospitalizations",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "evidence_quote"
+        ],
+        "query_rationale": "A broader web search using natural language terms likely to appear in CDPH press releases, county health department reports, and official surveillance summaries. 'Neuroinvasive' is the standard CDC/CDPH classification term for severe WNV disease and will help surface case-classification data. Avoids over-quoted exact phrases that may not match real page text.",
+        "expected_source_type_or_evidence": "CDPH press release, county health department advisory, or westnile.ca.gov summary referencing August 2024 case counts",
+        "expected_trust_signal": "Source attributed to CDPH, a California county public health department, or official state surveillance program",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV",
+          "neuroinvasive"
+        ],
+        "target_location_terms": [
+          "California",
+          "county"
+        ],
+        "time_terms": [
+          "August 2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q2"
+      },
+      {
+        "query_id": "iter1_q3",
+        "query": "CDC ArboNET West Nile virus 2024 California cases deaths statistics",
+        "provider_channel": "database_search",
+        "query_type": "database",
+        "source_type": "structured_database",
+        "role_hint": "validation",
+        "priority": 3,
+        "expected_fields": [
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "subnational_location",
+          "date_reported",
+          "evidence_quote"
+        ],
+        "query_rationale": "CDC ArboNET is the national arboviral surveillance system that aggregates state-reported WNV data including California. It publishes annual and weekly case statistics by state, including confirmed/probable cases, neuroinvasive disease, and deaths. This provides a cross-validation source independent of CDPH and may include August 2024 cumulative figures.",
+        "expected_source_type_or_evidence": "CDC ArboNET weekly or annual WNV statistics table for 2024 with California state row",
+        "expected_trust_signal": "CDC.gov domain; data labeled as ArboNET surveillance system output",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV",
+          "ArboNET"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q3"
+      },
+      {
+        "query_id": "iter1_q4",
+        "query": "\"West Nile virus\" California 2024 cases deaths August outbreak health department",
+        "provider_channel": "news_search",
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 4,
+        "expected_fields": [
+          "cases_confirmed",
+          "deaths",
+          "locality",
+          "subnational_location",
+          "date_reported",
+          "evidence_quote",
+          "source_url"
+        ],
+        "query_rationale": "News articles published in August 2024 frequently cite official CDPH or county health department figures and can surface specific case counts, deaths, and locality data that corroborate or supplement official reports. This query uses natural language terms without over-quoted phrases to maximize recall across news outlets covering the California WNV season peak.",
+        "expected_source_type_or_evidence": "News article from California regional or statewide outlet (e.g., LA Times, Sacramento Bee, SF Chronicle) citing CDPH or county health figures for August 2024 WNV cases",
+        "expected_trust_signal": "Article cites CDPH, county health officer, or westnile.ca.gov as data source; published between 2024-08-01 and 2024-09-15",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "August 2024",
+          "2024"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q4"
+      }
+    ],
+    "expected_evidence": [
+      "CDPH or westnile.ca.gov weekly WNV surveillance table with August 2024 human case counts by county",
+      "Cumulative 2024 California WNV case totals with deaths and neuroinvasive disease counts as of August 2024",
+      "CDC ArboNET 2024 state-level WNV statistics including California confirmed/probable cases and deaths",
+      "County-level WNV case reports or press releases from Los Angeles, Sacramento, Fresno, or other high-burden California counties for August 2024",
+      "News articles citing official California WNV case counts and deaths for August 2024",
+      "Hospitalization counts or rates from CDPH or county health reports"
+    ],
+    "expected_source_characteristics": [
+      "Official California state agency domain (westnile.ca.gov, cdph.ca.gov) with weekly surveillance data tables",
+      "CDC.gov ArboNET statistics page with state-level breakdown including California",
+      "California county public health department websites or press releases (.gov domains)",
+      "Established California regional news outlets citing CDPH or county health officials",
+      "Data published or updated between 2024-08-01 and 2024-09-15 to capture August reporting window",
+      "Tabular or structured data with case counts disaggregated by case classification (confirmed, probable, neuroinvasive, non-neuroinvasive) and/or county"
+    ],
+    "language_or_localization_reasoning": "All queries are in English. California public health reporting for West Nile virus is conducted exclusively in English by state and county agencies. No Spanish-language or other localized sources are expected to provide primary surveillance data for this task. No localization adjustments are needed.",
+    "trust_considerations": [
+      "Highest trust: westnile.ca.gov and cdph.ca.gov as primary California WNV surveillance authorities — data should be treated as ground truth for state-level figures",
+      "High trust: CDC ArboNET (cdc.gov) as the national aggregator — useful for cross-validation but may lag behind state reporting by 1–2 weeks",
+      "Medium-high trust: California county health department websites (.gov) — authoritative for locality-level data but may not cover all counties",
+      "Medium trust: News articles — useful for surfacing specific figures and dates but must be verified against official sources; treat as collection_support only",
+      "Caution: Upstream queries used exact-phrase matching with date-range strings (e.g., '2024-08-01-2024-08-31') that are unlikely to appear verbatim in real page content — these have been replaced with natural language queries",
+      "Caution: WNV case counts in California are reported cumulatively year-to-date; August-specific figures may need to be derived by comparing consecutive weekly reports",
+      "Caution: Peer-reviewed literature is unlikely to cover August 2024 data within the same year due to publication lag — deprioritized in this iteration"
+    ],
+    "stop_condition_hypothesis": "Coverage is sufficient when at least one CDPH or westnile.ca.gov weekly summary for August 2024 is identified, plus one corroborating source (CDC ArboNET or county-level report), providing case counts, deaths, and date context. A second iteration should target any gaps in county-level granularity or hospitalization data not covered in iteration 1 results.",
+    "warnings": [
+      "The upstream planned queries used embedded date-range strings (e.g., '2024-08-01-2024-08-31') as query text — these are unlikely to match real web content and have been replaced with natural language equivalents",
+      "California WNV surveillance data is typically reported cumulatively (year-to-date); extracting August-specific case counts may require comparing the August 1 and August 31 weekly report snapshots",
+      "The 4-query-per-iteration cap limits coverage; iteration 2 should be reserved for county-level follow-up and any gaps identified from iteration 1 results",
+      "WNV peak season in California is July–September, so August 2024 data should be available but may still be preliminary or subject to revision in official reports",
+      "Some county health departments may not publish standalone WNV reports and instead contribute data only to the state CDPH/westnile.ca.gov system"
+    ]
+  },
+  {
+    "iteration_index": 2,
+    "search_objective": "Refined follow-up search",
+    "search_reasoning": "Iteration 1 returned strong signals from westnile.ca.gov Arbobulletins (weekly PDFs), CDC ArboNET historic data, and county-level sources. However, critical gaps remain: (1) The two Arbobulletin PDFs identified (week 29 and week 32) bracket August 2024 but their exact epidemiological week dates are not confirmed in the snippets — additional weekly bulletins covering weeks 31–35 (roughly August 2024) are needed to pin down August-specific cumulative case counts and deaths. (2) No deaths figure with an August 2024 date anchor has been confirmed for California specifically — the Placer County snippet mentions \"54 confirmed cases and 5 deaths\" but no date is confirmed. (3) The CIDRAP Facebook post references a 5th California WNV death but no date or county is confirmed. (4) Hospitalization data has not surfaced. (5) The westnile.ca.gov Arbobulletin download index page has not been directly targeted to enumerate all August 2024 weekly PDFs (weeks ~31–35). A second iteration targeting the Arbobulletin index, specific August-week bulletins, CDPH press releases with death/hospitalization data, and the CDC 2024 current-season statistics page will close these gaps within the 4-query cap.",
+    "query_batch": [
+      {
+        "query_id": "iter2_q1",
+        "query": "westnile.ca.gov arbobulletin 2024 weekly download August site:westnile.ca.gov",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "hospitalizations",
+          "subnational_location",
+          "locality",
+          "evidence_quote"
+        ],
+        "query_rationale": "The westnile.ca.gov Arbobulletin download page lists all weekly PDF surveillance bulletins by week number. Targeting this index page will enumerate the specific download IDs and week numbers for August 2024 bulletins (approximately weeks 31–35), allowing identification of all relevant PDFs beyond the two already found (weeks 29 and 32). This is the highest-priority gap: without the full set of August weekly bulletins, cumulative case counts cannot be anchored to the August 2024 window.",
+        "expected_source_type_or_evidence": "westnile.ca.gov Arbobulletin index page listing weekly PDF reports with week numbers and download links for 2024",
+        "expected_trust_signal": "Official westnile.ca.gov domain; CDPH Arboviral Surveillance Program weekly bulletin series",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV",
+          "arbobulletin"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "2024",
+          "August 2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q1 — Arbobulletin PDFs for weeks 29 and 32 were found; need to enumerate all August 2024 weeks (31–35)",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q1"
+      },
+      {
+        "query_id": "iter2_q2",
+        "query": "California West Nile virus arbobulletin week 33 34 35 2024 human cases deaths",
+        "provider_channel": "web_search",
+        "query_type": "general_web",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 2,
+        "expected_fields": [
+          "date_reported",
+          "cases_confirmed",
+          "deaths",
+          "subnational_location",
+          "locality",
+          "evidence_quote"
+        ],
+        "query_rationale": "Epidemiological weeks 33–35 of 2024 correspond to August 11 – September 7, covering the latter two-thirds of August 2024. These bulletins will contain the cumulative case counts and deaths as of late August 2024, which are essential for deriving August-specific totals. Directly querying for these week numbers targets the specific PDFs most likely to contain the peak August 2024 surveillance data.",
+        "expected_source_type_or_evidence": "westnile.ca.gov Arbobulletin PDF for week 33, 34, or 35 of 2024 with cumulative human case counts, deaths, and county breakdown",
+        "expected_trust_signal": "westnile.ca.gov domain; CDPH weekly arboviral surveillance bulletin with week number and year in filename or title",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV",
+          "arbobulletin"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "week 33",
+          "week 34",
+          "week 35",
+          "August 2024",
+          "2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q1/q2 — weeks 29 and 32 found; weeks 33–35 needed to cover full August 2024 window",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q2"
+      },
+      {
+        "query_id": "iter2_q3",
+        "query": "CDC West Nile virus 2024 current season statistics cases deaths by state California",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "structured_database",
+        "role_hint": "validation",
+        "priority": 3,
+        "expected_fields": [
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "subnational_location",
+          "date_reported",
+          "evidence_quote"
+        ],
+        "query_rationale": "The CDC publishes a '2024 West Nile Virus Activity in the United States' current-season statistics page (distinct from the historic data page already found) that includes weekly updated case counts by state, including California, with neuroinvasive and non-neuroinvasive breakdowns and deaths. This provides independent cross-validation of CDPH figures and may include August 2024 cumulative totals for California. The historic data page (cdc.gov/west-nile-virus/data-maps/historic-data.html) was found in iteration 1 but covers 1999–2025 aggregates; the current-season page provides finer temporal resolution.",
+        "expected_source_type_or_evidence": "CDC.gov 2024 WNV current-season statistics table or map with California state row showing confirmed/probable cases, neuroinvasive disease counts, and deaths as of August or September 2024",
+        "expected_trust_signal": "cdc.gov domain; page title references '2024' and 'current season' or 'preliminary data'; data attributed to ArboNET",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV",
+          "ArboNET",
+          "neuroinvasive"
+        ],
+        "target_location_terms": [
+          "California",
+          "United States"
+        ],
+        "time_terms": [
+          "2024",
+          "current season"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q3 — CDC historic data page found but does not provide 2024 current-season weekly resolution; current-season page needed",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q3"
+      },
+      {
+        "query_id": "iter2_q4",
+        "query": "California West Nile virus death August 2024 CDPH hospitalization confirmed cases county",
+        "provider_channel": "news_search",
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 4,
+        "expected_fields": [
+          "deaths",
+          "hospitalizations",
+          "cases_confirmed",
+          "locality",
+          "subnational_location",
+          "date_reported",
+          "evidence_quote",
+          "source_url"
+        ],
+        "query_rationale": "The Placer County press release (54 cases, 5 deaths) and CIDRAP Facebook post (5th California WNV death) from iteration 1 suggest multiple California WNV deaths occurred during or around August 2024, but exact dates and hospitalization counts are unconfirmed. News articles published in August–September 2024 citing CDPH or county health officials are the most likely source for death-specific dates, hospitalization figures, and county-level attribution. This query targets those articles directly, with 'hospitalization' added to surface the one target field most absent from iteration 1 results.",
+        "expected_source_type_or_evidence": "California regional or statewide news article (e.g., Sacramento Bee, LA Times, KCRA, ABC7) published August–September 2024 citing CDPH or county health official figures for WNV deaths and hospitalizations in California",
+        "expected_trust_signal": "Article published between 2024-08-01 and 2024-09-30; cites CDPH, county health officer, or westnile.ca.gov as data source; includes specific death count and/or hospitalization figure for California",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "August 2024",
+          "2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q4 — deaths hinted at (5 deaths, Placer County) but no hospitalization data found; death dates unconfirmed for August 2024 window",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q4"
+      }
+    ],
+    "expected_evidence": [],
+    "expected_source_characteristics": [],
+    "language_or_localization_reasoning": "",
+    "trust_considerations": [],
+    "stop_condition_hypothesis": "",
+    "warnings": [
+      "The avmosquito.org snippet citing '1466 cases and 320 deaths in California' appears to be a cumulative all-time historical figure (since WNV arrived in California in 2004), NOT a 2024-specific count — do not treat as August 2024 data without verification.",
+      "The westnile.ca.gov homepage now shows 2026 data, confirming the live dashboard does not retain historical year data — August 2024 data is only accessible via archived Arbobulletin PDFs or the CDPH statistics archive.",
+      "Epidemiological week 29 of 2024 ends July 20, 2024 (pre-August); week 32 ends August 10, 2024 (early August). Weeks 33–36 cover August 11 – September 7, 2024 and are the primary target for August 2024 case counts.",
+      "The abcnews.com result references Wisconsin and Illinois WNV deaths, not California — it should not be used as a California-specific source despite mentioning national CDC case counts.",
+      "Facebook.com (CIDRAP post) is a social media secondary source — useful for identifying the existence of a 5th California WNV death report but must be corroborated by the primary CIDRAP or CDPH source.",
+      "California WNV data is reported cumulatively year-to-date in Arbobulletins; August-specific case counts must be derived by subtracting the week 31 cumulative total from the week 35 (or last August week) cumulative total.",
+      "The 4-query cap for iteration 2 is binding — queries are prioritized to maximize August 2024 temporal specificity and death/hospitalization data coverage."
+    ]
+  }
+]

@@ -1,0 +1,604 @@
+{
+  "timeline_type": "workflow_timeline",
+  "session_id": "goal_round01_dengue_florida_2025_06_01_2025_06_30",
+  "items": [
+    {
+      "step_index": 1,
+      "node_name": "task_intake_and_scope_planning",
+      "node_label": "Task intake and scope planning",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "task_intake_summary.structured_task_present": true,
+        "task_intake_summary.target_field_count": 14,
+        "task_intake_summary.source_preference_count": 5
+      },
+      "key_decisions": [],
+      "warnings": [
+        "source_discovery_not_yet_disease_generic",
+        "extraction_record_model_still_hantavirus_named"
+      ],
+      "artifact_links": [],
+      "user_facing_explanation": "Turns the user request into structured task scope.",
+      "trace_message": "Built CollectionSpec from structured task input."
+    },
+    {
+      "step_index": 2,
+      "node_name": "disease_intelligence_builder",
+      "node_label": "Disease intelligence builder",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "disease_intelligence_summary.alias_count": 4,
+        "disease_intelligence_summary.pathogen_term_count": 7,
+        "disease_intelligence_summary.source_category_count": 5,
+        "disease_intelligence_summary.query_term_count": 13,
+        "disease_intelligence_summary.source_need_count": 15
+      },
+      "key_decisions": [],
+      "warnings": [
+        "Florida dengue reports frequently distinguish travel-associated from locally acquired cases — both categories must be captured and labeled separately in collection records.",
+        "Epi week boundaries for June 2025 (approx. Epi Weeks 22–26) must be mapped to calendar dates before populating date_reported fields.",
+        "FDOH arbovirus surveillance reports may be published with a 1–2 week lag; the June 30 end date may not yet have a corresponding published report at time of collection.",
+        "ArboNET data may reflect national aggregates — always filter or confirm Florida-specific figures before recording.",
+        "County-level dengue data may be suppressed in public FDOH reports for small counts (n<5) to protect patient privacy; record suppression explicitly rather than imputing zero.",
+        "The task_input_warnings flag 'extraction_record_model_still_hantavirus_named' indicates a potential model/template mismatch — verify that the extraction schema in use is dengue-specific and not inherited from a hantavirus template.",
+        "The task_input_warnings flag 'source_discovery_not_yet_disease_generic' indicates source discovery logic may not yet be fully generalized; validate that dengue-specific source categories (e.g., FDOH arbovirus pages, ArboNET) are included in the discovery pipeline.",
+        "Do not invent or assume URLs; source_url must be populated only from directly observed, verifiable source documents.",
+        "Peer-reviewed literature published in June 2025 is unlikely to reflect real-time June 2025 case counts; prioritize official agency surveillance reports for this time window.",
+        "If PAHO or WHO situation reports reference U.S. dengue counts, confirm whether Florida is explicitly named before attributing counts to this geography."
+      ],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Built disease intelligence from LLM output (Dengue)."
+    },
+    {
+      "step_index": 3,
+      "node_name": "profile_and_schema_setup",
+      "node_label": "Profile and schema setup",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "profile_schema_summary.core_field_count": 25,
+        "profile_schema_summary.target_field_count": 14,
+        "profile_schema_summary.source_category_count": 5
+      },
+      "key_decisions": [],
+      "warnings": [
+        "source_discovery_not_yet_disease_generic",
+        "extraction_record_model_still_hantavirus_named",
+        "extraction_record_schema_not_yet_disease_generic",
+        "target_field_not_yet_supported_by_record_model:locality",
+        "target_field_not_yet_supported_by_record_model:hospitalizations"
+      ],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Built active disease profile, collection schema, and source strategy (Dengue, generation_method=disease_intelligence_generated_profile_schema)."
+    },
+    {
+      "step_index": 4,
+      "node_name": "executable_source_planning",
+      "node_label": "Executable source planning",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "executable_source_plan_summary.target_field_count": 14,
+        "executable_source_plan_summary.llm_enabled": true,
+        "executable_source_plan_summary.objective_count": 9,
+        "executable_source_plan_summary.planned_source_category_count": 5,
+        "executable_source_plan_summary.planned_query_count": 10,
+        "executable_source_plan_summary.risk_count": 2,
+        "source_planning_agent_summary.llm_source_planning_enabled": true,
+        "source_planning_agent_summary.agent_query_count": 10,
+        "source_planning_agent_summary.agent_query_added_count": 10,
+        "source_planning_agent_summary.agent_candidate_hint_count": 0,
+        "source_planning_agent_summary.human_review_recommended": true,
+        "source_planning_agent_summary.query_strategy_consumed_executable_plan": true
+      },
+      "key_decisions": [],
+      "warnings": [
+        "source_plan_created_not_executed_stage4",
+        "source_discovery_execution_not_implemented_stage4",
+        "florida_dengue_primarily_travel_associated_locally_acquired_cases_rare",
+        "fdoh_arbovirus_reports_may_lag_reporting_window",
+        "county_level_granularity_may_require_direct_county_health_dept_queries",
+        "arbonet_data_may_not_be_publicly_queryable_at_subnational_level"
+      ],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Built executable source plan with 10 planned queries; no searches were executed."
+    },
+    {
+      "step_index": 5,
+      "node_name": "query_strategy_builder",
+      "node_label": "Query strategy builder",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {},
+      "key_decisions": [],
+      "warnings": [
+        "source_plan_created_not_executed_stage4",
+        "source_discovery_execution_not_implemented_stage4",
+        "florida_dengue_primarily_travel_associated_locally_acquired_cases_rare",
+        "fdoh_arbovirus_reports_may_lag_reporting_window",
+        "county_level_granularity_may_require_direct_county_health_dept_queries",
+        "arbonet_data_may_not_be_publicly_queryable_at_subnational_level"
+      ],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Built 10 direct_collection search queries from the LLM evidence strategy plan."
+    },
+    {
+      "step_index": 6,
+      "node_name": "source_discovery",
+      "node_label": "Source discovery",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "source_search_execution_summary.search_enabled": true,
+        "source_search_execution_summary.live_search_enabled": true,
+        "source_search_execution_summary.fixture_search_enabled": false,
+        "source_search_execution_summary.combine_with_seed_catalog": false,
+        "source_search_execution_summary.planned_query_count": 10,
+        "source_search_execution_summary.selected_query_count": 8,
+        "source_search_execution_summary.executed_query_count": 8,
+        "source_search_execution_summary.skipped_query_count": 0,
+        "source_search_execution_summary.raw_search_result_count": 64,
+        "source_search_execution_summary.deduplicated_search_result_count": 40,
+        "source_search_execution_summary.rejected_search_result_count": 24,
+        "source_search_execution_summary.candidate_from_search_count": 40
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [
+        "diagnostics/source_search_execution_summary.json"
+      ],
+      "user_facing_explanation": "Executes configured source discovery and records search-derived candidates.",
+      "trace_message": "Discovered 40 source candidates using live_search_only."
+    },
+    {
+      "step_index": 7,
+      "node_name": "source_dedup_and_registry",
+      "node_label": "Source dedup and registry",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "source_registry_summary.input_candidate_count": 40,
+        "source_registry_summary.registry_entry_count": 40,
+        "source_registry_summary.duplicate_count": 0,
+        "source_registry_summary.official_report_alias_duplicate_count": 0,
+        "source_registry_summary.search_derived_entry_count": 40
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Built source registry with 40 entries (0 duplicates dropped)."
+    },
+    {
+      "step_index": 8,
+      "node_name": "source_screening",
+      "node_label": "Source screening",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "source_screening_summary.input_registry_count": 40,
+        "source_screening_summary.screened_count": 40,
+        "source_screening_summary.low_confidence_count": 0,
+        "source_screening_summary.missing_url_count": 0,
+        "source_screening_summary.missing_source_type_count": 0,
+        "source_credibility_summary.assessed_source_count": 40,
+        "source_credibility_summary.high_credibility_count": 11,
+        "source_credibility_summary.medium_credibility_count": 10,
+        "source_credibility_summary.low_credibility_count": 2,
+        "source_credibility_summary.needs_review_count": 2,
+        "source_credibility_summary.excluded_count": 30,
+        "source_credibility_summary.search_derived_assessed_count": 40
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [
+        "collection/source_registry.json",
+        "diagnostics/source_identity_summary.json"
+      ],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Screened 40 sources using deterministic policy."
+    },
+    {
+      "step_index": 9,
+      "node_name": "source_critic_and_uncertainty_routing",
+      "node_label": "Source critic and uncertainty routing",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "source_critic_summary.input_registry_count": 40,
+        "source_critic_summary.critic_reviewed_count": 40,
+        "source_critic_summary.agreement_count": 30,
+        "source_critic_summary.disagreement_count": 10,
+        "source_critic_summary.llm_source_critic_enabled": true,
+        "source_critic_summary.attempted_source_count": 0,
+        "source_critic_summary.assessed_source_count": 0,
+        "source_critic_summary.skipped_source_count": 40,
+        "source_critic_summary.failed_source_count": 0,
+        "source_critic_summary.blocked_fetch_count": 0,
+        "source_critic_summary.needs_review_count": 0,
+        "source_critic_summary.allowed_fetch_count": 0
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Critic reviewed 40 sources; 31 ready for fetch, 0 deferred, 12 flagged for human review."
+    },
+    {
+      "step_index": 10,
+      "node_name": "content_fetch_and_parse",
+      "node_label": "Content fetch and parse",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "content_fetch_summary.live_fetch_enabled": true,
+        "content_fetch_summary.fixture_documents_enabled": false,
+        "content_fetch_summary.content_fixture_map_enabled": false,
+        "content_fetch_summary.fixture_document_count": 0,
+        "content_fetch_summary.source_id_allowlist_enabled": false,
+        "content_fetch_summary.search_derived_fetch_enabled": true,
+        "content_fetch_summary.search_derived_input_count": 40,
+        "content_fetch_summary.selected_search_derived_fetch_count": 31,
+        "content_fetch_summary.generated_target_fetch_count": 0,
+        "content_fetch_summary.search_verified_target_fetch_count": 0,
+        "content_fetch_summary.target_unusable_needs_fallback": false,
+        "content_fetch_summary.fallback_search_executed": true
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [
+        "diagnostics/live_fetch_summary.json",
+        "diagnostics/fetch_manifest.json"
+      ],
+      "user_facing_explanation": "Fetches and parses allowed source documents.",
+      "trace_message": "Built 31 fetch requests, produced 31 documents (live_fetch_enabled=True, fixture_documents_enabled=False, fixtures_loaded=0)."
+    },
+    {
+      "step_index": 11,
+      "node_name": "document_quality_check",
+      "node_label": "Document quality check",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "document_quality_summary.document_count": 31,
+        "document_quality_summary.usable_count": 29,
+        "document_quality_summary.partial_count": 0,
+        "document_quality_summary.offline_stub_count": 0,
+        "document_quality_summary.parse_deferred_count": 0,
+        "document_quality_summary.unusable_count": 2,
+        "document_quality_summary.error_page_document_count": 2,
+        "document_quality_summary.not_task_relevant_count": 0
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Quality-checked 31 documents: 29 usable, 0 partial, 0 offline stub, 0 parse deferred, 2 unusable."
+    },
+    {
+      "step_index": 12,
+      "node_name": "evidence_chunking_and_data_presence_flagging",
+      "node_label": "Evidence chunking and data presence flagging",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "evidence_chunking_summary.input_document_count": 31,
+        "evidence_chunking_summary.chunkable_document_count": 29,
+        "evidence_chunking_summary.skipped_document_count": 2,
+        "evidence_chunking_summary.text_chunk_count": 314,
+        "evidence_chunking_summary.table_chunk_count": 85,
+        "evidence_chunking_summary.markdown_metric_row_chunk_count": 85,
+        "evidence_chunking_summary.total_chunk_count": 399,
+        "evidence_chunking_summary.context_only_document_count": 0,
+        "evidence_chunking_summary.context_only_chunk_count": 0,
+        "evidence_chunking_summary.disease_mismatch_chunk_count": 56,
+        "data_presence_summary.total_chunk_count": 399,
+        "data_presence_summary.target_data_chunk_count": 388
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Chunked 29/31 documents into 399 evidence chunks (388 flagged as containing target data)."
+    },
+    {
+      "step_index": 13,
+      "node_name": "structured_extraction",
+      "node_label": "Structured extraction",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "structured_extraction_summary.input_chunk_count": 399,
+        "structured_extraction_summary.target_data_chunk_count": 305,
+        "structured_extraction_summary.extractable_chunk_count": 355,
+        "structured_extraction_summary.raw_record_count": 43,
+        "structured_extraction_summary.skipped_chunk_count": 44,
+        "structured_extraction_summary.llm_enabled": true,
+        "structured_extraction_summary.llm_eligible_chunk_count": 355,
+        "structured_extraction_summary.llm_call_count": 30,
+        "structured_extraction_summary.llm_success_count": 30,
+        "structured_extraction_summary.llm_empty_output_count": 21,
+        "structured_extraction_summary.llm_error_count": 0,
+        "structured_extraction_summary.llm_fallback_count": 0
+      },
+      "key_decisions": [],
+      "warnings": [
+        {
+          "filled_metric_period_from_source_reporting_period": 54,
+          "ambiguous_metric_column_semantics": 84,
+          "deterministic_metric_row_splitter": 32,
+          "metric_row_rebound_from_llm_source_row_id": 2,
+          "inferred_cumulative_metric_from_column_label": 2
+        }
+      ],
+      "artifact_links": [
+        "diagnostics/structured_extraction_summary.json",
+        "diagnostics/raw_records.json"
+      ],
+      "user_facing_explanation": "Extracts structured public-health records from evidence chunks.",
+      "trace_message": "Built 43 raw records (extraction_mode=llm_structured_output, llm_enabled=True)."
+    },
+    {
+      "step_index": 14,
+      "node_name": "schema_validation_and_repair",
+      "node_label": "Schema validation and repair",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "schema_validation_summary.raw_record_count": 43,
+        "schema_validation_summary.validated_record_count": 43,
+        "schema_validation_summary.rejected_record_count": 0,
+        "schema_validation_summary.needs_review_count": 16,
+        "schema_validation_summary.human_review_item_count": 16,
+        "schema_validation_summary.generic_record_count": 43,
+        "schema_validation_summary.legacy_hantavirus_record_count": 0,
+        "schema_validation_summary.review_required_record_count": 16,
+        "schema_validation_summary.unsupported_target_field_count": 0,
+        "schema_validation_summary.disease_mismatch_rejected_record_count": 0,
+        "schema_validation_summary.disease_uncertain_review_record_count": 0
+      },
+      "key_decisions": [],
+      "warnings": [
+        {}
+      ],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Validated 43 raw records: 43 validated (16 need review), 0 rejected."
+    },
+    {
+      "step_index": 15,
+      "node_name": "record_normalization",
+      "node_label": "Record normalization",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "record_normalization_summary.input_validated_record_count": 43,
+        "record_normalization_summary.normalized_record_count": 43,
+        "record_normalization_summary.needs_review_count": 16,
+        "record_normalization_summary.country_normalized_count": 27,
+        "record_normalization_summary.date_normalized_count": 0,
+        "record_normalization_summary.virus_or_syndrome_normalized_count": 27,
+        "record_normalization_summary.case_definition_normalized_count": 19,
+        "record_normalization_summary.source_type_warning_count": 0,
+        "record_normalization_summary.generic_record_count": 43,
+        "record_normalization_summary.legacy_hantavirus_record_count": 0,
+        "record_normalization_summary.review_required_record_count": 16,
+        "record_normalization_summary.unsupported_target_field_count": 0
+      },
+      "key_decisions": [],
+      "warnings": [
+        {
+          "missing_country_after_normalization": 16,
+          "unrecognized_case_definition": 15,
+          "unrecognized_virus_or_syndrome": 16
+        }
+      ],
+      "artifact_links": [
+        "diagnostics/normalized_records.json"
+      ],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Normalized 43/43 records (16 need review)."
+    },
+    {
+      "step_index": 16,
+      "node_name": "record_linking",
+      "node_label": "Record linking",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "record_linking_summary.input_normalized_record_count": 43,
+        "record_linking_summary.linked_event_count": 21,
+        "record_linking_summary.single_record_event_count": 13,
+        "record_linking_summary.multi_record_event_count": 7,
+        "record_linking_summary.multi_source_event_count": 0,
+        "record_linking_summary.needs_review_event_count": 1,
+        "record_linking_summary.not_linkable_event_count": 0,
+        "record_linking_summary.records_with_linked_event_id_count": 43,
+        "record_linking_summary.human_review_item_count": 14,
+        "record_linking_summary.event_cluster_count": 21,
+        "record_linking_summary.duplicate_cluster_count": 1,
+        "record_linking_summary.countable_record_count": 42
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [],
+      "user_facing_explanation": "Workflow node state and summaries are reconstructed from completed run artifacts.",
+      "trace_message": "Linked 43/43 normalized records into 21 candidate events."
+    },
+    {
+      "step_index": 17,
+      "node_name": "cross_source_consistency_check",
+      "node_label": "Cross-source consistency check",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "validation_summary.validation_result_count": 116,
+        "validation_summary.validation_case_count": 116,
+        "validation_summary.validation_comparison_count": 116,
+        "validation_summary.needs_human_review_count": 10,
+        "validation_summary.active_validation_record_count": 0,
+        "validation_summary.inactive_validation_record_count": 0,
+        "validation_summary.validation_record_count": 0,
+        "validation_summary.raw_validation_record_count": 0,
+        "trusted_source_validation_summary.trusted_source_validation_result_count": 42,
+        "trusted_source_validation_summary.trusted_source_comparison_count": 0,
+        "trusted_source_validation_summary.aggregate_comparison_count": 0,
+        "trusted_source_validation_summary.missing_validation_count": 42
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [
+        "diagnostics/claim_comparisons.json",
+        "diagnostics/corroborated_events.json"
+      ],
+      "user_facing_explanation": "Compares claims across sources without deciding official truth.",
+      "trace_message": "Checked 8 multi-record events; found 10 new conflicts and 116 validation results (6 events need review)."
+    },
+    {
+      "step_index": 18,
+      "node_name": "quality_gate_routing",
+      "node_label": "Quality gate routing",
+      "status": "executed",
+      "route_after_node": "finalize",
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "run_quality_summary.direct_collection_enabled": true,
+        "run_quality_summary.normalized_record_count": 43,
+        "run_quality_summary.accepted_record_count": 0,
+        "run_quality_summary.primary_case_dataset_eligible_count": 0,
+        "run_quality_summary.accepted_primary_case_record_count": 0,
+        "run_quality_summary.accepted_non_primary_observation_count": 0,
+        "run_quality_summary.task_aware_non_primary_record_count": 0,
+        "run_quality_summary.surveillance_summary_record_count": 16,
+        "run_quality_summary.non_primary_observation_count": 32,
+        "run_quality_summary.corroborated_primary_case_event_count": 0,
+        "run_quality_summary.no_primary_case_dataset_records": true,
+        "run_quality_summary.no_corroborated_primary_case_events": true
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [
+        "diagnostics/run_quality_summary.json",
+        "diagnostics/final_dataset_quality_summary.json"
+      ],
+      "user_facing_explanation": "The run completed technically, but no accepted primary case records reached final_case_dataset.",
+      "trace_message": "Human review disabled; preserving review flags as audit metadata and routing to final_data_package_builder."
+    },
+    {
+      "step_index": 19,
+      "node_name": "human_review",
+      "node_label": "Human review",
+      "status": "not_observed_in_trace",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "human_review_application_summary.records_before_review": 43,
+        "human_review_application_summary.records_after_review": 43,
+        "human_review_application_summary.records_excluded_by_review": 0,
+        "human_review_application_summary.records_corrected_by_review": 0,
+        "human_review_application_summary.clusters_modified_by_review": 0,
+        "human_review_application_summary.validation_results_modified_by_review": 0,
+        "human_review_application_summary.sources_modified_by_review": 0,
+        "human_review_application_summary.anomalies_resolved_by_review": 0,
+        "human_review_application_summary.decisions_provided_count": 0,
+        "human_review_application_summary.decisions_applied_count": 0,
+        "human_review_application_summary.decisions_rejected_count": 0,
+        "human_review_application_summary.audit_entry_count": 0
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [
+        "human_review/human_review_priority_summary.json",
+        "human_review/top_review_items.csv"
+      ],
+      "user_facing_explanation": "Packages uncertain or high-impact evidence for manual review.",
+      "trace_message": null
+    },
+    {
+      "step_index": 20,
+      "node_name": "final_data_package_builder",
+      "node_label": "Final data package builder",
+      "status": "executed",
+      "route_after_node": null,
+      "input_count_summary": {},
+      "output_count_summary": {},
+      "important_counts": {
+        "finalization_summary.final_dataset_count": 0,
+        "finalization_summary.final_dataset_pre_quality_gate_count": 43,
+        "finalization_summary.final_dataset_post_review_count": 0,
+        "finalization_summary.quarantined_record_count": 0,
+        "finalization_summary.pending_review_record_count": 43,
+        "finalization_summary.non_primary_observation_count": 32,
+        "finalization_summary.final_case_dataset_count": 0,
+        "finalization_summary.global_outbreak_event_dataset_count": 0,
+        "finalization_summary.regional_surveillance_dataset_count": 0,
+        "finalization_summary.country_year_aggregate_dataset_count": 0,
+        "finalization_summary.official_alert_dataset_count": 0,
+        "finalization_summary.zero_case_statement_count": 16
+      },
+      "key_decisions": [],
+      "warnings": [],
+      "artifact_links": [
+        "collection/final_package.json"
+      ],
+      "user_facing_explanation": "Exports auditable datasets, diagnostics, reports, and review artifacts.",
+      "trace_message": "Assembled hardened FinalDataPackage from current state."
+    }
+  ],
+  "technical_workflow_completed": true,
+  "ended_in_human_review": true,
+  "final_case_dataset_count": 0,
+  "final_dataset_count": 0,
+  "quarantined_record_count": 0,
+  "human_review_item_count": 117,
+  "run_quality_status": "no_primary_case_dataset_records",
+  "warnings": [
+    "missing optional list artifact: documents",
+    "missing optional list artifact: source_search_results",
+    "missing optional dict artifact: executable_source_plan_summary",
+    "missing optional dict artifact: source_planning_agent_summary"
+  ],
+  "generated_from_artifacts_only": true
+}

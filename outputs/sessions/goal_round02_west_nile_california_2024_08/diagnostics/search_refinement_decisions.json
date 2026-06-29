@@ -1,0 +1,191 @@
+[
+  {
+    "iteration_index": 1,
+    "decision": "continue_search",
+    "decision_reason": "Iteration 1 returned strong signals from westnile.ca.gov (9 results including multiple weekly update PDFs with 2024 human case counts) and cdc.gov (4 results including ArboNET historic data), plus publichealth.lacounty.gov. However, the snippets show cumulative year-to-date figures (e.g., \"112 human cases,\" \"98 human cases\") without confirmed August-specific breakdowns, weekly report dates, deaths, hospitalizations, or county-level disaggregation for the August 2024 window. Key gaps remain: (1) the specific westnile.ca.gov weekly update PDFs covering the August 1–31, 2024 window have not been identified by date — the download IDs (4980, 5061, 5072) need date anchoring; (2) deaths and hospitalizations for August 2024 specifically are not yet confirmed in snippets; (3) county-level data for Sacramento, Kern, Fresno, and other high-burden counties beyond LA is absent; (4) the CDC 2024 provisional data page (distinct from historic data) has not surfaced. Iteration 2 should: (a) target the westnile.ca.gov weekly archive index to identify August 2024 report dates, (b) target the CDC 2024 provisional WNV data page, (c) target Sacramento and Kern county health departments directly, and (d) target CDPH press releases confirming deaths in August 2024.",
+    "coverage_assessment": "Partial. Multiple westnile.ca.gov weekly update PDFs are present with 2024 cumulative case counts (98–112 human cases from 23+ counties), and the LA County WNV data page was found. However, no snippet confirms August-specific case counts, deaths, or hospitalizations within the 2024-08-01 to 2024-08-31 window. The CDC ArboNET historic data page was found but covers 1999–2025 aggregates, not 2024 provisional monthly data. The westnile.ca.gov homepage shows 2026 data (current year), confirming the site is live but the August 2024 weekly reports need date-specific identification. Facebook and beaconbio.org results are low-value for this task.",
+    "source_diversity_assessment": "Moderate. Source types present: official state agency (westnile.ca.gov, 9 results), federal agency (cdc.gov, 4 results), county health (publichealth.lacounty.gov, 1 result), news (latimes.com, abcnews.com, today.com, cidrap.umn.edu, 4 results), social media (facebook.com, 3 results — low value), academic (pmc.ncbi.nlm.nih.gov, jamanetwork.com — not August 2024 specific), vector control (glamosquito.org, lawestvector.org — potentially useful for locality data). Missing: Sacramento County, Kern County, Fresno County health department sources; CDPH press releases for August 2024 deaths; CDC 2024 provisional data page.",
+    "trustworthiness_assessment": "High for westnile.ca.gov (official CDPH-affiliated state surveillance site) and cdc.gov. Moderate for publichealth.lacounty.gov (official county source but snippet is general, not August 2024 specific). Low for facebook.com and beaconbio.org. The PMC article covers 2013–2024 aggregate mortality data, not August 2024 California-specific. News sources (latimes.com, cidrap.umn.edu) may contain August 2024 quotes citing official figures — worth pursuing if they appeared in the accepted candidates but were not in the top 10 summaries.",
+    "disease_location_time_fit_assessment": "Disease fit: Excellent — all top results are WNV-specific for California. Location fit: Good — California statewide and LA County covered; Sacramento, Kern, Fresno county-level sources not yet confirmed. Time fit: Weak — snippets reference 2024 cumulative figures but no snippet is anchored to August 2024 specifically. The weekly update PDFs (download_ids 4980, 5061, 5072) likely span different weeks of 2024 but their exact report dates are unknown from metadata alone. The gap between \"98 cases\" and \"112 cases\" across two PDFs suggests sequential weekly reports, but which weeks cover August is unconfirmed.",
+    "corroboration_potential_assessment": "Good potential. The westnile.ca.gov weekly PDFs are the primary source; CDC ArboNET 2024 provisional data can corroborate statewide totals; county health departments can corroborate locality-level data. The CIDRAP result (cidrap.umn.edu) is a credible secondary source that often cites official figures with evidence quotes. Iteration 2 should surface the westnile.ca.gov weekly report archive/index page to identify which download IDs correspond to August 2024 reports, and target the CDC 2024 WNV data page directly.",
+    "next_query_batch": [
+      {
+        "query_id": "iter2_q1",
+        "query": "site:westnile.ca.gov weekly update 2024 archive August human cases",
+        "provider_channel": "official_site_search",
+        "query_rationale": "The westnile.ca.gov weekly update PDFs found in iteration 1 (download_ids 4980, 5061, 5072) have unknown publication dates. The site's archive or index page listing all 2024 weekly reports with their dates is the critical missing link to identify which PDFs cover the August 1–31, 2024 window. A site-scoped query targeting the archive/index structure will surface the report listing page, enabling date-anchored identification of August 2024 weekly reports.",
+        "expected_source_type_or_evidence": "westnile.ca.gov page listing all 2024 weekly update reports with publication dates, or an index/archive page linking to individual weekly PDFs dated within August 2024",
+        "expected_trust_signal": "westnile.ca.gov domain; page title containing 'weekly update', 'archive', or '2024'; list of dated report links",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "2024",
+          "August"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q1 — westnile.ca.gov weekly PDFs found but publication dates unknown",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "hospitalizations",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "source_url",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "iter2_q2",
+        "query": "CDC West Nile virus 2024 provisional data cases deaths California neuroinvasive non-neuroinvasive",
+        "provider_channel": "official_site_search",
+        "query_rationale": "Iteration 1 found the CDC ArboNET historic data page (1999–2025 aggregates) but not the 2024 provisional/current-year statistics page, which CDC typically publishes separately during and after the transmission season. The 2024 provisional page would show California-specific neuroinvasive disease cases, non-neuroinvasive (fever) cases, and deaths for 2024, serving as a federal cross-validation source. This query targets that distinct CDC page.",
+        "expected_source_type_or_evidence": "CDC WNV 2024 provisional statistics page showing state-level case counts (neuroinvasive, non-neuroinvasive) and deaths for California, with 'provisional' or 'preliminary' language",
+        "expected_trust_signal": "cdc.gov domain; page title referencing '2024' and 'provisional' or 'statistics'; tabular state-level data with California row",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV",
+          "neuroinvasive",
+          "non-neuroinvasive"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q2 — CDC historic data page found but 2024 provisional page not yet surfaced",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "validation",
+        "priority": 2,
+        "expected_fields": [
+          "cases_confirmed",
+          "cases_probable",
+          "deaths",
+          "subnational_location",
+          "date_reported",
+          "source_url",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "iter2_q3",
+        "query": "West Nile virus August 2024 California deaths confirmed CDPH press release Sacramento Kern Fresno",
+        "provider_channel": "web_search",
+        "query_rationale": "Deaths are the most critical unfilled field for August 2024. The Facebook snippet from iteration 1 referenced a CDPH press release confirming 'first human West Nile virus deaths' but was undated and from a low-trust domain. This query targets CDPH press releases and Sacramento/Kern/Fresno county health department pages that would confirm deaths and case counts in August 2024. These counties are historically the highest-burden WNV counties in California outside of LA.",
+        "expected_source_type_or_evidence": "CDPH press release or official advisory confirming WNV deaths in California in August 2024; Sacramento County, Kern County, or Fresno County health department WNV update with case counts and deaths for August 2024",
+        "expected_trust_signal": "cdph.ca.gov, saccounty.gov, kernpublichealth.com, or fresnocountyca.gov domain; press release format with date in August 2024; numeric death and case figures attributed to official spokesperson",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV"
+        ],
+        "target_location_terms": [
+          "California",
+          "Sacramento",
+          "Kern",
+          "Fresno",
+          "CDPH"
+        ],
+        "time_terms": [
+          "August 2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q3 — county-level sources for Sacramento, Kern, Fresno not found; deaths field unfilled",
+        "query_type": "general_web",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 3,
+        "expected_fields": [
+          "deaths",
+          "cases_confirmed",
+          "locality",
+          "subnational_location",
+          "date_reported",
+          "source_url",
+          "evidence_quote"
+        ]
+      },
+      {
+        "query_id": "iter2_q4",
+        "query": "West Nile virus California August 2024 hospitalizations cases deaths \"this year\" OR \"year to date\" OR \"so far in 2024\"",
+        "provider_channel": "news_search",
+        "query_rationale": "Hospitalizations are a target field not yet populated. News articles published in August 2024 citing official California WNV data often include hospitalization figures alongside case and death counts, using cumulative language like 'year to date' or 'so far in 2024.' CIDRAP, LA Times, and ABC News results appeared in iteration 1 but were not in the top summaries — this query is designed to surface those and similar articles with evidence quotes containing hospitalization data. The OR phrases target the natural language patterns used in mid-season surveillance reporting.",
+        "expected_source_type_or_evidence": "News article from August 2024 citing CDPH or county health official with numeric WNV hospitalization, case, and/or death figures for California; CIDRAP situation report or news brief with California-specific data",
+        "expected_trust_signal": "Publication date in August 2024; byline citing CDPH, county health officer, or official data source; numeric hospitalization figures in evidence quote",
+        "language": "en",
+        "target_disease_terms": [
+          "West Nile virus",
+          "WNV"
+        ],
+        "target_location_terms": [
+          "California"
+        ],
+        "time_terms": [
+          "August 2024",
+          "2024"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q4 — hospitalizations field unfilled; news sources found but hospitalization data not confirmed in snippets",
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 4,
+        "expected_fields": [
+          "hospitalizations",
+          "cases_confirmed",
+          "cases_unspecified",
+          "deaths",
+          "locality",
+          "date_reported",
+          "source_url",
+          "evidence_quote"
+        ]
+      }
+    ],
+    "stop_reason": null,
+    "warnings": [
+      "Iteration 2 is the final permitted iteration (max_iterations=2); all 4 query slots must be used strategically to close the most critical gaps.",
+      "westnile.ca.gov weekly PDFs (download_ids 4980, 5061, 5072) have unknown publication dates from metadata — the archive/index page query is highest priority to anchor these to August 2024.",
+      "CDC ArboNET 2024 provisional data is on a different page than the historic data page already found — target the 2024-specific provisional statistics page.",
+      "Deaths and hospitalizations for August 2024 California are the most critical unfilled fields — CDPH press releases and CIDRAP/news sources are the best remaining vectors for these.",
+      "Max total queries is 10; 4 were used in iteration 1, so up to 6 remain, but max_queries_per_iteration=4 caps this iteration at 4 queries (total: 8 of 10 used)."
+    ]
+  },
+  {
+    "iteration_index": 2,
+    "decision": "stop_sufficient",
+    "decision_reason": "Two full iterations (8 queries, 56 raw results) have been executed against the maximum permitted bounds (max_iterations=2, max_total_queries=10). The candidate pool now contains authoritative, task-relevant sources across multiple tiers that collectively cover the required target fields for California WNV in August 2024. Continuing would exceed the stated iteration and query limits, and the marginal gain from additional queries is low given the source landscape already surfaced.",
+    "coverage_assessment": "Coverage is partially sufficient for the August 2024 window. The following target fields have candidate sources:\n\n• cases_confirmed / cases_unspecified: westnile.ca.gov weekly PDFs (download_ids 4980, 5061, 5072) show cumulative 2024 figures of 98 and 112 human cases respectively; the Fresno County press release (fresnocountyca.gov, dated 09-13-2024) cites CDPH reporting 38 human cases as of that date; consolidatedmadca.gov confirms 3 asymptomatic Fresno County cases as of 07-10-2024.\n• deaths: fresnocountyca.gov press release cites CDPH reporting 4 deaths in 2024 as of 09-13-2024; the Facebook/CDPH snippet references \"first human West Nile virus deaths\" (undated, low trust).\n• subnational_location / locality: Fresno County confirmed via fresnocountyca.gov and consolidatedmadca.gov; LA County via publichealth.lacounty.gov; Tulare County mentioned in westnile.ca.gov snippet; 23 counties referenced in the 98-case weekly update.\n• date_reported: The Fresno County press release is dated 09-13-2024 (just outside the August window but citing cumulative 2024 figures); the consolidatedmadca.gov release is dated 07-10-2024 (just before the window). The westnile.ca.gov weekly PDFs lack confirmed publication dates in metadata.\n• source_url / source_type / evidence_quote: Multiple candidate URLs with snippet-level evidence quotes available.\n\nRemaining gaps:\n• August-specific (2024-08-01 to 2024-08-31) weekly breakdowns: The westnile.ca.gov weekly PDFs have unknown publication dates from metadata alone — date anchoring requires page fetch, which is outside this workflow's scope.\n• hospitalizations: No candidate source has surfaced hospitalization figures for California August 2024 specifically.\n• cases_probable / cases_suspected: Not disaggregated in any surfaced snippet.\n• Sacramento and Kern county-level data: Not confirmed in accepted candidates despite targeting.",
+    "source_diversity_assessment": "Source diversity is adequate across tiers:\n• State official: westnile.ca.gov (CDPH-operated, 9+2 results across iterations) — primary authoritative tier\n• County official: fresnocountyca.gov, consolidatedmadca.gov (Fresno), publichealth.lacounty.gov (LA) — secondary official tier\n• Federal official: cdc.gov (ArboNET historic data) — federal validation tier\n• News/media: latimes.com, abc10.com, fresnobee.com, bakersfieldnow.com, abcnews.com, today.com — collection-support tier (cite official figures)\n• Aggregator/surveillance: beaconbio.org — low priority, 2025-focused\n• Low-trust: facebook.com (4 results) — not usable as primary evidence\n\nMissing diversity: Sacramento County (saccounty.gov), Kern County (kernpublichealth.com), and Riverside County health departments did not surface as accepted candidates. CDPH press releases on cdph.ca.gov itself (distinct from westnile.ca.gov) did not appear as direct candidates.",
+    "trustworthiness_assessment": "High trust: westnile.ca.gov (CDPH-operated state surveillance portal), fresnocountyca.gov (official county health department PDF press release with date 09-13-2024), consolidatedmadca.gov (official mosquito abatement district joint release with date 07-10-2024), publichealth.lacounty.gov (official LA County health), cdc.gov (federal ArboNET).\n\nMedium trust: News outlets (abc10.com, fresnobee.com, bakersfieldnow.com, latimes.com) — acceptable as collection-support sources that cite official figures; evidence quotes must be traceable to named official sources.\n\nLow trust / not usable as primary evidence: facebook.com posts (4 results) — social media reposts of CDPH content without direct URL to original CDPH press release; en.wikipedia.org — background only; ama-assn.org result is 2025-focused and not California-specific for August 2024; 19january2025snapshot.epa.gov — EPA technical documentation covering 2002–2023 national data, not California August 2024 specific.\n\nKey trust caveat: The westnile.ca.gov weekly PDF download IDs (4980, 5061, 5072) have no confirmed publication dates in the metadata. The 112-case and 98-case cumulative figures cannot be definitively assigned to the August 2024 window without date confirmation. The fresnocountyca.gov press release (09-13-2024) citing 38 cases and 4 deaths is the most date-anchored official source, but it falls just outside the August 31 cutoff and reflects cumulative figures through early September.",
+    "disease_location_time_fit_assessment": "Disease fit: Excellent — all accepted candidates are explicitly about West Nile virus (WNV). No off-topic disease contamination.\n\nLocation fit: Good — primary candidates are California-specific (westnile.ca.gov, fresnocountyca.gov, publichealth.lacounty.gov, consolidatedmadca.gov). The CDC historic data page covers all U.S. states but includes California-filterable data. Some results (AMA 2025, BEACON 2025, Wikipedia, EPA technical doc) are national/multi-year and not California August 2024 specific — these are low-priority candidates.\n\nTime fit: Partial — this is the most significant limitation. The task window is 2024-08-01 to 2024-08-31. The best-anchored official source (fresnocountyca.gov) is dated 09-13-2024 and reports cumulative figures through that date (38 cases, 4 deaths). The consolidatedmadca.gov release is dated 07-10-2024 (pre-window). The westnile.ca.gov weekly PDFs have unknown dates but their cumulative case counts (98 and 112) bracket a period that likely spans August 2024 based on the progression of the transmission season. No source has been confirmed to report August-specific (monthly) case counts — all figures are cumulative year-to-date, which is the standard CDPH reporting format. This is a structural limitation of the data source, not a search failure.",
+    "corroboration_potential_assessment": "Strong corroboration potential exists between:\n1. westnile.ca.gov weekly PDFs (primary state surveillance) and the fresnocountyca.gov press release (county-level, citing CDPH figures) — both reference CDPH as the authoritative data source, enabling cross-validation of cumulative 2024 case and death counts.\n2. The CDC historic data page (cdc.gov) provides a federal-tier cross-check for annual California WNV totals, though it covers 1999–2025 aggregates rather than monthly breakdowns.\n3. The consolidatedmadca.gov Fresno joint release (07-10-2024) corroborates early-season Fresno County case activity that feeds into the August cumulative figures.\n\nWeaker corroboration: Facebook/social media snippets referencing CDPH press releases are low-trust and cannot be used as primary evidence without tracing to the original CDPH domain source. The AMA and BEACON results are 2025-focused and do not corroborate August 2024 California data.",
+    "next_query_batch": [],
+    "stop_reason": "Max iterations reached (2/2). Sufficient authoritative source candidates identified across state, county, and federal tiers to populate the required target fields. Remaining gaps (August-specific weekly report date anchoring, hospitalizations) are structural limitations of how CDPH publishes data — not addressable by further web search within these bounds.",
+    "warnings": [
+      "Max iterations (2/2) and effective query budget (8/10 used, with 2 remaining but no further iterations permitted) have been reached — no additional search is possible within stated bounds.",
+      "The westnile.ca.gov weekly PDF download IDs (4980, 5061, 5072) have no confirmed publication dates in search metadata. Date anchoring to the August 2024 window requires fetching the actual PDF content or the westnile.ca.gov archive index page — this must be handled at the data extraction stage, not the search planning stage.",
+      "All CDPH/westnile.ca.gov figures are cumulative year-to-date, not calendar-month specific. August 2024 case counts must be derived by identifying the weekly reports dated within 2024-08-01 to 2024-08-31 and reading the cumulative totals at the start and end of that window.",
+      "The fresnocountyca.gov press release (09-13-2024) is the most date-anchored official source but falls 13 days outside the August 31 cutoff. Its cited figures (38 cases, 4 deaths statewide as of that date) are cumulative and include cases reported after August 31.",
+      "Hospitalizations remain an unfilled target field — no candidate source surfaced hospitalization figures for California August 2024. This gap may be irresolvable without fetching the full westnile.ca.gov weekly PDF content, which includes hospitalization breakdowns in its standard table format.",
+      "Facebook.com results (4 accepted candidates) should not be used as primary evidence sources. They are social media reposts and lack direct traceability to original CDPH press release URLs.",
+      "The CDC 2024 provisional data page (cdc.gov/west-nile-virus/data-maps/current-year-data.html) was found but its snippet shows 2026 current-year data, confirming it is a rolling page that no longer contains 2024-specific data. The CDC historic data page (1999-2025) is the correct federal source for 2024 California annual totals.",
+      "Sacramento County and Kern County health department sources did not surface as accepted candidates despite targeted queries. These gaps may require direct navigation to saccounty.gov and kernpublichealth.com at the data extraction stage."
+    ]
+  }
+]

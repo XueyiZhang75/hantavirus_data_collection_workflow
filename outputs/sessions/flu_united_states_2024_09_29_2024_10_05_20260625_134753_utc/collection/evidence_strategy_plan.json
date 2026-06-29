@@ -1,0 +1,681 @@
+{
+  "plan_id": "exec_source_plan_influenza_seasonal_united_states_2024_09_29_2024_10_05",
+  "disease": "Influenza (Seasonal)",
+  "location": "united states",
+  "time_window": "2024-09-29-2024-10-05",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "time_window_2024_09_29_to_2024_10_05_spans_epiweek_40_2024_season_start",
+    "early_season_low_activity_expected_official_surveillance_may_show_minimal_counts",
+    "excluded_terms_avian_influenza_H5N1_H5N2_H7N9_enforced"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify CDC FluView Interactive and CDC Influenza Division weekly surveillance reports covering MMWR Week 40 (2024-09-29 to 2024-10-05) for the United States, including ILI activity, laboratory-confirmed influenza counts, hospitalizations, and deaths.",
+      "source_role_hint": "collection",
+      "rationale": "CDC FluView is the primary authoritative weekly influenza surveillance report for the United States and is the highest-priority collection source for this task window.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify CDC FluSurv-NET (Influenza Hospitalization Surveillance Network) data for MMWR Week 40 2024 covering laboratory-confirmed influenza hospitalizations in the United States.",
+      "source_role_hint": "collection",
+      "rationale": "FluSurv-NET provides hospitalization rates and counts for laboratory-confirmed influenza, directly supporting the hospitalizations target field.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify state-level health department influenza surveillance reports or weekly flu updates published during or covering the period 2024-09-29 to 2024-10-05 for U.S. states and territories.",
+      "source_role_hint": "collection",
+      "rationale": "State health departments publish subnational influenza data that can populate subnational_location and locality fields not available in national aggregates.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_collection_004",
+      "objective": "Identify CDC WONDER or HHS Protect public data portal datasets containing influenza case, death, or hospitalization records for the United States for the target time window.",
+      "source_role_hint": "collection",
+      "rationale": "Structured databases from CDC and HHS may provide machine-readable records with precise date and count fields.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify WHO FluNet or PAHO influenza surveillance reports covering the United States for MMWR Week 40 2024 to serve as an independent validation source.",
+      "source_role_hint": "validation",
+      "rationale": "WHO FluNet aggregates national influenza laboratory data independently from CDC FluView and can validate case counts and subtype distributions.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify HealthMap, ProMED, or GOARN situation reports referencing influenza activity in the United States during late September to early October 2024.",
+      "source_role_hint": "validation",
+      "rationale": "Independent surveillance aggregators provide secondary validation signals for outbreak detection and case counts.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify CDC case definitions and ILI surveillance methodology documents for the 2024-2025 influenza season to support correct interpretation of count semantics.",
+      "source_role_hint": "context",
+      "rationale": "Understanding whether counts are confirmed, probable, suspected, or ILI-based is essential for correct field mapping and evidence quote interpretation.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify peer-reviewed literature or preprints describing early 2024-2025 influenza season epidemiology in the United States to provide case definition and baseline context.",
+      "source_role_hint": "context",
+      "rationale": "Literature sources help interpret surveillance data and provide case definitions for confirmed vs. suspected counts.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag any sources that aggregate influenza data across multiple weeks or seasons without week-specific breakdowns, or that conflate seasonal influenza with avian influenza (H5N1/H5N2), for human review.",
+      "source_role_hint": "human_review",
+      "rationale": "Aggregated or conflated sources risk introducing out-of-window counts or excluded disease terms into the collection.",
+      "priority": 4
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_official_public_health_agency",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC FluView, CDC FluSurv-NET, CDC WONDER, HHS Protect, and U.S. state/territory health department weekly influenza surveillance reports are the primary authoritative sources for influenza case, death, and hospitalization data in the United States. MMWR Week 40 (2024-09-29 to 2024-10-05) reports are the direct target. Key agencies: CDC Influenza Division (cdc.gov/flu), all 50 state health departments, D.C. and U.S. territories.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "early_season_week_40_may_show_low_or_zero_counts",
+        "ILI_counts_are_syndrome_based_not_confirmed_cases_require_field_mapping_care"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_international_organization_report",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "WHO FluNet provides country-level laboratory-confirmed influenza specimen data for the United States, independently aggregated from national surveillance. PAHO regional influenza updates may also cover the U.S. for the target week. These serve as independent validation against CDC FluView collection records.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "WHO_FluNet_data_may_lag_by_one_to_two_weeks",
+        "PAHO_reports_may_aggregate_across_multiple_weeks"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_structured_database",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC FluView Interactive (online dashboard), HHS Protect public data, and HealthData.gov influenza datasets provide machine-readable structured records that can be queried for MMWR Week 40 2024 data. These support both collection and validation roles.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "dashboard_data_may_not_be_archivable_as_static_URL",
+        "API_access_may_be_required_for_week_specific_queries"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "date_reported",
+        "cases_confirmed",
+        "cases_suspected",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "why_relevant": "Peer-reviewed studies on early 2024-2025 influenza season epidemiology in the United States provide case definitions, baseline activity context, and subtype distribution data that support correct interpretation of surveillance counts.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "literature_unlikely_to_contain_week_specific_counts_for_target_window",
+        "primarily_useful_for_context_and_case_definition_not_direct_extraction"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_news_and_situation_report",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Reputable news outlets (e.g., AP, Reuters, STAT News) and situation reports (e.g., ProMED, HealthMap) may report on early influenza season activity in the United States during late September to early October 2024, providing supplementary signals and corroborating evidence quotes.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "news_sources_may_cite_CDC_data_without_adding_new_counts",
+        "risk_of_conflating_seasonal_influenza_with_avian_influenza_H5N1_coverage"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"influenza cases United States 2024\" cases deaths public health united states 2024-09-29-2024-10-05 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "influenza cases United States 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"flu cases United States October 2024\" cases deaths public health united states 2024-09-29-2024-10-05 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "flu cases United States October 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"influenza cases United States 2024\" outbreak report surveillance united states 2024-09-29-2024-10-05 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "influenza cases United States 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"flu cases United States October 2024\" outbreak report surveillance united states 2024-09-29-2024-10-05 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "flu cases United States October 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"influenza cases United States 2024\" epidemiology cases deaths united states 2024-09-29-2024-10-05 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "influenza cases United States 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"flu cases United States October 2024\" epidemiology cases deaths united states 2024-09-29-2024-10-05 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "flu cases United States October 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"influenza cases United States 2024\" surveillance dataset cases deaths united states 2024-09-29-2024-10-05 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "influenza cases United States 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"flu cases United States October 2024\" surveillance dataset cases deaths united states 2024-09-29-2024-10-05 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "flu cases United States October 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"influenza cases United States 2024\" outbreak report cases deaths united states 2024-09-29-2024-10-05 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "influenza cases United States 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"flu cases United States October 2024\" outbreak report cases deaths united states 2024-09-29-2024-10-05 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "flu cases United States October 2024"
+      ],
+      "location_terms_used": [
+        "united states"
+      ],
+      "time_terms_used": [
+        "2024-09-29-2024-10-05",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

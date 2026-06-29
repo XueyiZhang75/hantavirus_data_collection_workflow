@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 117,
+  &quot;prioritized_review_item_count&quot;: 117,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 20,
+    &quot;P1_high&quot;: 38,
+    &quot;P2_medium&quot;: 32,
+    &quot;P3_low&quot;: 27
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;conflicting_claims_review&quot;: 1,
+    &quot;possible_primary_case_evidence&quot;: 3,
+    &quot;validation_conflict_review&quot;: 27,
+    &quot;claim_corroboration_review&quot;: 18,
+    &quot;source_identity_review&quot;: 4,
+    &quot;outside_scope_review&quot;: 4,
+    &quot;source_credibility_review&quot;: 1,
+    &quot;missing_required_fields_review&quot;: 32,
+    &quot;general_review&quot;: 27
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_claim_corroboration_conflict_corr_event_002</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_002 - Dengue in Florida: What to know - Emerging Pathogens Ins...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_002&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_1298a67f3fad_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_1298a67f3fad_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_752899844c7d_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_752899844c7d_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_752899844c7d_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_53763309bf94_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_005_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_011_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_19aff7ba1bc3_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_19aff7ba1bc3_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_19aff7ba1bc3_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_19aff7ba1bc3_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_84acc76573c8_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_84acc76573c8_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_84acc76573c8_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_e1219da5b350_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_e1219da5b350_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_e1219da5b350_003_cases_unspecified&quot;,
+    &quot;src_search_53763309bf94&quot;,
+    &quot;src_search_ce6ce02a80f2&quot;,
+    &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;src_search_84acc76573c8&quot;,
+    &quot;src_search_1298a67f3fad&quot;,
+    &quot;src_search_e1219da5b350&quot;,
+    &quot;src_search_752899844c7d&quot;,
+    &quot;corr_event_002&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_1298a67f3fad_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_1298a67f3fad_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_752899844c7d_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_752899844c7d_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_752899844c7d_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_53763309bf94_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_005_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ce6ce02a80f2_011_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_19aff7ba1bc3_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_19aff7ba1bc3_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_19aff7ba1bc3_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_19aff7ba1bc3_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_84acc76573c8_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_84acc76573c8_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_84acc76573c8_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_e1219da5b350_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_e1219da5b350_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_e1219da5b350_003_cases_unspecified&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_53763309bf94&quot;,
+    &quot;src_search_ce6ce02a80f2&quot;,
+    &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;src_search_84acc76573c8&quot;,
+    &quot;src_search_1298a67f3fad&quot;,
+    &quot;src_search_e1219da5b350&quot;,
+    &quot;src_search_752899844c7d&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-01-2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_002 - Dengue in Florida: What to know - Emerging Pathogens Ins...&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://epi.ufl.edu/2025/06/24/dengue-in-florida-what-to-know&quot;,
+  &quot;source_title&quot;: &quot;Dengue in Florida: What to know - Emerging Pathogens Institute&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_002&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_53763309bf94&quot;,
+    &quot;source_url&quot;: &quot;https://epi.ufl.edu/2025/06/24/dengue-in-florida-what-to-know&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_015</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_015 - Dengue in Florida: What to know - Emerging Pathogens Institute</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_015&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_53763309bf94_001&quot;,
+    &quot;event_015&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_53763309bf94_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_015&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_015 - Dengue in Florida: What to know - Emerging Pathogens Institute&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;[In 2024](https://www.cdc.gov/dengue/data-research/facts-stats/historic-data.html), Florida reported 1,044 local and travel-associated cases of dengue, the most in the continental U.S., with California following with 719 cases.&quot;,
+  &quot;source_url&quot;: &quot;https://epi.ufl.edu/2025/06/24/dengue-in-florida-what-to-know&quot;,
+  &quot;source_title&quot;: &quot;Dengue in Florida: What to know - Emerging Pathogens Institute&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_015&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;outside_time_window&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_53763309bf94&quot;,
+    &quot;source_url&quot;: &quot;https://epi.ufl.edu/2025/06/24/dengue-in-florida-what-to-know&quot;,
+    &quot;evidence_quote&quot;: &quot;[In 2024](https://www.cdc.gov/dengue/data-research/facts-stats/historic-data.html), Florida reported 1,044 local and travel-associated cases of dengue, the most in the continental U.S., with California following with 719 cases.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_53763309bf94_013&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_differ&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_016</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_016 - [PDF] Florida Arbovirus Surveillance</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_016&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_ce6ce02a80f2_001&quot;,
+    &quot;rec_src_search_ce6ce02a80f2_003&quot;,
+    &quot;event_016&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_ce6ce02a80f2_001&quot;,
+    &quot;rec_src_search_ce6ce02a80f2_003&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_016&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_016 - [PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;international travel . In 2025, 81 travel -associated dengue cases have been reported .&quot;,
+  &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-23-arbovirus-surveillance.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;actual_publisher&quot;: &quot;floridahealth.gov&quot;,
+  &quot;source_type_final&quot;: &quot;state_or_local_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_016&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;record period 2025-01-01 to 2025-06-30 is too broad for requested task window 2025-06-01 to 2025-06-30&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_ce6ce02a80f2&quot;,
+    &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-23-arbovirus-surveillance.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;international travel . In 2025, 81 travel -associated dengue cases have been reported .&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_ce6ce02a80f2_012&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_differ&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_018</h2><p><strong>P0_critical</strong> possible_primary_case_evidence</p><p>possible primary case evidence - review_duplicate_event_018 - [PDF] Florida Arbovirus Surveillance</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_018&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 110,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;possible_primary_case_evidence&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_ce6ce02a80f2_004&quot;,
+    &quot;rec_src_search_ce6ce02a80f2_005&quot;,
+    &quot;event_018&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_ce6ce02a80f2_004&quot;,
+    &quot;rec_src_search_ce6ce02a80f2_005&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_018&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;possible primary case evidence - review_duplicate_event_018 - [PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;why_it_matters&quot;: &quot;No accepted primary case dataset records exist, and this item may contain possible primary case evidence.&quot;,
+  &quot;evidence_quote&quot;: &quot;Volusia . Four case s were reported in non -Florida resident s. In 2025, sixty -seven cases of dengue reported in&quot;,
+  &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-23-arbovirus-surveillance.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;actual_publisher&quot;: &quot;floridahealth.gov&quot;,
+  &quot;source_type_final&quot;: &quot;state_or_local_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is this a task-compatible primary case observation or only context/secondary evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect corroboration and source identity before deciding whether a structured human decision is warranted.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_018&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;record period 2025-01-01 to 2025-06-30 is too broad for requested task window 2025-06-01 to 2025-06-30&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_ce6ce02a80f2&quot;,
+    &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-23-arbovirus-surveillance.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;Volusia . Four case s were reported in non -Florida resident s. In 2025, sixty -seven cases of dengue reported in&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_ce6ce02a80f2_023&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_differ&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_005</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_005 - [PDF] Florida Arbovirus Surveillance</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_005&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_752899844c7d&quot;,
+    &quot;event_002&quot;,
+    &quot;anom_005&quot;,
+    &quot;val_result_045&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_752899844c7d&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_002&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-01-2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_005 - [PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;1 Florida Arbovirus Surveillance Week 26: June 23-29, 2024 Arbovirus surveillance in Florida includes endemic mosquito-borne viruses such as West Nile virus (WNV), Eastern equine encephalitis virus (EEEV), and St. Louis encephalitis virus (SLEV), as well as exotic viruses such as dengue virus (DENV), chikungunya virus (CHIKV), Zika virus (ZIKV) and California encephalitis group viruses (CEV). Malaria, a parasitic mosquito-borne disease is also included. During the period of June 23-29, 2024, the following arboviral activity was recorded in Florida. WNV activity: No human cases of WNV infection were reported this week. No horses with WNV infection were reported this week. No sentinel chickens tested positive for antibodies to WNV this week. No mosquito pools tested positive for WNV this...&quot;,
+  &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2024-26-arbovirus-surveillance.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;actual_publisher&quot;: &quot;floridahealth.gov&quot;,
+  &quot;source_type_final&quot;: &quot;state_or_local_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_005&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_752899844c7d&quot;,
+    &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2024-26-arbovirus-surveillance.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources report substantially different numeric values for the same linked event.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_006</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_006 - [PDF] Florida Arbovirus Surveillance</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_006&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;event_003&quot;,
+    &quot;anom_006&quot;,
+    &quot;val_result_047&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_19aff7ba1bc3&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_003&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-01-2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_006 - [PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;1 Florida Arbovirus Surveillance Week 24: June 8-14, 2025 Arbovirus surveillance in Florida includes endemic mosquito-borne viruses such as West Nile virus (WNV), Eastern equine encephalitis virus (EEEV), and St. Louis encephalitis virus (SLEV), as well as exotic viruses such as dengue virus (DENV), chikungunya virus (CHIKV), Zika virus (ZIKV), and California encephalitis group viruses (CEV). Malaria, a parasitic mosquito-borne disease is also included. During the period of June 8-14, 2025, the following arboviral activity was recorded in Florida. WNV activity: No human cases of WNV infection were reported this week. No horses with WNV infection were reported this week. No sentinel chickens tested positive for antibodies to WNV this week. In 2025, positive samples from one horse and 26...&quot;,
+  &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-24-arbovirus-surveillance.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;actual_publisher&quot;: &quot;floridahealth.gov&quot;,
+  &quot;source_type_final&quot;: &quot;state_or_local_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_006&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-24-arbovirus-surveillance.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources report substantially different numeric values for the same linked event.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_007</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_007 - [PDF] Florida Arbovirus Surveillance</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_007&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;event_003&quot;,
+    &quot;anom_007&quot;,
+    &quot;val_result_048&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_19aff7ba1bc3&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_003&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-01-2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_007 - [PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;1 Florida Arbovirus Surveillance Week 24: June 8-14, 2025 Arbovirus surveillance in Florida includes endemic mosquito-borne viruses such as West Nile virus (WNV), Eastern equine encephalitis virus (EEEV), and St. Louis encephalitis virus (SLEV), as well as exotic viruses such as dengue virus (DENV), chikungunya virus (CHIKV), Zika virus (ZIKV), and California encephalitis group viruses (CEV). Malaria, a parasitic mosquito-borne disease is also included. During the period of June 8-14, 2025, the following arboviral activity was recorded in Florida. WNV activity: No human cases of WNV infection were reported this week. No horses with WNV infection were reported this week. No sentinel chickens tested positive for antibodies to WNV this week. In 2025, positive samples from one horse and 26...&quot;,
+  &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-24-arbovirus-surveillance.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;actual_publisher&quot;: &quot;floridahealth.gov&quot;,
+  &quot;source_type_final&quot;: &quot;state_or_local_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_007&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-24-arbovirus-surveillance.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources may use different case definitions or reporting categories.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_008</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_008 - [PDF] Florida Arbovirus Surveillance</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_008&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;event_005&quot;,
+    &quot;anom_008&quot;,
+    &quot;val_result_051&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_19aff7ba1bc3&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_005&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-01-2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_008 - [PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;1 Florida Arbovirus Surveillance Week 24: June 8-14, 2025 Arbovirus surveillance in Florida includes endemic mosquito-borne viruses such as West Nile virus (WNV), Eastern equine encephalitis virus (EEEV), and St. Louis encephalitis virus (SLEV), as well as exotic viruses such as dengue virus (DENV), chikungunya virus (CHIKV), Zika virus (ZIKV), and California encephalitis group viruses (CEV). Malaria, a parasitic mosquito-borne disease is also included. During the period of June 8-14, 2025, the following arboviral activity was recorded in Florida. WNV activity: No human cases of WNV infection were reported this week. No horses with WNV infection were reported this week. No sentinel chickens tested positive for antibodies to WNV this week. In 2025, positive samples from one horse and 26...&quot;,
+  &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-24-arbovirus-surveillance.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;actual_publisher&quot;: &quot;floridahealth.gov&quot;,
+  &quot;source_type_final&quot;: &quot;state_or_local_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_008&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-24-arbovirus-surveillance.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources report substantially different numeric values for the same linked event.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_009</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_009 - [PDF] Florida Arbovirus Surveillance</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_009&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;event_005&quot;,
+    &quot;anom_009&quot;,
+    &quot;val_result_052&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_19aff7ba1bc3&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_005&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-01-2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_009 - [PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;1 Florida Arbovirus Surveillance Week 24: June 8-14, 2025 Arbovirus surveillance in Florida includes endemic mosquito-borne viruses such as West Nile virus (WNV), Eastern equine encephalitis virus (EEEV), and St. Louis encephalitis virus (SLEV), as well as exotic viruses such as dengue virus (DENV), chikungunya virus (CHIKV), Zika virus (ZIKV), and California encephalitis group viruses (CEV). Malaria, a parasitic mosquito-borne disease is also included. During the period of June 8-14, 2025, the following arboviral activity was recorded in Florida. WNV activity: No human cases of WNV infection were reported this week. No horses with WNV infection were reported this week. No sentinel chickens tested positive for antibodies to WNV this week. In 2025, positive samples from one horse and 26...&quot;,
+  &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-24-arbovirus-surveillance.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;actual_publisher&quot;: &quot;floridahealth.gov&quot;,
+  &quot;source_type_final&quot;: &quot;state_or_local_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_009&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_19aff7ba1bc3&quot;,
+    &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-24-arbovirus-surveillance.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources may use different case definitions or reporting categories.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_010</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_010 - [PDF] Florida Arbovirus Surveillance</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_010&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_84acc76573c8&quot;,
+    &quot;event_006&quot;,
+    &quot;anom_010&quot;,
+    &quot;val_result_054&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_84acc76573c8&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_006&quot;
+  ],
+  &quot;disease&quot;: &quot;Dengue&quot;,
+  &quot;location&quot;: &quot;Florida&quot;,
+  &quot;date_or_period&quot;: &quot;2025-06-01-2025-06-30&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_010 - [PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;1 Florida Arbovirus Surveillance Week 25: June 15-21, 2025 Arbovirus surveillance in Florida includes endemic mosquito-borne viruses such as West Nile virus (WNV), Eastern equine encephalitis virus (EEEV), and St. Louis encephalitis virus (SLEV), as well as exotic viruses such as dengue virus (DENV), chikungunya virus (CHIKV), Zika virus (ZIKV), and California encephalitis group viruses (CEV). Malaria, a parasitic mosquito-borne disease is also included. During the period of June 15-21, 2025, the following arboviral activity was recorded in Florida. WNV activity: One human case of WNV infection was reported this week in St. Johns County. No horses with WNV infection were reported this week. No sentinel chickens tested positive for antibodies to WNV this week. In 2025, positive samples f...&quot;,
+  &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-25-arbovirus-surveillance.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Florida Arbovirus Surveillance&quot;,
+  &quot;actual_publisher&quot;: &quot;floridahealth.gov&quot;,
+  &quot;source_type_final&quot;: &quot;state_or_local_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_010&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_84acc76573c8&quot;,
+    &quot;source_url&quot;: &quot;https://www.floridahealth.gov/wp-content/uploads/2025/07/2025-25-arbovirus-surveillance.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources report substantially different numeric values for the same linked event.&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

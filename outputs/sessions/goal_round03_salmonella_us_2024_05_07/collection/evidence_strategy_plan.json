@@ -1,0 +1,811 @@
+{
+  "plan_id": "exec_source_plan_salmonellosis_non_typhoidal_salmonella_united_states_2024_05_01_2024_07_31",
+  "disease": "Salmonellosis (non-typhoidal Salmonella)",
+  "location": "United States",
+  "time_window": "2024-05-01-2024-07-31",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "llm_plan_augments_deterministic_base_with_targeted_queries",
+    "excluded_terms_enforced_typhoid_fever_salmonella_typhi_paratyphi_animal_veterinary_food_product_testing"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify CDC outbreak investigation pages, CDC FoodNet surveillance reports, and CDC PulseNet cluster announcements reporting Salmonella human cases, hospitalizations, and deaths in the United States during May–July 2024.",
+      "source_role_hint": "collection",
+      "rationale": "CDC is the primary US federal public health authority for Salmonella surveillance. FoodNet provides active case counts; PulseNet tracks WGS-linked clusters; outbreak investigation pages provide serotype-specific case, hospitalization, and death counts with dates and locations.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify FDA CFSAN outbreak and food safety alert pages that report human illness counts, hospitalizations, and deaths linked to Salmonella-contaminated food products recalled or investigated during May–July 2024.",
+      "source_role_hint": "collection",
+      "rationale": "FDA CFSAN publishes outbreak investigation pages with case counts, states affected, and illness date ranges for foodborne Salmonella events, often complementing CDC data.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify state health department situation reports, press releases, and epidemiological bulletins from US states reporting Salmonella case counts, hospitalizations, or deaths during May–July 2024.",
+      "source_role_hint": "collection",
+      "rationale": "State health departments (e.g., California CDPH, Texas DSHS, Florida DOH) publish subnational Salmonella data that may not be aggregated at the federal level within the task time window.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_004",
+      "objective": "Identify USDA FSIS outbreak investigation reports that include human illness case counts linked to meat, poultry, or egg products during May–July 2024.",
+      "source_role_hint": "collection",
+      "rationale": "USDA FSIS investigates Salmonella outbreaks linked to FSIS-regulated products and publishes human illness counts alongside recall notices.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify WHO PAHO situation reports or event-based surveillance summaries covering Salmonella outbreaks in the United States during 2024 for independent cross-validation of case and death counts.",
+      "source_role_hint": "validation",
+      "rationale": "PAHO and WHO publish regional disease event summaries that can serve as independent validation against CDC-reported figures.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify CDC NORS (National Outbreak Reporting System) data or summary tables for Salmonella outbreaks reported in 2024 to cross-validate outbreak-level case and death counts.",
+      "source_role_hint": "validation",
+      "rationale": "NORS is a structured database of US foodborne and enteric disease outbreaks; its aggregate counts can validate individual outbreak records collected from other sources.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify CDC case definition documents and FoodNet methodology pages to clarify count semantics (confirmed vs. probable vs. suspected) and reporting lag for Salmonella surveillance in the US.",
+      "source_role_hint": "context",
+      "rationale": "Understanding CDC case definitions and FoodNet active surveillance methodology is essential for correctly classifying extracted counts into the appropriate schema fields.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify peer-reviewed literature (PubMed/MMWR) reporting Salmonella outbreak investigations or surveillance summaries for the United States in 2024 to provide epidemiological context and case definition clarity.",
+      "source_role_hint": "context",
+      "rationale": "MMWR reports and peer-reviewed outbreak investigations provide detailed case definitions, serotype data, and epidemiological curves that contextualize extracted counts.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_collection_support_001",
+      "objective": "Identify reputable news and situation report sources (e.g., Outbreak News Today, Food Safety News, ProMED) covering Salmonella outbreaks in the United States during May–July 2024 to surface outbreak signals not yet reflected in official sources.",
+      "source_role_hint": "collection_support",
+      "rationale": "News and situation reports may capture early outbreak signals, state-level case counts, or recall-linked illness data before official CDC pages are published.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag sources where count semantics are ambiguous (e.g., cumulative vs. newly reported), where the reporting period substantially exceeds May–July 2024, or where Salmonella counts may include typhoidal serotypes, for human review before extraction.",
+      "source_role_hint": "human_review",
+      "rationale": "Ambiguous count semantics, broad reporting periods, and typhoidal contamination are the primary risks for incorrect record extraction in this task.",
+      "priority": 4
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_cdc_outbreak_investigations",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC Division of Foodborne, Waterborne, and Environmental Diseases (DFWED) publishes multistate Salmonella outbreak investigation pages with serotype, case counts, hospitalization counts, death counts, illness date ranges, and states affected. These are the highest-priority collection sources for the task.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "outbreak_pages_may_have_cumulative_counts_spanning_beyond_task_window"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_cdc_foodnet",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "hospitalizations",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC FoodNet (Foodborne Diseases Active Surveillance Network) provides active laboratory-confirmed Salmonella case counts across 10 US sites. Annual and preliminary reports may contain 2024 data covering the task window.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "foodnet_reports_may_be_annual_and_lag_task_window",
+        "subnational_scope_limited_to_10_sentinel_sites"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_cdc_pulsenet",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "hospitalizations",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC PulseNet tracks WGS-linked Salmonella clusters and publishes cluster announcements with case counts and states affected. Relevant for identifying outbreak-linked confirmed case counts.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "pulsenet_cluster_pages_may_not_include_death_counts"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_fda_cfsan_outbreaks",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "hospitalizations",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "FDA CFSAN outbreak investigation pages report human illness counts, hospitalizations, and deaths linked to Salmonella-contaminated FDA-regulated food products. Often published alongside food recalls.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "fda_pages_may_include_food_product_testing_data_requiring_exclusion",
+        "must_extract_only_human_illness_counts"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_state_health_departments",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "hospitalizations",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "US state health departments publish Salmonella outbreak reports, press releases, and epidemiological bulletins with subnational case counts, hospitalizations, and deaths. Key states include CA, TX, FL, NY, GA, WA, and others with high Salmonella burden.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "state_reports_may_use_different_case_definitions",
+        "requires_state_by_state_search_coverage"
+      ]
+    },
+    {
+      "source_category_id": "cat_006_usda_fsis",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "hospitalizations",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "USDA FSIS publishes outbreak investigation reports and recall notices for Salmonella linked to meat, poultry, and egg products, including human illness counts.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "must_exclude_food_product_testing_data_and_extract_only_human_illness_counts"
+      ]
+    },
+    {
+      "source_category_id": "cat_007_paho_who_reports",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "PAHO and WHO publish regional disease event summaries and situation reports that may include US Salmonella outbreak data for independent cross-validation.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "paho_who_coverage_of_us_salmonella_may_be_limited_to_large_multistate_outbreaks"
+      ]
+    },
+    {
+      "source_category_id": "cat_008_cdc_nors",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC NORS (National Outbreak Reporting System) is a structured database of US foodborne and enteric disease outbreaks with case, hospitalization, and death counts by pathogen, year, and state.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "nors_data_for_2024_may_not_be_publicly_available_within_task_window",
+        "annual_reporting_lag_may_exclude_may_july_2024_data"
+      ]
+    },
+    {
+      "source_category_id": "cat_009_peer_reviewed_mmwr",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC MMWR reports and peer-reviewed outbreak investigations provide detailed Salmonella case definitions, serotype data, epidemiological curves, and case/death counts for US outbreaks. MMWR is the primary rapid communication vehicle for US outbreak investigations.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "mmwr_reports_for_may_july_2024_outbreaks_may_be_published_with_lag",
+        "requires_pubmed_and_cdc_mmwr_search"
+      ]
+    },
+    {
+      "source_category_id": "cat_010_news_situation_reports",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "hospitalizations",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Reputable food safety and outbreak news sources (Food Safety News, Outbreak News Today, ProMED) may surface early Salmonella outbreak signals, state-level case counts, and recall-linked illness data before official CDC pages are finalized.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "news_sources_may_cite_unofficial_or_preliminary_counts",
+        "requires_cross_validation_against_official_sources"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"Salmonella outbreak United States 2024\" cases deaths public health United States 2024-05-01-2024-07-31 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Salmonella outbreak United States 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"Salmonella cases US 2024\" cases deaths public health United States 2024-05-01-2024-07-31 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Salmonella cases US 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"Salmonella outbreak United States 2024\" outbreak report surveillance United States 2024-05-01-2024-07-31 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Salmonella outbreak United States 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"Salmonella cases US 2024\" outbreak report surveillance United States 2024-05-01-2024-07-31 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Salmonella cases US 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"Salmonella outbreak United States 2024\" epidemiology cases deaths United States 2024-05-01-2024-07-31 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "Salmonella outbreak United States 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"Salmonella cases US 2024\" epidemiology cases deaths United States 2024-05-01-2024-07-31 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "Salmonella cases US 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"Salmonella outbreak United States 2024\" surveillance dataset cases deaths United States 2024-05-01-2024-07-31 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Salmonella outbreak United States 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"Salmonella cases US 2024\" surveillance dataset cases deaths United States 2024-05-01-2024-07-31 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Salmonella cases US 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"Salmonella outbreak United States 2024\" outbreak report cases deaths United States 2024-05-01-2024-07-31 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Salmonella outbreak United States 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"Salmonella cases US 2024\" outbreak report cases deaths United States 2024-05-01-2024-07-31 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "Salmonella cases US 2024"
+      ],
+      "location_terms_used": [
+        "United States"
+      ],
+      "time_terms_used": [
+        "2024-05-01-2024-07-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

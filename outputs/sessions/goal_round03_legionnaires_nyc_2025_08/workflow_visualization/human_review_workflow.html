@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 91,
+  &quot;prioritized_review_item_count&quot;: 91,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 6,
+    &quot;P1_high&quot;: 53,
+    &quot;P2_medium&quot;: 0,
+    &quot;P3_low&quot;: 32
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;conflicting_claims_review&quot;: 2,
+    &quot;primary_case_dataset_blocker&quot;: 2,
+    &quot;validation_conflict_review&quot;: 6,
+    &quot;claim_corroboration_review&quot;: 31,
+    &quot;source_identity_review&quot;: 10,
+    &quot;source_credibility_review&quot;: 1,
+    &quot;outside_scope_review&quot;: 7,
+    &quot;provenance_review&quot;: 1,
+    &quot;general_review&quot;: 31
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_claim_corroboration_conflict_corr_event_002</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_002 - NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_002&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_a9306f6e1687_001_observation&quot;,
+    &quot;claim_rec_src_search_743df961a25b_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_743df961a25b_001_deaths&quot;,
+    &quot;claim_rec_src_search_743df961a25b_002_deaths&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_002_deaths&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_003_hospitalizations&quot;,
+    &quot;claim_rec_src_search_5b7e6dfb326c_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_5b7e6dfb326c_001_deaths&quot;,
+    &quot;claim_rec_src_search_5b7e6dfb326c_001_hospitalizations&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_004_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_004_deaths&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_005_deaths&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_004_hospitalizations&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_006_hospitalizations&quot;,
+    &quot;src_search_743df961a25b&quot;,
+    &quot;src_search_b74bccc017c5&quot;,
+    &quot;src_search_a9306f6e1687&quot;,
+    &quot;src_search_5b7e6dfb326c&quot;,
+    &quot;src_search_8e86f33ccf00&quot;,
+    &quot;corr_event_002&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_a9306f6e1687_001_observation&quot;,
+    &quot;claim_rec_src_search_743df961a25b_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_743df961a25b_001_deaths&quot;,
+    &quot;claim_rec_src_search_743df961a25b_002_deaths&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_002_deaths&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_003_hospitalizations&quot;,
+    &quot;claim_rec_src_search_5b7e6dfb326c_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_5b7e6dfb326c_001_deaths&quot;,
+    &quot;claim_rec_src_search_5b7e6dfb326c_001_hospitalizations&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_004_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_004_deaths&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_005_deaths&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_004_hospitalizations&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_006_hospitalizations&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_743df961a25b&quot;,
+    &quot;src_search_b74bccc017c5&quot;,
+    &quot;src_search_a9306f6e1687&quot;,
+    &quot;src_search_5b7e6dfb326c&quot;,
+    &quot;src_search_8e86f33ccf00&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York City&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-01-2025-08-31&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_002 - NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101...&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://www.vaccineadvisor.com/news/nyc-legionnaires-outbreak-fourth-death-confirmed-101-sickened&quot;,
+  &quot;source_title&quot;: &quot;NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101 Sickened&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_002&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_743df961a25b&quot;,
+    &quot;source_url&quot;: &quot;https://www.vaccineadvisor.com/news/nyc-legionnaires-outbreak-fourth-death-confirmed-101-sickened&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_claim_corroboration_conflict_corr_event_003</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_003 - Legionnaires&#x27; disease outbreak: Sixth person dies in Leg...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_003&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_fd4c39b5e976_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_fd4c39b5e976_001_deaths&quot;,
+    &quot;claim_rec_src_search_fd4c39b5e976_002_deaths&quot;,
+    &quot;claim_rec_src_search_950d652e6d2a_001_observation&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_002_deaths&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_003_hospitalizations&quot;,
+    &quot;claim_rec_src_search_f72980cd3634_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_f72980cd3634_001_deaths&quot;,
+    &quot;claim_rec_src_search_f72980cd3634_002_deaths&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_004_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_005_deaths&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_006_hospitalizations&quot;,
+    &quot;claim_rec_src_search_1596aec16d67_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_1596aec16d67_001_deaths&quot;,
+    &quot;claim_rec_src_search_1596aec16d67_001_hospitalizations&quot;,
+    &quot;claim_rec_src_search_1596aec16d67_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b4917c664acb_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_b4917c664acb_002_hospitalizations&quot;,
+    &quot;claim_rec_src_search_b4917c664acb_003_deaths&quot;,
+    &quot;claim_rec_src_search_743df961a25b_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_743df961a25b_003_deaths&quot;,
+    &quot;claim_rec_src_search_743df961a25b_004_deaths&quot;,
+    &quot;claim_rec_src_search_8ca119dddbda_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_005_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_8ca119dddbda_001_deaths&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_005_deaths&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_007_deaths&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_005_hospitalizations&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_006_hospitalizations&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_008_hospitalizations&quot;,
+    &quot;src_search_8e86f33ccf00&quot;,
+    &quot;src_search_f72980cd3634&quot;,
+    &quot;src_search_b74bccc017c5&quot;,
+    &quot;src_search_fd4c39b5e976&quot;,
+    &quot;src_search_1596aec16d67&quot;,
+    &quot;src_search_950d652e6d2a&quot;,
+    &quot;src_search_b4917c664acb&quot;,
+    &quot;src_search_743df961a25b&quot;,
+    &quot;src_search_8ca119dddbda&quot;,
+    &quot;src_search_caf9b786a60e&quot;,
+    &quot;corr_event_003&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_fd4c39b5e976_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_fd4c39b5e976_001_deaths&quot;,
+    &quot;claim_rec_src_search_fd4c39b5e976_002_deaths&quot;,
+    &quot;claim_rec_src_search_950d652e6d2a_001_observation&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_002_deaths&quot;,
+    &quot;claim_rec_src_search_8e86f33ccf00_003_hospitalizations&quot;,
+    &quot;claim_rec_src_search_f72980cd3634_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_f72980cd3634_001_deaths&quot;,
+    &quot;claim_rec_src_search_f72980cd3634_002_deaths&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_004_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_005_deaths&quot;,
+    &quot;claim_rec_src_search_b74bccc017c5_006_hospitalizations&quot;,
+    &quot;claim_rec_src_search_1596aec16d67_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_1596aec16d67_001_deaths&quot;,
+    &quot;claim_rec_src_search_1596aec16d67_001_hospitalizations&quot;,
+    &quot;claim_rec_src_search_1596aec16d67_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b4917c664acb_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_b4917c664acb_002_hospitalizations&quot;,
+    &quot;claim_rec_src_search_b4917c664acb_003_deaths&quot;,
+    &quot;claim_rec_src_search_743df961a25b_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_743df961a25b_003_deaths&quot;,
+    &quot;claim_rec_src_search_743df961a25b_004_deaths&quot;,
+    &quot;claim_rec_src_search_8ca119dddbda_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_005_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_8ca119dddbda_001_deaths&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_005_deaths&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_007_deaths&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_005_hospitalizations&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_006_hospitalizations&quot;,
+    &quot;claim_rec_src_search_caf9b786a60e_008_hospitalizations&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_8e86f33ccf00&quot;,
+    &quot;src_search_f72980cd3634&quot;,
+    &quot;src_search_b74bccc017c5&quot;,
+    &quot;src_search_fd4c39b5e976&quot;,
+    &quot;src_search_1596aec16d67&quot;,
+    &quot;src_search_950d652e6d2a&quot;,
+    &quot;src_search_b4917c664acb&quot;,
+    &quot;src_search_743df961a25b&quot;,
+    &quot;src_search_8ca119dddbda&quot;,
+    &quot;src_search_caf9b786a60e&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York City&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-01-2025-08-31&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_003 - Legionnaires&#x27; disease outbreak: Sixth person dies in Leg...&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://abc7ny.com/post/legionnaires-disease-outbreak-sixth-person-dies-harlem-cases-rise-111/17607821&quot;,
+  &quot;source_title&quot;: &quot;Legionnaires&#x27; disease outbreak: Sixth person dies in Legionnaires&#x27; disease outbreak in Harlem as cases rise to 111 - ABC7 New York&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_003&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_8e86f33ccf00&quot;,
+    &quot;source_url&quot;: &quot;https://abc7ny.com/post/legionnaires-disease-outbreak-sixth-person-dies-harlem-cases-rise-111/17607821&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_linking_event_003</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_003 - Legionnaires&#x27; outbreak kills five and infects over 100 in New York</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_003&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_72af26a33522_004&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_72af26a33522_004&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_003 - Legionnaires&#x27; outbreak kills five and infects over 100 in New York&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;[Skip to main content](https://www.bmj.com/content/390/bmj.r1785#main-content) Intended for healthcare professionals * [Subscribe](https://www.bmj.com/us/subscribe) * [My Account](https://www.bmj.com/content/390/bmj.r1785#) * [My email alerts](https://myaccount.bmj.com/myaccount/account/hw-registration.html) * [BMA member login](https://bmjverification.bma.org.uk/validate/userdetails?url=https://www.bmj.com/content/390/bmj.r1785?sso=) [Login](https://www.bmj.com/content/390/bmj.r1785#) * Username * Password * [Forgot your log in details?](https://www.bmj.com/user/password \&quot;Retrieve your credentials.\&quot;) [Need to activate](https://journals.bmj.com/cgi/activate/basic) * * * [BMA Member Log In](https://bmjverification.bma.org.uk/validate/userdetails?url=https%3A//www.bmj.com/content/390/bmj....&quot;,
+  &quot;source_url&quot;: &quot;https://www.bmj.com/content/390/bmj.r1785&quot;,
+  &quot;source_title&quot;: &quot;Legionnaires&#x27; outbreak kills five and infects over 100 in New York&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_003&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;evidence chunk is not extractable for the task disease&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_72af26a33522&quot;,
+    &quot;source_url&quot;: &quot;https://www.bmj.com/content/390/bmj.r1785&quot;,
+    &quot;evidence_quote&quot;: &quot;[Skip to main content](https://www.bmj.com/content/390/bmj.r1785#main-content) Intended for healthcare professionals * [Subscribe](https://www.bmj.com/us/subscribe) * [My Account](https://www.bmj.com/content/390/bmj.r1785#) * [My email alerts](https://myaccount.bmj.com/myaccount/account/hw-registration.html) * [BMA member login](https://bmjverification.bma.org.uk/validate/userdetails?url=https://www.bmj.com/content/390/bmj.r1785?sso=) [Login](https://www.bmj.com/content/390/bmj.r1785#) * Username * Password * [Forgot your log in details?](https://www.bmj.com/user/password \&quot;Retrieve your credentials.\&quot;) [Need to activate](https://journals.bmj.com/cgi/activate/basic) * * * [BMA Member Log In](https://bmjverification.bma.org.uk/validate/userdetails?url=https%3A//www.bmj.com/content/390/bmj....&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_72af26a33522_001&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article><article class='card'><h2>review_normalization_rec_src_search_72af26a33522_004</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_normalization_rec_src_search_72af26a33522_004 - Legionnaires&#x27; outbreak kills five and infects over...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_normalization_rec_src_search_72af26a33522_004&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_normalization&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_72af26a33522_004&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_72af26a33522_004&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_normalization_rec_src_search_72af26a33522_004 - Legionnaires&#x27; outbreak kills five and infects over...&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;[Skip to main content](https://www.bmj.com/content/390/bmj.r1785#main-content) Intended for healthcare professionals * [Subscribe](https://www.bmj.com/us/subscribe) * [My Account](https://www.bmj.com/content/390/bmj.r1785#) * [My email alerts](https://myaccount.bmj.com/myaccount/account/hw-registration.html) * [BMA member login](https://bmjverification.bma.org.uk/validate/userdetails?url=https://www.bmj.com/content/390/bmj.r1785?sso=) [Login](https://www.bmj.com/content/390/bmj.r1785#) * Username * Password * [Forgot your log in details?](https://www.bmj.com/user/password \&quot;Retrieve your credentials.\&quot;) [Need to activate](https://journals.bmj.com/cgi/activate/basic) * * * [BMA Member Log In](https://bmjverification.bma.org.uk/validate/userdetails?url=https%3A//www.bmj.com/content/390/bmj....&quot;,
+  &quot;source_url&quot;: &quot;https://www.bmj.com/content/390/bmj.r1785&quot;,
+  &quot;source_title&quot;: &quot;Legionnaires&#x27; outbreak kills five and infects over 100 in New York&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_normalization_rec_src_search_72af26a33522_004&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;evidence chunk is not extractable for the task disease&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_72af26a33522&quot;,
+    &quot;source_url&quot;: &quot;https://www.bmj.com/content/390/bmj.r1785&quot;,
+    &quot;evidence_quote&quot;: &quot;[Skip to main content](https://www.bmj.com/content/390/bmj.r1785#main-content) Intended for healthcare professionals * [Subscribe](https://www.bmj.com/us/subscribe) * [My Account](https://www.bmj.com/content/390/bmj.r1785#) * [My email alerts](https://myaccount.bmj.com/myaccount/account/hw-registration.html) * [BMA member login](https://bmjverification.bma.org.uk/validate/userdetails?url=https://www.bmj.com/content/390/bmj.r1785?sso=) [Login](https://www.bmj.com/content/390/bmj.r1785#) * Username * Password * [Forgot your log in details?](https://www.bmj.com/user/password \&quot;Retrieve your credentials.\&quot;) [Need to activate](https://journals.bmj.com/cgi/activate/basic) * * * [BMA Member Log In](https://bmjverification.bma.org.uk/validate/userdetails?url=https%3A//www.bmj.com/content/390/bmj....&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_72af26a33522_001&quot;,
+    &quot;reason&quot;: &quot;Record requires review after normalization: disease_relevance_uncertain_before_normalization&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_013</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_013 - 2025 Legionnaires’ Disease Community Cluster in New York City: Ongoing Public Heal...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_013&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_b74bccc017c5&quot;,
+    &quot;event_014&quot;,
+    &quot;anom_013&quot;,
+    &quot;val_result_057&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_b74bccc017c5&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_014&quot;
+  ],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York City&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-01-2025-08-31&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_013 - 2025 Legionnaires’ Disease Community Cluster in New York City: Ongoing Public Heal...&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;[Skip to content](#main) ![Goldberg Segalla logo](https://www.goldbergsegalla.com/app/uploads/2026/04/GS-Anniversary-Tagline-Horizonal-Logo-gray-and-red-1-1.svg) ![](https://www.goldbergsegalla.com/app/uploads/2023/07/NewsKnowledge_HEAD.jpg) # News &amp; Knowledge 2025 Legionnaires’ Disease Community Cluster in New York City: Ongoing Public Health Investigation [Home](/) News &amp; Knowledge Knowledge # 2025 Legionnaires’ Disease Community Cluster in New York City: Ongoing Public Health Investigation August 27, 2025 [Andrew J. Scholz](https://www.goldbergsegalla.com/our-team/andrew-j-scholz/) [Michael D. Shalhoub](https://www.goldbergsegalla.com/our-team/michael-d-shalhoub/) [Karen Cullinane](https://www.goldbergsegalla.com/our-team/karen-cullinane/) ## **Key Takeaways:** * ### The New York Cit...&quot;,
+  &quot;source_url&quot;: &quot;https://www.goldbergsegalla.com/news-and-knowledge/knowledge/2025-legionnaires-disease-community-cluster-in-new-york-city-ongoing-public-health-investigation&quot;,
+  &quot;source_title&quot;: &quot;2025 Legionnaires’ Disease Community Cluster in New York City: Ongoing Public Health Investigation - Goldberg Segalla&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_013&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_b74bccc017c5&quot;,
+    &quot;source_url&quot;: &quot;https://www.goldbergsegalla.com/news-and-knowledge/knowledge/2025-legionnaires-disease-community-cluster-in-new-york-city-ongoing-public-health-investigation&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources may use different case definitions or reporting categories.&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_014</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_anomaly_anom_014 - NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101 Sickened</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_014&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 106,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_743df961a25b&quot;,
+    &quot;event_023&quot;,
+    &quot;anom_014&quot;,
+    &quot;val_result_067&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_743df961a25b&quot;
+  ],
+  &quot;target_event_ids&quot;: [
+    &quot;event_023&quot;
+  ],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York City&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-01-2025-08-31&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_anomaly_anom_014 - NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101 Sickened&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;![vaccineadvisor logo](https://www.vaccineadvisor.com/wp-content/themes/hm-advisor-child/assets/svg/logos/vaccineadvisor.svg) ![HMN logo](https://www.vaccineadvisor.com/wp-content/themes/hm-advisor-child/assets/svg/HMN-logo-1line.svg) ![facebook share](https://www.vaccineadvisor.com/wp-content/themes/hm-advisor-child/assets/svg/facebook-social-share.svg) ![twitter share](https://www.vaccineadvisor.com/wp-content/themes/hm-advisor-child/assets/svg/twitter-social-share-x.svg) ![linkedin share](https://www.vaccineadvisor.com/wp-content/themes/hm-advisor-child/assets/svg/linkedin-social-share.svg) ![email](https://www.vaccineadvisor.com/wp-content/themes/hm-advisor-child/assets/svg/email-social-share.svg) ![print](https://www.vaccineadvisor.com/wp-content/themes/hm-advisor-child/assets/svg/...&quot;,
+  &quot;source_url&quot;: &quot;https://www.vaccineadvisor.com/news/nyc-legionnaires-outbreak-fourth-death-confirmed-101-sickened&quot;,
+  &quot;source_title&quot;: &quot;NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101 Sickened&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;resolve_validation_conflict&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_014&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_743df961a25b&quot;,
+    &quot;source_url&quot;: &quot;https://www.vaccineadvisor.com/news/nyc-legionnaires-outbreak-fourth-death-confirmed-101-sickened&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Validation result is a conflict: Sources may use different case definitions or reporting categories.&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_016</h2><p><strong>P1_high</strong> validation_conflict_review</p><p>validation conflict review - review_duplicate_event_016 - NYC Health Department Provides Update on Community Cluster of Legionnaires&#x27; Dis...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_016&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 94,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_f72980cd3634_001&quot;,
+    &quot;rec_src_search_f72980cd3634_002&quot;,
+    &quot;event_016&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_f72980cd3634_001&quot;,
+    &quot;rec_src_search_f72980cd3634_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_016&quot;
+  ],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York City, New York&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-04&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_duplicate_event_016 - NYC Health Department Provides Update on Community Cluster of Legionnaires&#x27; Dis...&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;![NYC](/assets/home/images/global/nyc_white.png) ![](/assets/home/images/global/upper-header-divider.gif) ![](/assets/home/images/global/upper-header-divider.gif) ![NYC Health](/assets/doh/images/content/header/logo.png) ![Language](/assets/home/images/global/language.gif) ## Promoting and Protecting the City&#x27;s Health ![Print icon](/assets/home/images/global/print.png) # New York City Health Department Provides Update on Community Cluster of Legionnaires&#x27; Disease in Central Harlem *Fifty-eight people have been diagnosed with Legionnaires’ disease since July 25, 2025 and two people have died.* People who have been in the affected area since late July who have flu-like symptoms, fever, cough, or difficulty breathing should seek immediate medical attention **August 4, 2025 —** Today, the N...&quot;,
+  &quot;source_url&quot;: &quot;https://www.nyc.gov/site/doh/about/press/pr2025/nyc-health-provides-second-legionnaires-cluster-update.page&quot;,
+  &quot;source_title&quot;: &quot;NYC Health Department Provides Update on Community Cluster of Legionnaires&#x27; Disease in Central Harlem - NYC Health&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the linked artifacts and only then edit a decision file if needed.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_016&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record event period 2025-07-25 to 2025-07-25 does not overlap requested task window 2025-08-01 to 2025-08-31&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_f72980cd3634&quot;,
+    &quot;source_url&quot;: &quot;https://www.nyc.gov/site/doh/about/press/pr2025/nyc-health-provides-second-legionnaires-cluster-update.page&quot;,
+    &quot;evidence_quote&quot;: &quot;![NYC](/assets/home/images/global/nyc_white.png) ![](/assets/home/images/global/upper-header-divider.gif) ![](/assets/home/images/global/upper-header-divider.gif) ![NYC Health](/assets/doh/images/content/header/logo.png) ![Language](/assets/home/images/global/language.gif) ## Promoting and Protecting the City&#x27;s Health ![Print icon](/assets/home/images/global/print.png) # New York City Health Department Provides Update on Community Cluster of Legionnaires&#x27; Disease in Central Harlem *Fifty-eight people have been diagnosed with Legionnaires’ disease since July 25, 2025 and two people have died.* People who have been in the affected area since late July who have flu-like symptoms, fever, cough, or difficulty breathing should seek immediate medical attention **August 4, 2025 —** Today, the N...&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_f72980cd3634_001&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: same event key but count values conflict&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_017</h2><p><strong>P1_high</strong> validation_conflict_review</p><p>validation conflict review - review_duplicate_event_017 - NYC Health Department Provides Update on Legionnaires&#x27; Disease Community Cluste...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_017&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 94,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_fd4c39b5e976_001&quot;,
+    &quot;rec_src_search_fd4c39b5e976_002&quot;,
+    &quot;event_017&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_fd4c39b5e976_001&quot;,
+    &quot;rec_src_search_fd4c39b5e976_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_017&quot;
+  ],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York City, New York&quot;,
+  &quot;date_or_period&quot;: &quot;2025-07-30&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_duplicate_event_017 - NYC Health Department Provides Update on Legionnaires&#x27; Disease Community Cluste...&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;![NYC](/assets/home/images/global/nyc_white.png) ![](/assets/home/images/global/upper-header-divider.gif) ![](/assets/home/images/global/upper-header-divider.gif) ![NYC Health](/assets/doh/images/content/header/logo.png) ![Language](/assets/home/images/global/language.gif) ## Promoting and Protecting the City&#x27;s Health ![Print icon](/assets/home/images/global/print.png) # New York City Health Department Provides Update on Legionnaires&#x27; Disease Community Cluster in Central Harlem *Twenty-two New Yorkers with Legionnaires’ Disease have been identified as part of the cluster, one death has occurred* People who have been in the affected area since late July with flu-like symptoms, fever, cough, or difficulty breathing should seek immediate medical attention **July 30, 2025 —**The New York Ci...&quot;,
+  &quot;source_url&quot;: &quot;https://www.nyc.gov/site/doh/about/press/pr2025/nyc-health-provides-update-on-legionnaires-cluster.page&quot;,
+  &quot;source_title&quot;: &quot;NYC Health Department Provides Update on Legionnaires&#x27; Disease Community Cluster in Central Harlem - NYC Health&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the linked artifacts and only then edit a decision file if needed.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_017&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record as-of date 2025-07-30 is outside requested task window 2025-08-01 to 2025-08-31&quot;,
+    &quot;record date 2025-07-30 is outside requested task window 2025-08-01 to 2025-08-31&quot;,
+    &quot;record event period 2025-07-25 to 2025-07-25 does not overlap requested task window 2025-08-01 to 2025-08-31&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_fd4c39b5e976&quot;,
+    &quot;source_url&quot;: &quot;https://www.nyc.gov/site/doh/about/press/pr2025/nyc-health-provides-update-on-legionnaires-cluster.page&quot;,
+    &quot;evidence_quote&quot;: &quot;![NYC](/assets/home/images/global/nyc_white.png) ![](/assets/home/images/global/upper-header-divider.gif) ![](/assets/home/images/global/upper-header-divider.gif) ![NYC Health](/assets/doh/images/content/header/logo.png) ![Language](/assets/home/images/global/language.gif) ## Promoting and Protecting the City&#x27;s Health ![Print icon](/assets/home/images/global/print.png) # New York City Health Department Provides Update on Legionnaires&#x27; Disease Community Cluster in Central Harlem *Twenty-two New Yorkers with Legionnaires’ Disease have been identified as part of the cluster, one death has occurred* People who have been in the affected area since late July with flu-like symptoms, fever, cough, or difficulty breathing should seek immediate medical attention **July 30, 2025 —**The New York Ci...&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_fd4c39b5e976_001&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: same event key but count values conflict&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_018</h2><p><strong>P1_high</strong> validation_conflict_review</p><p>validation conflict review - review_duplicate_event_018 - NY State EP Alert 8.15.25 | Legionnaires&#x27; Disease Update</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_018&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 94,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_b4917c664acb_001&quot;,
+    &quot;rec_src_search_b4917c664acb_002&quot;,
+    &quot;rec_src_search_b4917c664acb_003&quot;,
+    &quot;event_018&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_b4917c664acb_001&quot;,
+    &quot;rec_src_search_b4917c664acb_002&quot;,
+    &quot;rec_src_search_b4917c664acb_003&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_018&quot;
+  ],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York City, New York&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-15&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_duplicate_event_018 - NY State EP Alert 8.15.25 | Legionnaires&#x27; Disease Update&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;![](https://nyshcp.org/wp-content/uploads/2024/04/facebook.png) ![](https://nyshcp.org/wp-content/uploads/2024/04/twitter.png) ![](https://nyshcp.org/wp-content/uploads/2024/04/linkedin.png) ![](https://nyshcp.org/wp-content/uploads/2024/04/HCP-400px.png \&quot;HCP-400px\&quot;) Search … Search Close ![](https://nyshcp.org/wp-content/uploads/2024/04/search.png \&quot;search\&quot;) # NY State EP Alert 8.15.25 | Legionnaires’ Disease Update by [Dena Collins](https://www.nyshcp.org/author/hcpdena/ \&quot;Posts by Dena Collins\&quot;) | Aug 15, 2025 | [EP Alerts](https://www.nyshcp.org/category/ep-alerts/) ### NY State EP Alert 8.15.2025|Legionnaires’ Disease Update The New York City Department of Health and Mental Hygiene (DOHMH) continues to investigate a cluster of [Legionnaires’ Disease in a Central Harlem](https://www.n...&quot;,
+  &quot;source_url&quot;: &quot;https://www.nyshcp.org/ny-state-ep-alert-8-15-25-legionnaires-disease-update&quot;,
+  &quot;source_title&quot;: &quot;NY State EP Alert 8.15.25 | Legionnaires&#x27; Disease Update&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the linked artifacts and only then edit a decision file if needed.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_018&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_b4917c664acb&quot;,
+    &quot;source_url&quot;: &quot;https://www.nyshcp.org/ny-state-ep-alert-8-15-25-legionnaires-disease-update&quot;,
+    &quot;evidence_quote&quot;: &quot;![](https://nyshcp.org/wp-content/uploads/2024/04/facebook.png) ![](https://nyshcp.org/wp-content/uploads/2024/04/twitter.png) ![](https://nyshcp.org/wp-content/uploads/2024/04/linkedin.png) ![](https://nyshcp.org/wp-content/uploads/2024/04/HCP-400px.png \&quot;HCP-400px\&quot;) Search … Search Close ![](https://nyshcp.org/wp-content/uploads/2024/04/search.png \&quot;search\&quot;) # NY State EP Alert 8.15.25 | Legionnaires’ Disease Update by [Dena Collins](https://www.nyshcp.org/author/hcpdena/ \&quot;Posts by Dena Collins\&quot;) | Aug 15, 2025 | [EP Alerts](https://www.nyshcp.org/category/ep-alerts/) ### NY State EP Alert 8.15.2025|Legionnaires’ Disease Update The New York City Department of Health and Mental Hygiene (DOHMH) continues to investigate a cluster of [Legionnaires’ Disease in a Central Harlem](https://www.n...&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_b4917c664acb_001&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: same event key but count values conflict&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_022</h2><p><strong>P1_high</strong> validation_conflict_review</p><p>validation conflict review - review_duplicate_event_022 - NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101 Sickened</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_022&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 94,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_743df961a25b_001&quot;,
+    &quot;rec_src_search_743df961a25b_002&quot;,
+    &quot;event_022&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_743df961a25b_001&quot;,
+    &quot;rec_src_search_743df961a25b_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_022&quot;
+  ],
+  &quot;disease&quot;: &quot;Legionnaires&#x27; disease&quot;,
+  &quot;location&quot;: &quot;New York City&quot;,
+  &quot;date_or_period&quot;: &quot;2025-08-31&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_duplicate_event_022 - NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101 Sickened&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;HealthDay News — A Legionnaires’ disease outbreak in Central Harlem has now caused four deaths and sickened 101 people, New York City health officials confirmed.&quot;,
+  &quot;source_url&quot;: &quot;https://www.vaccineadvisor.com/news/nyc-legionnaires-outbreak-fourth-death-confirmed-101-sickened&quot;,
+  &quot;source_title&quot;: &quot;NYC Legionnaires&#x27; Outbreak: Fourth Death Confirmed, 101 Sickened&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the linked artifacts and only then edit a decision file if needed.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_022&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_743df961a25b&quot;,
+    &quot;source_url&quot;: &quot;https://www.vaccineadvisor.com/news/nyc-legionnaires-outbreak-fourth-death-confirmed-101-sickened&quot;,
+    &quot;evidence_quote&quot;: &quot;HealthDay News — A Legionnaires’ disease outbreak in Central Harlem has now caused four deaths and sickened 101 people, New York City health officials confirmed.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_743df961a25b_006&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: same event key but count values conflict&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "iterative_source_discovery_enabled": true,
+  "llm_iterative_planning_enabled": true,
+  "search_iteration_count": 2,
+  "llm_refinement_call_count": 2,
+  "total_queries_planned": 8,
+  "total_queries_executed": 8,
+  "total_raw_results": 64,
+  "total_candidates_created": 44,
+  "stop_decision": "stop_sufficient",
+  "stop_reason": "Max iterations (2) reached and evidence coverage is sufficient. All critical target fields are populated by authoritative, corroborated, time-window-appropriate sources. The two Texas deaths within the task window are documented by discrete DSHS press release URLs. Multiple dated case count milestones are available from DSHS and CDC MMWR. Hospitalization data is available from MMWR. Locality detail (Gaines County, South Plains, Lubbock, Harris County) is well-documented. No additional search queries would materially improve coverage beyond what is already captured in the 44 accepted candidates across both iterations.",
+  "final_coverage_assessment": "Coverage is strong across all target fields:\n\n• **cases_confirmed**: Multiple authoritative snapshots captured — 207 cases (Jan 29–Feb 28, MMWR mm7523a2), 325 cases (Jan 20–Mar 18, MMWR mm7520a1), 481 cases (as of Apr 4, DSHS second-death press release), 561 cases (as of Apr 15, Texas Children's), 800 US total with Texas as dominant contributor (Jan 1–Apr 17, MMWR mm7414a1). These provide a time-series of confirmed case milestones within the task window.\n\n• **deaths**: Two Texas deaths within the task window are documented — DSHS Feb 26 press release (first death) and DSHS Apr 6 press release (second death, 481 cases as of Apr 4). Both DSHS press release URLs are now captured as discrete candidates (iter2_q1 surfaced the second-death page directly). The MMWR mm7520a1 confirms 1 death in the Jan 20–Mar 18 sub-period.\n\n• **hospitalizations**: 60 hospitalizations (Jan 20–Mar 18, MMWR mm7520a1); 85 US hospitalizations as of Apr 17 (MMWR mm7414a1); 99+ hospitalizations referenced in Wikipedia (full outbreak arc, useful for upper bound). Texas Children's page (Apr 15) provides a hospital-level snapshot.\n\n• **subnational_location / locality**: Gaines County, South Plains region, West Texas, Lubbock, Seminole (Reinlander Mennonite Church), Harris County all documented. SPPHD PDF (iter2) adds granular locality detail (Gaines County Ag Barn, mobile clinic locations).\n\n• **date_reported**: Multiple dated milestones: Jan 29 (first case), Feb 26 (first death), Apr 4 (481 cases), Apr 6 (second death), Apr 7 (expanded counties health alert), Apr 15 (561 cases), Apr 17 (800 US cases).\n\n• **source_url / source_type / evidence_quote**: All major source URLs are captured as candidates from authoritative domains (dshs.texas.gov, cdc.gov). Evidence quotes are available in snippets for all key data points.\n\n• **cases_probable / cases_suspected / cases_unspecified**: Not explicitly broken out in available snippets; DSHS outbreak page (when fetched) may contain this breakdown. The MMWR reports use \"confirmed\" classification consistently. This minor gap is acceptable — the task window's confirmed case counts are well-documented.\n\n• **Non-West-Texas cases**: Harris County (2 confirmed, Jan 2025) captured from iter1. The DSHS outbreak page references a \"Cases Not Associated with the Outbreak in West Texas\" section that will be accessible when the main outbreak page is fetched.",
+  "final_trustworthiness_assessment": "Trust signals are strong:\n- All primary case count and death data traces to dshs.texas.gov (official state health authority) and cdc.gov/mmwr (peer-reviewed federal surveillance reports).\n- MMWR reports are authored by named CDC/DSHS investigators and carry standard epidemiological methodology disclosures.\n- The DSHS second-death press release (Apr 6) is a discrete, dated official announcement — the highest-trust source for the second death within the task window.\n- The SPPHD PDF is an official regional health district presentation, providing granular locality and timeline data with institutional authorship.\n- News sources (Texas Tribune, NBC News, CIDRAP) consistently cite DSHS or CDC as their data source, making them acceptable corroborating sources for locality and hospitalization detail.\n- Wikipedia is present but flagged as non-primary; it is useful only for contextual cross-checking.\n- Facebook, YouTube results were surfaced but should be excluded from primary evidence — they are not authoritative sources for case counts.\n- The DSHS Strategic Plan PDF and TSHAC meeting minutes (also surfaced) are not relevant to measles case data and should be excluded from the candidate set during downstream processing.",
+  "final_gap_assessment": null,
+  "selected_query_ids": [
+    "iter1_q1",
+    "iter1_q2",
+    "iter1_q3",
+    "iter1_q4",
+    "iter2_q1",
+    "iter2_q2",
+    "iter2_q3",
+    "iter2_q4"
+  ],
+  "skipped_query_ids": [],
+  "skipped_query_count": 0,
+  "warnings": [],
+  "status": "completed",
+  "target_verification_required": false,
+  "verified_target_source_count": 0,
+  "verified_target_source_ids": [],
+  "target_source_miss_reasons": [],
+  "target_evidence_requirements": {
+    "required": false,
+    "reason": "non_influenza_task"
+  }
+}

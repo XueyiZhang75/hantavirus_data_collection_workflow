@@ -1,0 +1,33 @@
+{
+  "iterative_source_discovery_enabled": true,
+  "llm_iterative_planning_enabled": true,
+  "search_iteration_count": 1,
+  "llm_refinement_call_count": 1,
+  "total_queries_planned": 4,
+  "total_queries_executed": 4,
+  "total_raw_results": 32,
+  "total_candidates_created": 28,
+  "stop_decision": "stop_no_promising_sources",
+  "stop_reason": "LLM requested continuation but returned no next query batch.",
+  "final_coverage_assessment": "Partial. Iteration 1 confirmed: (1) One SVS boletim epidemiológico on gov.br with SE 4 data (260k probable cases, 29 deaths); (2) PAHO March 28 2024 alert with Brazil share of Americas cases; (3) State-level bulletin pages for Minas Gerais and Distrito Federal; (4) InfoDengue platform homepage; (5) Brazilian news (Folha, Agência Brasil, G1) and Cofen article with full-year 2024 totals. Missing: explicit Q1 cumulative totals (SE 1–13) at national level with confirmed/probable/suspected/deaths breakdown; national emergency declaration document; subnational (UF-level) case breakdown for Q1; PAHO or WHO situation report with Brazil-specific Q1 case counts; ReliefWeb situation reports not yet summarized.",
+  "final_trustworthiness_assessment": "High for gov.br (SVS boletim epidemiológico — primary authoritative source), paho.org (international organization — cross-validator), saude.mg.gov.br and saude.df.gov.br (state health secretariats — authoritative for subnational data). Moderate for agenciabrasil.ebc.com.br (official Brazilian government news agency — cites MoH data), g1.globo.com and folha.uol.com.br (major Brazilian news — typically cite official figures). Low for YouTube (not extractable as structured data), cofen.gov.br (nursing council — secondary aggregator), ghc.com.br (hospital group — facility-level, not population-level). Academic sources (PMC, SciELO) are peer-reviewed but may not provide Q1-specific granularity.",
+  "final_gap_assessment": null,
+  "selected_query_ids": [
+    "iter1_q1",
+    "iter1_q2",
+    "iter1_q3",
+    "iter1_q4"
+  ],
+  "skipped_query_ids": [],
+  "skipped_query_count": 0,
+  "warnings": [],
+  "status": "completed",
+  "target_verification_required": false,
+  "verified_target_source_count": 0,
+  "verified_target_source_ids": [],
+  "target_source_miss_reasons": [],
+  "target_evidence_requirements": {
+    "required": false,
+    "reason": "non_influenza_task"
+  }
+}

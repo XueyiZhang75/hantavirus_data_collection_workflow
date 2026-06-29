@@ -1,0 +1,752 @@
+{
+  "plan_id": "exec_source_plan_west_nile_virus_disease_california_2024_08_01_2024_08_31",
+  "disease": "West Nile Virus Disease",
+  "location": "California",
+  "time_window": "2024-08-01-2024-08-31",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "llm_plan_augments_deterministic_baseline_with_disease_specific_queries",
+    "excluded_terms_enforced_equine_avian_veterinary_dead_bird_mosquito_pool_only"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify CDPH and California county-level official sources reporting West Nile virus human cases, deaths, and hospitalizations in California during August 2024.",
+      "source_role_hint": "collection",
+      "rationale": "CDPH publishes weekly WNV surveillance summaries and county-level breakdowns; these are the primary extractable records for confirmed, probable, and neuroinvasive case counts.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify CDC ArboNET and DVBD West Nile virus surveillance data for California covering the August 2024 reporting window.",
+      "source_role_hint": "collection",
+      "rationale": "CDC ArboNET is the national arboviral surveillance system and publishes state-level WNV human case data that may include California August 2024 counts.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify high-burden California county health department sources (Los Angeles, Sacramento, Kern, Fresno, San Bernardino, Riverside) reporting WNV human cases or deaths in August 2024.",
+      "source_role_hint": "collection",
+      "rationale": "California's Central Valley and Southern California counties historically report the highest WNV burden; county-level reports may contain locality-specific extractable records not aggregated at the state level.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify independent structured databases or international organization summaries (e.g., PAHO, WHO) that cross-reference California WNV human case counts for August 2024.",
+      "source_role_hint": "validation",
+      "rationale": "Independent aggregators provide a held-back validation layer to compare against CDPH and county-level collection records.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify CDC Wonder, ProMED, or HealthMap structured data entries for West Nile virus in California during August 2024.",
+      "source_role_hint": "validation",
+      "rationale": "Structured surveillance databases and alert systems provide independently aggregated counts usable for masked validation without contaminating collection.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify California WNV case definition documents, surveillance protocol pages, and CDPH methodology notes to support count-semantics interpretation.",
+      "source_role_hint": "context",
+      "rationale": "Understanding whether reported counts are confirmed, probable, neuroinvasive, or cumulative-vs-weekly is essential for correct field mapping and normalization.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify peer-reviewed literature on California WNV epidemiology in 2024 for case definition and syndrome term context.",
+      "source_role_hint": "context",
+      "rationale": "Literature may clarify clinical syndrome classifications (WNND, WNF, acute flaccid paralysis) and reporting lag patterns relevant to August 2024 data.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_collection_support_001",
+      "objective": "Identify reputable news and situation reports covering West Nile virus cases or deaths in California in August 2024 as collection support signals.",
+      "source_role_hint": "collection_support",
+      "rationale": "News reports may surface early outbreak signals, county-specific case announcements, or death confirmations not yet aggregated in official weekly summaries.",
+      "priority": 5
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag sources that report only mosquito pool positives, dead bird counts, sentinel chicken seroconversions, or equine/avian cases without human case data for exclusion or human review.",
+      "source_role_hint": "human_review",
+      "rationale": "Per task acceptance contract, non-human case sources must be excluded; ambiguous sources mixing human and vector/animal data require human review before extraction.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_review_002",
+      "objective": "Flag sources with cumulative year-to-date counts that cannot be disaggregated to the August 2024 window for human review.",
+      "source_role_hint": "human_review",
+      "rationale": "Reporting periods substantially broader than the task window (2024-08-01 to 2024-08-31) require human judgment on whether partial extraction is valid.",
+      "priority": 3
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_cdph_official",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "California Department of Public Health (CDPH) – Division of Communicable Disease Control publishes weekly West Nile virus surveillance summaries with human case counts by county, case classification (confirmed/probable/neuroinvasive), deaths, and reporting date. This is the primary authoritative source for California WNV human data.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "weekly_summaries_may_use_cumulative_ytd_counts_requiring_delta_calculation",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_california_county_health",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "High-burden county health departments (Los Angeles, Sacramento, Kern, Fresno, San Bernardino, Riverside, Stanislaus, Tulare) may publish independent WNV human case reports, press releases, or dashboards with locality-level data not available in state aggregates.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "county_reports_may_not_align_with_state_reporting_periods",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_cdc_arbonet_dvbd",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC ArboNET (Division of Vector-Borne Diseases) publishes national WNV human case surveillance data by state, including California, with neuroinvasive and non-neuroinvasive breakdowns. Weekly and annual tables may cover August 2024.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "arbonet_data_may_lag_by_several_weeks",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_international_organization",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "PAHO and WHO situation reports may reference US/California WNV case counts as part of regional arboviral surveillance summaries, providing an independent validation layer.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "international_reports_unlikely_to_have_california_subnational_detail",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_structured_database",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Structured databases including CDC Wonder, ProMED-mail, HealthMap, and California open data portals may contain machine-readable WNV case records for California in August 2024 usable for validation.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "promed_entries_may_mix_human_and_animal_data_requiring_filtering",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_006_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "why_relevant": "Peer-reviewed epidemiological studies on California WNV provide case definitions, syndrome classifications, and reporting methodology context essential for correct field normalization.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "2024_literature_unlikely_to_be_published_by_august_2024_requires_screening",
+        "requires_later_search_result_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_007_news_situation_report",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Reputable news outlets (LA Times, Sacramento Bee, SF Chronicle) and situation reports may publish early WNV case or death announcements citing official sources, providing collection support signals for August 2024.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "news_counts_may_not_match_official_totals_use_as_support_only",
+        "requires_later_search_result_screening"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"West Nile virus California 2024\" cases deaths public health California 2024-08-01-2024-08-31 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "West Nile virus California 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"WNV California August 2024\" cases deaths public health California 2024-08-01-2024-08-31 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "WNV California August 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"West Nile virus California 2024\" outbreak report surveillance California 2024-08-01-2024-08-31 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "West Nile virus California 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"WNV California August 2024\" outbreak report surveillance California 2024-08-01-2024-08-31 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "WNV California August 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"West Nile virus California 2024\" epidemiology cases deaths California 2024-08-01-2024-08-31 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "West Nile virus California 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"WNV California August 2024\" epidemiology cases deaths California 2024-08-01-2024-08-31 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "WNV California August 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"West Nile virus California 2024\" surveillance dataset cases deaths California 2024-08-01-2024-08-31 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "West Nile virus California 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"WNV California August 2024\" surveillance dataset cases deaths California 2024-08-01-2024-08-31 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "WNV California August 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"West Nile virus California 2024\" outbreak report cases deaths California 2024-08-01-2024-08-31 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "West Nile virus California 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"WNV California August 2024\" outbreak report cases deaths California 2024-08-01-2024-08-31 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "WNV California August 2024"
+      ],
+      "location_terms_used": [
+        "California"
+      ],
+      "time_terms_used": [
+        "2024-08-01-2024-08-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

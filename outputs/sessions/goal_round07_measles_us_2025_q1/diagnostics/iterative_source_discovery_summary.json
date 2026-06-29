@@ -1,0 +1,37 @@
+{
+  "iterative_source_discovery_enabled": true,
+  "llm_iterative_planning_enabled": true,
+  "search_iteration_count": 2,
+  "llm_refinement_call_count": 2,
+  "total_queries_planned": 8,
+  "total_queries_executed": 8,
+  "total_raw_results": 64,
+  "total_candidates_created": 46,
+  "stop_decision": "stop_limits_reached",
+  "stop_reason": "Maximum iteration limit (max_iterations: 2) has been reached. Both planned iterations have been fully executed (8 queries total, within the 10-query cap). The accumulated candidate set is sufficiently rich to support field extraction for the Q1 2025 task window, and further searching is not permitted under the stated bounds.",
+  "final_coverage_assessment": "Coverage across the target fields is strong for the primary outbreak (Southwest US / West Texas Mennonite community):\n\n• disease: Confirmed — Measles, across all accepted sources.\n• country: United States — confirmed across all sources.\n• subnational_location: Texas (primary), New Mexico (Lea County death confirmed via ArcGIS snippet and nmhealth.org), Oklahoma (OSDH March 11 link via MSK library guide), Kansas (coronavirus.kdheks.gov appeared in iteration 2 domain counts). Maryland (Howard County) also surfaced.\n• locality: Gaines County TX, Lubbock TX, West Texas (Mennonite community), Lea County NM, Harris/Houston TX, Rockwall TX, Travis TX, Howard County MD — all identified from snippets.\n• date_reported: Multiple Q1 2025 dates captured: January 2025 onset (Wikipedia, MSK guide), February 26 (first TX death — DSHS news release referenced in DSHS snippet, YouTube KSAT12 video, abc7ny.com), March 4 (Lubbock Online — 159 TX cases), March 6 (NM Lea County death — ArcGIS snippet), March 7 (CDC HAN advisory — 208 TX+NM cases), March 21 (Lubbock child care facility index case — MMWR mm7521a1).\n• cases_confirmed: 124 (as of ~Feb 26, DSHS via abc7ny), 159 TX / Gaines County >100 (March 4, Lubbock Online), 208 TX+NM (March 7, CDC HAN), 800 total Jan 1–Apr 17 (MMWR mm7414a1 — partially outside Q1 window but Q1 sub-period data extractable), 505 TX (PBS — post-Q1), 750 TX final (Texas Tribune — post-Q1, useful for context only).\n• deaths: 3 total confirmed — 2 children in Lubbock (first death Feb 26 per DSHS/abc7ny/YouTube; second death April 6 per DSHS snippet — outside Q1 window), 1 adult in Lea County NM (March 6 per ArcGIS snippet). Within strict Q1 window: at minimum 1 confirmed death (Feb 26 TX child) and 1 confirmed death (March 6 NM adult) = 2 deaths within Q1.\n• hospitalizations: 18 hospitalized as of ~Feb 26 (DSHS via abc7ny); 85 hospitalized Jan 1–Apr 17 (MMWR mm7414a1 — partially outside Q1); >99 total (Wikipedia — full outbreak). Q1-specific hospitalization sub-totals will need annotation.\n• source_url: Multiple authoritative URLs captured across cdc.gov (HAN, MMWR ×2, data page, global page), dshs.texas.gov, nmhealth.org, lubbockonline.com, texastribune.org, abc7ny.com, pbs.org, cidrap.umn.edu, publichealth.jhu.edu, paho.org (×4), who.int, en.wikipedia.org, libguides.mskcc.org, arcgis.com, reuters.com, nytimes.com, coronavirus.kdheks.gov.\n• source_type: official_public_health_agency (CDC, DSHS, NMDOH, KDHE), international_organization_report (PAHO, WHO), news_and_situation_report (CIDRAP, Texas Tribune, Lubbock Online, PBS, abc7ny, Reuters, NYT), academic/tracker (JHU IVAC, Wikipedia).\n• evidence_quote: Multiple extractable quotes from snippets (CDC HAN advisory text, MMWR aggregate text, abc7ny DSHS press release quote, Lubbock Online case count, ArcGIS NM death date).",
+  "final_trustworthiness_assessment": "High overall trustworthiness:\n• CDC sources (cdc.gov) are the gold standard for US measles surveillance — HAN advisory and MMWR reports are peer-reviewed or officially cleared.\n• Texas DSHS (dshs.texas.gov) is the primary state authority — press releases referenced in snippets are authoritative for TX-specific case counts and deaths.\n• New Mexico DOH (nmhealth.org) is the primary state authority for NM data — the 2025 Measles Outbreak sub-page is present in the candidate set.\n• PAHO (paho.org, 4 results) provides independent international validation.\n• CIDRAP (cidrap.umn.edu) is a highly regarded academic public health news outlet that consistently cites CDC as its primary source — suitable as a secondary corroborator.\n• Texas Tribune (texastribune.org) explicitly states it used DSHS data from January–June 2025 — high credibility for TX-specific figures.\n• Lubbock Online (lubbockonline.com) is a local outlet with direct access to Lubbock Public Health — suitable for locality-level detail.\n• Wikipedia is useful for narrative and locality identification but numeric fields must be traced to primary sources.\n• ArcGIS dashboard (arcgis.com) — the NM Lea County death snippet (3/6/25) is useful but the dashboard is a secondary aggregator; the nmhealth.org page is the preferred primary source for NM data.\n• YouTube videos cannot yield evidence_quote extractions and should be deprioritized.\n• Facebook result should be excluded as non-authoritative.",
+  "final_gap_assessment": null,
+  "selected_query_ids": [
+    "iter1_q1",
+    "iter1_q2",
+    "iter1_q3",
+    "iter1_q4",
+    "iter2_q1",
+    "iter2_q2",
+    "iter2_q3",
+    "iter2_q4"
+  ],
+  "skipped_query_ids": [],
+  "skipped_query_count": 0,
+  "warnings": [],
+  "status": "completed",
+  "target_verification_required": false,
+  "verified_target_source_count": 0,
+  "verified_target_source_ids": [],
+  "target_source_miss_reasons": [],
+  "target_evidence_requirements": {
+    "required": false,
+    "reason": "non_influenza_task"
+  }
+}

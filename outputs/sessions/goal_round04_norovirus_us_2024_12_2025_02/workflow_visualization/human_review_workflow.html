@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 81,
+  &quot;prioritized_review_item_count&quot;: 81,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 0,
+    &quot;P1_high&quot;: 38,
+    &quot;P2_medium&quot;: 0,
+    &quot;P3_low&quot;: 43
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;claim_corroboration_review&quot;: 13,
+    &quot;source_identity_review&quot;: 24,
+    &quot;outside_scope_review&quot;: 1,
+    &quot;general_review&quot;: 43
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_claim_corroboration_review_corr_event_005</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_claim_corroboration_review_corr_event_005 - US norovirus outbreaks are up, CDC data show - CIDRAP</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_review_corr_event_005&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 92,
+  &quot;issue_type&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_c8f6e152147e_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_c8f6e152147e_002_observation&quot;,
+    &quot;src_search_c8f6e152147e&quot;,
+    &quot;corr_event_005&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_c8f6e152147e_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_c8f6e152147e_002_observation&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_c8f6e152147e&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Norovirus&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-12-01-2025-02-28&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_claim_corroboration_review_corr_event_005 - US norovirus outbreaks are up, CDC data show - CIDRAP&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;Primary case claim has no independent corroborating source.&quot;,
+  &quot;source_url&quot;: &quot;https://www.cidrap.umn.edu/norovirus/us-norovirus-outbreaks-are-cdc-data-show&quot;,
+  &quot;source_title&quot;: &quot;US norovirus outbreaks are up, CDC data show - CIDRAP&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;academic_or_peer_reviewed_source&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_review_corr_event_005&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_c8f6e152147e&quot;,
+    &quot;source_url&quot;: &quot;https://www.cidrap.umn.edu/norovirus/us-norovirus-outbreaks-are-cdc-data-show&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Primary case claim has no independent corroborating source.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_3b4e2043d3a5</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_3b4e2043d3a5 - Norovirus Surge May Be Driven by Ultra-Contagious Variant. K...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_3b4e2043d3a5&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_3b4e2043d3a5&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_3b4e2043d3a5&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Norovirus&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-12-01-2025-02-28&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_3b4e2043d3a5 - Norovirus Surge May Be Driven by Ultra-Contagious Variant. K...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.today.com/health/disease/norovirus-surge-2025-2026-rcna246985&quot;,
+  &quot;source_title&quot;: &quot;Norovirus Surge May Be Driven by Ultra-Contagious Variant. Know These Signs&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;news_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_3b4e2043d3a5&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_3b4e2043d3a5&quot;,
+    &quot;source_url&quot;: &quot;https://www.today.com/health/disease/norovirus-surge-2025-2026-rcna246985&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Today.com (NBC News / TODAY Show) is a mainstream broadcast-affiliated news outlet with moderate editorial standards. For a public health data collection task, it sits at the lowest tier of the source priority hierarchy (news_and_situation_report). The article title — \&quot;Norovirus Surge May Be Driven by Ultra-Contagious Variant. Know These Signs\&quot; — is consumer-health framing, not epidemiological reporting. The hedged language (\&quot;May Be Driven by\&quot;) and the advisory \&quot;Know These Signs\&quot; suffix are characteristic of general-audience health journalism rather than surveillance or outbreak reporting. This strongly limits its utility for extracting structured case counts, hospitalizations, or deaths. However, the article may cite or reference authoritative upstream sources (CDC NoroSTAT, NORS, CaliciNet, or state health departments) that would qualify as primary collection targets. Its role is therefore appropriately classified as context/collection_support: useful for identifying upstream sources and corroborating the existence of a surge signal within the target time window (Dec 2024–Feb 2025), but not suitable as a primary data source for numeric field extraction. The missing publisher field is a minor metadata gap for a well-known domain; today.com is unambiguously the NBC TODAY Show digital property. The independence_unclear flag is warranted because consumer health journalism frequently relies on single expert interviews or press releases without independent verification. The screening_and_critic_disagree flag warrants attention: if a critic module assessed this source differently from the screener, the disagreement should be resolved before the source is used even in a context role. Human review is advisable specifically to (1) inspect whether the article body cites upstream primary sources worth adding to the collection queue, and (2) resolve the screener/critic disagreement flag.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_926b43baa66c</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_926b43baa66c - WDEF News 12 - &quot;Outbreaks of norovirus are most common...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_926b43baa66c&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_926b43baa66c&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_926b43baa66c&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Norovirus&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-12-01-2025-02-28&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_926b43baa66c - WDEF News 12 - \&quot;Outbreaks of norovirus are most common...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.facebook.com/wdefnews12/posts/outbreaks-of-norovirus-are-most-common-between-november-and-april-the-cdc-says-l/1261711429336143&quot;,
+  &quot;source_title&quot;: &quot;WDEF News 12 - \&quot;Outbreaks of norovirus are most common...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;social_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_926b43baa66c&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_926b43baa66c&quot;,
+    &quot;source_url&quot;: &quot;https://www.facebook.com/wdefnews12/posts/outbreaks-of-norovirus-are-most-common-between-november-and-april-the-cdc-says-l/1261711429336143&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;This source is a Facebook post from a local TV news station (WDEF News 12) linking to or summarizing CDC-attributed norovirus seasonality information. Several compounding credibility concerns apply: (1) The canonical URL resolves to facebook.com, a social media platform, not the originating news outlet&#x27;s own domain — this means the actual article content, editorial controls, and provenance chain are not directly verifiable from the URL alone. (2) The publisher field is null, which is a metadata gap for a source typed as news_and_situation_report. (3) The independence score (0.42) is low, suggesting the content is likely a repost or summary of another source (likely CDC or a wire report) rather than original reporting — the snippet references CDC directly (\&quot;the CDC says\&quot;), confirming secondary relay. (4) The authority score (0.48) is below the midpoint, consistent with a local affiliate social media post rather than a primary public health authority. (5) The deterministic screener and critic disagree (screening_and_critic_disagree flag), which is a meaningful signal warranting LLM advisory review. On the positive side, disease relevance (0.95) and local/geographic relevance (0.95) are high, the time window is consistent with the task, and the source does appear to relay CDC-sourced information, which partially offsets authority concerns. However, for a public health data collection task requiring empirical case counts, outbreak-level data, or surveillance figures, a Facebook post from a local news affiliate is structurally unsuitable as a primary or even strong secondary data source. It may serve as a pointer to the underlying CDC or WDEF News 12 article, but should not be used for direct data extraction.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_e119c616592e</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_e119c616592e - Norovirus cases are surging. Here&#x27;s how to protect yourself.</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_e119c616592e&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_e119c616592e&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_e119c616592e&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Norovirus&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-12-01-2025-02-28&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_e119c616592e - Norovirus cases are surging. Here&#x27;s how to protect yourself.&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.advisory.com/daily-briefing/2025/12/08/norovirus&quot;,
+  &quot;source_title&quot;: &quot;Norovirus cases are surging. Here&#x27;s how to protect yourself.&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;news_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_e119c616592e&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_e119c616592e&quot;,
+    &quot;source_url&quot;: &quot;https://www.advisory.com/daily-briefing/2025/12/08/norovirus&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;advisory.com is a healthcare advisory and research firm that publishes a \&quot;Daily Briefing\&quot; news digest. It is not a primary public health authority, peer-reviewed journal, or structured surveillance database. Its content is typically a secondary synthesis or summary of reporting from other sources (e.g., CDC, news outlets), which limits its value as a primary data source for empirical case counts. However, it is a professionally produced outlet with an identifiable institutional identity, which partially offsets the low authority score. The domain is topically and geographically relevant to the task, and the article falls squarely within the target time window and disease scope. The missing publisher field is a minor metadata gap given the domain is self-identifying. The independence concern is real: advisory.com content may cite CDC or news sources without clear attribution chains, making provenance of any numeric claims difficult to verify. The deterministic screening and critic disagreement flag warrants LLM review to resolve. Overall, the source is appropriate only as a context/background reference — not for direct numeric extraction — unless it contains clearly attributed, verifiable quotes from primary sources.&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_001</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_duplicate_event_001 - CDC: 2024-2025 seasonal norovirus outbreaks up from previous years | Contempora...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_001&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 84,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_8d7dfb3aeace_002&quot;,
+    &quot;event_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_8d7dfb3aeace_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_001&quot;
+  ],
+  &quot;disease&quot;: &quot;Norovirus Gastroenteritis&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-02-28&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_duplicate_event_001 - CDC: 2024-2025 seasonal norovirus outbreaks up from previous years | Contempora...&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;According to CaliciNet—a network of public health laboratories—the dominant strain of norovirus is currently GII.17, which made up 69.7% of the genotype distribution among norovirus outbreaks from September 1, 2024 to December 31, 2024.5,6&quot;,
+  &quot;source_url&quot;: &quot;https://www.contemporarypediatrics.com/view/cdc-2025-seasonal-norovirus-outbreaks-up-previous-years&quot;,
+  &quot;source_title&quot;: &quot;CDC: 2024-2025 seasonal norovirus outbreaks up from previous years | Contemporary Pediatrics&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open claims, claim comparisons, and corroborated events.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_001&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_8d7dfb3aeace&quot;,
+    &quot;source_url&quot;: &quot;https://www.contemporarypediatrics.com/view/cdc-2025-seasonal-norovirus-outbreaks-up-previous-years&quot;,
+    &quot;evidence_quote&quot;: &quot;According to CaliciNet—a network of public health laboratories—the dominant strain of norovirus is currently GII.17, which made up 69.7% of the genotype distribution among norovirus outbreaks from September 1, 2024 to December 31, 2024.5,6&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_8d7dfb3aeace_014&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_differ&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_004</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_duplicate_event_004 - Staying Healthy: Norovirus Infections Surge in 2025 - AllCare Health</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_004&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 84,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_fb7ff50094aa_001&quot;,
+    &quot;rec_src_search_fb7ff50094aa_002&quot;,
+    &quot;event_004&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_fb7ff50094aa_001&quot;,
+    &quot;rec_src_search_fb7ff50094aa_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_004&quot;
+  ],
+  &quot;disease&quot;: &quot;Norovirus Gastroenteritis&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-12-01&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_duplicate_event_004 - Staying Healthy: Norovirus Infections Surge in 2025 - AllCare Health&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;Norovirus, a leading cause of acute gastroenteritis in the United States, is emerging as a significant public health concern in 2025. The stomach virus spreads quickly in cooler weather and cases typically peak in February. The CDC reported a surge in cases as of late December 2024, with about 36% more illness than the same period in 2023, and almost 50% more than the previous decade&#x27;s average. Each year, it accounts for an estimated 19 to 21 million cases of vomiting and diarrhea, with approximately one in fifteen Americans affected. NoroSTAT Data | Norovirus | CDC&quot;,
+  &quot;source_url&quot;: &quot;https://www.allcarehealth.com/articles-events/articles/staying-healthy-norovirus-infections-surge-in-2025&quot;,
+  &quot;source_title&quot;: &quot;Staying Healthy: Norovirus Infections Surge in 2025 - AllCare Health&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open claims, claim comparisons, and corroborated events.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_004&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_fb7ff50094aa&quot;,
+    &quot;source_url&quot;: &quot;https://www.allcarehealth.com/articles-events/articles/staying-healthy-norovirus-infections-surge-in-2025&quot;,
+    &quot;evidence_quote&quot;: &quot;Norovirus, a leading cause of acute gastroenteritis in the United States, is emerging as a significant public health concern in 2025. The stomach virus spreads quickly in cooler weather and cases typically peak in February. The CDC reported a surge in cases as of late December 2024, with about 36% more illness than the same period in 2023, and almost 50% more than the previous decade&#x27;s average. Each year, it accounts for an estimated 19 to 21 million cases of vomiting and diarrhea, with approximately one in fifteen Americans affected. NoroSTAT Data | Norovirus | CDC&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_fb7ff50094aa_021&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_differ&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_005</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_duplicate_event_005 - US norovirus outbreaks are up, CDC data show - CIDRAP</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_005&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 84,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_c8f6e152147e_001&quot;,
+    &quot;event_005&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_c8f6e152147e_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_005&quot;
+  ],
+  &quot;disease&quot;: &quot;Norovirus Gastroenteritis&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-02-28&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_duplicate_event_005 - US norovirus outbreaks are up, CDC data show - CIDRAP&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;[Data](https://www.cdc.gov/vessel-sanitation/cruise-ship-outbreaks/index.html) released earlier this week by the CDC show that 16 cruise ship norovirus outbreaks were reported in 2024, including 5 in December that sickened 890 passengers and crew members.&quot;,
+  &quot;source_url&quot;: &quot;https://www.cidrap.umn.edu/norovirus/us-norovirus-outbreaks-are-cdc-data-show&quot;,
+  &quot;source_title&quot;: &quot;US norovirus outbreaks are up, CDC data show - CIDRAP&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;academic_or_peer_reviewed_source&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open claims, claim comparisons, and corroborated events.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_005&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_c8f6e152147e&quot;,
+    &quot;source_url&quot;: &quot;https://www.cidrap.umn.edu/norovirus/us-norovirus-outbreaks-are-cdc-data-show&quot;,
+    &quot;evidence_quote&quot;: &quot;[Data](https://www.cdc.gov/vessel-sanitation/cruise-ship-outbreaks/index.html) released earlier this week by the CDC show that 16 cruise ship norovirus outbreaks were reported in 2024, including 5 in December that sickened 890 passengers and crew members.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_c8f6e152147e_009&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_differ&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_007</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_duplicate_event_007 - Norovirus outbreaks surging across the US: CDC data - The Hill</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_007&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 84,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_2acdad71566e_004&quot;,
+    &quot;event_007&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_2acdad71566e_004&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_007&quot;
+  ],
+  &quot;disease&quot;: &quot;Norovirus Gastroenteritis&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-12-30&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_duplicate_event_007 - Norovirus outbreaks surging across the US: CDC data - The Hill&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;Norovirus is the leading cause of foodborne illness in the United States. Each year, there are about 2,500 reported outbreaks. They can occur throughout the year but are most common between November and April, the CDC said.&quot;,
+  &quot;source_url&quot;: &quot;https://thehill.com/policy/healthcare/5059834-norovirus-outbreaks-cdc&quot;,
+  &quot;source_title&quot;: &quot;Norovirus outbreaks surging across the US: CDC data - The Hill&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open claims, claim comparisons, and corroborated events.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_007&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_2acdad71566e&quot;,
+    &quot;source_url&quot;: &quot;https://thehill.com/policy/healthcare/5059834-norovirus-outbreaks-cdc&quot;,
+    &quot;evidence_quote&quot;: &quot;Norovirus is the leading cause of foodborne illness in the United States. Each year, there are about 2,500 reported outbreaks. They can occur throughout the year but are most common between November and April, the CDC said.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_2acdad71566e_012&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_008</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_duplicate_event_008 - Norovirus outbreaks surging across the US: CDC data - The Hill</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_008&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 84,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_2acdad71566e_003&quot;,
+    &quot;event_008&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_2acdad71566e_003&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_008&quot;
+  ],
+  &quot;disease&quot;: &quot;Norovirus Gastroenteritis&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2024-12-30&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_duplicate_event_008 - Norovirus outbreaks surging across the US: CDC data - The Hill&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;The highest number for the same period over the last several years was 65 outbreaks.&quot;,
+  &quot;source_url&quot;: &quot;https://thehill.com/policy/healthcare/5059834-norovirus-outbreaks-cdc&quot;,
+  &quot;source_title&quot;: &quot;Norovirus outbreaks surging across the US: CDC data - The Hill&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open claims, claim comparisons, and corroborated events.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_008&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_2acdad71566e&quot;,
+    &quot;source_url&quot;: &quot;https://thehill.com/policy/healthcare/5059834-norovirus-outbreaks-cdc&quot;,
+    &quot;evidence_quote&quot;: &quot;The highest number for the same period over the last several years was 65 outbreaks.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_2acdad71566e_010&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_incompatible&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_009</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_duplicate_event_009 - Norovirus Outbreaks - CDC</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_009&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 84,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_b15c469d896c_001&quot;,
+    &quot;event_009&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_b15c469d896c_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_009&quot;
+  ],
+  &quot;disease&quot;: &quot;Norovirus Gastroenteritis&quot;,
+  &quot;location&quot;: &quot;United States&quot;,
+  &quot;date_or_period&quot;: &quot;2025-02-28&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_duplicate_event_009 - Norovirus Outbreaks - CDC&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;Each year, there are about 2,500 reported norovirus outbreaks in the United States. Norovirus outbreaks occur throughout the year but are most common from November to April.&quot;,
+  &quot;source_url&quot;: &quot;https://www.cdc.gov/norovirus/outbreak-basics/index.html&quot;,
+  &quot;source_title&quot;: &quot;Norovirus Outbreaks - CDC&quot;,
+  &quot;actual_publisher&quot;: &quot;Centers for Disease Control and Prevention&quot;,
+  &quot;source_type_final&quot;: &quot;national_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;final_dataset&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open claims, claim comparisons, and corroborated events.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_009&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record passed deterministic run quality gates&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_b15c469d896c&quot;,
+    &quot;source_url&quot;: &quot;https://www.cdc.gov/norovirus/outbreak-basics/index.html&quot;,
+    &quot;evidence_quote&quot;: &quot;Each year, there are about 2,500 reported norovirus outbreaks in the United States. Norovirus outbreaks occur throughout the year but are most common from November to April.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_b15c469d896c_005&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: count_semantics_differ&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

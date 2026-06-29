@@ -1,0 +1,691 @@
+{
+  "plan_id": "exec_source_plan_dengue_florida_2025_06_01_2025_06_30",
+  "disease": "Dengue",
+  "location": "Florida",
+  "time_window": "2025-06-01-2025-06-30",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "florida_dengue_primarily_travel_associated_locally_acquired_cases_rare",
+    "fdoh_arbovirus_reports_may_lag_reporting_window",
+    "county_level_granularity_may_require_direct_county_health_dept_queries",
+    "arbonet_data_may_not_be_publicly_queryable_at_subnational_level"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify Florida Department of Health (FDOH) arbovirus surveillance reports, weekly or monthly situation reports, and press releases reporting dengue human cases, deaths, and hospitalizations in Florida during June 2025.",
+      "source_role_hint": "collection",
+      "rationale": "FDOH is the primary official source for dengue case counts in Florida, publishing arbovirus surveillance summaries that include travel-associated and locally acquired dengue cases by county.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify CDC ArboNET or CDC Division of Vector-Borne Diseases (DVBD) reports, tables, or dashboards containing dengue case data for Florida for June 2025.",
+      "source_role_hint": "collection",
+      "rationale": "CDC ArboNET is the national arboviral surveillance system and may contain Florida-specific dengue case counts, including confirmed and probable classifications.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify county-level health department reports (Miami-Dade, Broward, Palm Beach, Hillsborough, Orange) with dengue case data for June 2025.",
+      "source_role_hint": "collection",
+      "rationale": "High-population Florida counties with international travel hubs are most likely to report dengue cases; county health departments may publish local arbovirus alerts or situation reports.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify PAHO or WHO situation reports, disease outbreak news, or regional surveillance bulletins referencing dengue in Florida or the USA for June 2025.",
+      "source_role_hint": "validation",
+      "rationale": "International organization reports provide independent validation of case counts and can confirm whether Florida-specific data is included in broader US or Americas summaries.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify structured databases (HealthMap, ProMED, Global Health Monitor, or open data portals) with dengue event records for Florida in June 2025.",
+      "source_role_hint": "validation",
+      "rationale": "Structured surveillance databases aggregate official and news signals and can serve as independent validation against FDOH and CDC primary sources.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify peer-reviewed literature or CDC case definitions establishing dengue confirmed, probable, and suspected classification criteria applicable to Florida surveillance.",
+      "source_role_hint": "context",
+      "rationale": "Case definition context is required to correctly interpret and normalize case classification fields (confirmed vs. probable vs. suspected) extracted from FDOH and CDC sources.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify background sources describing Florida's dengue epidemiology, including travel-associated vs. locally acquired case patterns, to contextualize June 2025 data.",
+      "source_role_hint": "context",
+      "rationale": "Florida dengue cases are predominantly travel-associated; understanding this baseline helps flag anomalies such as locally acquired clusters or outbreaks.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag any sources where dengue counts are aggregated with other arboviruses (West Nile, Zika, chikungunya) without dengue-specific breakdowns, or where reporting period substantially exceeds June 2025.",
+      "source_role_hint": "human_review",
+      "rationale": "Arbovirus aggregate counts without dengue-specific figures must not be extracted as dengue records; sources with broad reporting periods require human judgment on date-window fit.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_review_002",
+      "objective": "Flag any news or situation report sources that cite case counts without traceable official provenance for human review before extraction.",
+      "source_role_hint": "human_review",
+      "rationale": "News sources may cite unofficial or unverified figures; human review ensures only traceable, provenance-backed counts enter the collection pipeline.",
+      "priority": 4
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_official_public_health_agency",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "FDOH publishes weekly and annual arbovirus surveillance reports including dengue case counts by county, case classification (confirmed/probable), travel status, and occasionally hospitalizations and deaths. CDC DVBD and ArboNET provide national-level data with state breakdowns. These are the highest-priority primary collection sources for Florida dengue in June 2025.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "fdoh_arbovirus_reports_may_use_annual_cumulative_counts_requiring_period_filtering",
+        "arbonet_subnational_data_may_not_be_publicly_accessible",
+        "county_health_dept_reports_may_not_be_indexed_by_search_engines"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_international_organization_report",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "PAHO publishes regional dengue situation reports and epidemiological updates covering the Americas including the USA. WHO Disease Outbreak News may reference US dengue events. These provide independent validation of Florida case data.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "paho_reports_may_aggregate_usa_without_florida_breakdown",
+        "reporting_period_may_be_broader_than_june_2025_window"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_structured_database",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "HealthMap, ProMED-mail, Global Health Monitor, and open government data portals aggregate dengue event signals from official and news sources. These structured databases can validate FDOH/CDC primary data and surface county-level signals.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "promed_entries_may_not_include_numeric_case_counts",
+        "healthmap_may_aggregate_without_florida_specific_granularity"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Peer-reviewed studies on Florida dengue epidemiology, case definitions, and surveillance methodology provide context for interpreting extracted counts. Recent publications may also contain 2025 case series or outbreak reports.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "publication_lag_may_preclude_june_2025_specific_literature",
+        "case_definition_context_is_primary_value_not_case_counts"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_news_and_situation_report",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Local Florida news outlets (Miami Herald, Tampa Bay Times, Sun Sentinel) and health news aggregators may report dengue alerts, locally acquired case clusters, or FDOH press releases during June 2025, providing early signals and supporting evidence quotes.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "news_counts_must_be_traceable_to_official_source_for_extraction",
+        "risk_of_unverified_or_duplicated_counts_across_outlets"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"dengue\" cases deaths public health Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"DENV\" cases deaths public health Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "DENV"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"dengue\" outbreak report surveillance Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"DENV\" outbreak report surveillance Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "DENV"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"dengue\" epidemiology cases deaths Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "dengue"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"DENV\" epidemiology cases deaths Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "DENV"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"dengue\" surveillance dataset cases deaths Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"DENV\" surveillance dataset cases deaths Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "DENV"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"dengue\" outbreak report cases deaths Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"DENV\" outbreak report cases deaths Florida 2025-06-01-2025-06-30 2025",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "DENV"
+      ],
+      "location_terms_used": [
+        "Florida"
+      ],
+      "time_terms_used": [
+        "2025-06-01-2025-06-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

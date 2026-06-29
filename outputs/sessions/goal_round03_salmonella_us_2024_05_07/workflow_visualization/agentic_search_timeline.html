@@ -1,0 +1,1352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agentic Search Timeline</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Agentic Search Timeline</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><article class='card'><h2>PLAN</h2><pre>{
+  &quot;card_type&quot;: &quot;PLAN&quot;,
+  &quot;title&quot;: &quot;Search plan&quot;,
+  &quot;summary&quot;: {
+    &quot;planned_query_count&quot;: 10,
+    &quot;iterative_search_enabled&quot;: true
+  }
+}</pre></article><article class='card'><h2>SEARCH iteration 1</h2><pre>{
+  &quot;card_type&quot;: &quot;SEARCH iteration 1&quot;,
+  &quot;queries&quot;: [
+    {
+      &quot;query_id&quot;: &quot;iter1_q1&quot;,
+      &quot;query&quot;: &quot;CDC Salmonella outbreak investigation 2024 cases hospitalizations deaths site:cdc.gov&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;CDC&#x27;s outbreak investigation pages are the primary authoritative source for confirmed US Salmonella case counts, hospitalization rates, death counts, and subnational location breakdowns. Restricting to cdc.gov maximises precision. Removing rigid quoted phrases allows the query to match CDC&#x27;s own page titles (e.g., &#x27;Outbreak Investigation of Salmonella: [Vehicle] (Month Year)&#x27;).&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;CDC outbreak investigation summary pages listing case counts, illness onset dates, states affected, hospitalizations, and deaths&quot;,
+      &quot;expected_trust_signal&quot;: &quot;cdc.gov domain; CDC outbreak investigation branding; epidemiologic curve or case-count table&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;Salmonella&quot;,
+        &quot;salmonellosis&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;,
+        &quot;US&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2024&quot;,
+        &quot;May 2024&quot;,
+        &quot;June 2024&quot;,
+        &quot;July 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;iter1_q1&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter1_q2&quot;,
+      &quot;query&quot;: &quot;Salmonella outbreak United States cases hospitalizations 2024 May June July site:cdc.gov OR site:fda.gov&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Extends coverage to FDA, which publishes foodborne illness outbreak advisories and recall notices that include Salmonella case counts and hospitalization data linked to specific food vehicles and states. The OR operator captures both agencies in one query slot, maximising yield within the 4-query cap.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;FDA outbreak advisory or recall notice citing Salmonella case counts, states affected, and illness dates; CDC multistate outbreak page&quot;,
+      &quot;expected_trust_signal&quot;: &quot;fda.gov or cdc.gov domain; official outbreak advisory or recall notice language; case count and hospitalization figures&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;Salmonella&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2024&quot;,
+        &quot;May 2024&quot;,
+        &quot;June 2024&quot;,
+        &quot;July 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;iter1_q2&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter1_q3&quot;,
+      &quot;query&quot;: &quot;Salmonella outbreak United States 2024 cases deaths hospitalizations state health department&quot;,
+      &quot;provider_channel&quot;: &quot;web_search&quot;,
+      &quot;query_type&quot;: &quot;general_web&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 2,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_probable&quot;,
+        &quot;cases_suspected&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;State health departments (e.g., CDPH, NYSDOH, TXDSHS) often publish their own Salmonella outbreak advisories with subnational case counts, locality detail, and hospitalization figures before CDC finalises a multistate summary. A broad web search without domain restriction surfaces these state-level pages, which are critical for the subnational_location and locality target fields.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;State health department press release or outbreak advisory with case counts, county or city breakdown, and illness date range&quot;,
+      &quot;expected_trust_signal&quot;: &quot;State .gov domain (e.g., health.state.xx.us or dph.xx.gov); official press release or advisory language; epidemiologic data table&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;Salmonella&quot;,
+        &quot;salmonellosis&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;,
+        &quot;state&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2024&quot;,
+        &quot;May&quot;,
+        &quot;June&quot;,
+        &quot;July&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;iter1_q3&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter1_q4&quot;,
+      &quot;query&quot;: &quot;Salmonella outbreak US 2024 cases deaths recalled food ProMED OR \&quot;outbreak news\&quot; OR \&quot;food safety news\&quot;&quot;,
+      &quot;provider_channel&quot;: &quot;news_search&quot;,
+      &quot;query_type&quot;: &quot;news&quot;,
+      &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+      &quot;role_hint&quot;: &quot;collection_support&quot;,
+      &quot;priority&quot;: 3,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_unspecified&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;ProMED-mail and specialist food-safety news outlets (e.g., Food Safety News, Outbreak News Today) aggregate and cite official case counts, hospitalization data, and death figures for US Salmonella outbreaks, often with state-level granularity and earlier publication dates than CDC final summaries. This query covers the news/situation-report source type and may surface outbreaks not yet finalised on CDC pages.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;ProMED post or food-safety news article citing official case counts, states affected, hospitalization numbers, and death toll for a specific Salmonella outbreak event&quot;,
+      &quot;expected_trust_signal&quot;: &quot;ProMED archive post with DONs reference; Food Safety News or Outbreak News Today byline citing CDC or state health department figures; publication date within May–July 2024&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;Salmonella&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;US&quot;,
+        &quot;United States&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2024&quot;,
+        &quot;May 2024&quot;,
+        &quot;June 2024&quot;,
+        &quot;July 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;iter1_q4&quot;
+    }
+  ],
+  &quot;plan&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;search_objective&quot;: &quot;Identify authoritative sources reporting Salmonella cases, deaths, hospitalizations, and outbreak details in the United States during May–July 2024, covering all target fields: confirmed/probable/suspected/unspecified case counts, deaths, hospitalizations, subnational locations, and dates reported.&quot;,
+    &quot;search_reasoning&quot;: &quot;The upstream planned queries are structurally sound but have two weaknesses: (1) they use rigid quoted phrase strings (e.g., \&quot;Salmonella outbreak United States 2024\&quot;) that may miss CDC outbreak investigation pages, FDA food-safety recalls, and state health department advisories that use different phrasing; (2) the 10-query inventory exceeds the 4-query-per-iteration cap, so we must prioritize the highest-yield query types for iteration 1. Priority order: (a) CDC official outbreak investigation pages are the single most authoritative source for confirmed US Salmonella case counts and are best reached via a targeted web_search against cdc.gov; (b) FDA outbreak/recall pages often carry case counts and hospitalization data for foodborne Salmonella; (c) ProMED/PAHO/WHO situation reports provide international validation and may cite US figures; (d) news aggregation (e.g., outbreak news) surfaces state-level detail and hospitalization data not yet in CDC summaries. We refine query text to remove over-restrictive quoted phrases, add CDC/FDA agency signals, and include the specific date window terms \&quot;May 2024\&quot;, \&quot;June 2024\&quot;, \&quot;July 2024\&quot; to improve temporal precision. We stay within the 4-query cap for iteration 1 and reserve literature/database queries for iteration 2 if gaps remain.&quot;,
+    &quot;query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;iter1_q1&quot;,
+        &quot;query&quot;: &quot;CDC Salmonella outbreak investigation 2024 cases hospitalizations deaths site:cdc.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;CDC&#x27;s outbreak investigation pages are the primary authoritative source for confirmed US Salmonella case counts, hospitalization rates, death counts, and subnational location breakdowns. Restricting to cdc.gov maximises precision. Removing rigid quoted phrases allows the query to match CDC&#x27;s own page titles (e.g., &#x27;Outbreak Investigation of Salmonella: [Vehicle] (Month Year)&#x27;).&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC outbreak investigation summary pages listing case counts, illness onset dates, states affected, hospitalizations, and deaths&quot;,
+        &quot;expected_trust_signal&quot;: &quot;cdc.gov domain; CDC outbreak investigation branding; epidemiologic curve or case-count table&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;,
+          &quot;salmonellosis&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;US&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2024&quot;,
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;iter1_q1&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter1_q2&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak United States cases hospitalizations 2024 May June July site:cdc.gov OR site:fda.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Extends coverage to FDA, which publishes foodborne illness outbreak advisories and recall notices that include Salmonella case counts and hospitalization data linked to specific food vehicles and states. The OR operator captures both agencies in one query slot, maximising yield within the 4-query cap.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;FDA outbreak advisory or recall notice citing Salmonella case counts, states affected, and illness dates; CDC multistate outbreak page&quot;,
+        &quot;expected_trust_signal&quot;: &quot;fda.gov or cdc.gov domain; official outbreak advisory or recall notice language; case count and hospitalization figures&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2024&quot;,
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;iter1_q2&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter1_q3&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak United States 2024 cases deaths hospitalizations state health department&quot;,
+        &quot;provider_channel&quot;: &quot;web_search&quot;,
+        &quot;query_type&quot;: &quot;general_web&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;cases_suspected&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;State health departments (e.g., CDPH, NYSDOH, TXDSHS) often publish their own Salmonella outbreak advisories with subnational case counts, locality detail, and hospitalization figures before CDC finalises a multistate summary. A broad web search without domain restriction surfaces these state-level pages, which are critical for the subnational_location and locality target fields.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;State health department press release or outbreak advisory with case counts, county or city breakdown, and illness date range&quot;,
+        &quot;expected_trust_signal&quot;: &quot;State .gov domain (e.g., health.state.xx.us or dph.xx.gov); official press release or advisory language; epidemiologic data table&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;,
+          &quot;salmonellosis&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;state&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2024&quot;,
+          &quot;May&quot;,
+          &quot;June&quot;,
+          &quot;July&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;iter1_q3&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter1_q4&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak US 2024 cases deaths recalled food ProMED OR \&quot;outbreak news\&quot; OR \&quot;food safety news\&quot;&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_unspecified&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;ProMED-mail and specialist food-safety news outlets (e.g., Food Safety News, Outbreak News Today) aggregate and cite official case counts, hospitalization data, and death figures for US Salmonella outbreaks, often with state-level granularity and earlier publication dates than CDC final summaries. This query covers the news/situation-report source type and may surface outbreaks not yet finalised on CDC pages.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;ProMED post or food-safety news article citing official case counts, states affected, hospitalization numbers, and death toll for a specific Salmonella outbreak event&quot;,
+        &quot;expected_trust_signal&quot;: &quot;ProMED archive post with DONs reference; Food Safety News or Outbreak News Today byline citing CDC or state health department figures; publication date within May–July 2024&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;US&quot;,
+          &quot;United States&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2024&quot;,
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;iter1_q4&quot;
+      }
+    ],
+    &quot;expected_evidence&quot;: [
+      &quot;CDC outbreak investigation summary with case count, illness onset date range, states affected, hospitalization count, and death count&quot;,
+      &quot;FDA outbreak advisory or recall notice with Salmonella case counts and state distribution&quot;,
+      &quot;State health department press release with subnational case counts and locality detail&quot;,
+      &quot;ProMED or food-safety news article citing official figures for a US Salmonella outbreak event in May–July 2024&quot;,
+      &quot;Epidemiologic curve or case-count table with confirmed/probable/suspected breakdown&quot;,
+      &quot;Evidence quotes containing numeric case counts, hospitalization rates, or death figures attributable to Salmonella within the time window&quot;
+    ],
+    &quot;expected_source_characteristics&quot;: [
+      &quot;Official US federal public health agency page (CDC, FDA) with outbreak investigation branding&quot;,
+      &quot;State or territorial health department page on a .gov domain&quot;,
+      &quot;International disease surveillance aggregator (ProMED-mail) with post date in 2024&quot;,
+      &quot;Specialist food-safety journalism outlet citing primary official sources&quot;,
+      &quot;Pages containing structured epidemiologic data: case counts, dates, locations, hospitalization and death figures&quot;
+    ],
+    &quot;language_or_localization_reasoning&quot;: &quot;All queries are in English. The United States is an English-language jurisdiction; CDC, FDA, and state health departments publish exclusively in English for official outbreak data. No localization to other languages is required for this task. Spanish-language sources (e.g., from Puerto Rico&#x27;s Departamento de Salud) could be relevant for subnational coverage of US territories but are deferred to iteration 2 if territorial data is needed.&quot;,
+    &quot;trust_considerations&quot;: [
+      &quot;Prefer cdc.gov and fda.gov pages as primary authoritative sources for confirmed case counts and deaths&quot;,
+      &quot;State .gov health department pages are authoritative for subnational data but may use different case definitions&quot;,
+      &quot;ProMED and Food Safety News are acceptable secondary sources when they directly cite and quote official figures&quot;,
+      &quot;Avoid sources that do not cite a primary official agency or that aggregate without attribution&quot;,
+      &quot;Check that reported dates fall within 2024-05-01–2024-07-31; CDC pages may report outbreaks that started earlier but were active in the window&quot;,
+      &quot;Be alert to the distinction between &#x27;confirmed&#x27; and &#x27;total&#x27; (confirmed + probable) case counts, which CDC sometimes conflates in summary language&quot;
+    ],
+    &quot;stop_condition_hypothesis&quot;: &quot;Coverage is sufficient when at least one CDC outbreak investigation page, one FDA advisory or recall notice, and one news/situation-report source are identified that together provide case counts, hospitalization figures, at least one death figure or explicit zero, subnational location(s), and a date reported within the 2024-05-01–2024-07-31 window. If iteration 1 returns these, iteration 2 can be scoped to fill remaining field gaps (e.g., probable/suspected breakdowns, state-level granularity).&quot;,
+    &quot;warnings&quot;: [
+      &quot;Upstream queries used over-restrictive quoted phrases that may suppress relevant CDC and FDA pages with different title formats — refined in this iteration&quot;,
+      &quot;The 10-query upstream inventory exceeds the 4-query-per-iteration cap; only the 4 highest-priority, highest-yield queries are included here&quot;,
+      &quot;CDC outbreak investigation pages are sometimes published weeks after the outbreak window closes; pages dated after 2024-07-31 may still contain data for the target window&quot;,
+      &quot;Some Salmonella outbreaks in this window may be linked to specific food vehicles (e.g., cucumbers, eggs, poultry) — food-vehicle terms can be added in iteration 2 if needed&quot;,
+      &quot;State-level data may use &#x27;probable&#x27; or &#x27;suspected&#x27; case categories not present in CDC federal summaries — both source types needed for full field coverage&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>OBSERVE iteration 1</h2><pre>{
+  &quot;card_type&quot;: &quot;OBSERVE iteration 1&quot;,
+  &quot;observation&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;executed_query_ids&quot;: [
+      &quot;iter1_q1&quot;,
+      &quot;iter1_q2&quot;,
+      &quot;iter1_q3&quot;,
+      &quot;iter1_q4&quot;
+    ],
+    &quot;executed_queries&quot;: [
+      &quot;CDC Salmonella outbreak investigation 2024 cases hospitalizations deaths site:cdc.gov&quot;,
+      &quot;Salmonella outbreak United States cases hospitalizations 2024 May June July site:cdc.gov OR site:fda.gov&quot;,
+      &quot;Salmonella outbreak United States 2024 cases deaths hospitalizations state health department&quot;,
+      &quot;Salmonella outbreak US 2024 cases deaths recalled food ProMED OR \&quot;outbreak news\&quot; OR \&quot;food safety news\&quot;&quot;
+    ],
+    &quot;raw_result_count&quot;: 31,
+    &quot;accepted_candidate_count&quot;: 24,
+    &quot;duplicate_result_count&quot;: 7,
+    &quot;rejected_result_count&quot;: 7,
+    &quot;result_domain_counts&quot;: {
+      &quot;cdc.gov&quot;: 13,
+      &quot;marlerblog.com&quot;: 3,
+      &quot;fda.gov&quot;: 3,
+      &quot;food-safety.com&quot;: 3,
+      &quot;publications.aap.org&quot;: 1,
+      &quot;cidrap.umn.edu&quot;: 2,
+      &quot;fsis.usda.gov&quot;: 1,
+      &quot;thenewlede.org&quot;: 1,
+      &quot;facebook.com&quot;: 1,
+      &quot;pirg.org&quot;: 1,
+      &quot;fsns.com&quot;: 1,
+      &quot;pmc.ncbi.nlm.nih.gov&quot;: 1
+    },
+    &quot;top_result_summaries&quot;: [
+      {
+        &quot;title&quot;: &quot;Salmonella Outbreak Linked to Eggs - September 2024 - CDC&quot;,
+        &quot;snippet&quot;: &quot;Fast Facts · Cases: 93 · Hospitalizations: 34 · Deaths: 0 · States: 12.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/eggs-09-24/index.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Investigation Update: Salmonella Outbreak, Cucumbers, November 2024 | Salmonella Infection | CDC&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # Investigation Update: Salmonella Outbreak, Cucumbers, November 2024. Epidemiologic and traceback data showed that cucumbers grown by Agrotato, S.A. de C.V. in Sonora, Mexico, were contaminated with *Salmonella* and made people sick. A total of 113 people infected with the outbreak strain of *Salmonella* were reported from 23 states. Illnesses started on dates ranging from October 12, 2024, to December 7, 2024. An illness sub-cluster is a group of unrelated sick people who all ate at the same location or event, such as a restaurant, long-term care facility, or school. Epidemiologic and traceback data show that cucumbers grown by Agrotato, S.A. de C.V. in Sonora, Mexico, including recalled cucumbers from SunFed Produce, LLC., may be contaminated with *Salmonella* and may be making people sick. As of December 17, 2024, a total of 100 people infected with the outbreak strain of *Salmonella* have been reported from 23 states.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/cucumbers-11-24/investigation.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Investigation Update: Salmonella Outbreak, Backyard Poultry - May 2024 | Salmonella Infection | CDC&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # Investigation Update: *Salmonella* Outbreak, Backyard Poultry - May 2024. Epidemiologic, laboratory, and traceback data showed that contact with backyard poultry made people sick. A total of 470 people infected with one of the outbreak strains of *Salmonella* were reported from 48 states (see map). Illnesses started on dates ranging from January 1, 2024, to September 4, 2024 (see timeline). Investigators in Minnesota, Ohio, Tennessee, Utah, and Wisconsin collected samples from backyard poultry or from inside the boxes used to ship poultry from hatcheries to retail stores, including the box liner and bedding. As of August 19, 2024, 409 people infected with one of the outbreak strains of *Salmonella* have been reported from 45 states (see map). Investigators in Minnesota, Ohio, Utah, and Wisconsin collected samples from backyard poultry or from inside the boxes used to ship poultry from hatcheries to retail stores, including the box liner and bedding.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/backyardpoultry-05-24/investigation.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 3,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Salmonella Outbreak Linked to Charcuterie Meats, January 2024&quot;,
+        &quot;snippet&quot;: &quot;Fast Facts. Cases: 104; Hospitalizations: 27; Deaths: 0; States: 33. UpdatesLocationsTimeline. Outbreak Investigation Summary. Data showed that charcuterie meat&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/meats-01-24/index.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 4,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Investigation Update: Salmonella Outbreak, Eggs - September 2024&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # Investigation Update: Salmonella Outbreak, Eggs - September 2024. Recalled eggs are no longer available for sale and are outside their shelf life. Epidemiologic, laboratory, and traceback data showed that eggs supplied by Milo&#x27;s Poultry Farms were contaminated with *Salmonella* and made people sick. As of October 17, 2024, a total of 93 people infected with the outbreak strain of *Salmonella* have been reported from 12 states. Illnesses started on dates ranging from May 23, 2024, to September 13, 2024. Based on WGS analysis, bacteria from 83 people&#x27;s samples and 72 environmental samples are predicted to be nonsusceptible to ciprofloxacin and are related to a strain of *Salmonella* Enteritidis that has also been isolated from chicken. Epidemiologic, laboratory, and traceback data show that eggs supplied by Milo&#x27;s Poultry Farms are contaminated with *Salmonella* and are making people sick. As of September 6, 2024, a total of 65 people infected with the outbreak strain of *Salmonella* have been reported from 9 states.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/eggs-09-24/investigation.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 5,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded Dragons — United States, 2024  | MMWR&quot;,
+        &quot;snippet&quot;: &quot;Eighteen reported cases were among persons with household exposure to bearded dragons; *S.* Cotham isolates from two bearded dragons kept in two patient households were closely genetically related to each other, to 2012–2014 isolates, and to clinical isolates from the 26 confirmed cases. CDC initiated a multistate investigation and as of December 10, 2024, an additional 19 cases had been identified, for a total of 26 confirmed cases from 13 states; state public health partners identified one probable case in an additional state for a total of 27 cases. Cotham infection was defined as the occurrence of clinical signs consistent with salmonellosis on or after January 11, 2024, in a person with exposure to a bearded dragon, and polymerase chain reaction–confirmed *Salmonella* positive test result but with no isolate available for WGS; however, in the one identified probable case, feces of the bearded dragon owned by the patient was tested and resulted in isolation of the *S*.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 6,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Summary of Possible Multistate Enteric (Intestinal) Disease Outbreaks in 2024 | Foodborne Outbreaks | CDC&quot;,
+        &quot;snippet&quot;: &quot;# Summary of Possible Multistate Enteric (Intestinal) Disease Outbreaks in 2024. During 2024, CDC, with state and regulatory public health partners, investigated 203 possible multistate outbreaks, of which **62** were determined to be outbreaks. Outcomes for investigations of possible multistate outbreaks, 2024. 203 possible multistate outbreaks: two or more people with a similar illness living in two or more states; 62 multistate outbreaks: two or more people with a similar illness that have evidence of a common source; 45 solved multistate outbreaks: outbreak for which a source was identified; 28 multistate outbreaks-confirmed sources: solved outbreak with at least two types of data supporting the source (epidemiologic plus lab and/or traceback data). 62 multistate outbreaks investigated (1 Campylobacter outbreaks, 10 E.coli outbreaks, 13 Listeria outbreaks and 38 Salmonella outbreaks). 45 solved multistate outbreaks: 73% multistate outbreaks solved; 29 foodborne and 16 animal contact. #### Figure 3: Illnesses in solved multistate foodborne and animal contact outbreaks, 2016-2024.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/foodborne-outbreaks/php/data-research/summary-2024.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 7,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Salmonella Outbreak Linked to Fresh Basil, April 2024 - CDC&quot;,
+        &quot;snippet&quot;: &quot;Salmonella Outbreak Linked to Fresh Basil, April 2024. Food safety alert. Investigation status: Closed. Recall issued: Yes.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/basil-04-24/index.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 8,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;E. coli, Salmonella, Listeria Oh My! | Marler Blog&quot;,
+        &quot;snippet&quot;: &quot;The FDA and CDC, in collaboration with state and local partners are investigating illnesses in a multistate outbreak of *E. Based on epidemiological information collected by CDC, a total of 69 people infected with the same strain of *E. FDA’s traceback investigation has identified an iceberg and romaine lettuce blend from a common supplier as the source of this outbreak; however, impacted product identified to date appears to be past shelf life and no longer on the market. As of November 26, 2024, a total of 68 people infected with the outbreak strain of *Salmonella* have been reported from 19 states: Alaska, California, Colorado, Iowa, Illinois, Massachusetts, Montana, Nebraska, New Jersey, New York, Ohio, Oregon, Pennsylvania, South Dakota, Texas, Utah, Washington, Wisconsin and Wyoming. As of November 22, 2024, 11 people infected with the outbreak strain of *Listeria*have been reported from four states: California (7), Illinois (2), New York (1) and New Jersey (1).&quot;,
+        &quot;url&quot;: &quot;https://www.marlerblog.com/case-news/e-coli-salmonella-listeria-oh-my&quot;,
+        &quot;domain&quot;: &quot;marlerblog.com&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Investigation Update: Salmonella Outbreak, July 2025 - CDC&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. Epidemiologic and laboratory data showed that frozen Deep brand foods were contaminated with *Salmonella* Anatum and made people sick. A total of 12 people infected with the outbreak strain of *Salmonella* were reported from 11 states. In June and July 2025, FDA was informed that import samples of Deep brand frozen Sprouted Mat (moth) and Moong (mung) beans tested positive for *Salmonella* and WGS analysis showed that the *Salmonella* present in the samples was the strain that caused illnesses in this outbreak. This means that people got sick from eating sprouted beans. Epidemiologic and laboratory data show that frozen sprouted beans are contaminated with *Salmonella* Anatum and may be making people sick. As of July 16, 11 people infected with the outbreak strain of *Salmonella* have been reported from 10 states. The product samples tested positive for *Salmonella* and WGS analysis showed that the *Salmonella* present in the samples is the strain causing illnesses in this outbreak.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/sproutedbeans-07-25/investigation.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      }
+    ],
+    &quot;apparent_source_types&quot;: [
+      &quot;news_and_situation_report&quot;,
+      &quot;official_public_health_agency&quot;
+    ],
+    &quot;disease_relevance_signals&quot;: [
+      &quot;Salmonella&quot;
+    ],
+    &quot;location_relevance_signals&quot;: [
+      &quot;United States&quot;
+    ],
+    &quot;evidence_availability_signals&quot;: [
+      &quot;case&quot;,
+      &quot;cases&quot;,
+      &quot;death&quot;,
+      &quot;deaths&quot;,
+      &quot;outbreak&quot;
+    ],
+    &quot;gaps_identified&quot;: [],
+    &quot;source_quality_concerns&quot;: [
+      &quot;duplicate URLs appeared in search results&quot;
+    ],
+    &quot;notes_for_llm&quot;: [
+      &quot;Observation includes search metadata only; fetched page text is not included.&quot;,
+      &quot;Only provider search results can become source candidates.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>REFINE decision 1</h2><pre>{
+  &quot;card_type&quot;: &quot;REFINE decision 1&quot;,
+  &quot;decision&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;decision&quot;: &quot;continue_search&quot;,
+    &quot;decision_reason&quot;: &quot;Iteration 1 returned strong coverage of CDC outbreak investigation pages and some FDA/news sources, but several important gaps remain for the specific May–July 2024 window: (1) The most directly relevant outbreak — Backyard Poultry May 2024 — was found but its hospitalization and death counts are not visible in the snippet; the index/summary page (not just the investigation update) needs to be surfaced. (2) The Fresh Basil April 2024 outbreak snippet shows no case counts — it may have illness dates extending into May 2024. (3) No CDC outbreak pages specifically dated May, June, or July 2024 (other than Backyard Poultry) have been surfaced — there may be additional outbreaks (e.g., linked to cantaloupes, onions, or other vehicles) active in that window. (4) FDA recall/advisory pages for May–July 2024 Salmonella events have not been individually surfaced (only 3 fda.gov results appeared, none with visible case counts in snippets). (5) FSIS/USDA appeared once but without case-count detail. (6) State-level subnational data (cases_probable, cases_suspected, locality) is still absent. (7) The CDC 2024 multistate outbreak summary page was found but its per-outbreak breakdown for May–July needs targeted follow-up. Iteration 2 should: (a) target CDC outbreak index pages specifically for May–July 2024 vehicles not yet surfaced; (b) target FDA advisories with case counts for that window; (c) target Food Safety News and CIDRAP for state-level and hospitalization detail; (d) use the CDC 2024 summary page as a pivot to find individual outbreak pages active in the window.&quot;,
+    &quot;coverage_assessment&quot;: &quot;Partial. The Backyard Poultry May 2024 CDC page is the strongest in-window hit, but its hospitalization/death figures are not confirmed from the snippet alone. The Eggs September 2024 outbreak has illness onset dates starting May 23, 2024, placing it squarely in the window. The Fresh Basil April 2024 outbreak may extend into May. No CDC pages for outbreaks specifically initiated in June or July 2024 have been surfaced yet. The CDC 2024 multistate summary mentions 38 Salmonella outbreaks but individual pages for June–July 2024 events are missing. FDA and FSIS pages with case counts for the window are absent from visible snippets. State-level subnational data (cases_probable, cases_suspected, locality) is entirely absent.&quot;,
+    &quot;source_diversity_assessment&quot;: &quot;Good federal agency coverage (cdc.gov 13 results, fda.gov 3, fsis.usda.gov 1). Secondary sources present (marlerblog.com 3, cidrap.umn.edu 2, food-safety.com 3). However, state health department .gov pages are absent — none of the 24 accepted candidates appear to be state-level pages. ProMED was not surfaced. MMWR literature appeared once (bearded dragons, not in window). The facebook.com result should be deprioritized. pirg.org is advocacy, not epidemiologic data.&quot;,
+    &quot;trustworthiness_assessment&quot;: &quot;High for cdc.gov results. FDA and FSIS results are authoritative but snippets lack case counts. marlerblog.com and cidrap.umn.edu are acceptable secondary sources that cite official figures. food-safety.com requires verification. facebook.com and pirg.org are low-trust for epidemiologic data. No state .gov pages yet confirmed.&quot;,
+    &quot;disease_location_time_fit_assessment&quot;: &quot;Disease fit: excellent (all results are Salmonella). Location fit: good (all US-focused). Time fit: PARTIAL — the strongest in-window result is Backyard Poultry May 2024 (illness dates Jan–Sep 2024, active throughout the window). Eggs September 2024 has illness onset from May 23, 2024 (in window). Fresh Basil April 2024 may extend into May. Several other surfaced results (Cucumbers Nov 2024, Charcuterie Jan 2024, Bearded Dragons 2024, Sprouted Beans July 2025) are outside the May–July 2024 window. The CDC 2024 summary page is a meta-source that covers the full year. Iteration 2 must specifically target outbreaks with illness dates or report dates in May–July 2024.&quot;,
+    &quot;corroboration_potential_assessment&quot;: &quot;The Backyard Poultry May 2024 CDC page is the anchor source for the window. The Eggs September 2024 page (illness onset from May 23) provides corroboration for the May–July window. A second iteration targeting specific June–July 2024 outbreak vehicles, FDA advisories with case counts, and Food Safety News/CIDRAP articles will substantially improve corroboration across multiple outbreaks and fill hospitalization/death/subnational gaps.&quot;,
+    &quot;next_query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;iter2_q1&quot;,
+        &quot;query&quot;: &quot;CDC Salmonella outbreak investigation June 2024 OR July 2024 cases hospitalizations deaths site:cdc.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_rationale&quot;: &quot;Iteration 1 surfaced the Backyard Poultry May 2024 outbreak but no CDC investigation pages specifically initiated in June or July 2024. This query directly targets CDC outbreak pages for those two months, which are the most underrepresented part of the window. The CDC 2024 summary mentions 38 Salmonella outbreaks — individual pages for June–July events are the highest-priority gap.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC outbreak investigation index or update page with title containing &#x27;June 2024&#x27; or &#x27;July 2024&#x27;, listing case counts, states, hospitalizations, and deaths&quot;,
+        &quot;expected_trust_signal&quot;: &quot;cdc.gov domain; outbreak investigation page URL pattern /salmonella/outbreaks/[vehicle]-06-24/ or -07-24/; Fast Facts box with case/hospitalization/death counts&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q1&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q2&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak 2024 cases hospitalizations \&quot;May 2024\&quot; OR \&quot;June 2024\&quot; OR \&quot;July 2024\&quot; site:cdc.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_rationale&quot;: &quot;Complements iter2_q1 by using quoted month-year phrases to match CDC pages that mention illness onset dates or report dates in the May–July 2024 window, even if the outbreak was named for a different month. This is particularly important for outbreaks like the Eggs September 2024 event (illness onset May 23) and any other outbreaks where the vehicle was identified later but illnesses began in the window.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC outbreak investigation page with illness onset dates or case-count update dates falling in May–July 2024; Fast Facts or investigation update table with numeric case/hospitalization/death data&quot;,
+        &quot;expected_trust_signal&quot;: &quot;cdc.gov domain; quoted date strings matching the target window; epidemiologic curve or case-count table&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q1&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q3&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak United States May June July 2024 cases hospitalizations deaths FDA advisory recall site:fda.gov OR site:fsis.usda.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_rationale&quot;: &quot;Iteration 1 returned only 3 fda.gov results and 1 fsis.usda.gov result, none with visible case counts in snippets. FDA outbreak advisories and FSIS public health alerts for Salmonella events in May–July 2024 are critical secondary authoritative sources that often include case counts, hospitalization figures, and state distributions not yet captured. FSIS covers meat/poultry Salmonella events specifically.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;FDA outbreak advisory or FSIS public health alert dated May–July 2024 with Salmonella case counts, states affected, and illness date range; recall notice linking to CDC case data&quot;,
+        &quot;expected_trust_signal&quot;: &quot;fda.gov or fsis.usda.gov domain; official outbreak advisory or public health alert language; case count and hospitalization figures; publication date May–July 2024&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q4&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak United States 2024 cases deaths hospitalizations \&quot;state\&quot; \&quot;confirmed\&quot; \&quot;May\&quot; OR \&quot;June\&quot; OR \&quot;July\&quot; site:foodsafetynews.com OR site:cidrap.umn.edu OR site:outbreaknewstoday.com&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_rationale&quot;: &quot;Food Safety News, CIDRAP, and Outbreak News Today are the highest-quality specialist news sources for US Salmonella outbreak coverage. They routinely publish state-level case breakdowns, hospitalization figures, and probable/suspected case counts that are absent from CDC federal summaries. CIDRAP appeared twice in iteration 1 but without visible case counts; targeting these domains directly with month-year terms maximises the chance of surfacing subnational data and filling the cases_probable/cases_suspected/locality gaps that remain entirely uncovered.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;Food Safety News or CIDRAP article dated May–July 2024 citing official case counts by state, hospitalization numbers, and death figures for a specific Salmonella outbreak; Outbreak News Today post with state-level breakdown&quot;,
+        &quot;expected_trust_signal&quot;: &quot;foodsafetynews.com, cidrap.umn.edu, or outbreaknewstoday.com domain; article publication date May–July 2024; direct citation of CDC or state health department figures; numeric case/hospitalization/death data&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;,
+          &quot;salmonellosis&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;state&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;cases_suspected&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      }
+    ],
+    &quot;stop_reason&quot;: null,
+    &quot;warnings&quot;: [
+      &quot;Several accepted candidates (Cucumbers Nov 2024, Charcuterie Jan 2024, Sprouted Beans July 2025) are outside the May–July 2024 target window and should not be used as primary evidence without confirming overlap with the window.&quot;,
+      &quot;The Eggs September 2024 outbreak has illness onset starting May 23, 2024 — it is in-window but the outbreak was not formally announced until September; data collectors should note this distinction.&quot;,
+      &quot;The CDC 2024 multistate summary page lists 38 Salmonella outbreaks but individual pages for June–July 2024 events have not been surfaced — these are the highest-priority gap.&quot;,
+      &quot;No state health department .gov pages were returned in iteration 1 — state-level subnational data (cases_probable, cases_suspected, locality) remains entirely uncovered.&quot;,
+      &quot;The facebook.com result should be excluded from source candidates as it is not an authoritative epidemiologic source.&quot;,
+      &quot;Iteration 2 is the final permitted iteration (max_iterations: 2); queries must be maximally targeted to fill the most critical gaps within the 4-query cap.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>SEARCH iteration 2</h2><pre>{
+  &quot;card_type&quot;: &quot;SEARCH iteration 2&quot;,
+  &quot;queries&quot;: [
+    {
+      &quot;query_id&quot;: &quot;iter2_q1&quot;,
+      &quot;query&quot;: &quot;CDC Salmonella outbreak investigation June 2024 OR July 2024 cases hospitalizations deaths site:cdc.gov&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Iteration 1 surfaced the Backyard Poultry May 2024 outbreak but no CDC investigation pages specifically initiated in June or July 2024. This query directly targets CDC outbreak pages for those two months, which are the most underrepresented part of the window. The CDC 2024 summary mentions 38 Salmonella outbreaks — individual pages for June–July events are the highest-priority gap.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;CDC outbreak investigation index or update page with title containing &#x27;June 2024&#x27; or &#x27;July 2024&#x27;, listing case counts, states, hospitalizations, and deaths&quot;,
+      &quot;expected_trust_signal&quot;: &quot;cdc.gov domain; outbreak investigation page URL pattern /salmonella/outbreaks/[vehicle]-06-24/ or -07-24/; Fast Facts box with case/hospitalization/death counts&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;Salmonella&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;June 2024&quot;,
+        &quot;July 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;iter1_q1&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;iter2_q1&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter2_q2&quot;,
+      &quot;query&quot;: &quot;Salmonella outbreak 2024 cases hospitalizations \&quot;May 2024\&quot; OR \&quot;June 2024\&quot; OR \&quot;July 2024\&quot; site:cdc.gov&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Complements iter2_q1 by using quoted month-year phrases to match CDC pages that mention illness onset dates or report dates in the May–July 2024 window, even if the outbreak was named for a different month. This is particularly important for outbreaks like the Eggs September 2024 event (illness onset May 23) and any other outbreaks where the vehicle was identified later but illnesses began in the window.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;CDC outbreak investigation page with illness onset dates or case-count update dates falling in May–July 2024; Fast Facts or investigation update table with numeric case/hospitalization/death data&quot;,
+      &quot;expected_trust_signal&quot;: &quot;cdc.gov domain; quoted date strings matching the target window; epidemiologic curve or case-count table&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;Salmonella&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;May 2024&quot;,
+        &quot;June 2024&quot;,
+        &quot;July 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;iter1_q1&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;iter2_q2&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter2_q3&quot;,
+      &quot;query&quot;: &quot;Salmonella outbreak United States May June July 2024 cases hospitalizations deaths FDA advisory recall site:fda.gov OR site:fsis.usda.gov&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 2,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Iteration 1 returned only 3 fda.gov results and 1 fsis.usda.gov result, none with visible case counts in snippets. FDA outbreak advisories and FSIS public health alerts for Salmonella events in May–July 2024 are critical secondary authoritative sources that often include case counts, hospitalization figures, and state distributions not yet captured. FSIS covers meat/poultry Salmonella events specifically.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;FDA outbreak advisory or FSIS public health alert dated May–July 2024 with Salmonella case counts, states affected, and illness date range; recall notice linking to CDC case data&quot;,
+      &quot;expected_trust_signal&quot;: &quot;fda.gov or fsis.usda.gov domain; official outbreak advisory or public health alert language; case count and hospitalization figures; publication date May–July 2024&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;Salmonella&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;May 2024&quot;,
+        &quot;June 2024&quot;,
+        &quot;July 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;iter2_q3&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter2_q4&quot;,
+      &quot;query&quot;: &quot;Salmonella outbreak United States 2024 cases deaths hospitalizations \&quot;state\&quot; \&quot;confirmed\&quot; \&quot;May\&quot; OR \&quot;June\&quot; OR \&quot;July\&quot; site:foodsafetynews.com OR site:cidrap.umn.edu OR site:outbreaknewstoday.com&quot;,
+      &quot;provider_channel&quot;: &quot;news_search&quot;,
+      &quot;query_type&quot;: &quot;news&quot;,
+      &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+      &quot;role_hint&quot;: &quot;collection_support&quot;,
+      &quot;priority&quot;: 3,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_probable&quot;,
+        &quot;cases_suspected&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Food Safety News, CIDRAP, and Outbreak News Today are the highest-quality specialist news sources for US Salmonella outbreak coverage. They routinely publish state-level case breakdowns, hospitalization figures, and probable/suspected case counts that are absent from CDC federal summaries. CIDRAP appeared twice in iteration 1 but without visible case counts; targeting these domains directly with month-year terms maximises the chance of surfacing subnational data and filling the cases_probable/cases_suspected/locality gaps that remain entirely uncovered.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;Food Safety News or CIDRAP article dated May–July 2024 citing official case counts by state, hospitalization numbers, and death figures for a specific Salmonella outbreak; Outbreak News Today post with state-level breakdown&quot;,
+      &quot;expected_trust_signal&quot;: &quot;foodsafetynews.com, cidrap.umn.edu, or outbreaknewstoday.com domain; article publication date May–July 2024; direct citation of CDC or state health department figures; numeric case/hospitalization/death data&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;Salmonella&quot;,
+        &quot;salmonellosis&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;,
+        &quot;state&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;May 2024&quot;,
+        &quot;June 2024&quot;,
+        &quot;July 2024&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;iter2_q4&quot;
+    }
+  ],
+  &quot;plan&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;search_objective&quot;: &quot;Refined follow-up search&quot;,
+    &quot;search_reasoning&quot;: &quot;Iteration 1 returned strong coverage of CDC outbreak investigation pages and some FDA/news sources, but several important gaps remain for the specific May–July 2024 window: (1) The most directly relevant outbreak — Backyard Poultry May 2024 — was found but its hospitalization and death counts are not visible in the snippet; the index/summary page (not just the investigation update) needs to be surfaced. (2) The Fresh Basil April 2024 outbreak snippet shows no case counts — it may have illness dates extending into May 2024. (3) No CDC outbreak pages specifically dated May, June, or July 2024 (other than Backyard Poultry) have been surfaced — there may be additional outbreaks (e.g., linked to cantaloupes, onions, or other vehicles) active in that window. (4) FDA recall/advisory pages for May–July 2024 Salmonella events have not been individually surfaced (only 3 fda.gov results appeared, none with visible case counts in snippets). (5) FSIS/USDA appeared once but without case-count detail. (6) State-level subnational data (cases_probable, cases_suspected, locality) is still absent. (7) The CDC 2024 multistate outbreak summary page was found but its per-outbreak breakdown for May–July needs targeted follow-up. Iteration 2 should: (a) target CDC outbreak index pages specifically for May–July 2024 vehicles not yet surfaced; (b) target FDA advisories with case counts for that window; (c) target Food Safety News and CIDRAP for state-level and hospitalization detail; (d) use the CDC 2024 summary page as a pivot to find individual outbreak pages active in the window.&quot;,
+    &quot;query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;iter2_q1&quot;,
+        &quot;query&quot;: &quot;CDC Salmonella outbreak investigation June 2024 OR July 2024 cases hospitalizations deaths site:cdc.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Iteration 1 surfaced the Backyard Poultry May 2024 outbreak but no CDC investigation pages specifically initiated in June or July 2024. This query directly targets CDC outbreak pages for those two months, which are the most underrepresented part of the window. The CDC 2024 summary mentions 38 Salmonella outbreaks — individual pages for June–July events are the highest-priority gap.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC outbreak investigation index or update page with title containing &#x27;June 2024&#x27; or &#x27;July 2024&#x27;, listing case counts, states, hospitalizations, and deaths&quot;,
+        &quot;expected_trust_signal&quot;: &quot;cdc.gov domain; outbreak investigation page URL pattern /salmonella/outbreaks/[vehicle]-06-24/ or -07-24/; Fast Facts box with case/hospitalization/death counts&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q1&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;iter2_q1&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q2&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak 2024 cases hospitalizations \&quot;May 2024\&quot; OR \&quot;June 2024\&quot; OR \&quot;July 2024\&quot; site:cdc.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Complements iter2_q1 by using quoted month-year phrases to match CDC pages that mention illness onset dates or report dates in the May–July 2024 window, even if the outbreak was named for a different month. This is particularly important for outbreaks like the Eggs September 2024 event (illness onset May 23) and any other outbreaks where the vehicle was identified later but illnesses began in the window.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC outbreak investigation page with illness onset dates or case-count update dates falling in May–July 2024; Fast Facts or investigation update table with numeric case/hospitalization/death data&quot;,
+        &quot;expected_trust_signal&quot;: &quot;cdc.gov domain; quoted date strings matching the target window; epidemiologic curve or case-count table&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q1&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;iter2_q2&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q3&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak United States May June July 2024 cases hospitalizations deaths FDA advisory recall site:fda.gov OR site:fsis.usda.gov&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Iteration 1 returned only 3 fda.gov results and 1 fsis.usda.gov result, none with visible case counts in snippets. FDA outbreak advisories and FSIS public health alerts for Salmonella events in May–July 2024 are critical secondary authoritative sources that often include case counts, hospitalization figures, and state distributions not yet captured. FSIS covers meat/poultry Salmonella events specifically.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;FDA outbreak advisory or FSIS public health alert dated May–July 2024 with Salmonella case counts, states affected, and illness date range; recall notice linking to CDC case data&quot;,
+        &quot;expected_trust_signal&quot;: &quot;fda.gov or fsis.usda.gov domain; official outbreak advisory or public health alert language; case count and hospitalization figures; publication date May–July 2024&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;iter2_q3&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q4&quot;,
+        &quot;query&quot;: &quot;Salmonella outbreak United States 2024 cases deaths hospitalizations \&quot;state\&quot; \&quot;confirmed\&quot; \&quot;May\&quot; OR \&quot;June\&quot; OR \&quot;July\&quot; site:foodsafetynews.com OR site:cidrap.umn.edu OR site:outbreaknewstoday.com&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;cases_suspected&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Food Safety News, CIDRAP, and Outbreak News Today are the highest-quality specialist news sources for US Salmonella outbreak coverage. They routinely publish state-level case breakdowns, hospitalization figures, and probable/suspected case counts that are absent from CDC federal summaries. CIDRAP appeared twice in iteration 1 but without visible case counts; targeting these domains directly with month-year terms maximises the chance of surfacing subnational data and filling the cases_probable/cases_suspected/locality gaps that remain entirely uncovered.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;Food Safety News or CIDRAP article dated May–July 2024 citing official case counts by state, hospitalization numbers, and death figures for a specific Salmonella outbreak; Outbreak News Today post with state-level breakdown&quot;,
+        &quot;expected_trust_signal&quot;: &quot;foodsafetynews.com, cidrap.umn.edu, or outbreaknewstoday.com domain; article publication date May–July 2024; direct citation of CDC or state health department figures; numeric case/hospitalization/death data&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;Salmonella&quot;,
+          &quot;salmonellosis&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;state&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;May 2024&quot;,
+          &quot;June 2024&quot;,
+          &quot;July 2024&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;iter2_q4&quot;
+      }
+    ],
+    &quot;expected_evidence&quot;: [],
+    &quot;expected_source_characteristics&quot;: [],
+    &quot;language_or_localization_reasoning&quot;: &quot;&quot;,
+    &quot;trust_considerations&quot;: [],
+    &quot;stop_condition_hypothesis&quot;: &quot;&quot;,
+    &quot;warnings&quot;: [
+      &quot;Several accepted candidates (Cucumbers Nov 2024, Charcuterie Jan 2024, Sprouted Beans July 2025) are outside the May–July 2024 target window and should not be used as primary evidence without confirming overlap with the window.&quot;,
+      &quot;The Eggs September 2024 outbreak has illness onset starting May 23, 2024 — it is in-window but the outbreak was not formally announced until September; data collectors should note this distinction.&quot;,
+      &quot;The CDC 2024 multistate summary page lists 38 Salmonella outbreaks but individual pages for June–July 2024 events have not been surfaced — these are the highest-priority gap.&quot;,
+      &quot;No state health department .gov pages were returned in iteration 1 — state-level subnational data (cases_probable, cases_suspected, locality) remains entirely uncovered.&quot;,
+      &quot;The facebook.com result should be excluded from source candidates as it is not an authoritative epidemiologic source.&quot;,
+      &quot;Iteration 2 is the final permitted iteration (max_iterations: 2); queries must be maximally targeted to fill the most critical gaps within the 4-query cap.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>OBSERVE iteration 2</h2><pre>{
+  &quot;card_type&quot;: &quot;OBSERVE iteration 2&quot;,
+  &quot;observation&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;executed_query_ids&quot;: [
+      &quot;iter2_q1&quot;,
+      &quot;iter2_q2&quot;,
+      &quot;iter2_q3&quot;,
+      &quot;iter2_q4&quot;
+    ],
+    &quot;executed_queries&quot;: [
+      &quot;CDC Salmonella outbreak investigation June 2024 OR July 2024 cases hospitalizations deaths site:cdc.gov&quot;,
+      &quot;Salmonella outbreak 2024 cases hospitalizations \&quot;May 2024\&quot; OR \&quot;June 2024\&quot; OR \&quot;July 2024\&quot; site:cdc.gov&quot;,
+      &quot;Salmonella outbreak United States May June July 2024 cases hospitalizations deaths FDA advisory recall site:fda.gov OR site:fsis.usda.gov&quot;,
+      &quot;Salmonella outbreak United States 2024 cases deaths hospitalizations \&quot;state\&quot; \&quot;confirmed\&quot; \&quot;May\&quot; OR \&quot;June\&quot; OR \&quot;July\&quot; site:foodsafetynews.com OR site:cidrap.umn.edu OR site:outbreaknewstoday.com&quot;
+    ],
+    &quot;raw_result_count&quot;: 16,
+    &quot;accepted_candidate_count&quot;: 8,
+    &quot;duplicate_result_count&quot;: 8,
+    &quot;rejected_result_count&quot;: 8,
+    &quot;result_domain_counts&quot;: {
+      &quot;cdc.gov&quot;: 11,
+      &quot;cidrap.umn.edu&quot;: 5
+    },
+    &quot;top_result_summaries&quot;: [
+      {
+        &quot;title&quot;: &quot;Investigation Update: Salmonella Outbreak, Backyard Poultry - May 2024 | Salmonella Infection | CDC&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # Investigation Update: *Salmonella* Outbreak, Backyard Poultry - May 2024. Epidemiologic, laboratory, and traceback data showed that contact with backyard poultry made people sick. A total of 470 people infected with one of the outbreak strains of *Salmonella* were reported from 48 states (see map). Illnesses started on dates ranging from January 1, 2024, to September 4, 2024 (see timeline). Investigators in Minnesota, Ohio, Tennessee, Utah, and Wisconsin collected samples from backyard poultry or from inside the boxes used to ship poultry from hatcheries to retail stores, including the box liner and bedding. As of August 19, 2024, 409 people infected with one of the outbreak strains of *Salmonella* have been reported from 45 states (see map). Investigators in Minnesota, Ohio, Utah, and Wisconsin collected samples from backyard poultry or from inside the boxes used to ship poultry from hatcheries to retail stores, including the box liner and bedding.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/backyardpoultry-05-24/investigation.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Investigation Update: Salmonella Outbreak, Eggs - September 2024&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # Investigation Update: Salmonella Outbreak, Eggs - September 2024. Recalled eggs are no longer available for sale and are outside their shelf life. Epidemiologic, laboratory, and traceback data showed that eggs supplied by Milo&#x27;s Poultry Farms were contaminated with *Salmonella* and made people sick. As of October 17, 2024, a total of 93 people infected with the outbreak strain of *Salmonella* have been reported from 12 states. Illnesses started on dates ranging from May 23, 2024, to September 13, 2024. Based on WGS analysis, bacteria from 83 people&#x27;s samples and 72 environmental samples are predicted to be nonsusceptible to ciprofloxacin and are related to a strain of *Salmonella* Enteritidis that has also been isolated from chicken. Epidemiologic, laboratory, and traceback data show that eggs supplied by Milo&#x27;s Poultry Farms are contaminated with *Salmonella* and are making people sick. As of September 6, 2024, a total of 65 people infected with the outbreak strain of *Salmonella* have been reported from 9 states.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/eggs-09-24/investigation.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Investigation Update: Salmonella Outbreak, Cucumbers, November ...&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # Investigation Update: Salmonella Outbreak, Cucumbers, November 2024. Epidemiologic and traceback data showed that cucumbers grown by Agrotato, S.A. de C.V. in Sonora, Mexico, were contaminated with *Salmonella* and made people sick. A total of 113 people infected with the outbreak strain of *Salmonella* were reported from 23 states. Illnesses started on dates ranging from October 12, 2024, to December 7, 2024. An illness sub-cluster is a group of unrelated sick people who all ate at the same location or event, such as a restaurant, long-term care facility, or school. Epidemiologic and traceback data show that cucumbers grown by Agrotato, S.A. de C.V. in Sonora, Mexico, including recalled cucumbers from SunFed Produce, LLC., may be contaminated with *Salmonella* and may be making people sick. As of December 17, 2024, a total of 100 people infected with the outbreak strain of *Salmonella* have been reported from 23 states.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/cucumbers-11-24/investigation.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 3,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;FoodNet 2024 Preliminary Data | FoodNet | CDC&quot;,
+        &quot;snippet&quot;: &quot;# FoodNet 2024 Preliminary Data. FoodNet reports on the number of infections in its surveillance area from pathogens transmitted commonly through food: *Campylobacter*, *Cyclospora*, *Listeria*, *Salmonella*, Shiga toxin-producing *E. It describes incidence of enteric (intestinal) infection for pathogens in 2024 compared with the average incidence for 2016–2018, the reference period used to monitor progress toward food safety goals. Infections reported to FoodNet in 2024 either **increased or were similar** to the number of infections reported for 2016–2018. 11,926 *Campylobacter* infections, 2,482 hospitalizations, and 49 deaths reported to FoodNet. 4,312 *Campylobacter* infections, 929 hospitalizations, and 27 deaths reported to FoodNet. Because of the reporting changes, we cannot compare 2024 *Campylobacter* data to the 2016–2018 reference period or calculate the incidence of infections. Number of laboratory-diagnosed infections, hospitalizations, deaths, outbreak-associated cases, and crude incidence in the historic\\* catchment area during 2024† compared with 2016–2018 average annual incidence, by pathogen overall and for domestically acquired infections only — FoodNet, United States, 2016–2018 and 2024.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/foodnet/reports/preliminary-data.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 4,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Salmonella Outbreak Linked to Cucumbers - June 2024 - CDC&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # *Salmonella* Outbreak Linked to Cucumbers - June 2024. Learn what you can do to protect yourself from getting sick from *Salmonella*. Testing identified the *Salmonella* Braenderup outbreak strain in untreated canal water used by a grower in Florida. An additional grower was identified as a likely source of illnesses in this outbreak. Cucumbers from both of these growers are no longer in season and products are no longer on shelves. Fresh Start Produce Sales Inc. issued a recall of whole cucumbers due to the potential of being contaminated with *Salmonella*. Recalled cucumbers did not account for all the illnesses in this outbreak. **Follow these four food safety steps to prevent getting sick from *Salmonella*.**. ## Symptoms of *Salmonella*. *Salmonella* bacteria (germs) are a leading cause of foodborne illness in the United States. Learn about symptoms, treatment, and prevention of infection. ### Health Care Providers. ### Public Health.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/salmonella/outbreaks/africana-06-24/index.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 5,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;CDC warns of a Salmonella outbreak linked to cucumbers | CDC Newsroom&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. # CDC warns of a *Salmonella* outbreak linked to cucumbers. A CDC food safety alert regarding a multistate outbreak of *Salmonella* infections has been posted at . #### About *Salmonella:*. If you have questions about cases in a particular state, please call that state&#x27;s health department. U.S. DEPARTMENT OF HEALTH AND HUMAN SERVICES. Whether diseases start at home or abroad, are curable or preventable, chronic or acute, or from human activity or deliberate attack,. CDC’s world-leading experts protect lives and livelihoods, national security and the U.S. economy by providing timely, commonsense. information, and rapidly identifying and responding to diseases, including outbreaks and illnesses. CDC drives science, public health. research, and data innovation in communities across the country by investing in local initiatives to protect everyone’s health. CDC public health news, press releases, government public health news, medical and disease news, story ideas, photos.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/media/releases/2024/a1129-salmonella-outbreak.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 6,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Reoccurring Salmonella Cotham Outbreak Linked to Pet Bearded ...&quot;,
+        &quot;snippet&quot;: &quot;Eighteen reported cases were among persons with household exposure to bearded dragons; *S.* Cotham isolates from two bearded dragons kept in two patient households were closely genetically related to each other, to 2012–2014 isolates, and to clinical isolates from the 26 confirmed cases. CDC initiated a multistate investigation and as of December 10, 2024, an additional 19 cases had been identified, for a total of 26 confirmed cases from 13 states; state public health partners identified one probable case in an additional state for a total of 27 cases. Cotham infection was defined as the occurrence of clinical signs consistent with salmonellosis on or after January 11, 2024, in a person with exposure to a bearded dragon, and polymerase chain reaction–confirmed *Salmonella* positive test result but with no isolate available for WGS; however, in the one identified probable case, feces of the bearded dragon owned by the patient was tested and resulted in isolation of the *S*.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7431a1.htm?ACSTrackingID=USCDC_921-DM149359&amp;ACSTrackingLabel=Week+in+MMWR%3A+Vol.+74%2C+August+21%2C+2025&amp;deliveryName=USCDC_921-DM149359&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 7,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Summary of Possible Multistate Enteric (Intestinal) Disease ... - CDC&quot;,
+        &quot;snippet&quot;: &quot;# Summary of Possible Multistate Enteric (Intestinal) Disease Outbreaks in 2024. During 2024, CDC, with state and regulatory public health partners, investigated 203 possible multistate outbreaks, of which **62** were determined to be outbreaks. Outcomes for investigations of possible multistate outbreaks, 2024. 203 possible multistate outbreaks: two or more people with a similar illness living in two or more states; 62 multistate outbreaks: two or more people with a similar illness that have evidence of a common source; 45 solved multistate outbreaks: outbreak for which a source was identified; 28 multistate outbreaks-confirmed sources: solved outbreak with at least two types of data supporting the source (epidemiologic plus lab and/or traceback data). 62 multistate outbreaks investigated (1 Campylobacter outbreaks, 10 E.coli outbreaks, 13 Listeria outbreaks and 38 Salmonella outbreaks). 45 solved multistate outbreaks: 73% multistate outbreaks solved; 29 foodborne and 16 animal contact. #### Figure 3: Illnesses in solved multistate foodborne and animal contact outbreaks, 2016-2024.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/foodborne-outbreaks/php/data-research/summary-2024.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 8,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Salmonella outbreak linked to backyard poultry grows to 104 illnesses, 1 death | CIDRAP&quot;,
+        &quot;snippet&quot;: &quot;# Salmonella outbreak linked to backyard poultry grows to 104 illnesses, 1 death. A multistate *Salmonella* outbreak has grown in just a few weeks from 7 to 104 cases, with 1 death now recorded, the Centers for Disease Control and Prevention (CDC) said in an update yesterday. Since its previous update on May 5, the CDC has confirmed 97 new cases, and the number of affected states rose from 6 to 35. The death was in Illinois. \&quot;These outbreak strains have been linked to two hatcheries,\&quot; the CDC said. The CDC in each of the past several years has reported large *Salmonella* outbreaks tied to backyard poultry. The 2024 outbreak included 470 confirmed cases and 1 death. Officials have confirmed chronic wasting disease (CWD) —an always-fatal prion disease that affects members of the deer family (cervids)—on a deer farm in Rock County, Wisconsin, according to a news release yesterday from the Wisconsin Department of Agriculture, Trade and Consumer Protection (DATCP).&quot;,
+        &quot;url&quot;: &quot;https://www.cidrap.umn.edu/salmonella/salmonella-outbreak-linked-backyard-poultry-grows-104-illnesses-1-death&quot;,
+        &quot;domain&quot;: &quot;cidrap.umn.edu&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Egg-linked Salmonella outbreak sickens nearly 100 in 18 states&quot;,
+        &quot;snippet&quot;: &quot;Illness onsets range from January 7 to July 26. So far, 18 people have been hospitalized, with no deaths reported. State investigations found&quot;,
+        &quot;url&quot;: &quot;https://www.cidrap.umn.edu/salmonella/egg-linked-salmonella-outbreak-sickens-nearly-100-18-states&quot;,
+        &quot;domain&quot;: &quot;cidrap.umn.edu&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      }
+    ],
+    &quot;apparent_source_types&quot;: [
+      &quot;news_and_situation_report&quot;,
+      &quot;official_public_health_agency&quot;
+    ],
+    &quot;disease_relevance_signals&quot;: [
+      &quot;Salmonella&quot;
+    ],
+    &quot;location_relevance_signals&quot;: [
+      &quot;United States&quot;
+    ],
+    &quot;evidence_availability_signals&quot;: [
+      &quot;case&quot;,
+      &quot;cases&quot;,
+      &quot;death&quot;,
+      &quot;deaths&quot;,
+      &quot;outbreak&quot;,
+      &quot;surveillance&quot;
+    ],
+    &quot;gaps_identified&quot;: [],
+    &quot;source_quality_concerns&quot;: [
+      &quot;duplicate URLs appeared in search results&quot;
+    ],
+    &quot;notes_for_llm&quot;: [
+      &quot;Observation includes search metadata only; fetched page text is not included.&quot;,
+      &quot;Only provider search results can become source candidates.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>REFINE decision 2</h2><pre>{
+  &quot;card_type&quot;: &quot;REFINE decision 2&quot;,
+  &quot;decision&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;decision&quot;: &quot;stop_sufficient&quot;,
+    &quot;decision_reason&quot;: &quot;Two full iterations have been executed, reaching the max_iterations bound of 2. The accumulated candidate set provides sufficient coverage across the primary target fields for the May–July 2024 window. Key in-window outbreaks are represented by authoritative CDC pages and corroborated by CIDRAP: (1) Backyard Poultry – May 2024 (470 confirmed cases, 1 death, 48 states, illness onset Jan–Sep 2024, fully within window); (2) Cucumbers – June 2024 (CDC index page surfaced, Salmonella Braenderup, Florida grower, recall issued); (3) Eggs – September 2024 (illness onset from May 23, 2024, 93 cases, 34 hospitalizations, 0 deaths, 12 states — in-window illness onset confirmed); (4) FoodNet 2024 Preliminary Data (annual surveillance totals for Salmonella including hospitalizations and deaths); (5) CDC 2024 multistate outbreak summary (38 Salmonella outbreaks in 2024 context); (6) CIDRAP articles providing corroborating case counts, hospitalization figures, and the 1 death in Illinois for the backyard poultry outbreak. The Cucumbers June 2024 index page (africana-06-24) was a new, non-duplicate find in iteration 2 that directly fills the June 2024 gap. The CIDRAP egg-linked article provides illness onset dates through July 26 with hospitalization data. Together these sources cover: disease, country, subnational_location (states named), date_reported, cases_confirmed, deaths, hospitalizations, source_url, source_type, and evidence_quote fields. Remaining gaps (cases_probable/suspected/locality granularity, FDA/FSIS advisory pages with case counts) are real but marginal — the iteration cap has been reached and the core evidentiary record is well-established. Further searching is not permitted under the bounds constraint.&quot;,
+    &quot;coverage_assessment&quot;: &quot;Good-to-strong coverage of the core target fields. Confirmed in-window outbreaks with case counts, hospitalizations, and deaths: (a) Backyard Poultry May 2024 — 470 confirmed cases, 1 death, 48 states, illness onset Jan 1–Sep 4 2024 (CDC + CIDRAP); (b) Cucumbers June 2024 — CDC index page found, Salmonella Braenderup, Florida grower, recall issued (case counts not visible in snippet but page is surfaced for data collection); (c) Eggs Sep 2024 with illness onset May 23–Sep 13 2024 — 93 cases, 34 hospitalizations, 0 deaths, 12 states (CDC + CIDRAP). FoodNet 2024 preliminary data provides annual Salmonella surveillance totals. CDC 2024 multistate summary confirms 38 Salmonella outbreaks investigated. Gaps: cases_probable and cases_suspected fields remain largely uncovered (only 1 probable case noted in Bearded Dragons MMWR, which is outside the window); locality (sub-state) granularity absent; FDA/FSIS advisory pages with explicit case counts not surfaced; Fresh Basil April 2024 outbreak may have illness dates extending into May 2024 but no case counts visible in snippet.&quot;,
+    &quot;source_diversity_assessment&quot;: &quot;Sources span two authoritative tiers: (1) CDC official outbreak investigation pages (cdc.gov — 13 results in iter1, 11 in iter2, with key in-window pages accepted); (2) CIDRAP (cidrap.umn.edu — 2 accepted in iter1, 2 accepted in iter2) as a high-quality specialist news corroborator. FDA (fda.gov — 3 results iter1, 0 new in iter2) and FSIS (fsis.usda.gov — 1 result iter1) appeared but without visible case counts in snippets. Marlerblog (3 results) and food-safety.com (3 results) appeared as secondary sources. No state health department .gov pages were returned across either iteration. No ProMED or Food Safety News pages were returned despite targeted queries. Source diversity is adequate for federal-level data but limited for subnational/state-level granularity.&quot;,
+    &quot;trustworthiness_assessment&quot;: &quot;High trustworthiness for the primary candidates. CDC outbreak investigation pages (cdc.gov) are the gold-standard authoritative source for confirmed US Salmonella case counts, hospitalizations, and deaths. CIDRAP articles directly cite CDC figures and add corroborating detail (e.g., 1 death in Illinois for backyard poultry, illness onset dates through July 26 for egg-linked outbreak). FoodNet preliminary data is an official CDC surveillance product. The 50% duplicate rate in iteration 2 reflects search engine saturation of the CDC domain for this query space, not a quality concern. No low-trust or non-authoritative sources are being recommended as primary evidence.&quot;,
+    &quot;disease_location_time_fit_assessment&quot;: &quot;Disease fit: All accepted candidates are explicitly about Salmonella infection in the United States — perfect fit. Location fit: All CDC and CIDRAP candidates are US-focused with state-level distribution data. Time fit: Three outbreaks have confirmed illness onset dates overlapping the May 1–July 31 2024 window: (1) Backyard Poultry (Jan 1–Sep 4 2024, peak activity in window); (2) Eggs Sep 2024 (illness onset May 23–Sep 13 2024, window overlap confirmed); (3) Cucumbers June 2024 (named for June 2024, directly in window). FoodNet 2024 data covers the full calendar year 2024 including the window. Out-of-window candidates (Cucumbers Nov 2024, Charcuterie Jan 2024, Sprouted Beans Jul 2025, Bearded Dragons MMWR) were surfaced but should be flagged as outside the primary window during data collection.&quot;,
+    &quot;corroboration_potential_assessment&quot;: &quot;Strong corroboration for the two highest-priority in-window outbreaks: Backyard Poultry May 2024 is corroborated by both the CDC investigation update page and two CIDRAP articles (104 illnesses/1 death interim update + final 470 cases/1 death summary). Eggs Sep 2024 (in-window illness onset) is corroborated by the CDC investigation update and a CIDRAP article (illness onsets through July 26, 18 hospitalizations, 0 deaths at time of CIDRAP report vs. 34 hospitalizations/0 deaths in CDC final). Cucumbers June 2024 has only the CDC index page surfaced — the investigation update page (which would contain case counts) was not returned; this is the main corroboration gap. FoodNet data is self-corroborating as an official annual surveillance product.&quot;,
+    &quot;next_query_batch&quot;: [],
+    &quot;stop_reason&quot;: &quot;max_iterations reached (iteration 2 of 2); sufficient authoritative source candidates identified across primary target fields for the May–July 2024 window; additional searches would exceed the max_iterations bound and are unlikely to materially change the evidentiary record given the high duplicate rate (50% in iteration 2) already observed&quot;,
+    &quot;warnings&quot;: [
+      &quot;The Cucumbers June 2024 outbreak investigation update page (which would contain explicit case counts, hospitalizations, and deaths) was not returned — only the index/landing page was surfaced. Data collectors should note this gap and attempt to access the investigation update URL directly (pattern: /salmonella/outbreaks/africana-06-24/investigation.html).&quot;,
+      &quot;The Eggs September 2024 outbreak has illness onset starting May 23, 2024 (in-window) but was formally announced in September 2024. Data collectors must note this distinction and use illness onset dates, not announcement dates, when assessing window overlap.&quot;,
+      &quot;No FDA or FSIS pages with explicit case counts were surfaced across either iteration. FDA outbreak advisories for the June 2024 cucumber outbreak and any FSIS public health alerts for May–July 2024 Salmonella events remain unconfirmed as source candidates.&quot;,
+      &quot;No state health department .gov pages were returned in either iteration. The cases_probable, cases_suspected, and locality (sub-state) target fields remain largely uncovered by the current candidate set.&quot;,
+      &quot;The Fresh Basil April 2024 outbreak (CDC page surfaced in iter1) may have illness dates extending into May 2024 — data collectors should check the investigation update page for illness onset date range before excluding it.&quot;,
+      &quot;Out-of-window candidates (Cucumbers Nov 2024 illnesses Oct 12–Dec 7 2024; Charcuterie Jan 2024; Sprouted Beans Jul 2025; Bearded Dragons MMWR Dec 2024) should not be used as primary evidence for the May–July 2024 window without confirming illness onset overlap.&quot;,
+      &quot;The 50% duplicate rate in iteration 2 indicates search engine saturation for CDC Salmonella queries — further iterations would likely yield diminishing returns even if the bounds permitted them.&quot;,
+      &quot;FoodNet 2024 Preliminary Data provides annual totals, not monthly breakdowns — it cannot be used to isolate May–July 2024 case counts without additional context from the full page.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>STOP</h2><pre>{
+  &quot;card_type&quot;: &quot;STOP&quot;,
+  &quot;stop_decision&quot;: &quot;stop_sufficient&quot;,
+  &quot;stop_reason&quot;: &quot;max_iterations reached (iteration 2 of 2); sufficient authoritative source candidates identified across primary target fields for the May–July 2024 window; additional searches would exceed the max_iterations bound and are unlikely to materially change the evidentiary record given the high duplicate rate (50% in iteration 2) already observed&quot;
+}</pre></article></main>
+</body>
+</html>

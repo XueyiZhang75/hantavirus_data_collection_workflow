@@ -1,0 +1,1439 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agentic Search Timeline</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Agentic Search Timeline</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><article class='card'><h2>PLAN</h2><pre>{
+  &quot;card_type&quot;: &quot;PLAN&quot;,
+  &quot;title&quot;: &quot;Search plan&quot;,
+  &quot;summary&quot;: {
+    &quot;planned_query_count&quot;: 10,
+    &quot;iterative_search_enabled&quot;: true
+  }
+}</pre></article><article class='card'><h2>SEARCH iteration 1</h2><pre>{
+  &quot;card_type&quot;: &quot;SEARCH iteration 1&quot;,
+  &quot;queries&quot;: [
+    {
+      &quot;query_id&quot;: &quot;iter1_q1&quot;,
+      &quot;query&quot;: &quot;CDC measles cases United States 2025 outbreak surveillance confirmed&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_probable&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Targets the CDC&#x27;s own measles surveillance or outbreak tracker for 2025. CDC is the primary national authority for confirmed and probable case counts, deaths, and hospitalizations in the US. Removing the rigid exact-phrase wrapper improves recall against CDC page titles and headings that use natural language. Expected to surface the CDC 2025 measles cases page or MMWR outbreak reports.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;CDC.gov measles surveillance page, MMWR report, or CDC outbreak investigation update with case count table&quot;,
+      &quot;expected_trust_signal&quot;: &quot;cdc.gov domain, official CDC authorship, tabular case data with confirmed/probable breakdown&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;measles&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;,
+        &quot;US&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2025&quot;,
+        &quot;Q1 2025&quot;,
+        &quot;January 2025&quot;,
+        &quot;February 2025&quot;,
+        &quot;March 2025&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;iter1_q1&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter1_q2&quot;,
+      &quot;query&quot;: &quot;measles outbreak 2025 state health department cases confirmed deaths United States&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 2,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_suspected&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Measles in the US manifests as localized outbreaks investigated by state or local health departments. This query targets state-level official reports that carry subnational_location and locality data — fields that CDC national summaries may not fully disaggregate. Broad enough to surface multiple states (e.g., Texas, Ohio, Florida) that may have reported outbreaks in Q1 2025.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;State health department press release, outbreak investigation page, or situation report naming specific counties or communities with case counts&quot;,
+      &quot;expected_trust_signal&quot;: &quot;State .gov domain (e.g., dshs.texas.gov, odh.ohio.gov), official press release language, named outbreak investigation&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;measles&quot;,
+        &quot;measles outbreak&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;,
+        &quot;state&quot;,
+        &quot;county&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2025&quot;,
+        &quot;January 2025&quot;,
+        &quot;February 2025&quot;,
+        &quot;March 2025&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;iter1_q2&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter1_q3&quot;,
+      &quot;query&quot;: &quot;WHO PAHO measles United States 2025 cases situation report outbreak news&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;domain_limited&quot;,
+      &quot;source_type&quot;: &quot;international_organization_report&quot;,
+      &quot;role_hint&quot;: &quot;validation&quot;,
+      &quot;priority&quot;: 3,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_probable&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;WHO Disease Outbreak News and PAHO epidemiological alerts independently report on US measles activity and provide cross-validated case totals. These sources often include cumulative figures, case classification breakdowns, and context on vaccination status — useful for validating CDC numbers and filling deaths/hospitalizations fields. Refined from upstream q_exec_003/004 to use natural phrasing and include both WHO and PAHO.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;WHO Disease Outbreak News entry or PAHO epidemiological alert for measles in the Americas/United States in 2025&quot;,
+      &quot;expected_trust_signal&quot;: &quot;who.int or paho.org domain, official situation report format, case count table with date range&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;measles&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;,
+        &quot;Americas&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2025&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;iter1_q3&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter1_q4&quot;,
+      &quot;query&quot;: &quot;measles outbreak United States 2025 cases deaths hospitalizations January February March&quot;,
+      &quot;provider_channel&quot;: &quot;news_search&quot;,
+      &quot;query_type&quot;: &quot;news&quot;,
+      &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+      &quot;role_hint&quot;: &quot;collection_support&quot;,
+      &quot;priority&quot;: 4,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_unspecified&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;News coverage of US measles outbreaks in Q1 2025 provides timely locality detail, hospitalization narratives, and dates that official pages may lag. Including &#x27;hospitalizations&#x27; and month names improves recall for articles covering specific outbreak events. Refined from upstream q_exec_009/010 to remove the non-functional embedded date-range string and add hospitalization as a term. Established health-beat outlets (AP, Reuters, NPR, STAT News) typically cite official figures directly, making them useful secondary sources for evidence_quote extraction.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;News article from AP, Reuters, NPR, STAT News, or local outlet reporting on a specific US measles outbreak with case counts and location details&quot;,
+      &quot;expected_trust_signal&quot;: &quot;Named journalist, citation of CDC or state health department as source, specific case count with date&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;measles&quot;,
+        &quot;measles outbreak&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;,
+        &quot;US&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2025&quot;,
+        &quot;January 2025&quot;,
+        &quot;February 2025&quot;,
+        &quot;March 2025&quot;
+      ],
+      &quot;is_follow_up_query&quot;: false,
+      &quot;previous_iteration_basis&quot;: null,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+      &quot;iteration_index&quot;: 1,
+      &quot;iterative_query_id&quot;: &quot;iter1_q4&quot;
+    }
+  ],
+  &quot;plan&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;search_objective&quot;: &quot;Identify authoritative sources reporting measles cases, deaths, hospitalizations, and subnational locations in the United States for the period 2025-01-01 to 2025-03-31, covering CDC surveillance, state/local health departments, WHO/PAHO international reports, and news coverage of outbreaks.&quot;,
+    &quot;search_reasoning&quot;: &quot;The upstream plan covers the right source-type spectrum (official agency, international org, structured database, literature, news) but uses overly rigid quoted-phrase constructions that may suppress relevant results (e.g., CDC pages that say \&quot;measles\&quot; and \&quot;2025\&quot; without the exact phrase \&quot;measles cases United States 2025\&quot;). For iteration 1 we have a budget of 4 queries. Priority order: (1) CDC official surveillance page — highest authority, most likely to carry confirmed case counts, subnational breakdowns, and hospitalization data; (2) state-level health department outbreak reports — measles in the US is typically reported as discrete outbreaks in specific states, so state-level queries are essential for subnational_location and locality fields; (3) WHO/PAHO international situation reports — cross-validates US figures and may carry cumulative totals; (4) news/media — useful for dates, locality detail, and hospitalization narratives that official pages may lag. Exact-phrase queries from the upstream plan are refined to remove the redundant date-range string embedded in the query text (search engines do not parse \&quot;2025-01-01-2025-03-31\&quot; as a date filter) and to use more natural, discoverable phrasing. Language is English only; no localization needed for the US context.&quot;,
+    &quot;query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;iter1_q1&quot;,
+        &quot;query&quot;: &quot;CDC measles cases United States 2025 outbreak surveillance confirmed&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Targets the CDC&#x27;s own measles surveillance or outbreak tracker for 2025. CDC is the primary national authority for confirmed and probable case counts, deaths, and hospitalizations in the US. Removing the rigid exact-phrase wrapper improves recall against CDC page titles and headings that use natural language. Expected to surface the CDC 2025 measles cases page or MMWR outbreak reports.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;CDC.gov measles surveillance page, MMWR report, or CDC outbreak investigation update with case count table&quot;,
+        &quot;expected_trust_signal&quot;: &quot;cdc.gov domain, official CDC authorship, tabular case data with confirmed/probable breakdown&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;US&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;Q1 2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;iter1_q1&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter1_q2&quot;,
+        &quot;query&quot;: &quot;measles outbreak 2025 state health department cases confirmed deaths United States&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_suspected&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Measles in the US manifests as localized outbreaks investigated by state or local health departments. This query targets state-level official reports that carry subnational_location and locality data — fields that CDC national summaries may not fully disaggregate. Broad enough to surface multiple states (e.g., Texas, Ohio, Florida) that may have reported outbreaks in Q1 2025.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;State health department press release, outbreak investigation page, or situation report naming specific counties or communities with case counts&quot;,
+        &quot;expected_trust_signal&quot;: &quot;State .gov domain (e.g., dshs.texas.gov, odh.ohio.gov), official press release language, named outbreak investigation&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;measles outbreak&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;state&quot;,
+          &quot;county&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;iter1_q2&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter1_q3&quot;,
+        &quot;query&quot;: &quot;WHO PAHO measles United States 2025 cases situation report outbreak news&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;domain_limited&quot;,
+        &quot;source_type&quot;: &quot;international_organization_report&quot;,
+        &quot;role_hint&quot;: &quot;validation&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;WHO Disease Outbreak News and PAHO epidemiological alerts independently report on US measles activity and provide cross-validated case totals. These sources often include cumulative figures, case classification breakdowns, and context on vaccination status — useful for validating CDC numbers and filling deaths/hospitalizations fields. Refined from upstream q_exec_003/004 to use natural phrasing and include both WHO and PAHO.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;WHO Disease Outbreak News entry or PAHO epidemiological alert for measles in the Americas/United States in 2025&quot;,
+        &quot;expected_trust_signal&quot;: &quot;who.int or paho.org domain, official situation report format, case count table with date range&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;Americas&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;iter1_q3&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter1_q4&quot;,
+        &quot;query&quot;: &quot;measles outbreak United States 2025 cases deaths hospitalizations January February March&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 4,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_unspecified&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;News coverage of US measles outbreaks in Q1 2025 provides timely locality detail, hospitalization narratives, and dates that official pages may lag. Including &#x27;hospitalizations&#x27; and month names improves recall for articles covering specific outbreak events. Refined from upstream q_exec_009/010 to remove the non-functional embedded date-range string and add hospitalization as a term. Established health-beat outlets (AP, Reuters, NPR, STAT News) typically cite official figures directly, making them useful secondary sources for evidence_quote extraction.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;News article from AP, Reuters, NPR, STAT News, or local outlet reporting on a specific US measles outbreak with case counts and location details&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Named journalist, citation of CDC or state health department as source, specific case count with date&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;measles outbreak&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;US&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: false,
+        &quot;previous_iteration_basis&quot;: null,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_initial_search_plan&quot;,
+        &quot;iteration_index&quot;: 1,
+        &quot;iterative_query_id&quot;: &quot;iter1_q4&quot;
+      }
+    ],
+    &quot;expected_evidence&quot;: [
+      &quot;CDC measles case count table or tracker for 2025 with confirmed/probable case totals&quot;,
+      &quot;State health department outbreak investigation reports naming specific counties or communities&quot;,
+      &quot;WHO or PAHO situation report citing US measles case numbers for Q1 2025&quot;,
+      &quot;News articles quoting official case counts, deaths, or hospitalizations with dates and locations&quot;
+    ],
+    &quot;expected_source_characteristics&quot;: [
+      &quot;Official CDC .gov surveillance or outbreak page updated in 2025&quot;,
+      &quot;State health department press releases or outbreak pages (e.g., Texas DSHS, Ohio ODH)&quot;,
+      &quot;WHO Disease Outbreak News or PAHO epidemiological alert referencing the United States&quot;,
+      &quot;Established health-beat news outlets (AP, Reuters, NPR, STAT News) citing official figures&quot;
+    ],
+    &quot;language_or_localization_reasoning&quot;: &quot;All authoritative US public health reporting on measles is in English. No Spanish, French, or other language queries are needed for the United States national scope. State-level reports from Puerto Rico or other territories would be in English as well.&quot;,
+    &quot;trust_considerations&quot;: [
+      &quot;CDC and state health department pages are primary authoritative sources; prioritize for cases_confirmed and deaths fields&quot;,
+      &quot;WHO/PAHO reports provide cross-validated international perspective but may lag by weeks&quot;,
+      &quot;News articles are useful for locality and hospitalization narrative but must be traced back to an official source for numeric fields&quot;,
+      &quot;Peer-reviewed literature is unlikely to cover Q1 2025 events within the same quarter; deprioritized for iteration 1&quot;,
+      &quot;Structured databases (e.g., HealthMap, ProMED) may aggregate but should be treated as secondary validators&quot;
+    ],
+    &quot;stop_condition_hypothesis&quot;: &quot;Iteration 1 is insufficient on its own because no results have been retrieved yet. A second iteration will be needed if subnational/locality granularity or hospitalization data remain uncovered after reviewing iteration-1 results.&quot;,
+    &quot;warnings&quot;: [
+      &quot;Exact-phrase queries with embedded date strings (e.g., &#x27;2025-01-01-2025-03-31&#x27;) are unlikely to match real page text and have been removed from query bodies&quot;,
+      &quot;Measles in the US is reported as discrete outbreaks, not a continuous national count; state-specific queries are essential for subnational_location coverage&quot;,
+      &quot;CDC may publish a single rolling 2025 measles tracker page rather than separate reports per outbreak — a direct CDC site query is the most efficient path&quot;,
+      &quot;Q1 2025 peer-reviewed literature is unlikely to exist within the collection window; literature queries are deferred to iteration 2 if needed&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>OBSERVE iteration 1</h2><pre>{
+  &quot;card_type&quot;: &quot;OBSERVE iteration 1&quot;,
+  &quot;observation&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;executed_query_ids&quot;: [
+      &quot;iter1_q1&quot;,
+      &quot;iter1_q2&quot;,
+      &quot;iter1_q3&quot;,
+      &quot;iter1_q4&quot;
+    ],
+    &quot;executed_queries&quot;: [
+      &quot;CDC measles cases United States 2025 outbreak surveillance confirmed&quot;,
+      &quot;measles outbreak 2025 state health department cases confirmed deaths United States&quot;,
+      &quot;WHO PAHO measles United States 2025 cases situation report outbreak news&quot;,
+      &quot;measles outbreak United States 2025 cases deaths hospitalizations January February March&quot;
+    ],
+    &quot;raw_result_count&quot;: 32,
+    &quot;accepted_candidate_count&quot;: 25,
+    &quot;duplicate_result_count&quot;: 7,
+    &quot;rejected_result_count&quot;: 7,
+    &quot;result_domain_counts&quot;: {
+      &quot;cidrap.umn.edu&quot;: 3,
+      &quot;cdc.gov&quot;: 5,
+      &quot;publications.aap.org&quot;: 2,
+      &quot;youtube.com&quot;: 2,
+      &quot;publichealth.jhu.edu&quot;: 3,
+      &quot;libguides.mskcc.org&quot;: 2,
+      &quot;en.wikipedia.org&quot;: 2,
+      &quot;dshs.texas.gov&quot;: 1,
+      &quot;contagionlive.com&quot;: 1,
+      &quot;dph.sc.gov&quot;: 1,
+      &quot;arcgis.com&quot;: 1,
+      &quot;paho.org&quot;: 2,
+      &quot;who.int&quot;: 2,
+      &quot;abc7news.com&quot;: 1,
+      &quot;reliefweb.int&quot;: 1,
+      &quot;forbes.com&quot;: 1,
+      &quot;naccho.org&quot;: 1,
+      &quot;pmc.ncbi.nlm.nih.gov&quot;: 1
+    },
+    &quot;top_result_summaries&quot;: [
+      {
+        &quot;title&quot;: &quot;CDC confirms 23 more US measles cases as 2025 total tops 1,500 | CIDRAP&quot;,
+        &quot;snippet&quot;: &quot;# CDC confirms 23 more US measles cases as 2025 total tops 1,500. In its weekly measles update, the Centers for Disease Control and Prevention (CDC) said there are now 1,514 confirmed measles cases in the United States reported this year, with 23 new cases reported in the past week. Eighty-six percent of the cases have been part of 40 outbreaks reported to the CDC. Of note, 92% of case-patients are unvaccinated or have unknown vaccination status, 4% have only one measles, mumps, and rubella dose, and 4% were fully vaccinated. Georgia&#x27;s health department reported three more measles infections with links to its most recent case; two patients were unvaccinated and one had an unknown vaccination status. Eleven new Ebola virus cases have been added to the outbreak in the Democratic Republic of the Congo (DRC) in the past week, pushing the case total to 57, including 35 deaths, for a death rate of 61.4%, the World Health Organization (WHO) reported yesterday.&quot;,
+        &quot;url&quot;: &quot;https://www.cidrap.umn.edu/measles/cdc-confirms-23-more-us-measles-cases-2025-total-tops-1500&quot;,
+        &quot;domain&quot;: &quot;cidrap.umn.edu&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Expanding Measles Outbreak in the United States and Guidance for ...&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. # Expanding Measles Outbreak in the United States and Guidance for the Upcoming Travel Season. This is an official CDC health advisory. The Centers for Disease Control and Prevention (CDC) is issuing this Health Alert Network (HAN) Health Advisory to notify clinicians, public health officials, and potential travelers about a measles outbreak in Texas and New Mexico and offer guidance for prevention and monitoring. As of March 7, 2025, Texas and New Mexico have reported 208 confirmed cases associated with this outbreak (198 in Texas and 10 in New Mexico). With spring and summer travel season approaching in the United States, CDC emphasizes the important role that clinicians and public health officials play in preventing the spread of measles. The risk for widespread measles in the United States remains low due to robust U.S. immunization and surveillance programs and outbreak response capacity supported by federal, state, tribal, local, and territorial health partners.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/han/php/notices/han00522.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Measles Update — United States, January 1–April 17, 2025 | MMWR&quot;,
+        &quot;snippet&quot;: &quot;Although measles was declared eliminated in the United States in 2000, large outbreaks with 50 or more cases have become more frequent, especially in close-knit communities with low vaccination coverage. During January 1–April 17, 2025, a total of 800 measles cases were reported in the United States, the second highest annual case count in 25 years; 82% were associated with an ongoing outbreak in close-knit communities with low vaccination coverage in New Mexico, Oklahoma, and Texas. As of April 17, a total of 800 cases have been reported in the United States in 2025; 654 (82%) cases in New Mexico, Oklahoma, and Texas have been associated with the ongoing outbreak. Overall, 771 (96%) patients have been unvaccinated or had unknown vaccination status (77% were unvaccinated, and 14% had unknown vaccination status when excluding 590 cases reported by Texas, which requires explicit consent by law [i.e., opt-in] to enroll in the Texas Immunization Registry), 85 (11%) patients have been hospitalized, and three patients have died.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/74/wr/mm7414a1.htm&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 3,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Red Book Online Outbreaks: Measles - AAP Publications&quot;,
+        &quot;snippet&quot;: &quot;Measles Cases in 2025 and 2026. As of June 18, 2026, 2,104 confirmed measles cases were reported in the United States in 2026.&quot;,
+        &quot;url&quot;: &quot;https://publications.aap.org/redbook/resources/15187/Red-Book-Online-Outbreaks-Measles&quot;,
+        &quot;domain&quot;: &quot;publications.aap.org&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 4,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Clinician Update on Measles Cases and Outbreaks in the United States - Sept 11 2025&quot;,
+        &quot;snippet&quot;: &quot;[57:35 NOFO CK26-0107: Building Partnerships for Prevention of Emerging &amp; Reemerging Infectious Diseases Centers for Disease Control and Prevention (CDC)230 views • 2 days ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=eYDFp3ZUd3c)[1:33:16 CDC Public Health Grand Rounds: Measuring Vaccine Effectiveness Centers for Disease Control and Prevention (CDC)2.6K views • Streamed 2 weeks ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=T9bAlDKcr8o)[6:43:20 Advisory Committee on Immunization Practices (ACIP) - September 18, 2025 - Day 1 of 2 Centers for Disease Control and Prevention (CDC)52K views • Streamed 9 months ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=-6uBNXsYRHQ)[26:37 Mantoux Tuberculin Skin Test Video Centers for Disease Control and Prevention (CDC)313K views • 3 years ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=Qzt-qGgglo0)[8:03 Antimicrobial Resistance and Public Health What You Need to Know Centers for Disease Control and Prevention (CDC)2.4K views • 1 month ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=h3RXhHAeo-8)[18:44 Radiation Basics Made Simple Segment 1: Sources of Radiation Centers for Disease Control and Prevention (CDC)61K views • 1 year ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=AXu1bMaX3l0)[55:24 Introduction to Epidemiology Centers for Disease Control and Prevention (CDC)434K views • 9 years ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=4oaQUAnA6nY)[52:06 Introduction to Public Health Centers for Disease Control and Prevention (CDC)712K views • 10 years ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=-dmJSLNgjxo)[17:03 Vessel Sanitation Program: Protecting Public Health on Cruise Ships Since 1975 Centers for Disease Control and Prevention (CDC)362 views • 9 days ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=dzYS6gvStAM)[6:02 Practical Modeling Concepts for Public Health: Risk Assessments Example (audio description)Centers for Disease Control and Prevention (CDC)258 views • 2 weeks ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=s9tt3NT6Pbg)[5:20 Practical Modeling Concepts for Public Health: Nowcasts (audio description)Centers for Disease Control and Prevention (CDC)201 views • 2 weeks ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=7Ji8u0SP0-E)[2:50 Practical Modeling Concepts for Public Health: Scenario models Centers for Disease Control and Prevention (CDC)193 views • 2 weeks ago Live Playlist ()Mix (50+)](https://www.youtube.com/watch?v=yt6MFXLUHR0). ### [Practical Modeling Concepts for Public Health: Short-term forecasts](https://www.youtube.com/watch?v=ZMVyY8d1F-s&amp;pp=ugUHEgVlbi1VUw%3D%3D).&quot;,
+        &quot;url&quot;: &quot;https://www.youtube.com/watch?v=oW__IShdZws&quot;,
+        &quot;domain&quot;: &quot;youtube.com&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 5,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;U.S. Measles Tracker | International Vaccine Access Center&quot;,
+        &quot;snippet&quot;: &quot;[Skip to main content](https://publichealth.jhu.edu/ivac/resources/us-measles-tracker#main-content). [Skip Section Navigation](https://publichealth.jhu.edu/ivac/resources/us-measles-tracker#page-content). [In this section](https://publichealth.jhu.edu/ivac/resources/us-measles-tracker#). *   [Expand](https://publichealth.jhu.edu/ivac/resources/us-measles-tracker#)[Reports](https://publichealth.jhu.edu/ivac/resources/reports). [](https://publichealth.jhu.edu/ivac/resources/us-measles-tracker). &gt; * The data presented in the maps are compiled from official sources, including state and county health departments and additional county-level news releases or news articles, and represent laboratory-confirmed measles cases reported by public health authorities since January 1, 2025. The cumulative cases map includes measles cases reported for each county in the United States since January 1, 2025, revealing the relative scale of the outbreaks across states. &gt; * The data presented in the table are compiled from official sources, including state and county health departments and additional county-level news releases or news articles, and represents laboratory-confirmed measles cases reported by public health authorities since January 1, 2025. Additional details on dates for cases reported after January 1, 2025 are available in the [Github repository](https://github.com/CSSEGISandData/measles_data \&quot;(opens in a new window)\&quot;).&quot;,
+        &quot;url&quot;: &quot;https://publichealth.jhu.edu/ivac/resources/us-measles-tracker&quot;,
+        &quot;domain&quot;: &quot;publichealth.jhu.edu&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 6,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Measles Cases and Outbreaks&quot;,
+        &quot;snippet&quot;: &quot;[Here&#x27;s how you know](https://www.cdc.gov/measles/data-research/index.html#gov-notice). *   [Cases and Outbreaks](https://www.cdc.gov/measles/data-research/index.html). [_search_](https://www.cdc.gov/measles/data-research/index.html#). *   [Cases and Outbreaks](https://www.cdc.gov/measles/data-research/index.html). [](https://www.cdc.gov/measles/data-research/index.html \&quot;Measles cases in 2026\&quot;). [](https://www.cdc.gov/measles/data-research/index.html \&quot;Weekly measles cases by rash onset date\&quot;). [](https://www.cdc.gov/measles/data-research/index.html \&quot;Map of measles cases among U.S. residents\&quot;). [](https://www.cdc.gov/measles/data-research/index.html \&quot;Yearly measles cases\&quot;). [](https://www.cdc.gov/measles/data-research/index.html \&quot;MMR vaccine coverage for kindergarteners by school year (2009–2025)\&quot;). [](https://www.cdc.gov/measles/data-research/index.html \&quot;What to know about measles cases &amp;amp; outbreak data\&quot;). [Expand All](https://www.cdc.gov/measles/data-research/index.html#). [](https://www.cdc.gov/measles/data-research/index.html \&quot;History of measles cases\&quot;). [](https://www.cdc.gov/measles/data-research/index.html \&quot;Previous years\&quot;). [Expand All](https://www.cdc.gov/measles/data-research/index.html#). *   [National Update on Measles Cases and Outbreaks — United States, January 1–October 1, 2019](https://www.cdc.gov/mmwr/volumes/68/wr/mm6840e2.htm). *   [Notes from the Field: Measles Outbreaks from Imported Cases in Orthodox Jewish Communities — New York and New Jersey, 2018–2019](https://www.cdc.gov/mmwr/volumes/68/wr/mm6819a4.htm). [](https://www.cdc.gov/measles/data-research/index.html \&quot;Learn more\&quot;). [](https://www.cdc.gov/measles/data-research/index.html \&quot;Release Notes\&quot;). [Expand All](https://www.cdc.gov/measles/data-research/index.html#). *   [Measles cases in 2026](https://www.cdc.gov/measles/data-research/index.html#cdc_data_surveillance_section_10-measles-cases-in-2026 \&quot;Measles cases in 2026\&quot;). *   [Yearly measles cases](https://www.cdc.gov/measles/data-research/index.html#cdc_data_surveillance_section_5-yearly-measles-cases \&quot;Yearly measles cases\&quot;). *   [What to know about measles cases &amp; outbreak data](https://www.cdc.gov/measles/data-research/index.html#cdc_data_surveillance_section_12-what-to-know-about-measles-cases-outbreak-data \&quot;What to know about measles cases &amp; outbreak data\&quot;). *   [Cases and Outbreaks](https://www.cdc.gov/measles/data-research/index.html). [Contact Us](https://www.cdc.gov/measles/data-research/index.html#contactUs). [Policies](https://www.cdc.gov/measles/data-research/index.html#policies). [Languages](https://www.cdc.gov/measles/data-research/index.html#languages). [](https://www.cdc.gov/measles/data-research/index.html# \&quot;Go to top\&quot;).&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/measles/data-research/index.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 7,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Global Measles Outbreaks - CDC&quot;,
+        &quot;snippet&quot;: &quot;A **.gov** website belongs to an official government organization in the United States. A **lock** (  ) or **https://** means you&#x27;ve safely connected to the .gov website. # Global Measles Outbreaks. Although measles was declared eliminated in the United States in 2000, measles cases and outbreaks continue to occur in the United States due to unvaccinated international travelers. Large measles outbreaks are possible when travel-related measles cases reach at-risk U.S. populations with low immunization against measles. In 2019, the U.S. nearly lost its elimination status with almost 1,300 measles cases from a large outbreak in New York and cases in 30 additional states. After a decrease in global measles incidence during the COVID-19 pandemic, measles activity globally and in the United States continues to rise. This table is based on provisional monthly surveillance data reported to the World Health Organization (Geneva) as of June 2026. Measles outbreaks worldwide, data and statistics, plus the work we do on these vaccine-preventable diseases to help global health security.&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/global-measles-vaccination/data-research/global-measles-outbreaks/index.html&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 8,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Public Health: U.S. Measles Outbreak 2025 - MSK Library Guides&quot;,
+        &quot;snippet&quot;: &quot;# Public Health: U.S. Measles Outbreak 2025. ## Measles Cases 2025. ##### Measles Cases in the United States, 2025. ###### **Confirmed Measles Cases**. | **Month** | **State (County/City)** | **Cases** | **Details** |. |  | Texas (Harris/Houston) | 2 | Unvaccinated adults, same household, international travel, |. |  | Texas (Gaines/Lubbock) | 2 | Unvaccinated, school-age children, both hospitalized |. |  | Texas (Rockwall) | 1 | Unvaccinated adult with recent international travel; case not believed to be linked to West Texas outbreak. |  | Texas (Travis) | 1 | Unvaccinated infant with recent international travel. |  | Maryland (Howard) | 1 | A confirmed case of measles was reported in Baltimore of a Howard County child with recent international travel. | **March 11, 2025** | The Oklahoma State Department of Health (OSDH) reports that two confirmed measles cases in the state are linked to the West Texas outbreak after exposure to known cases.&quot;,
+        &quot;url&quot;: &quot;https://libguides.mskcc.org/publichealth/measles2025&quot;,
+        &quot;domain&quot;: &quot;libguides.mskcc.org&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;2025 Southwest United States measles outbreak - Wikipedia&quot;,
+        &quot;snippet&quot;: &quot;# 2025 Southwest United States measles outbreak. | 2025–26 United States measles outbreak | |. | Location | United States (Texas, New Mexico, Oklahoma, Kansas), Mexico (Chihuahua \&quot;Chihuahua (state)\&quot;)) |. In January 2025, cases of measles began to appear in Texas and neighboring states in the United States. The outbreak became one of the largest in the country since 2000, when the United States declared the disease eliminated in the country. In March, cases linked to the outbreak were announced in Oklahoma, the Mexican state of Chihuahua \&quot;Chihuahua (state)\&quot;), and Kansas. Cases were concentrated in the Texas Mennonite community, and officials believed the disease was first imported from an outbreak in a Mennonite community in Ontario, Canada. More than 99 individuals were hospitalized, and three died: two children in Lubbock (a six-year-old and an eight-year-old) and an adult in Lea County, New Mexico. The Texas outbreak involved the measles genotype D8, and was linked to cases in New Mexico, Kansas, Oklahoma, and Chihuahua, Mexico \&quot;Chihuahua (state)\&quot;).&quot;,
+        &quot;url&quot;: &quot;https://en.wikipedia.org/wiki/2025_Southwest_United_States_measles_outbreak&quot;,
+        &quot;domain&quot;: &quot;en.wikipedia.org&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      }
+    ],
+    &quot;apparent_source_types&quot;: [
+      &quot;international_organization_report&quot;,
+      &quot;news_and_situation_report&quot;,
+      &quot;official_public_health_agency&quot;
+    ],
+    &quot;disease_relevance_signals&quot;: [
+      &quot;Measles&quot;
+    ],
+    &quot;location_relevance_signals&quot;: [
+      &quot;United States&quot;
+    ],
+    &quot;evidence_availability_signals&quot;: [
+      &quot;case&quot;,
+      &quot;cases&quot;,
+      &quot;death&quot;,
+      &quot;deaths&quot;,
+      &quot;outbreak&quot;,
+      &quot;surveillance&quot;
+    ],
+    &quot;gaps_identified&quot;: [],
+    &quot;source_quality_concerns&quot;: [
+      &quot;duplicate URLs appeared in search results&quot;
+    ],
+    &quot;notes_for_llm&quot;: [
+      &quot;Observation includes search metadata only; fetched page text is not included.&quot;,
+      &quot;Only provider search results can become source candidates.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>REFINE decision 1</h2><pre>{
+  &quot;card_type&quot;: &quot;REFINE decision 1&quot;,
+  &quot;decision&quot;: {
+    &quot;iteration_index&quot;: 1,
+    &quot;decision&quot;: &quot;continue_search&quot;,
+    &quot;decision_reason&quot;: &quot;Iteration 1 produced strong national-level coverage (CDC HAN advisory, MMWR update, CDC surveillance page, CIDRAP weekly updates, JHU tracker, Wikipedia outbreak article, MSK library guide with county-level detail) and confirmed the primary outbreak locus (Texas/New Mexico/Oklahoma/Kansas Mennonite community). However, several target fields remain underserved by the current candidate set: (1) subnational_location and locality granularity for states beyond Texas — Oklahoma, New Mexico, Kansas, and other states with smaller clusters are represented only in passing; (2) state-level official press releases for Oklahoma (OSDH), New Mexico (NMDOH), and Kansas (KDHE) that would carry authoritative confirmed case counts and dates for those jurisdictions; (3) the Texas DSHS appeared only once and its snippet did not carry Q1 2025 case-count tables; (4) PAHO and WHO appeared (2 results each) but their snippets did not confirm Q1-specific case totals for the US; (5) hospitalization data at the subnational level is absent beyond the MMWR aggregate (85 hospitalized through April 17); (6) the deaths field (3 deaths: 2 children in Lubbock, 1 adult in Lea County, NM) needs corroboration from state-level official sources. A second iteration targeting these specific gaps — state health department pages for TX/NM/OK/KS, PAHO Q1 situation report, and MMWR/CDC early-2025 weekly reports — will materially improve subnational_location, locality, date_reported, deaths, and hospitalizations field coverage within the Q1 2025 window. Budget allows one more iteration (max 4 queries).&quot;,
+    &quot;coverage_assessment&quot;: &quot;National-level case counts and the dominant Southwest outbreak are well-covered. CDC HAN advisory (March 7, 2025: 208 confirmed in TX+NM), MMWR (800 cases through April 17, 85 hospitalized, 3 deaths), and CIDRAP weekly updates provide strong national anchors. Subnational coverage is partial: Texas DSHS appeared once without a detailed snippet; Oklahoma, New Mexico, and Kansas state-level official pages are absent from the candidate set. The MSK library guide provides useful county-level detail (Harris/Houston, Gaines/Lubbock, Rockwall, Travis in TX; Howard County MD; Oklahoma March 11 link) but is a secondary aggregator, not a primary state agency source. Deaths (3) and hospitalizations (85+) are confirmed at national level but not corroborated by state-level official sources for the Q1 window specifically.&quot;,
+    &quot;source_diversity_assessment&quot;: &quot;Good diversity across source types: CDC official (5 results), CIDRAP (3), JHU IVAC tracker (3), Wikipedia (2), MSK library guide (2), AAP (2), PAHO (2), WHO (2), Texas DSHS (1), SC DPH (1), news outlets (abc7, forbes, contagionlive, reliefweb). Missing: Oklahoma OSDH, New Mexico DOH, Kansas KDHE, and New Mexico Lea County-specific official pages. PAHO/WHO snippets did not surface Q1-specific US situation reports. ProMED and HealthMap (structured databases) are absent but lower priority given strong official coverage.&quot;,
+    &quot;trustworthiness_assessment&quot;: &quot;High-trust sources dominate: CDC.gov (5 results including HAN advisory and MMWR), CIDRAP (peer-reviewed public health news citing CDC), JHU IVAC (academic tracker citing official sources). Wikipedia is useful for narrative context but not for numeric field extraction. MSK library guide is a secondary aggregator — useful for locality detail but must be traced to primary sources. AAP Red Book snippet references 2026 data and is out of scope for Q1 2025. YouTube result is not extractable. No low-credibility or fringe sources detected.&quot;,
+    &quot;disease_location_time_fit_assessment&quot;: &quot;Disease fit: Excellent — all accepted results are measles-specific. Location fit: Good nationally; partial subnationally (TX dominant, NM/OK/KS underrepresented in official sources). Time fit: Partial — MMWR covers Jan 1–Apr 17 (extends beyond Q1 but includes Q1 data); CDC HAN advisory is dated March 7, 2025 (within Q1); CIDRAP result references 1,514 cases (a later cumulative figure beyond Q1). Need to surface sources specifically reporting Q1 2025 (Jan–Mar) case counts and dates, particularly early outbreak reports from January–February 2025 for Texas and the initial Oklahoma/NM case announcements.&quot;,
+    &quot;corroboration_potential_assessment&quot;: &quot;The 3 deaths (2 Lubbock children, 1 Lea County NM adult) appear in Wikipedia and MMWR snippets but need corroboration from Texas DSHS and New Mexico DOH official pages. The 85 hospitalization figure from MMWR needs state-level corroboration. The March 7 CDC HAN figure of 208 confirmed (198 TX, 10 NM) is a strong anchor for Q1 but needs Texas DSHS and NMDOH press releases to confirm at the state level. Oklahoma&#x27;s March 11 link to West Texas outbreak (2 cases per MSK guide) needs OSDH corroboration.&quot;,
+    &quot;next_query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;iter2_q1&quot;,
+        &quot;query&quot;: &quot;Texas DSHS measles outbreak 2025 confirmed cases Gaines County Lubbock deaths January February March&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_rationale&quot;: &quot;Texas DSHS is the primary state authority for the dominant Q1 2025 outbreak. The iteration-1 Texas DSHS result (dshs.texas.gov, 1 result) did not surface a detailed snippet with case counts or dates. This query targets DSHS press releases and outbreak investigation pages for Gaines County and Lubbock — the epicenter of the outbreak and site of 2 of the 3 deaths. Including month names improves recall for early-outbreak announcements in January–February 2025.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;Texas DSHS press release or outbreak investigation page with confirmed case count, county-level breakdown, and death/hospitalization data for Q1 2025&quot;,
+        &quot;expected_trust_signal&quot;: &quot;dshs.texas.gov domain, official press release language, named county, specific case count with date&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;measles outbreak&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;Texas&quot;,
+          &quot;Gaines County&quot;,
+          &quot;Lubbock&quot;,
+          &quot;West Texas&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q1 and iter1_q2 — Texas DSHS appeared once without detailed snippet; deaths in Lubbock need state-level corroboration&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q2&quot;,
+        &quot;query&quot;: &quot;New Mexico Department of Health measles 2025 confirmed cases Lea County deaths Oklahoma Kansas outbreak&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_rationale&quot;: &quot;New Mexico DOH and Oklahoma OSDH are the two other primary state authorities for the Southwest outbreak. The Lea County NM adult death needs NMDOH corroboration. Oklahoma&#x27;s March 11 link (2 cases) needs OSDH press release confirmation. Kansas KDHE may have issued a press release for cases linked to the outbreak. Combining these in one query maximizes recall for the multi-state outbreak&#x27;s subnational_location and locality fields within the Q1 window.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;New Mexico DOH or Oklahoma OSDH press release or situation update naming Lea County NM death, confirmed case counts, and dates in Q1 2025; Kansas KDHE outbreak notice&quot;,
+        &quot;expected_trust_signal&quot;: &quot;nmhealth.org, health.ok.gov, or kdhe.ks.gov domain; official press release language; named county; specific case count with date&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;measles outbreak&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New Mexico&quot;,
+          &quot;Lea County&quot;,
+          &quot;Oklahoma&quot;,
+          &quot;Kansas&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q2 — NM/OK/KS state-level official pages absent from iteration-1 candidate set; Lea County death and Oklahoma March 11 cases need state-level corroboration&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q3&quot;,
+        &quot;query&quot;: &quot;PAHO PAHO/WHO measles Americas United States situation report epidemiological update January March 2025&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_rationale&quot;: &quot;PAHO appeared twice in iteration 1 but snippets did not confirm Q1-specific US case totals. PAHO publishes epidemiological alerts and situation reports for the Americas that independently validate CDC figures and may carry cumulative Q1 2025 US case counts, deaths, and hospitalization data. Refining the query to include &#x27;epidemiological update&#x27; and month names improves recall for PAHO&#x27;s structured report format.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;PAHO epidemiological alert or situation report for measles in the Americas referencing US Q1 2025 case counts, deaths, and hospitalizations&quot;,
+        &quot;expected_trust_signal&quot;: &quot;paho.org domain, official PAHO situation report format, case count table with date range covering January–March 2025&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;sarampión&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;Americas&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q3 — PAHO appeared twice but Q1-specific US situation report not confirmed in snippets&quot;,
+        &quot;query_type&quot;: &quot;domain_limited&quot;,
+        &quot;source_type&quot;: &quot;international_organization_report&quot;,
+        &quot;role_hint&quot;: &quot;validation&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q4&quot;,
+        &quot;query&quot;: &quot;measles Texas New Mexico outbreak January 2025 first cases Mennonite community Gaines County hospitalized children&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_rationale&quot;: &quot;The earliest Q1 2025 outbreak reports (January–early February) from Texas are underrepresented in the current candidate set. News articles covering the initial Gaines County/Mennonite community cases in January 2025 will provide date_reported, locality, and early case-count data that official pages may have since rolled into cumulative totals. Including &#x27;hospitalized children&#x27; targets articles covering the Lubbock hospitalizations and deaths that occurred in Q1. AP, Reuters, Texas Tribune, and local Lubbock outlets are likely sources.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;News article from AP, Reuters, Texas Tribune, or Lubbock Avalanche-Journal reporting on the initial January 2025 Gaines County measles cases with dates, case counts, and hospitalization/death details&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Named journalist, citation of Texas DSHS or CDC as source, specific case count with date in January or February 2025&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;measles outbreak&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;Texas&quot;,
+          &quot;Gaines County&quot;,
+          &quot;Lubbock&quot;,
+          &quot;New Mexico&quot;,
+          &quot;Mennonite&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q4 — early January–February 2025 outbreak onset dates and initial case counts for Gaines County not captured in iteration-1 news results&quot;,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 4,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_unspecified&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ]
+      }
+    ],
+    &quot;stop_reason&quot;: null,
+    &quot;warnings&quot;: [
+      &quot;The MMWR result (mm7414a1.htm) covers January 1–April 17, 2025 — it extends beyond the Q1 2025 window (ending March 31). Numeric fields extracted from this source must be annotated as covering a period that partially exceeds the task window; only Q1-specific figures should be attributed to the Jan 1–Mar 31 period.&quot;,
+      &quot;The CIDRAP result referencing 1,514 total 2025 cases is clearly beyond Q1 2025 and should not be used for Q1 case-count fields without a specific Q1 sub-total.&quot;,
+      &quot;AAP Red Book snippet references 2026 data (2,104 cases as of June 18, 2026) — this result is out of scope for Q1 2025 and should be excluded from field extraction.&quot;,
+      &quot;YouTube result (rank 5) is a video and cannot be used for evidence_quote extraction; it should be deprioritized or excluded.&quot;,
+      &quot;Wikipedia is useful for narrative context and locality identification but numeric fields extracted from it must be traced to primary sources before being used in confirmed/deaths/hospitalizations fields.&quot;,
+      &quot;Duplicate URLs (7 detected) suggest some queries returned overlapping result sets; iteration-2 queries are differentiated by state-specific and time-specific terms to reduce duplication.&quot;,
+      &quot;Max iterations is 2 and max total queries is 10; this iteration uses 4 queries, bringing the total to 8, within bounds.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>SEARCH iteration 2</h2><pre>{
+  &quot;card_type&quot;: &quot;SEARCH iteration 2&quot;,
+  &quot;queries&quot;: [
+    {
+      &quot;query_id&quot;: &quot;iter2_q1&quot;,
+      &quot;query&quot;: &quot;Texas DSHS measles outbreak 2025 confirmed cases Gaines County Lubbock deaths January February March&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 1,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;Texas DSHS is the primary state authority for the dominant Q1 2025 outbreak. The iteration-1 Texas DSHS result (dshs.texas.gov, 1 result) did not surface a detailed snippet with case counts or dates. This query targets DSHS press releases and outbreak investigation pages for Gaines County and Lubbock — the epicenter of the outbreak and site of 2 of the 3 deaths. Including month names improves recall for early-outbreak announcements in January–February 2025.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;Texas DSHS press release or outbreak investigation page with confirmed case count, county-level breakdown, and death/hospitalization data for Q1 2025&quot;,
+      &quot;expected_trust_signal&quot;: &quot;dshs.texas.gov domain, official press release language, named county, specific case count with date&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;measles&quot;,
+        &quot;measles outbreak&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;Texas&quot;,
+        &quot;Gaines County&quot;,
+        &quot;Lubbock&quot;,
+        &quot;West Texas&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2025&quot;,
+        &quot;January 2025&quot;,
+        &quot;February 2025&quot;,
+        &quot;March 2025&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;iter1_q1 and iter1_q2 — Texas DSHS appeared once without detailed snippet; deaths in Lubbock need state-level corroboration&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;iter2_q1&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter2_q2&quot;,
+      &quot;query&quot;: &quot;New Mexico Department of Health measles 2025 confirmed cases Lea County deaths Oklahoma Kansas outbreak&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;official_site&quot;,
+      &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+      &quot;role_hint&quot;: &quot;collection&quot;,
+      &quot;priority&quot;: 2,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;New Mexico DOH and Oklahoma OSDH are the two other primary state authorities for the Southwest outbreak. The Lea County NM adult death needs NMDOH corroboration. Oklahoma&#x27;s March 11 link (2 cases) needs OSDH press release confirmation. Kansas KDHE may have issued a press release for cases linked to the outbreak. Combining these in one query maximizes recall for the multi-state outbreak&#x27;s subnational_location and locality fields within the Q1 window.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;New Mexico DOH or Oklahoma OSDH press release or situation update naming Lea County NM death, confirmed case counts, and dates in Q1 2025; Kansas KDHE outbreak notice&quot;,
+      &quot;expected_trust_signal&quot;: &quot;nmhealth.org, health.ok.gov, or kdhe.ks.gov domain; official press release language; named county; specific case count with date&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;measles&quot;,
+        &quot;measles outbreak&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;New Mexico&quot;,
+        &quot;Lea County&quot;,
+        &quot;Oklahoma&quot;,
+        &quot;Kansas&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2025&quot;,
+        &quot;January 2025&quot;,
+        &quot;February 2025&quot;,
+        &quot;March 2025&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;iter1_q2 — NM/OK/KS state-level official pages absent from iteration-1 candidate set; Lea County death and Oklahoma March 11 cases need state-level corroboration&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;iter2_q2&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter2_q3&quot;,
+      &quot;query&quot;: &quot;PAHO PAHO/WHO measles Americas United States situation report epidemiological update January March 2025&quot;,
+      &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+      &quot;query_type&quot;: &quot;domain_limited&quot;,
+      &quot;source_type&quot;: &quot;international_organization_report&quot;,
+      &quot;role_hint&quot;: &quot;validation&quot;,
+      &quot;priority&quot;: 3,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_probable&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;PAHO appeared twice in iteration 1 but snippets did not confirm Q1-specific US case totals. PAHO publishes epidemiological alerts and situation reports for the Americas that independently validate CDC figures and may carry cumulative Q1 2025 US case counts, deaths, and hospitalization data. Refining the query to include &#x27;epidemiological update&#x27; and month names improves recall for PAHO&#x27;s structured report format.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;PAHO epidemiological alert or situation report for measles in the Americas referencing US Q1 2025 case counts, deaths, and hospitalizations&quot;,
+      &quot;expected_trust_signal&quot;: &quot;paho.org domain, official PAHO situation report format, case count table with date range covering January–March 2025&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;measles&quot;,
+        &quot;sarampión&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;United States&quot;,
+        &quot;Americas&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;2025&quot;,
+        &quot;January 2025&quot;,
+        &quot;February 2025&quot;,
+        &quot;March 2025&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;iter1_q3 — PAHO appeared twice but Q1-specific US situation report not confirmed in snippets&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;iter2_q3&quot;
+    },
+    {
+      &quot;query_id&quot;: &quot;iter2_q4&quot;,
+      &quot;query&quot;: &quot;measles Texas New Mexico outbreak January 2025 first cases Mennonite community Gaines County hospitalized children&quot;,
+      &quot;provider_channel&quot;: &quot;news_search&quot;,
+      &quot;query_type&quot;: &quot;news&quot;,
+      &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+      &quot;role_hint&quot;: &quot;collection_support&quot;,
+      &quot;priority&quot;: 4,
+      &quot;expected_fields&quot;: [
+        &quot;disease&quot;,
+        &quot;country&quot;,
+        &quot;subnational_location&quot;,
+        &quot;locality&quot;,
+        &quot;date_reported&quot;,
+        &quot;cases_confirmed&quot;,
+        &quot;cases_unspecified&quot;,
+        &quot;deaths&quot;,
+        &quot;hospitalizations&quot;,
+        &quot;source_url&quot;,
+        &quot;source_type&quot;,
+        &quot;evidence_quote&quot;
+      ],
+      &quot;query_rationale&quot;: &quot;The earliest Q1 2025 outbreak reports (January–early February) from Texas are underrepresented in the current candidate set. News articles covering the initial Gaines County/Mennonite community cases in January 2025 will provide date_reported, locality, and early case-count data that official pages may have since rolled into cumulative totals. Including &#x27;hospitalized children&#x27; targets articles covering the Lubbock hospitalizations and deaths that occurred in Q1. AP, Reuters, Texas Tribune, and local Lubbock outlets are likely sources.&quot;,
+      &quot;expected_source_type_or_evidence&quot;: &quot;News article from AP, Reuters, Texas Tribune, or Lubbock Avalanche-Journal reporting on the initial January 2025 Gaines County measles cases with dates, case counts, and hospitalization/death details&quot;,
+      &quot;expected_trust_signal&quot;: &quot;Named journalist, citation of Texas DSHS or CDC as source, specific case count with date in January or February 2025&quot;,
+      &quot;language&quot;: &quot;en&quot;,
+      &quot;target_disease_terms&quot;: [
+        &quot;measles&quot;,
+        &quot;measles outbreak&quot;
+      ],
+      &quot;target_location_terms&quot;: [
+        &quot;Texas&quot;,
+        &quot;Gaines County&quot;,
+        &quot;Lubbock&quot;,
+        &quot;New Mexico&quot;,
+        &quot;Mennonite&quot;
+      ],
+      &quot;time_terms&quot;: [
+        &quot;January 2025&quot;,
+        &quot;February 2025&quot;,
+        &quot;2025&quot;
+      ],
+      &quot;is_follow_up_query&quot;: true,
+      &quot;previous_iteration_basis&quot;: &quot;iter1_q4 — early January–February 2025 outbreak onset dates and initial case counts for Gaines County not captured in iteration-1 news results&quot;,
+      &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+      &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+      &quot;iteration_index&quot;: 2,
+      &quot;iterative_query_id&quot;: &quot;iter2_q4&quot;
+    }
+  ],
+  &quot;plan&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;search_objective&quot;: &quot;Refined follow-up search&quot;,
+    &quot;search_reasoning&quot;: &quot;Iteration 1 produced strong national-level coverage (CDC HAN advisory, MMWR update, CDC surveillance page, CIDRAP weekly updates, JHU tracker, Wikipedia outbreak article, MSK library guide with county-level detail) and confirmed the primary outbreak locus (Texas/New Mexico/Oklahoma/Kansas Mennonite community). However, several target fields remain underserved by the current candidate set: (1) subnational_location and locality granularity for states beyond Texas — Oklahoma, New Mexico, Kansas, and other states with smaller clusters are represented only in passing; (2) state-level official press releases for Oklahoma (OSDH), New Mexico (NMDOH), and Kansas (KDHE) that would carry authoritative confirmed case counts and dates for those jurisdictions; (3) the Texas DSHS appeared only once and its snippet did not carry Q1 2025 case-count tables; (4) PAHO and WHO appeared (2 results each) but their snippets did not confirm Q1-specific case totals for the US; (5) hospitalization data at the subnational level is absent beyond the MMWR aggregate (85 hospitalized through April 17); (6) the deaths field (3 deaths: 2 children in Lubbock, 1 adult in Lea County, NM) needs corroboration from state-level official sources. A second iteration targeting these specific gaps — state health department pages for TX/NM/OK/KS, PAHO Q1 situation report, and MMWR/CDC early-2025 weekly reports — will materially improve subnational_location, locality, date_reported, deaths, and hospitalizations field coverage within the Q1 2025 window. Budget allows one more iteration (max 4 queries).&quot;,
+    &quot;query_batch&quot;: [
+      {
+        &quot;query_id&quot;: &quot;iter2_q1&quot;,
+        &quot;query&quot;: &quot;Texas DSHS measles outbreak 2025 confirmed cases Gaines County Lubbock deaths January February March&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 1,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;Texas DSHS is the primary state authority for the dominant Q1 2025 outbreak. The iteration-1 Texas DSHS result (dshs.texas.gov, 1 result) did not surface a detailed snippet with case counts or dates. This query targets DSHS press releases and outbreak investigation pages for Gaines County and Lubbock — the epicenter of the outbreak and site of 2 of the 3 deaths. Including month names improves recall for early-outbreak announcements in January–February 2025.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;Texas DSHS press release or outbreak investigation page with confirmed case count, county-level breakdown, and death/hospitalization data for Q1 2025&quot;,
+        &quot;expected_trust_signal&quot;: &quot;dshs.texas.gov domain, official press release language, named county, specific case count with date&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;measles outbreak&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;Texas&quot;,
+          &quot;Gaines County&quot;,
+          &quot;Lubbock&quot;,
+          &quot;West Texas&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q1 and iter1_q2 — Texas DSHS appeared once without detailed snippet; deaths in Lubbock need state-level corroboration&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;iter2_q1&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q2&quot;,
+        &quot;query&quot;: &quot;New Mexico Department of Health measles 2025 confirmed cases Lea County deaths Oklahoma Kansas outbreak&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;official_site&quot;,
+        &quot;source_type&quot;: &quot;official_public_health_agency&quot;,
+        &quot;role_hint&quot;: &quot;collection&quot;,
+        &quot;priority&quot;: 2,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;New Mexico DOH and Oklahoma OSDH are the two other primary state authorities for the Southwest outbreak. The Lea County NM adult death needs NMDOH corroboration. Oklahoma&#x27;s March 11 link (2 cases) needs OSDH press release confirmation. Kansas KDHE may have issued a press release for cases linked to the outbreak. Combining these in one query maximizes recall for the multi-state outbreak&#x27;s subnational_location and locality fields within the Q1 window.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;New Mexico DOH or Oklahoma OSDH press release or situation update naming Lea County NM death, confirmed case counts, and dates in Q1 2025; Kansas KDHE outbreak notice&quot;,
+        &quot;expected_trust_signal&quot;: &quot;nmhealth.org, health.ok.gov, or kdhe.ks.gov domain; official press release language; named county; specific case count with date&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;measles outbreak&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;New Mexico&quot;,
+          &quot;Lea County&quot;,
+          &quot;Oklahoma&quot;,
+          &quot;Kansas&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q2 — NM/OK/KS state-level official pages absent from iteration-1 candidate set; Lea County death and Oklahoma March 11 cases need state-level corroboration&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;iter2_q2&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q3&quot;,
+        &quot;query&quot;: &quot;PAHO PAHO/WHO measles Americas United States situation report epidemiological update January March 2025&quot;,
+        &quot;provider_channel&quot;: &quot;official_site_search&quot;,
+        &quot;query_type&quot;: &quot;domain_limited&quot;,
+        &quot;source_type&quot;: &quot;international_organization_report&quot;,
+        &quot;role_hint&quot;: &quot;validation&quot;,
+        &quot;priority&quot;: 3,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_probable&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;PAHO appeared twice in iteration 1 but snippets did not confirm Q1-specific US case totals. PAHO publishes epidemiological alerts and situation reports for the Americas that independently validate CDC figures and may carry cumulative Q1 2025 US case counts, deaths, and hospitalization data. Refining the query to include &#x27;epidemiological update&#x27; and month names improves recall for PAHO&#x27;s structured report format.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;PAHO epidemiological alert or situation report for measles in the Americas referencing US Q1 2025 case counts, deaths, and hospitalizations&quot;,
+        &quot;expected_trust_signal&quot;: &quot;paho.org domain, official PAHO situation report format, case count table with date range covering January–March 2025&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;sarampión&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;United States&quot;,
+          &quot;Americas&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;2025&quot;,
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;March 2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q3 — PAHO appeared twice but Q1-specific US situation report not confirmed in snippets&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;iter2_q3&quot;
+      },
+      {
+        &quot;query_id&quot;: &quot;iter2_q4&quot;,
+        &quot;query&quot;: &quot;measles Texas New Mexico outbreak January 2025 first cases Mennonite community Gaines County hospitalized children&quot;,
+        &quot;provider_channel&quot;: &quot;news_search&quot;,
+        &quot;query_type&quot;: &quot;news&quot;,
+        &quot;source_type&quot;: &quot;news_and_situation_report&quot;,
+        &quot;role_hint&quot;: &quot;collection_support&quot;,
+        &quot;priority&quot;: 4,
+        &quot;expected_fields&quot;: [
+          &quot;disease&quot;,
+          &quot;country&quot;,
+          &quot;subnational_location&quot;,
+          &quot;locality&quot;,
+          &quot;date_reported&quot;,
+          &quot;cases_confirmed&quot;,
+          &quot;cases_unspecified&quot;,
+          &quot;deaths&quot;,
+          &quot;hospitalizations&quot;,
+          &quot;source_url&quot;,
+          &quot;source_type&quot;,
+          &quot;evidence_quote&quot;
+        ],
+        &quot;query_rationale&quot;: &quot;The earliest Q1 2025 outbreak reports (January–early February) from Texas are underrepresented in the current candidate set. News articles covering the initial Gaines County/Mennonite community cases in January 2025 will provide date_reported, locality, and early case-count data that official pages may have since rolled into cumulative totals. Including &#x27;hospitalized children&#x27; targets articles covering the Lubbock hospitalizations and deaths that occurred in Q1. AP, Reuters, Texas Tribune, and local Lubbock outlets are likely sources.&quot;,
+        &quot;expected_source_type_or_evidence&quot;: &quot;News article from AP, Reuters, Texas Tribune, or Lubbock Avalanche-Journal reporting on the initial January 2025 Gaines County measles cases with dates, case counts, and hospitalization/death details&quot;,
+        &quot;expected_trust_signal&quot;: &quot;Named journalist, citation of Texas DSHS or CDC as source, specific case count with date in January or February 2025&quot;,
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;target_disease_terms&quot;: [
+          &quot;measles&quot;,
+          &quot;measles outbreak&quot;
+        ],
+        &quot;target_location_terms&quot;: [
+          &quot;Texas&quot;,
+          &quot;Gaines County&quot;,
+          &quot;Lubbock&quot;,
+          &quot;New Mexico&quot;,
+          &quot;Mennonite&quot;
+        ],
+        &quot;time_terms&quot;: [
+          &quot;January 2025&quot;,
+          &quot;February 2025&quot;,
+          &quot;2025&quot;
+        ],
+        &quot;is_follow_up_query&quot;: true,
+        &quot;previous_iteration_basis&quot;: &quot;iter1_q4 — early January–February 2025 outbreak onset dates and initial case counts for Gaines County not captured in iteration-1 news results&quot;,
+        &quot;execution_status&quot;: &quot;planned_not_executed&quot;,
+        &quot;query_source&quot;: &quot;iterative_llm_refinement&quot;,
+        &quot;iteration_index&quot;: 2,
+        &quot;iterative_query_id&quot;: &quot;iter2_q4&quot;
+      }
+    ],
+    &quot;expected_evidence&quot;: [],
+    &quot;expected_source_characteristics&quot;: [],
+    &quot;language_or_localization_reasoning&quot;: &quot;&quot;,
+    &quot;trust_considerations&quot;: [],
+    &quot;stop_condition_hypothesis&quot;: &quot;&quot;,
+    &quot;warnings&quot;: [
+      &quot;The MMWR result (mm7414a1.htm) covers January 1–April 17, 2025 — it extends beyond the Q1 2025 window (ending March 31). Numeric fields extracted from this source must be annotated as covering a period that partially exceeds the task window; only Q1-specific figures should be attributed to the Jan 1–Mar 31 period.&quot;,
+      &quot;The CIDRAP result referencing 1,514 total 2025 cases is clearly beyond Q1 2025 and should not be used for Q1 case-count fields without a specific Q1 sub-total.&quot;,
+      &quot;AAP Red Book snippet references 2026 data (2,104 cases as of June 18, 2026) — this result is out of scope for Q1 2025 and should be excluded from field extraction.&quot;,
+      &quot;YouTube result (rank 5) is a video and cannot be used for evidence_quote extraction; it should be deprioritized or excluded.&quot;,
+      &quot;Wikipedia is useful for narrative context and locality identification but numeric fields extracted from it must be traced to primary sources before being used in confirmed/deaths/hospitalizations fields.&quot;,
+      &quot;Duplicate URLs (7 detected) suggest some queries returned overlapping result sets; iteration-2 queries are differentiated by state-specific and time-specific terms to reduce duplication.&quot;,
+      &quot;Max iterations is 2 and max total queries is 10; this iteration uses 4 queries, bringing the total to 8, within bounds.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>OBSERVE iteration 2</h2><pre>{
+  &quot;card_type&quot;: &quot;OBSERVE iteration 2&quot;,
+  &quot;observation&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;executed_query_ids&quot;: [
+      &quot;iter2_q1&quot;,
+      &quot;iter2_q2&quot;,
+      &quot;iter2_q3&quot;,
+      &quot;iter2_q4&quot;
+    ],
+    &quot;executed_queries&quot;: [
+      &quot;Texas DSHS measles outbreak 2025 confirmed cases Gaines County Lubbock deaths January February March&quot;,
+      &quot;New Mexico Department of Health measles 2025 confirmed cases Lea County deaths Oklahoma Kansas outbreak&quot;,
+      &quot;PAHO PAHO/WHO measles Americas United States situation report epidemiological update January March 2025&quot;,
+      &quot;measles Texas New Mexico outbreak January 2025 first cases Mennonite community Gaines County hospitalized children&quot;
+    ],
+    &quot;raw_result_count&quot;: 32,
+    &quot;accepted_candidate_count&quot;: 21,
+    &quot;duplicate_result_count&quot;: 11,
+    &quot;rejected_result_count&quot;: 11,
+    &quot;result_domain_counts&quot;: {
+      &quot;cdc.gov&quot;: 4,
+      &quot;en.wikipedia.org&quot;: 2,
+      &quot;lubbockonline.com&quot;: 1,
+      &quot;youtube.com&quot;: 2,
+      &quot;texastribune.org&quot;: 2,
+      &quot;dshs.texas.gov&quot;: 1,
+      &quot;pbs.org&quot;: 1,
+      &quot;abc7ny.com&quot;: 1,
+      &quot;arcgis.com&quot;: 1,
+      &quot;nmhealth.org&quot;: 1,
+      &quot;nytimes.com&quot;: 1,
+      &quot;idse.net&quot;: 1,
+      &quot;cidrap.umn.edu&quot;: 2,
+      &quot;coronavirus.kdheks.gov&quot;: 1,
+      &quot;libguides.mskcc.org&quot;: 1,
+      &quot;paho.org&quot;: 4,
+      &quot;who.int&quot;: 1,
+      &quot;yalehealth.yale.edu&quot;: 1,
+      &quot;pmc.ncbi.nlm.nih.gov&quot;: 1,
+      &quot;reuters.com&quot;: 1,
+      &quot;publichealth.jhu.edu&quot;: 1,
+      &quot;facebook.com&quot;: 1
+    },
+    &quot;top_result_summaries&quot;: [
+      {
+        &quot;title&quot;: &quot;Measles Outbreak in a Child Care Facility — Lubbock, Texas, March–April 2025  | MMWR&quot;,
+        &quot;snippet&quot;: &quot;During March–April 2025, eight confirmed measles cases linked to a child care facility were reported in Lubbock, Texas. On March 21, 2025, Lubbock Public Health (LPH) in Texas received a report of a child care attendee aged 3 years, with fever, rash, cough, coryza, conjunctivitis, otitis media, and diarrhea who received a positive test result for measles by real-time reverse transcription–polymerase chain reaction (RT-PCR). Six additional children who attended the same child care facility and the grandfather of one of the children were confirmed by RT-PCR testing to have measles. On March 21, 2025, Lubbock Public Health (LPH) in Texas was notified of a suspected measles case in a child aged 3 years (index patient, patient A) who had fever, rash, cough, coryza, conjunctivitis, otitis media, and diarrhea. During March 25–29, LPH was notified of two additional suspected measles cases (patients B and C); both cases occurred in children who attended the same child care facility as the index patient, including a child in the same classroom as the index patient (patient B) and a sibling of the index patient (patient C) who was exposed at home (Table).&quot;,
+        &quot;url&quot;: &quot;https://www.cdc.gov/mmwr/volumes/75/wr/mm7521a1.htm&quot;,
+        &quot;domain&quot;: &quot;cdc.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;2025 Southwest United States measles outbreak - Wikipedia&quot;,
+        &quot;snippet&quot;: &quot;# 2025 Southwest United States measles outbreak. | 2025–26 United States measles outbreak | |. | Location | United States (Texas, New Mexico, Oklahoma, Kansas), Mexico (Chihuahua \&quot;Chihuahua (state)\&quot;)) |. In January 2025, cases of measles began to appear in Texas and neighboring states in the United States. The outbreak became one of the largest in the country since 2000, when the United States declared the disease eliminated in the country. In March, cases linked to the outbreak were announced in Oklahoma, the Mexican state of Chihuahua \&quot;Chihuahua (state)\&quot;), and Kansas. Cases were concentrated in the Texas Mennonite community, and officials believed the disease was first imported from an outbreak in a Mennonite community in Ontario, Canada. More than 99 individuals were hospitalized, and three died: two children in Lubbock (a six-year-old and an eight-year-old) and an adult in Lea County, New Mexico. The Texas outbreak involved the measles genotype D8, and was linked to cases in New Mexico, Kansas, Oklahoma, and Chihuahua, Mexico \&quot;Chihuahua (state)\&quot;).&quot;,
+        &quot;url&quot;: &quot;https://en.wikipedia.org/wiki/2025_Southwest_United_States_measles_outbreak&quot;,
+        &quot;domain&quot;: &quot;en.wikipedia.org&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Texas measles in Gaines County surpass 100 cases, officials urge ...&quot;,
+        &quot;snippet&quot;: &quot;Texas measles cases hit 159 cases in nine counties as Gaines County cases surpass 100 · 0 to 4 year olds: 53 cases (up 7 cases). · 5 to 17 year&quot;,
+        &quot;url&quot;: &quot;https://www.lubbockonline.com/story/news/local/2025/03/04/texas-measles-in-gaines-county-surpass-100-cases-officials-urge-caution-as-state-hits-159-cases/81218510007&quot;,
+        &quot;domain&quot;: &quot;lubbockonline.com&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 3,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;An unvaccinated child has died in the Texas measles outbreak, Lubbock health officials say&quot;,
+        &quot;snippet&quot;: &quot;An unvaccinated child has died in the Texas measles outbreak, Lubbock health officials say\nKSAT 12\n491000 subscribers\n18 likes\n622 views\n26 Feb 2025\nA child who was not vaccinated has died from measles in West Texas, the first death in an outbreak that began late last month and the first from measles in the U.S. since 2015.\n12 comments\n&quot;,
+        &quot;url&quot;: &quot;https://www.youtube.com/watch?v=7GpyBGjcyEQ&quot;,
+        &quot;domain&quot;: &quot;youtube.com&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 4,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Texas measles cases remain steady at 750. Track the spread here. - The Texas Tribune&quot;,
+        &quot;snippet&quot;: &quot;When we make a mistake — and from time to time, we will — we will work quickly to fully address the error, correcting it within the story, detailing the error on the story page and adding it to this running list of Tribune corrections. ***Editor’s note:**  From January 2025 through June 2025, The Texas Tribune used data from the Texas Department of State Health Services to track new measles cases, hospitalizations and deaths associated with the West Texas outbreak. *Sign up for The Brief, The Texas Tribune’s daily newsletter that keeps readers up to speed on the most essential Texas news.*. No new measles cases were reported in the last seven days, leaving the total number reported in Texas’ historic measles outbreak at 750, according to the latest update from the Texas Department of State Health Services on Tuesday. To declare the outbreak over, there would have to be no new cases in 42 days, according to the the Texas Department of State Health Services.&quot;,
+        &quot;url&quot;: &quot;https://www.texastribune.org/2025/04/22/texas-measles-outbreak-update&quot;,
+        &quot;domain&quot;: &quot;texastribune.org&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 5,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Measles Outbreak – August 12, 2025 | Texas DSHS&quot;,
+        &quot;snippet&quot;: &quot;The Department of State Health Services is currently undergoing Sunset review. # Measles Outbreak – August 12, 2025. ***The information on this page was last updated on August 12, 2025. On August 18,*** ***DSHS announced the end of the West Texas measles outbreak******. No further updates will be made to the data on this page.***. The Texas Department of State Health Services is reporting an outbreak of measles primarily in West Texas. This number is the total number of people hospitalized over the course of the outbreak. It is not the current number of people in the hospital. DSHS News Release – Feb. 26 Texas Announces First Death in Measles Outbreak. DSHS News Release – April 6 Texas Announces Second Death in Measles Outbreak. DSHS Health Alert – April 7 Texas 2025 Measles Outbreak – Expanded Outbreak Counties. 2025 Texas Measles Cases Not Associated with the Outbreak in West Texas.&quot;,
+        &quot;url&quot;: &quot;https://www.dshs.texas.gov/news-alerts/measles-outbreak-2025&quot;,
+        &quot;domain&quot;: &quot;dshs.texas.gov&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 6,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Texas measles outbreak tops 500 cases across 10 counties | PBS News&quot;,
+        &quot;snippet&quot;: &quot;Signs inform people of measles prevention and testing at the Gaines County Court House in Seminole. A day care facility in a Texas county that&#x27;s part of the measles outbreak has multiple cases, including children too young to be fully vaccinated, public health officials say. West Texas is in the middle of a still-growing measles outbreak with 505 cases reported on Tuesday. As of Friday, there were seven cases at a day care where one young child who was infectious gave it to two other children before it spread to other classrooms, Lubbock Public Health director Katherine Wells said. The public health department is recommending that any child with only one vaccine get their second dose early, and changed its recommendation for kids in Lubbock County to get the first vaccine dose at 6 months old instead of 1. The CDC said its first team was in the region from early March to April 1, withdrawing on-the-ground support days before a second child died in the outbreak.&quot;,
+        &quot;url&quot;: &quot;https://www.pbs.org/newshour/health/texas-measles-outbreak-tops-500-cases-across-10-counties&quot;,
+        &quot;domain&quot;: &quot;pbs.org&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 7,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;Measles death of unvaccinated child in Texas outbreak is 1st fatality ...&quot;,
+        &quot;snippet&quot;: &quot;# Measles death of unvaccinated child in Texas outbreak is 1st fatality in US in a decade. The majority of cases have occurred among unvaccinated people. An unvaccinated child has died in the West Texas measles outbreak. LUBBOCK, Texas -- An unvaccinated school-aged child in Texas has died of measles, the first death associated with an outbreak in the western part of the state that has infected more than 100 people. In a press release, the Texas Department of State Health Services (DSHS) said the child was hospitalized in the northwestern city of Lubbock last week and tested positive for measles. As of Wednesday, 124 cases of measles have been confirmed associated with the outbreak, according to data from DSHS. Almost all of the cases are in unvaccinated individuals or individuals whose vaccination status is unknown, and 18 people have been hospitalized so far, DSHS said. \&quot;This is the first time I&#x27;ve had any professional experience with a measles outbreak,\&quot; Johnson told ABC News.&quot;,
+        &quot;url&quot;: &quot;https://abc7ny.com/post/first-measles-death-is-reported-west-texas-outbreak-infected-more-120-people/15956727&quot;,
+        &quot;domain&quot;: &quot;abc7ny.com&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 8,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      },
+      {
+        &quot;title&quot;: &quot;2025-2026 US Measles Map&quot;,
+        &quot;snippet&quot;: &quot;Lea County, New Mexico. Confirmed Measles Deaths: 1; Background: 3/6/25: The New Mexico Department of Health reported a measles-associated fatality in an&quot;,
+        &quot;url&quot;: &quot;https://www.arcgis.com/apps/dashboards/dd314001921f4d2eac160f89ded0b49a&quot;,
+        &quot;domain&quot;: &quot;arcgis.com&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 1,
+        &quot;result_status&quot;: &quot;rejected&quot;,
+        &quot;rejection_reason&quot;: &quot;duplicate_url&quot;
+      },
+      {
+        &quot;title&quot;: &quot;Measles&quot;,
+        &quot;snippet&quot;: &quot;*   [Menu](https://www.nmhealth.org/about/erd/ideb/mog#). [Public Health](https://www.nmhealth.org/about/phd/). [View All](https://www.nmhealth.org/about/phd/). [View All](https://www.nmhealth.org/about/erd/). [View All](https://www.nmhealth.org/about/sld/). *   [Dispensary Locations](https://www.nmhealth.org/publication/view/general/2101/). [View All](https://www.nmhealth.org/about/ofm/). [View All](https://www.nmhealth.org/about/asd/). *   [Most Popular](https://www.nmhealth.org/about/erd/ideb/mog#). *   [Locations](https://www.nmhealth.org/about/erd/ideb/mog#). *   [Public Health](https://www.nmhealth.org/about/phd/). *   [Measles](https://www.nmhealth.org/about/erd/ideb/mog/). *   [2025 Measles Outbreak](https://www.nmhealth.org/about/erd/ideb/mog/mogo/). *   [Measles Outbreak Frequently Asked Questions](https://www.nmhealth.org/about/erd/ideb/mog/mfaq/). *   [Measles Infection Prevention and Control Guidance](https://www.nmhealth.org/publication/view/guide/9122/). *   [Clinical Overview of Measles | CDC](https://www.nmhealth.org/resource/view/2631/). *   [Measles Vaccine Recommendations | CDC](https://www.nmhealth.org/resource/view/2640/). *   [Evaluating a suspect measles patient presenting with rash](https://www.nmhealth.org/publication/view/guide/9211/). *   [Measles Contact Tracing for Healthcare Organizations](https://www.nmhealth.org/publication/view/guide/9245/). *   [Measles Post-Exposure Prophylaxis (PEP) Table](https://www.nmhealth.org/publication/view/guide/9316/). *   [Measles Guidance for Higher Educational Settings](https://www.nmhealth.org/publication/view/general/9518/). *   [Measles Guidance for Schools | English Version](https://www.nmhealth.org/publication/view/guide/9125/). *   [Measles Guidance for Employers](https://www.nmhealth.org/publication/view/guide/9167/). *   [Measles Guidance for Higher Educational Settings](https://www.nmhealth.org/publication/view/general/9518/)_(General)_. *   [Measles Post-Exposure Prophylaxis (PEP) Table](https://www.nmhealth.org/publication/view/guide/9316/)_(Guide)_. *   [Measles Infographic – English](https://www.nmhealth.org/publication/view/marketing/9126/)_(Marketing)_. *   [Measles Infection Prevention and Control Guidance](https://www.nmhealth.org/publication/view/guide/9122/)_(Guide)_. *   [Measles Guidance for Employers](https://www.nmhealth.org/publication/view/guide/9167/)_(Guide)_. *   [How Do I Know If I Need A Measles Vaccine?](https://www.nmhealth.org/resource/view/2711/). *   [New Mexico Measles Vaccination Info 2025](https://www.nmhealth.org/resource/view/2649/). *   [New Mexico Measles Vaccination Info 2025 (Spanish subtitles)](https://www.nmhealth.org/resource/view/2650/). *   [Measles | CDC](https://www.nmhealth.org/resource/view/2632/).&quot;,
+        &quot;url&quot;: &quot;https://www.nmhealth.org/about/erd/ideb/mog&quot;,
+        &quot;domain&quot;: &quot;nmhealth.org&quot;,
+        &quot;source&quot;: &quot;Tavily&quot;,
+        &quot;published_date&quot;: null,
+        &quot;rank&quot;: 2,
+        &quot;result_status&quot;: &quot;accepted&quot;,
+        &quot;rejection_reason&quot;: null
+      }
+    ],
+    &quot;apparent_source_types&quot;: [
+      &quot;international_organization_report&quot;,
+      &quot;news_and_situation_report&quot;,
+      &quot;official_public_health_agency&quot;
+    ],
+    &quot;disease_relevance_signals&quot;: [
+      &quot;Measles&quot;
+    ],
+    &quot;location_relevance_signals&quot;: [
+      &quot;United States&quot;
+    ],
+    &quot;evidence_availability_signals&quot;: [
+      &quot;case&quot;,
+      &quot;cases&quot;,
+      &quot;death&quot;,
+      &quot;deaths&quot;,
+      &quot;outbreak&quot;
+    ],
+    &quot;gaps_identified&quot;: [],
+    &quot;source_quality_concerns&quot;: [
+      &quot;duplicate URLs appeared in search results&quot;
+    ],
+    &quot;notes_for_llm&quot;: [
+      &quot;Observation includes search metadata only; fetched page text is not included.&quot;,
+      &quot;Only provider search results can become source candidates.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>REFINE decision 2</h2><pre>{
+  &quot;card_type&quot;: &quot;REFINE decision 2&quot;,
+  &quot;decision&quot;: {
+    &quot;iteration_index&quot;: 2,
+    &quot;decision&quot;: &quot;stop_limits_reached&quot;,
+    &quot;decision_reason&quot;: &quot;&quot;,
+    &quot;coverage_assessment&quot;: &quot;Coverage across the target fields is strong for the primary outbreak (Southwest US / West Texas Mennonite community):\n\n• disease: Confirmed — Measles, across all accepted sources.\n• country: United States — confirmed across all sources.\n• subnational_location: Texas (primary), New Mexico (Lea County death confirmed via ArcGIS snippet and nmhealth.org), Oklahoma (OSDH March 11 link via MSK library guide), Kansas (coronavirus.kdheks.gov appeared in iteration 2 domain counts). Maryland (Howard County) also surfaced.\n• locality: Gaines County TX, Lubbock TX, West Texas (Mennonite community), Lea County NM, Harris/Houston TX, Rockwall TX, Travis TX, Howard County MD — all identified from snippets.\n• date_reported: Multiple Q1 2025 dates captured: January 2025 onset (Wikipedia, MSK guide), February 26 (first TX death — DSHS news release referenced in DSHS snippet, YouTube KSAT12 video, abc7ny.com), March 4 (Lubbock Online — 159 TX cases), March 6 (NM Lea County death — ArcGIS snippet), March 7 (CDC HAN advisory — 208 TX+NM cases), March 21 (Lubbock child care facility index case — MMWR mm7521a1).\n• cases_confirmed: 124 (as of ~Feb 26, DSHS via abc7ny), 159 TX / Gaines County &gt;100 (March 4, Lubbock Online), 208 TX+NM (March 7, CDC HAN), 800 total Jan 1–Apr 17 (MMWR mm7414a1 — partially outside Q1 window but Q1 sub-period data extractable), 505 TX (PBS — post-Q1), 750 TX final (Texas Tribune — post-Q1, useful for context only).\n• deaths: 3 total confirmed — 2 children in Lubbock (first death Feb 26 per DSHS/abc7ny/YouTube; second death April 6 per DSHS snippet — outside Q1 window), 1 adult in Lea County NM (March 6 per ArcGIS snippet). Within strict Q1 window: at minimum 1 confirmed death (Feb 26 TX child) and 1 confirmed death (March 6 NM adult) = 2 deaths within Q1.\n• hospitalizations: 18 hospitalized as of ~Feb 26 (DSHS via abc7ny); 85 hospitalized Jan 1–Apr 17 (MMWR mm7414a1 — partially outside Q1); &gt;99 total (Wikipedia — full outbreak). Q1-specific hospitalization sub-totals will need annotation.\n• source_url: Multiple authoritative URLs captured across cdc.gov (HAN, MMWR ×2, data page, global page), dshs.texas.gov, nmhealth.org, lubbockonline.com, texastribune.org, abc7ny.com, pbs.org, cidrap.umn.edu, publichealth.jhu.edu, paho.org (×4), who.int, en.wikipedia.org, libguides.mskcc.org, arcgis.com, reuters.com, nytimes.com, coronavirus.kdheks.gov.\n• source_type: official_public_health_agency (CDC, DSHS, NMDOH, KDHE), international_organization_report (PAHO, WHO), news_and_situation_report (CIDRAP, Texas Tribune, Lubbock Online, PBS, abc7ny, Reuters, NYT), academic/tracker (JHU IVAC, Wikipedia).\n• evidence_quote: Multiple extractable quotes from snippets (CDC HAN advisory text, MMWR aggregate text, abc7ny DSHS press release quote, Lubbock Online case count, ArcGIS NM death date).&quot;,
+    &quot;source_diversity_assessment&quot;: &quot;Excellent diversity across source types and domains:\n• Primary official US federal: cdc.gov (5 results across 2 iterations — HAN advisory, MMWR ×2, data/research page, global page)\n• Primary official US state: dshs.texas.gov (2 results), nmhealth.org (1), coronavirus.kdheks.gov (1)\n• International organizations: paho.org (4 results across 2 iterations), who.int (2 results)\n• Academic/tracker: publichealth.jhu.edu/ivac (2 results), libguides.mskcc.org (2 results), arcgis.com (1)\n• News/media: cidrap.umn.edu (5), texastribune.org (2), lubbockonline.com (1), abc7ny.com (1), pbs.org (1), reuters.com (1), nytimes.com (1), contagionlive.com (1), forbes.com (1)\n• Reference/aggregator: en.wikipedia.org (2), pmc.ncbi.nlm.nih.gov (1)\n• Video (non-extractable for quotes): youtube.com (4) — deprioritized\n• Social (non-authoritative): facebook.com (1) — excluded\n\nNo single domain dominates; federal, state, international, and news sources are all represented. Oklahoma OSDH direct page was not surfaced as a standalone domain (only referenced via MSK library guide snippet), which is a minor residual gap, but the OSDH March 11 report is documented via the MSK guide evidence quote.&quot;,
+    &quot;trustworthiness_assessment&quot;: &quot;High overall trustworthiness:\n• CDC sources (cdc.gov) are the gold standard for US measles surveillance — HAN advisory and MMWR reports are peer-reviewed or officially cleared.\n• Texas DSHS (dshs.texas.gov) is the primary state authority — press releases referenced in snippets are authoritative for TX-specific case counts and deaths.\n• New Mexico DOH (nmhealth.org) is the primary state authority for NM data — the 2025 Measles Outbreak sub-page is present in the candidate set.\n• PAHO (paho.org, 4 results) provides independent international validation.\n• CIDRAP (cidrap.umn.edu) is a highly regarded academic public health news outlet that consistently cites CDC as its primary source — suitable as a secondary corroborator.\n• Texas Tribune (texastribune.org) explicitly states it used DSHS data from January–June 2025 — high credibility for TX-specific figures.\n• Lubbock Online (lubbockonline.com) is a local outlet with direct access to Lubbock Public Health — suitable for locality-level detail.\n• Wikipedia is useful for narrative and locality identification but numeric fields must be traced to primary sources.\n• ArcGIS dashboard (arcgis.com) — the NM Lea County death snippet (3/6/25) is useful but the dashboard is a secondary aggregator; the nmhealth.org page is the preferred primary source for NM data.\n• YouTube videos cannot yield evidence_quote extractions and should be deprioritized.\n• Facebook result should be excluded as non-authoritative.&quot;,
+    &quot;disease_location_time_fit_assessment&quot;: &quot;Disease fit: Excellent — all accepted sources are explicitly about measles.\nLocation fit: Excellent — all sources are US-focused; subnational locations (TX, NM, OK, KS, MD) are within scope.\nTime fit: Good with annotation caveats:\n• Most Q1-specific data points (Jan–Mar 31, 2025) are well-represented: January onset, February 26 first death, March 4 TX case count, March 6 NM death, March 7 CDC HAN (208 cases), March 21 Lubbock child care index case.\n• MMWR mm7414a1 covers Jan 1–Apr 17, 2025 — extends 17 days beyond Q1. Numeric fields from this source must be annotated as partially outside the Q1 window; Q1-specific sub-totals are not directly stated in the snippet but can be bounded by the March 7 CDC HAN figure (208 TX+NM) and the March 31 endpoint.\n• Texas Tribune (750 cases) and PBS (505 cases) are clearly post-Q1 and should be used only for context or to establish that the outbreak was ongoing through Q1.\n• AAP Red Book (2,104 cases as of June 18, 2026) is out of scope and should be excluded from field extraction.\n• MMWR mm7521a1 (Lubbock child care facility, March–April 2025) straddles Q1/Q2 — the March 21 index case date falls within Q1 and is extractable; April cases are outside scope.&quot;,
+    &quot;corroboration_potential_assessment&quot;: &quot;Key numeric fields are corroborated across multiple independent source types:\n• First TX death (Feb 26): DSHS press release (referenced in DSHS snippet) + abc7ny (citing DSHS) + YouTube KSAT12 (Feb 26 date confirmed in snippet) — three independent corroborating paths.\n• NM Lea County death (March 6): ArcGIS dashboard snippet + Wikipedia — two paths; nmhealth.org outbreak page is a third potential corroborator (page exists, content not fetched).\n• March 7 case count (208 TX+NM): CDC HAN advisory (cdc.gov) — primary authority, no corroboration needed.\n• March 4 TX case count (159): Lubbock Online (local outlet citing DSHS data) — single source but cites official data.\n• MMWR mm7414a1 aggregate (800 cases, 85 hospitalized, 3 deaths, Jan 1–Apr 17): CDC primary authority; partially outside Q1 window but the most authoritative aggregate available.\n• PAHO appeared 4 times in iteration-2 domain counts — PAHO situation reports for the Americas are present in the candidate set and can provide international cross-validation of US Q1 figures.\n• Kansas KDHE: coronavirus.kdheks.gov appeared once — provides state-level corroboration for KS cases linked to the outbreak in March 2025.&quot;,
+    &quot;next_query_batch&quot;: [],
+    &quot;stop_reason&quot;: &quot;Maximum iteration limit (max_iterations: 2) has been reached. Both planned iterations have been fully executed (8 queries total, within the 10-query cap). The accumulated candidate set is sufficiently rich to support field extraction for the Q1 2025 task window, and further searching is not permitted under the stated bounds.&quot;,
+    &quot;warnings&quot;: [
+      &quot;Max iterations (2) reached — no further search is permitted under the stated bounds.&quot;,
+      &quot;MMWR mm7414a1 covers January 1–April 17, 2025 (17 days beyond Q1 end of March 31). Aggregate figures (800 cases, 85 hospitalized, 3 deaths) must be annotated as covering a period that partially exceeds the Q1 2025 task window. Only Q1-specific sub-totals should be attributed to the Jan 1–Mar 31 period.&quot;,
+      &quot;The second Texas death (referenced in DSHS snippet as &#x27;April 6 Texas Announces Second Death&#x27;) falls outside the Q1 2025 window and must not be counted in Q1 deaths. Only the February 26 first death (TX child) and the March 6 NM adult death are within Q1.&quot;,
+      &quot;MMWR mm7521a1 (Lubbock child care facility, March–April 2025) straddles Q1/Q2. The March 21 index case and March 25–29 additional cases are within Q1; April cases are outside scope and must be excluded from Q1 field extraction.&quot;,
+      &quot;Texas Tribune (750 TX cases) and PBS (505 TX cases) are clearly post-Q1 and should be used only for outbreak context, not for Q1 case-count fields.&quot;,
+      &quot;AAP Red Book snippet (2,104 cases as of June 18, 2026) is entirely out of scope for Q1 2025 and must be excluded from all field extraction.&quot;,
+      &quot;CIDRAP result referencing 1,514 total 2025 cases is well beyond Q1 2025 and must not be used for Q1 case-count fields without a Q1-specific sub-total.&quot;,
+      &quot;YouTube results (4 total) cannot yield evidence_quote extractions and should be deprioritized or excluded from the source candidate set.&quot;,
+      &quot;Facebook result (facebook.com, 1 result) is non-authoritative and should be excluded.&quot;,
+      &quot;Oklahoma OSDH direct domain page was not surfaced as a standalone result — the March 11 OSDH report is documented only via the MSK library guide snippet. If OSDH-specific case counts are needed, a human reviewer should verify directly at health.ok.gov.&quot;,
+      &quot;Kansas KDHE (coronavirus.kdheks.gov, 1 result) appeared in the domain count but no snippet was provided in the top summaries — the content of this page is unknown from metadata alone and should be treated as a candidate requiring human verification.&quot;,
+      &quot;PAHO appeared 4 times in iteration-2 domain counts but no PAHO snippet was included in the top 10 summaries provided — PAHO Q1-specific US case totals remain unconfirmed from snippet evidence alone.&quot;,
+      &quot;Duplicate URL rejection rate was high in iteration 2 (11 of 32 raw results rejected as duplicates), indicating search result overlap between queries. This is expected given the narrow topic and does not indicate a coverage gap.&quot;,
+      &quot;The JHU IVAC US Measles Tracker (publichealth.jhu.edu) compiles county-level data from official sources since January 1, 2025, and its linked GitHub repository may contain date-specific case counts useful for subnational_location and locality fields — this is a high-value candidate for human follow-up.&quot;
+    ]
+  }
+}</pre></article><article class='card'><h2>STOP</h2><pre>{
+  &quot;card_type&quot;: &quot;STOP&quot;,
+  &quot;stop_decision&quot;: &quot;stop_limits_reached&quot;,
+  &quot;stop_reason&quot;: &quot;Maximum iteration limit (max_iterations: 2) has been reached. Both planned iterations have been fully executed (8 queries total, within the 10-query cap). The accumulated candidate set is sufficiently rich to support field extraction for the Q1 2025 task window, and further searching is not permitted under the stated bounds.&quot;
+}</pre></article></main>
+</body>
+</html>

@@ -1,0 +1,686 @@
+{
+  "plan_id": "exec_source_plan_measles_texas_2025_01_01_2025_04_30",
+  "disease": "Measles",
+  "location": "Texas",
+  "time_window": "2025-01-01-2025-04-30",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "llm_generated_plan_requires_human_review_before_execution",
+    "excluded_terms_enforced_german_measles_rubella_vaccine_adverse_events"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify Texas DSHS and local/county health department pages reporting confirmed, probable, suspected, or unspecified measles cases, deaths, and hospitalizations in Texas between 2025-01-01 and 2025-04-30.",
+      "source_role_hint": "collection",
+      "rationale": "Texas Department of State Health Services (DSHS) is the primary official reporting authority for notifiable disease surveillance in Texas. County-level health departments (e.g., Dallas County Health and Human Services, Harris County Public Health, Tarrant County Public Health) may publish localized outbreak data with finer geographic granularity needed for the locality field.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify CDC Division of Viral Diseases and CDC NCIRD pages reporting Texas-specific measles case counts, outbreak investigations, or situation updates for the 2025-01-01 to 2025-04-30 window.",
+      "source_role_hint": "collection",
+      "rationale": "CDC publishes national measles case counts broken down by state and often issues outbreak investigation notices that include Texas-specific data. These are authoritative and extractable for cases_confirmed, deaths, and hospitalizations.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify CDC Morbidity and Mortality Weekly Report (MMWR) articles or rapid communications covering measles outbreaks or case clusters in Texas during 2025.",
+      "source_role_hint": "collection",
+      "rationale": "MMWR reports frequently contain detailed epidemiological tables with confirmed case counts, deaths, hospitalizations, and locality-level data for outbreak investigations, making them high-value extractable sources.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify WHO PAHO or ProMED situation reports or alerts referencing measles cases or outbreaks in Texas or the United States during 2025-01-01 to 2025-04-30 for independent cross-validation.",
+      "source_role_hint": "validation",
+      "rationale": "International organization reports (WHO, PAHO, ProMED) provide independent aggregate or situation-level counts that can be used to validate totals collected from Texas DSHS and CDC sources without leaking into primary collection.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify CDC's national measles case count tracker or summary tables (e.g., CDC measles cases by year page) that report Texas-level or US-level totals for 2025 as a held-back validation reference.",
+      "source_role_hint": "validation",
+      "rationale": "CDC's annual measles case summary page provides a structured, independently maintained count that can serve as a validation benchmark against granular records collected from outbreak-specific sources.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify CDC or Texas DSHS case definition documents for measles (confirmed, probable, suspected) applicable to 2025 surveillance to support correct field mapping and count semantics.",
+      "source_role_hint": "context",
+      "rationale": "Case definitions determine whether a count maps to cases_confirmed, cases_probable, or cases_suspected. Misclassification without context leads to schema errors. The CSTE/CDC measles case definition and any Texas-specific adaptations are needed.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify peer-reviewed literature or preprints describing the epidemiology, genotype, or transmission dynamics of the 2025 Texas measles outbreak to support evidence quote interpretation and count semantics.",
+      "source_role_hint": "context",
+      "rationale": "Academic literature may clarify whether reported counts are cumulative or newly reported, define the outbreak period, and provide genotype data (e.g., measles clade, MeV genotype) that contextualizes the outbreak scope.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_collection_support_001",
+      "objective": "Identify reputable news sources (AP, Reuters, Texas Tribune, local Texas TV/newspaper outlets) reporting measles case counts, deaths, or hospitalizations in Texas during 2025-01-01 to 2025-04-30 that cite official sources.",
+      "source_role_hint": "collection_support",
+      "rationale": "News reports citing official DSHS or CDC figures can serve as collection support, providing early outbreak signals, locality-level detail, and evidence quotes when official pages are not yet indexed or accessible.",
+      "priority": 5
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag any sources where count semantics are ambiguous (cumulative vs. newly reported), where the reporting period substantially exceeds the task window, or where Texas-specific data cannot be disaggregated from national totals.",
+      "source_role_hint": "human_review",
+      "rationale": "Sources with ambiguous count semantics or overly broad reporting periods risk introducing incorrect records. Human review is required before such sources enter extraction to prevent schema misclassification.",
+      "priority": 4
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_official_public_health_agency",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Texas DSHS is the primary notifiable disease surveillance authority for Texas. Local/county health departments (Dallas County HHSD, Harris County Public Health, Tarrant County Public Health, Gaines County, etc.) may publish locality-level outbreak data. CDC NCIRD and CDC Division of Viral Diseases publish state-level measles case counts and outbreak investigation reports. These sources are the highest-priority extractable collection sources for all target fields.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "dshs_pages_may_update_dynamically_requiring_snapshot_capture",
+        "county_health_pages_may_lack_structured_data"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_international_organization_report",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "WHO PAHO situation reports, ProMED alerts, and ECDC rapid risk assessments may reference US or Texas measles outbreaks and provide independent aggregate counts usable for validation against DSHS/CDC collection records.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "international_reports_may_aggregate_us_nationally_without_texas_disaggregation",
+        "validation_leakage_risk_if_used_as_collection_source"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Peer-reviewed articles or preprints (e.g., MMWR, Emerging Infectious Diseases, NEJM, medRxiv) may contain detailed epidemiological tables for the 2025 Texas measles outbreak, including case definitions, genotype data, and count breakdowns by locality and case classification.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "publication_lag_may_limit_coverage_of_jan_apr_2025_window",
+        "preprints_require_additional_quality_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_structured_database",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "date_reported",
+        "cases_confirmed",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "CDC's national measles case count summary page, HealthData.gov open datasets, and state open data portals may provide structured, machine-readable case counts for Texas that serve as independent validation benchmarks.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "structured_databases_may_lag_real_time_outbreak_reporting",
+        "texas_open_data_portal_may_not_include_measles_specific_tables"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_news_and_situation_report",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Reputable news outlets (AP, Reuters, Texas Tribune, Dallas Morning News, Houston Chronicle, local TV stations) and situation reports citing official DSHS or CDC figures provide early outbreak signals, locality-level detail, and evidence quotes. Useful as collection support when official pages are not yet indexed.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_later_search_result_screening",
+        "news_sources_may_misquote_or_misclassify_case_counts",
+        "must_cite_official_source_to_qualify_as_collection_support",
+        "excluded_terms_must_be_enforced_german_measles_rubella_vaccine_adverse_events"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"measles Texas 2025\" cases deaths public health Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"measles outbreak Texas 2025\" cases deaths public health Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles outbreak Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"measles Texas 2025\" outbreak report surveillance Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"measles outbreak Texas 2025\" outbreak report surveillance Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles outbreak Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"measles Texas 2025\" epidemiology cases deaths Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "measles Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"measles outbreak Texas 2025\" epidemiology cases deaths Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "measles outbreak Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"measles Texas 2025\" surveillance dataset cases deaths Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"measles outbreak Texas 2025\" surveillance dataset cases deaths Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles outbreak Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"measles Texas 2025\" outbreak report cases deaths Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"measles outbreak Texas 2025\" outbreak report cases deaths Texas 2025-01-01-2025-04-30 2025",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "measles outbreak Texas 2025"
+      ],
+      "location_terms_used": [
+        "Texas"
+      ],
+      "time_terms_used": [
+        "2025-01-01-2025-04-30",
+        "2025"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dataset Decision Flow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Dataset Decision Flow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>No accepted primary case records</h2><pre>{
+  &quot;final_case_dataset&quot;: 0,
+  &quot;final_dataset&quot;: 7,
+  &quot;final_dataset_pre_quality_gate&quot;: 13,
+  &quot;final_dataset_post_review&quot;: 7,
+  &quot;zero_case_statements&quot;: 0,
+  &quot;exposure_monitoring_records&quot;: 0,
+  &quot;surveillance_summary_records&quot;: 13,
+  &quot;outbreak_summary_records&quot;: 0,
+  &quot;context_records&quot;: 0,
+  &quot;unclassified_observation_records&quot;: 3,
+  &quot;non_primary_observations&quot;: 6,
+  &quot;quarantined_records&quot;: 4,
+  &quot;pending_review_records&quot;: 2
+}</pre></section><section><table><tr><th>Record</th><th>Dataset View</th><th>Status</th><th>Reasons</th></tr><tr><td><code>rec_src_search_ff1cee7a6f74_001</code></td><td>final_dataset</td><td>accepted_with_warnings</td><td>[&#x27;record passed deterministic run quality gates&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_002</code></td><td>final_dataset_pre_quality_gate</td><td>quarantined_outside_scope</td><td>[&#x27;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&#x27;, &#x27;record date 2024-09-28 is outside requested task window 2024-09-29 to 2024-10-05&#x27;, &#x27;record date 2024-09-28 is outside requested task window 2024-09-29 to 2024-10-05&#x27;, &#x27;record period 2024-09-22 to 2024-09-28 does not overlap requested task window 2024-09-29 to 2024-10-05&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_003</code></td><td>final_dataset</td><td>accepted_with_warnings</td><td>[&#x27;record passed deterministic run quality gates&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_004</code></td><td>final_dataset</td><td>accepted_with_warnings</td><td>[&#x27;record passed deterministic run quality gates&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_005</code></td><td>final_dataset_pre_quality_gate</td><td>quarantined_outside_scope</td><td>[&#x27;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&#x27;, &#x27;record date 2024-09-28 is outside requested task window 2024-09-29 to 2024-10-05&#x27;, &#x27;record date 2024-09-28 is outside requested task window 2024-09-29 to 2024-10-05&#x27;, &#x27;record period 2024-09-22 to 2024-09-28 does not overlap requested task window 2024-09-29 to 2024-10-05&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_006</code></td><td>final_dataset_pre_quality_gate</td><td>quarantined_outside_scope</td><td>[&#x27;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&#x27;, &#x27;record date 2024-09-28 is outside requested task window 2024-09-29 to 2024-10-05&#x27;, &#x27;record date 2024-09-28 is outside requested task window 2024-09-29 to 2024-10-05&#x27;, &#x27;record period 2024-09-22 to 2024-09-28 does not overlap requested task window 2024-09-29 to 2024-10-05&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_007</code></td><td>final_dataset</td><td>accepted_with_warnings</td><td>[&#x27;record passed deterministic run quality gates&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_008</code></td><td>final_dataset</td><td>accepted_with_warnings</td><td>[&#x27;record passed deterministic run quality gates&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_009</code></td><td>final_dataset_pre_quality_gate</td><td>quarantined_outside_scope</td><td>[&#x27;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_010</code></td><td>final_dataset</td><td>accepted_with_warnings</td><td>[&#x27;record passed deterministic run quality gates&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_011</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;official or high-trust task-compatible metric has unresolved column semantics; route to human review instead of strict final inclusion&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_012</code></td><td>final_dataset</td><td>accepted_with_warnings</td><td>[&#x27;record passed deterministic run quality gates&#x27;]</td></tr><tr><td><code>rec_src_search_ff1cee7a6f74_013</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;official or high-trust task-compatible metric has unresolved column semantics; route to human review instead of strict final inclusion&#x27;]</td></tr></table></section></main>
+</body>
+</html>

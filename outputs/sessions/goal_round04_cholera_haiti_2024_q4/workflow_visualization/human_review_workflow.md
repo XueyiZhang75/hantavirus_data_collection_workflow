@@ -1,0 +1,16 @@
+# Human Review Workflow
+
+- Review items: `36`
+- Prioritized items: `36`
+- Generated decision templates are not auto-applied.
+
+- `review_claim_corroboration_conflict_corr_event_001`: P0_critical / conflicting claims review - review_claim_corroboration_conflict_corr_event_001 - [PDF] Multi-country outbreak of cholera - World Health O...
+- `review_duplicate_event_001`: P0_critical / validation conflict review - review_duplicate_event_001 - [PDF] Multi-country outbreak of cholera - World Health Organization (WHO)
+- `review_anomaly_anom_003`: P1_high / claim corroboration review - review_anomaly_anom_003 - event_001
+- `review_source_credibility_src_search_4f1e08e3f365`: P1_high / source identity review - review_source_credibility_src_search_4f1e08e3f365 - Haïti : La résurgence du choléra menace les communautés ...
+- `review_source_credibility_src_search_505b2ac21551`: P1_high / source identity review - review_source_credibility_src_search_505b2ac21551 - An Update of Cholera Cases as of 30th December 2024 ... - Fa...
+- `review_source_credibility_src_search_5b9b31558c67`: P1_high / source identity review - review_source_credibility_src_search_5b9b31558c67 - Haiti Country Report - Cholera Taxonomy
+- `review_source_credibility_src_search_664c22f9e3a2`: P1_high / source identity review - review_source_credibility_src_search_664c22f9e3a2 - Élimination du choléra en Haïti | The Global Alliance Agains...
+- `review_source_credibility_src_search_8929f93c6a7e`: P1_high / source identity review - review_source_credibility_src_search_8929f93c6a7e - Multi-Country Outbreak of Cholera, External Situation Report...
+- `review_source_credibility_src_search_a0ed0f2ccd87`: P1_high / source identity review - review_source_credibility_src_search_a0ed0f2ccd87 - Cholera, Haiti - BEACON
+- `review_source_credibility_src_search_bd6f7e5cf18e`: P1_high / source identity review - review_source_credibility_src_search_bd6f7e5cf18e - 2 February 2024 cholera update - Facebook

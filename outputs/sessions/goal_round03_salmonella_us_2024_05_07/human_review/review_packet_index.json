@@ -1,0 +1,1422 @@
+{
+  "session_id": "goal_round03_salmonella_us_2024_05_07",
+  "review_packets": [
+    {
+      "review_id": "review_claim_corroboration_conflict_corr_event_001",
+      "priority_rank": 1,
+      "priority_level": "P0_critical",
+      "issue_category": "conflicting_claims_review",
+      "target_type": "claim",
+      "target_ids": [
+        "claim_rec_src_search_10ccb06f620d_001_cases_unspecified",
+        "claim_rec_src_search_33733b13ba13_003_deaths",
+        "claim_rec_src_search_33733b13ba13_004_observation",
+        "claim_rec_src_search_051378e10a24_001_observation",
+        "claim_rec_src_search_051378e10a24_002_observation",
+        "claim_rec_src_search_10ccb06f620d_003_cases_confirmed",
+        "claim_rec_src_search_10ccb06f620d_004_cases_probable",
+        "claim_rec_src_search_10ccb06f620d_002_hospitalizations",
+        "claim_rec_src_search_3b86862864f7_001_cases_confirmed",
+        "claim_rec_src_search_3b86862864f7_001_cases_unspecified",
+        "claim_rec_src_search_3b86862864f7_002_cases_confirmed",
+        "claim_rec_src_search_3b86862864f7_003_cases_unspecified",
+        "claim_rec_src_search_33733b13ba13_002_hospitalizations",
+        "claim_rec_src_search_8207a084046e_001_hospitalizations",
+        "claim_rec_src_search_33733b13ba13_001_cases_unspecified",
+        "src_search_10ccb06f620d",
+        "src_search_3b86862864f7",
+        "src_search_33733b13ba13",
+        "src_search_051378e10a24",
+        "src_search_8207a084046e",
+        "corr_event_001"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Comparable claims conflict and may affect cases, date, location, or count semantics."
+    },
+    {
+      "review_id": "review_anomaly_anom_004",
+      "priority_rank": 2,
+      "priority_level": "P0_critical",
+      "issue_category": "validation_conflict_review",
+      "target_type": "anomaly",
+      "target_ids": [
+        "src_search_10ccb06f620d",
+        "event_003",
+        "anom_004",
+        "val_result_018"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "validation_results",
+        "validation_source_compatibility_summary",
+        "anomaly_results"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_anomaly_anom_005",
+      "priority_rank": 3,
+      "priority_level": "P0_critical",
+      "issue_category": "validation_conflict_review",
+      "target_type": "anomaly",
+      "target_ids": [
+        "src_search_3b86862864f7",
+        "event_009",
+        "anom_005",
+        "val_result_025"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "validation_results",
+        "validation_source_compatibility_summary",
+        "anomaly_results"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_anomaly_anom_003",
+      "priority_rank": 4,
+      "priority_level": "P0_critical",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "anomaly",
+      "target_ids": [
+        "src_search_10ccb06f620d",
+        "event_002",
+        "anom_003",
+        "val_result_001"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events",
+        "anomaly_results"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_duplicate_event_003",
+      "priority_rank": 5,
+      "priority_level": "P1_high",
+      "issue_category": "validation_conflict_review",
+      "target_type": "record",
+      "target_ids": [
+        "rec_src_search_10ccb06f620d_003",
+        "rec_src_search_10ccb06f620d_004",
+        "event_003"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "quarantined_records",
+        "context_records",
+        "final_case_dataset",
+        "validation_results",
+        "validation_source_compatibility_summary"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_claim_corroboration_review_corr_event_002",
+      "priority_rank": 6,
+      "priority_level": "P1_high",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "claim",
+      "target_ids": [
+        "claim_rec_src_search_3b86862864f7_004_cases_unspecified",
+        "src_search_3b86862864f7",
+        "corr_event_002"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_15fc5f8d47e2",
+      "priority_rank": 7,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_15fc5f8d47e2"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_58ef4c36918e",
+      "priority_rank": 8,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_58ef4c36918e"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_793a8dd9911b",
+      "priority_rank": 9,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_793a8dd9911b"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_duplicate_event_004",
+      "priority_rank": 10,
+      "priority_level": "P1_high",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "record",
+      "target_ids": [
+        "rec_src_search_10ccb06f620d_002",
+        "event_004"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "quarantined_records",
+        "context_records",
+        "final_case_dataset",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_duplicate_event_005",
+      "priority_rank": 11,
+      "priority_level": "P1_high",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "record",
+      "target_ids": [
+        "rec_src_search_8207a084046e_001",
+        "event_005"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "quarantined_records",
+        "context_records",
+        "final_case_dataset",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_duplicate_event_006",
+      "priority_rank": 12,
+      "priority_level": "P1_high",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "record",
+      "target_ids": [
+        "rec_src_search_3b86862864f7_001",
+        "event_006"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "quarantined_records",
+        "context_records",
+        "final_case_dataset",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_duplicate_event_007",
+      "priority_rank": 13,
+      "priority_level": "P1_high",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "record",
+      "target_ids": [
+        "rec_src_search_33733b13ba13_001",
+        "rec_src_search_33733b13ba13_002",
+        "rec_src_search_33733b13ba13_003",
+        "event_007"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "quarantined_records",
+        "context_records",
+        "final_case_dataset",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_duplicate_event_008",
+      "priority_rank": 14,
+      "priority_level": "P1_high",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "record",
+      "target_ids": [
+        "rec_src_search_33733b13ba13_004",
+        "event_008"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "quarantined_records",
+        "context_records",
+        "final_case_dataset",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_duplicate_event_009",
+      "priority_rank": 15,
+      "priority_level": "P1_high",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "record",
+      "target_ids": [
+        "rec_src_search_3b86862864f7_002",
+        "rec_src_search_3b86862864f7_003",
+        "event_009"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "quarantined_records",
+        "context_records",
+        "final_case_dataset",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_duplicate_event_010",
+      "priority_rank": 16,
+      "priority_level": "P1_high",
+      "issue_category": "claim_corroboration_review",
+      "target_type": "record",
+      "target_ids": [
+        "rec_src_search_051378e10a24_002",
+        "event_010"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "quarantined_records",
+        "context_records",
+        "final_case_dataset",
+        "claims",
+        "claim_comparisons",
+        "corroborated_events"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Claim-level support is unresolved or depends on a single source."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_23155caef955",
+      "priority_rank": 17,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_23155caef955"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_31b14f5b949d",
+      "priority_rank": 18,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_31b14f5b949d"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_33733b13ba13",
+      "priority_rank": 19,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_33733b13ba13"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_3faf6631782d",
+      "priority_rank": 20,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_3faf6631782d"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_5851bdcbd35f",
+      "priority_rank": 21,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_5851bdcbd35f"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_5bda1b341f55",
+      "priority_rank": 22,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_5bda1b341f55"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_fdcb0a062e7e",
+      "priority_rank": 23,
+      "priority_level": "P1_high",
+      "issue_category": "source_identity_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_fdcb0a062e7e"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Publisher or source identity uncertainty can affect source independence and credibility."
+    },
+    {
+      "review_id": "review_source_credibility_src_search_14427d356566",
+      "priority_rank": 24,
+      "priority_level": "P1_high",
+      "issue_category": "source_credibility_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_14427d356566"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "Source credibility affects whether evidence should support collection or only context."
+    },
+    {
+      "review_id": "review_validation_val_result_001",
+      "priority_rank": 25,
+      "priority_level": "P1_high",
+      "issue_category": "outside_scope_review",
+      "target_type": "validation_result",
+      "target_ids": [
+        "rec_src_search_10ccb06f620d_001",
+        "val_result_001"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "validation_results",
+        "validation_source_compatibility_summary"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "The item may be outside the requested disease, location, or time window."
+    },
+    {
+      "review_id": "review_anomaly_anom_001",
+      "priority_rank": 26,
+      "priority_level": "P1_high",
+      "issue_category": "anomaly_review",
+      "target_type": "anomaly",
+      "target_ids": [
+        "rec_src_search_3b86862864f7_001",
+        "src_search_3b86862864f7",
+        "anom_001"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "anomaly_results"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "An anomaly rule flagged the item for expert inspection."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_057e55c5d693",
+      "priority_rank": 27,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_057e55c5d693"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_23155caef955",
+      "priority_rank": 28,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_23155caef955"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_29acec08996b",
+      "priority_rank": 29,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_29acec08996b"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_31b14f5b949d",
+      "priority_rank": 30,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_31b14f5b949d"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_341f243cf7df",
+      "priority_rank": 31,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_341f243cf7df"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_3faf6631782d",
+      "priority_rank": 32,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_3faf6631782d"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_57e9dfd2a4f6",
+      "priority_rank": 33,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_57e9dfd2a4f6"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_5851bdcbd35f",
+      "priority_rank": 34,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_5851bdcbd35f"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_a5bc6c5400a7",
+      "priority_rank": 35,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_a5bc6c5400a7"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_c8cadc78e2a8",
+      "priority_rank": 36,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_c8cadc78e2a8"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_d978f9d93b3b",
+      "priority_rank": 37,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_d978f9d93b3b"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_e0c58bcf769a",
+      "priority_rank": 38,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_e0c58bcf769a"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_core_metric_gap_src_search_fdcb0a062e7e",
+      "priority_rank": 39,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_fdcb0a062e7e"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_00ed618d1c38",
+      "priority_rank": 40,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_00ed618d1c38"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_081ac510741f",
+      "priority_rank": 41,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_081ac510741f"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_14427d356566",
+      "priority_rank": 42,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_14427d356566"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_15fc5f8d47e2",
+      "priority_rank": 43,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_15fc5f8d47e2"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_1aa919b25056",
+      "priority_rank": 44,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_1aa919b25056"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_230f50d16406",
+      "priority_rank": 45,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_230f50d16406"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_23155caef955",
+      "priority_rank": 46,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_23155caef955"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_31b14f5b949d",
+      "priority_rank": 47,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_31b14f5b949d"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_33733b13ba13",
+      "priority_rank": 48,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_33733b13ba13"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_3faf6631782d",
+      "priority_rank": 49,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_3faf6631782d"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_420c4a0f3bfd",
+      "priority_rank": 50,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_420c4a0f3bfd"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_5851bdcbd35f",
+      "priority_rank": 51,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_5851bdcbd35f"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_58ef4c36918e",
+      "priority_rank": 52,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_58ef4c36918e"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_5bda1b341f55",
+      "priority_rank": 53,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_5bda1b341f55"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_69331015856f",
+      "priority_rank": 54,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_69331015856f"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_6d137cd3f82a",
+      "priority_rank": 55,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_6d137cd3f82a"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_793a8dd9911b",
+      "priority_rank": 56,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_793a8dd9911b"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_95a418d2f831",
+      "priority_rank": 57,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_95a418d2f831"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    },
+    {
+      "review_id": "review_source_src_search_fdcb0a062e7e",
+      "priority_rank": 58,
+      "priority_level": "P3_low",
+      "issue_category": "general_review",
+      "target_type": "source",
+      "target_ids": [
+        "src_search_fdcb0a062e7e"
+      ],
+      "recommended_artifacts_to_open": [
+        "human_review_items",
+        "record_inclusion_decisions",
+        "source_registry",
+        "source_identity_assessments"
+      ],
+      "artifact_paths": {
+        "human_review_items": "collection/human_review_items.json",
+        "top_review_items": "human_review/top_review_items.json",
+        "review_decision_prefill": "human_review/review_decision_prefill.json",
+        "review_action_guide": "human_review/review_action_guide.md"
+      },
+      "reason": "This review item requires human inspection before it should affect downstream interpretation."
+    }
+  ],
+  "generated_from_artifacts_only": true
+}

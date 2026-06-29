@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 36,
+  &quot;prioritized_review_item_count&quot;: 36,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 2,
+    &quot;P1_high&quot;: 9,
+    &quot;P2_medium&quot;: 1,
+    &quot;P3_low&quot;: 24
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;conflicting_claims_review&quot;: 1,
+    &quot;validation_conflict_review&quot;: 1,
+    &quot;claim_corroboration_review&quot;: 1,
+    &quot;source_identity_review&quot;: 8,
+    &quot;source_credibility_review&quot;: 1,
+    &quot;general_review&quot;: 24
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_claim_corroboration_conflict_corr_event_001</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_001 - [PDF] Multi-country outbreak of cholera - World Health O...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_001&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_803858403368_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_803858403368_002_deaths&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_001_cases_suspected&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_cases_suspected&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_deaths&quot;,
+    &quot;claim_rec_src_search_8fb70e3827e3_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_8fb70e3827e3_002_deaths&quot;,
+    &quot;src_search_803858403368&quot;,
+    &quot;src_search_9aefe8d01e47&quot;,
+    &quot;src_search_8fb70e3827e3&quot;,
+    &quot;corr_event_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_803858403368_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_803858403368_002_deaths&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_001_cases_suspected&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_cases_suspected&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_deaths&quot;,
+    &quot;claim_rec_src_search_8fb70e3827e3_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_8fb70e3827e3_002_deaths&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_803858403368&quot;,
+    &quot;src_search_9aefe8d01e47&quot;,
+    &quot;src_search_8fb70e3827e3&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_001 - [PDF] Multi-country outbreak of cholera - World Health O...&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://www.who.int/docs/default-source/coronaviruse/situation-reports/20250110_multi-country_outbreak-of-cholera_sitrep--22.pdf?sfvrsn=568bfb6d_3&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Multi-country outbreak of cholera - World Health Organization (WHO)&quot;,
+  &quot;actual_publisher&quot;: &quot;World Health Organization&quot;,
+  &quot;source_type_final&quot;: &quot;international_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_001&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_803858403368&quot;,
+    &quot;source_url&quot;: &quot;https://www.who.int/docs/default-source/coronaviruse/situation-reports/20250110_multi-country_outbreak-of-cholera_sitrep--22.pdf?sfvrsn=568bfb6d_3&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_duplicate_event_001</h2><p><strong>P0_critical</strong> validation_conflict_review</p><p>validation conflict review - review_duplicate_event_001 - [PDF] Multi-country outbreak of cholera - World Health Organization (WHO)</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_duplicate_event_001&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 102,
+  &quot;issue_type&quot;: &quot;duplicate_event_clustering&quot;,
+  &quot;issue_category&quot;: &quot;validation_conflict_review&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_803858403368_001&quot;,
+    &quot;rec_src_search_803858403368_002&quot;,
+    &quot;rec_src_search_8fb70e3827e3_001&quot;,
+    &quot;rec_src_search_8fb70e3827e3_002&quot;,
+    &quot;event_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_803858403368_001&quot;,
+    &quot;rec_src_search_803858403368_002&quot;,
+    &quot;rec_src_search_8fb70e3827e3_001&quot;,
+    &quot;rec_src_search_8fb70e3827e3_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_001&quot;
+  ],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;validation conflict review - review_duplicate_event_001 - [PDF] Multi-country outbreak of cholera - World Health Organization (WHO)&quot;,
+  &quot;why_it_matters&quot;: &quot;This review item requires human inspection before it should affect downstream interpretation.&quot;,
+  &quot;evidence_quote&quot;: &quot;From 1 January to 29 Dec ember 2024 , Haiti documented 10 556 cholera cases and 162 deaths. For more detailed&quot;,
+  &quot;source_url&quot;: &quot;https://www.who.int/docs/default-source/coronaviruse/situation-reports/20250110_multi-country_outbreak-of-cholera_sitrep--22.pdf?sfvrsn=568bfb6d_3&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Multi-country outbreak of cholera - World Health Organization (WHO)&quot;,
+  &quot;actual_publisher&quot;: &quot;World Health Organization&quot;,
+  &quot;source_type_final&quot;: &quot;international_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;high&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;What decision, if any, should a human reviewer record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the linked artifacts and only then edit a decision file if needed.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_duplicate_event_001&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: true,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;validation_results&quot;,
+    &quot;validation_source_compatibility_summary&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record period 2024-01-01 to 2024-12-29 is too broad for requested task window 2024-10-01 to 2024-12-31&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_803858403368&quot;,
+    &quot;source_url&quot;: &quot;https://www.who.int/docs/default-source/coronaviruse/situation-reports/20250110_multi-country_outbreak-of-cholera_sitrep--22.pdf?sfvrsn=568bfb6d_3&quot;,
+    &quot;evidence_quote&quot;: &quot;From 1 January to 29 Dec ember 2024 , Haiti documented 10 556 cholera cases and 162 deaths. For more detailed&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_803858403368_067&quot;,
+    &quot;reason&quot;: &quot;Duplicate/event clustering requires review: same event key but count values conflict&quot;
+  }
+}</pre></article><article class='card'><h2>review_anomaly_anom_003</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_anomaly_anom_003 - event_001</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_anomaly_anom_003&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 84,
+  &quot;issue_type&quot;: &quot;anomaly&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;anomaly&quot;,
+  &quot;target_ids&quot;: [
+    &quot;event_001&quot;,
+    &quot;anom_003&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [
+    &quot;event_001&quot;
+  ],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_anomaly_anom_003 - event_001&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;&quot;,
+  &quot;source_title&quot;: &quot;&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;&quot;,
+  &quot;source_identity_confidence&quot;: &quot;&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;review_cluster_canonical_count&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_anomaly&quot;,
+    &quot;dismiss_anomaly&quot;,
+    &quot;confirm_anomaly&quot;,
+    &quot;mark_anomaly_resolved&quot;,
+    &quot;mark_anomaly_needs_more_evidence&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_anomaly_anom_003&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;,
+    &quot;anomaly_results&quot;
+  ],
+  &quot;warnings&quot;: [],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;&quot;,
+    &quot;source_url&quot;: &quot;&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;event cluster canonical count differs from sum of comparable countable members&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_4f1e08e3f365</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_4f1e08e3f365 - Haïti : La résurgence du choléra menace les communautés ...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_4f1e08e3f365&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_4f1e08e3f365&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_4f1e08e3f365&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_4f1e08e3f365 - Haïti : La résurgence du choléra menace les communautés ...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.hrw.org/fr/news/2025/11/05/haiti-la-resurgence-du-cholera-menace-les-communautes-vulnerables&quot;,
+  &quot;source_title&quot;: &quot;Haïti : La résurgence du choléra menace les communautés ...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_4f1e08e3f365&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_4f1e08e3f365&quot;,
+    &quot;source_url&quot;: &quot;https://www.hrw.org/fr/news/2025/11/05/haiti-la-resurgence-du-cholera-menace-les-communautes-vulnerables&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_505b2ac21551</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_505b2ac21551 - An Update of Cholera Cases as of 30th December 2024 ... - Fa...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_505b2ac21551&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_505b2ac21551&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_505b2ac21551&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_505b2ac21551 - An Update of Cholera Cases as of 30th December 2024 ... - Fa...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.facebook.com/malawimoh/posts/an-update-of-cholera-cases-as-of-30th-december-2024ministryofhealth/905170445128563&quot;,
+  &quot;source_title&quot;: &quot;An Update of Cholera Cases as of 30th December 2024 ... - Facebook&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;social_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_505b2ac21551&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_505b2ac21551&quot;,
+    &quot;source_url&quot;: &quot;https://www.facebook.com/malawimoh/posts/an-update-of-cholera-cases-as-of-30th-december-2024ministryofhealth/905170445128563&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;This source presents several compounding credibility concerns that the deterministic assessment partially captures but underweights. The canonical URL resolves to facebook.com — a social media platform — yet the source_type is tagged as \&quot;international_organization_report,\&quot; which is a significant metadata mismatch. The page appears to be the Facebook presence of the Malawi Ministry of Health (malawimoh), not any Haitian or international health authority. This creates a dual problem: (1) geographic mismatch — the publisher is the Malawi MoH, while the collection task targets Haiti; and (2) platform mismatch — Facebook posts, even from official government accounts, are not equivalent to formal surveillance reports or bulletins and carry inherent risks of incompleteness, informal language, and lack of structured data fields. The query used (targeting site:who.int OR site:paho.org) did not match this domain, indicating a query-result mismatch that suggests this result was surfaced incidentally rather than as a targeted hit. The authority_score of 0.88 appears inflated given the social media platform and geographic mismatch. The deterministic assessment assigns \&quot;context\&quot; role and medium credibility, but the geographic irrelevance to Haiti and the platform type together warrant a downgrade. The screening_and_critic_disagree flag is present and unresolved, which alone warrants human review. Human review is recommended contrary to the deterministic finding.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_5b9b31558c67</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_5b9b31558c67 - Haiti Country Report - Cholera Taxonomy</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_5b9b31558c67&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_5b9b31558c67&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_5b9b31558c67&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_5b9b31558c67 - Haiti Country Report - Cholera Taxonomy&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://cholera-taxonomy.middle-distance.com/locations/648/country_report&quot;,
+  &quot;source_title&quot;: &quot;Haiti Country Report - Cholera Taxonomy&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_5b9b31558c67&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_5b9b31558c67&quot;,
+    &quot;source_url&quot;: &quot;https://cholera-taxonomy.middle-distance.com/locations/648/country_report&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_664c22f9e3a2</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_664c22f9e3a2 - Élimination du choléra en Haïti | The Global Alliance Agains...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_664c22f9e3a2&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_664c22f9e3a2&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_664c22f9e3a2&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_664c22f9e3a2 - Élimination du choléra en Haïti | The Global Alliance Agains...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.choleraalliance.org/fr/actualites/elimination-du-cholera-haiti&quot;,
+  &quot;source_title&quot;: &quot;Élimination du choléra en Haïti | The Global Alliance Against Cholera (G.A.A.C)&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_664c22f9e3a2&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_664c22f9e3a2&quot;,
+    &quot;source_url&quot;: &quot;https://www.choleraalliance.org/fr/actualites/elimination-du-cholera-haiti&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_8929f93c6a7e</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_8929f93c6a7e - Multi-Country Outbreak of Cholera, External Situation Report...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_8929f93c6a7e&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_8929f93c6a7e&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_8929f93c6a7e&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_8929f93c6a7e - Multi-Country Outbreak of Cholera, External Situation Report...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://reliefweb.int/report/democratic-republic-congo/multi-country-outbreak-cholera-external-situation-report-21-published-18-december-2024&quot;,
+  &quot;source_title&quot;: &quot;Multi-Country Outbreak of Cholera, External Situation Report #21 ...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_8929f93c6a7e&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_8929f93c6a7e&quot;,
+    &quot;source_url&quot;: &quot;https://reliefweb.int/report/democratic-republic-congo/multi-country-outbreak-cholera-external-situation-report-21-published-18-december-2024&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_a0ed0f2ccd87</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_a0ed0f2ccd87 - Cholera, Haiti - BEACON</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_a0ed0f2ccd87&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_a0ed0f2ccd87&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_a0ed0f2ccd87&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_a0ed0f2ccd87 - Cholera, Haiti - BEACON&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://beaconbio.org/en/event?eventid=4608b346-c917-4783-9f7d-e6e9af15cb65&quot;,
+  &quot;source_title&quot;: &quot;Cholera, Haiti - BEACON&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_a0ed0f2ccd87&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_a0ed0f2ccd87&quot;,
+    &quot;source_url&quot;: &quot;https://beaconbio.org/en/event?eventid=4608b346-c917-4783-9f7d-e6e9af15cb65&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_bd6f7e5cf18e</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_bd6f7e5cf18e - 2 February 2024 cholera update - Facebook</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_bd6f7e5cf18e&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_bd6f7e5cf18e&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_bd6f7e5cf18e&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-10-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_bd6f7e5cf18e - 2 February 2024 cholera update - Facebook&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.facebook.com/mohzambia/posts/2-february-2024-cholera-update/802242431943276&quot;,
+  &quot;source_title&quot;: &quot;2 February 2024 cholera update - Facebook&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;social_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_bd6f7e5cf18e&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_bd6f7e5cf18e&quot;,
+    &quot;source_url&quot;: &quot;https://www.facebook.com/mohzambia/posts/2-february-2024-cholera-update/802242431943276&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;This source presents multiple compounding credibility problems that the deterministic scorer has underweighted, and the advisory assessment recommends a downgrade from \&quot;medium\&quot; to \&quot;low.\&quot;\n\n**1. Domain mismatch — Facebook, not an authoritative platform (critical):**\nThe canonical URL resolves to `facebook.com`, a social media platform. Regardless of who posted the content, Facebook is not an authoritative publication venue for epidemiological surveillance data. The deterministic `source_type` label of `international_organization_report` is almost certainly a misclassification — it reflects the *identity of the poster* (MoH Zambia), not the *nature of the publication venue*. Social media posts are not peer-reviewed, not versioned, not archived reliably, and are subject to editing or deletion without notice.\n\n**2. Wrong country — Zambia, not Haiti (critical):**\nThe URL path contains `mohzambia` (Ministry of Health, Zambia). The collection task targets **Haiti**. This is a fundamental geographic mismatch. The query used (`Haiti cholera situation report... site:reliefweb.int OR site:unocha.org`) did not match the intended domain, and the result returned is from a completely different country&#x27;s health authority. No data from this source can be attributed to Haiti.\n\n**3. Wrong time window — February 2024, not Q4 2024 (significant):**\nThe title explicitly states \&quot;2 February 2024 cholera update.\&quot; The collection window is **2024-10-01 to 2024-12-31**. This source falls entirely outside the target time window by approximately 8 months.\n\n**4. Source type misclassification (significant):**\nThe deterministic scorer assigned `source_type: international_organization_report` and an `authority_score` of 0.88. While MoH Zambia is a legitimate national health authority, it is not an international organization, and its authority is irrelevant to a Haiti-focused task. The high authority score is misleading in this context.\n\n**5. Deterministic role disagreement (noted):**\nThe `screening_and_critic_disagree` risk flag is already present, indicating internal pipeline tension. The deterministic system assigned `source_role_final: context` but the advisory assessment finds even \&quot;context\&quot; to be inappropriate — a Zambia MoH Facebook post about a February 2024 cholera update has no contextual value for Haiti Q4 2024 surveillance data collection.\n\n**6. Missing publisher field (minor but noted):**\n`publisher` is null, which reduces provenance traceability, though the URL itself partially compensates.\n\n**7. `human_review_recommended: false` in deterministic output is likely incorrect:**\nGiven the country mismatch, time window mismatch, domain type, and source type misclassification, this source warrants at minimum a human flag review to confirm it should be excluded and to investigate why the live search query returned a Zambia/Facebook result for a Haiti/reliefweb query.&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "iterative_source_discovery_enabled": true,
+  "llm_iterative_planning_enabled": true,
+  "search_iteration_count": 2,
+  "llm_refinement_call_count": 2,
+  "total_queries_planned": 8,
+  "total_queries_executed": 7,
+  "total_raw_results": 56,
+  "total_candidates_created": 41,
+  "stop_decision": "stop_sufficient",
+  "stop_reason": "Max iterations reached (2/2). Sufficient authoritative source candidates identified across state, county, and federal tiers to populate the required target fields. Remaining gaps (August-specific weekly report date anchoring, hospitalizations) are structural limitations of how CDPH publishes data — not addressable by further web search within these bounds.",
+  "final_coverage_assessment": "Coverage is partially sufficient for the August 2024 window. The following target fields have candidate sources:\n\n• cases_confirmed / cases_unspecified: westnile.ca.gov weekly PDFs (download_ids 4980, 5061, 5072) show cumulative 2024 figures of 98 and 112 human cases respectively; the Fresno County press release (fresnocountyca.gov, dated 09-13-2024) cites CDPH reporting 38 human cases as of that date; consolidatedmadca.gov confirms 3 asymptomatic Fresno County cases as of 07-10-2024.\n• deaths: fresnocountyca.gov press release cites CDPH reporting 4 deaths in 2024 as of 09-13-2024; the Facebook/CDPH snippet references \"first human West Nile virus deaths\" (undated, low trust).\n• subnational_location / locality: Fresno County confirmed via fresnocountyca.gov and consolidatedmadca.gov; LA County via publichealth.lacounty.gov; Tulare County mentioned in westnile.ca.gov snippet; 23 counties referenced in the 98-case weekly update.\n• date_reported: The Fresno County press release is dated 09-13-2024 (just outside the August window but citing cumulative 2024 figures); the consolidatedmadca.gov release is dated 07-10-2024 (just before the window). The westnile.ca.gov weekly PDFs lack confirmed publication dates in metadata.\n• source_url / source_type / evidence_quote: Multiple candidate URLs with snippet-level evidence quotes available.\n\nRemaining gaps:\n• August-specific (2024-08-01 to 2024-08-31) weekly breakdowns: The westnile.ca.gov weekly PDFs have unknown publication dates from metadata alone — date anchoring requires page fetch, which is outside this workflow's scope.\n• hospitalizations: No candidate source has surfaced hospitalization figures for California August 2024 specifically.\n• cases_probable / cases_suspected: Not disaggregated in any surfaced snippet.\n• Sacramento and Kern county-level data: Not confirmed in accepted candidates despite targeting.",
+  "final_trustworthiness_assessment": "High trust: westnile.ca.gov (CDPH-operated state surveillance portal), fresnocountyca.gov (official county health department PDF press release with date 09-13-2024), consolidatedmadca.gov (official mosquito abatement district joint release with date 07-10-2024), publichealth.lacounty.gov (official LA County health), cdc.gov (federal ArboNET).\n\nMedium trust: News outlets (abc10.com, fresnobee.com, bakersfieldnow.com, latimes.com) — acceptable as collection-support sources that cite official figures; evidence quotes must be traceable to named official sources.\n\nLow trust / not usable as primary evidence: facebook.com posts (4 results) — social media reposts of CDPH content without direct URL to original CDPH press release; en.wikipedia.org — background only; ama-assn.org result is 2025-focused and not California-specific for August 2024; 19january2025snapshot.epa.gov — EPA technical documentation covering 2002–2023 national data, not California August 2024 specific.\n\nKey trust caveat: The westnile.ca.gov weekly PDF download IDs (4980, 5061, 5072) have no confirmed publication dates in the metadata. The 112-case and 98-case cumulative figures cannot be definitively assigned to the August 2024 window without date confirmation. The fresnocountyca.gov press release (09-13-2024) citing 38 cases and 4 deaths is the most date-anchored official source, but it falls just outside the August 31 cutoff and reflects cumulative figures through early September.",
+  "final_gap_assessment": null,
+  "selected_query_ids": [
+    "iter1_q1",
+    "iter1_q2",
+    "iter1_q3",
+    "iter1_q4",
+    "iter2_q1",
+    "iter2_q2",
+    "iter2_q3",
+    "iter2_q4"
+  ],
+  "skipped_query_ids": [],
+  "skipped_query_count": 0,
+  "warnings": [],
+  "status": "completed",
+  "target_verification_required": false,
+  "verified_target_source_count": 0,
+  "verified_target_source_ids": [],
+  "target_source_miss_reasons": [],
+  "target_evidence_requirements": {
+    "required": false,
+    "reason": "non_influenza_task"
+  }
+}

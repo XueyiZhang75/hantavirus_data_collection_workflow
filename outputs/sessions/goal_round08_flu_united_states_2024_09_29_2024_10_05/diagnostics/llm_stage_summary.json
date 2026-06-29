@@ -1,0 +1,178 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-6",
+  "api_key_present": true,
+  "disease_intelligence": {
+    "generation_method": "llm_generated",
+    "disease_standard_name": "Influenza",
+    "query_term_count": 12,
+    "warnings": [
+      "task_input_warnings flag: 'extraction_record_model_still_hantavirus_named' — verify that the extraction schema field names and model are correctly mapped to influenza, not hantavirus, before ingestion.",
+      "task_input_warnings flag: 'source_discovery_not_yet_disease_generic' — source discovery logic may not yet be tuned for influenza-specific sources; manually verify CDC FluView and state health department sources are in scope.",
+      "Early-season timing (MMWR Week 40, early October 2024) means influenza activity in the United States is typically at baseline or minimal — absence of high case counts is expected and should not be treated as a data gap.",
+      "CDC FluView data for Week 40 (ending 2024-10-05) may not be publicly released until approximately 2024-10-11 — check for publication lag before flagging as missing.",
+      "State health department reporting cadences vary; some states report weekly, others biweekly or monthly — document reporting frequency per source.",
+      "Influenza surveillance data is often preliminary at time of first release and subject to revision — flag all early-season extractions as provisional.",
+      "Do not invent or infer URLs; source_url must be populated only from directly observed source documents during collection.",
+      "FluSurv-NET hospitalization data for early season weeks may have suppressed cells (counts <10) — record suppression status rather than imputing zeros."
+    ],
+    "llm_call_succeeded": true
+  },
+  "source_planning": {
+    "enabled": true,
+    "status": "success",
+    "generation_method": "llm_executable_source_plan",
+    "execution_status": "planned_not_executed",
+    "planned_query_count": 10,
+    "planned_source_category_count": 5,
+    "provider_channel_counts": {
+      "official_site_search": 4,
+      "literature_api": 2,
+      "database_search": 2,
+      "news_search": 2
+    },
+    "agent_query_count": 10,
+    "agent_query_added_count": 10,
+    "candidate_hint_count": 0,
+    "warnings": [
+      "source_plan_created_not_executed_stage4",
+      "source_discovery_execution_not_implemented_stage4",
+      "early_season_low_activity_expected_for_week_ending_2024_10_05",
+      "cdc_fluview_weekly_report_is_primary_target_mmwr_week_40_2024",
+      "state_level_reports_may_lag_or_be_absent_for_early_season_weeks"
+    ],
+    "failure_type": null,
+    "failure_message": null
+  },
+  "source_critic": {
+    "enabled": true,
+    "attempted_source_count": 0,
+    "assessed_source_count": 0,
+    "skipped_source_count": 42,
+    "blocked_fetch_count": 0,
+    "needs_review_count": 0,
+    "allowed_fetch_count": 0,
+    "context_only_count": 0,
+    "decision_counts": {},
+    "fetch_recommendation_counts": {},
+    "risk_flag_counts": {},
+    "selection": {
+      "selection_mode": "auto_priority",
+      "explicit_allowlist_used": false,
+      "collection_mode": "direct_collection",
+      "direct_target_official_fast_path": true,
+      "max_sources": 4,
+      "eligible_candidate_count": 0,
+      "selected_candidate_count": 0,
+      "skipped_candidate_count": 42,
+      "selected_source_ids": [],
+      "skipped_reason_counts": {
+        "target_official_must_fetch_skips_llm_source_critic": 1,
+        "direct_target_official_fast_path_skips_source_critic": 41
+      }
+    },
+    "allowlist_enabled": false,
+    "max_sources": 4,
+    "review_blocks_fetch": false,
+    "failure_count": 0,
+    "semantic_leakage_count": 0,
+    "human_review_recommended_count": 0
+  },
+  "source_credibility": {
+    "enabled": true,
+    "assessed_source_count": 42,
+    "role_counts": {
+      "context": 26,
+      "validation": 13,
+      "excluded": 1,
+      "collection": 2
+    },
+    "risk_flag_counts": {
+      "official_public_health_authority": 32,
+      "local_source_matches_task_location": 33,
+      "source_disease_relevance:target_disease_match": 35,
+      "source_metadata_matches_requested_disease": 35,
+      "source_time_matches_requested_window": 18,
+      "task_location_granularity": 21,
+      "data_signal_in_source_metadata": 40,
+      "standard_web_page": 37,
+      "primary_or_authoritative_source": 36,
+      "complete_source_provenance": 29,
+      "context_or_background_only": 20,
+      "time_window_match_from_planned_query": 24,
+      "screening_and_critic_disagree": 18,
+      "local_or_subnational_granularity": 12,
+      "location_match_from_planned_query": 9,
+      "national_or_international_granularity": 9,
+      "pdf_or_report_likely_medium_readability": 5,
+      "missing_publisher": 13,
+      "low_machine_readability": 5,
+      "source_disease_relevance:ambiguous_disease": 5,
+      "ambiguous_disease_signal_in_source_metadata": 5,
+      "ambiguous_disease": 6,
+      "international_organization_authority": 4,
+      "source_disease_relevance:unrelated_disease": 1,
+      "unrelated_disease_signal_in_source_metadata": 1,
+      "source_disease_relevance:insufficient_text": 1,
+      "disease_relevance_unclear": 1,
+      "secondary_news_or_media_source": 7,
+      "independence_unclear": 5,
+      "low_authority_relevant_source": 5,
+      "named_publisher": 1,
+      "context_or_prevention_only": 2,
+      "source_likely_not_extractable": 2
+    },
+    "llm_assessed_count": 0,
+    "llm_failure_count": 0,
+    "needs_review_count": 0
+  },
+  "source_identity": {
+    "enabled": true,
+    "identity_assessed_count": 42,
+    "llm_identity_assessed_count": 0,
+    "post_fetch_identity_assessed_count": 3,
+    "unknown_publisher_count": 13,
+    "source_type_counts": {
+      "national_public_health_agency": 17,
+      "unknown": 2,
+      "background_fact_sheet": 1,
+      "international_public_health_agency": 8,
+      "structured_database": 2,
+      "state_or_local_public_health_agency": 1,
+      "social_media": 2,
+      "secondary_aggregator": 1,
+      "academic_or_peer_reviewed_source": 1,
+      "news_media": 4,
+      "official_public_health_agency": 3
+    },
+    "claim_support_role_counts": {
+      "primary_case_claim_support": 25,
+      "insufficient_information": 5,
+      "context_only": 7,
+      "corroboration_support": 5
+    },
+    "recommended_fetch_use_counts": {
+      "fetch_for_extraction": 30,
+      "fetch_only_after_review": 5,
+      "fetch_for_context": 7
+    },
+    "warning_counts": {
+      "search_provider_not_publisher": 42,
+      "publisher_from_search_metadata_unverified": 42,
+      "direct_target_official_fast_path_skips_source_identity": 42,
+      "actual_publisher_unknown": 13
+    }
+  },
+  "structured_extraction": {
+    "enabled": true,
+    "mode": "llm_structured_output",
+    "eligible_chunk_count": 20,
+    "call_count": 4,
+    "success_count": 4,
+    "error_count": 0,
+    "fallback_count": 0,
+    "raw_record_count": 14,
+    "max_chunks": 30,
+    "error_messages": []
+  }
+}

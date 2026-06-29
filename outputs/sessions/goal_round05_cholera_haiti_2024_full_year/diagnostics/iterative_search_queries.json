@@ -1,0 +1,352 @@
+[
+  {
+    "query_id": "iter1_q1",
+    "query": "MSPP choléra Haïti 2024 bulletin épidémiologique cas décès",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "MSPP is the primary national authority for cholera surveillance in Haiti. Their bulletins ('bulletins épidémiologiques') are the gold-standard source for subnational case/death breakdowns. French-language query with MSPP name and key epidemiological terms maximizes recall against their document corpus. Upstream queries did not explicitly name MSPP.",
+    "expected_source_type_or_evidence": "MSPP (Ministère de la Santé Publique et de la Population) weekly or monthly epidemiological bulletins, cholera situation reports, or surveillance summaries published on mspp.gouv.ht or affiliated portals",
+    "expected_trust_signal": "Official Haitian government health ministry domain (mspp.gouv.ht), French-language bulletin with case/death counts by department or commune",
+    "language": "fr",
+    "target_disease_terms": [
+      "choléra",
+      "cholera"
+    ],
+    "target_location_terms": [
+      "Haïti",
+      "Haiti"
+    ],
+    "time_terms": [
+      "2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q1"
+  },
+  {
+    "query_id": "iter1_q2",
+    "query": "PAHO WHO cholera Haiti 2024 situation report cases deaths epidemiological update",
+    "provider_channel": "official_site_search",
+    "query_type": "domain_limited",
+    "source_type": "international_organization_report",
+    "role_hint": "validation",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "PAHO is the WHO regional office for the Americas and publishes regular cholera situation reports for Haiti, often with subnational breakdowns and cumulative totals. WHO DONs provide internationally validated outbreak summaries. Explicitly naming both PAHO and WHO improves retrieval of these high-authority sources. Upstream queries used generic 'outbreak report surveillance' without agency names.",
+    "expected_source_type_or_evidence": "PAHO/AMRO situation reports, WHO Disease Outbreak News (DON), WHO GTFCC cholera updates, or PAHO epidemiological alerts for Haiti 2024",
+    "expected_trust_signal": "paho.org or who.int domain, official situation report or DON format with cumulative or weekly case/death counts",
+    "language": "en",
+    "target_disease_terms": [
+      "cholera"
+    ],
+    "target_location_terms": [
+      "Haiti"
+    ],
+    "time_terms": [
+      "2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q2"
+  },
+  {
+    "query_id": "iter1_q3",
+    "query": "Haiti cholera 2024 cases deaths ReliefWeb OCHA humanitarian situation report",
+    "provider_channel": "web_search",
+    "query_type": "domain_limited",
+    "source_type": "international_organization_report",
+    "role_hint": "collection_support",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "ReliefWeb aggregates OCHA, UNICEF, MSF, and other humanitarian actor reports on Haiti cholera. These often contain subnational breakdowns and time-series data not easily found via direct agency searches. OCHA Haiti publishes regular situation reports that include MSPP-sourced cholera statistics. This channel was not explicitly targeted in upstream queries.",
+    "expected_source_type_or_evidence": "OCHA Haiti situation reports on ReliefWeb, UNICEF humanitarian situation reports, MSF/IRC field reports with cholera case counts, or OCHA Flash Updates referencing cholera data",
+    "expected_trust_signal": "reliefweb.int or unocha.org domain, humanitarian situation report format with epidemiological figures attributed to MSPP or PAHO",
+    "language": "en",
+    "target_disease_terms": [
+      "cholera"
+    ],
+    "target_location_terms": [
+      "Haiti"
+    ],
+    "time_terms": [
+      "2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q3"
+  },
+  {
+    "query_id": "iter1_q4",
+    "query": "WHO Global Health Observatory cholera Haiti 2024 surveillance data annual cases deaths",
+    "provider_channel": "database_search",
+    "query_type": "database",
+    "source_type": "structured_database",
+    "role_hint": "validation",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "country",
+      "date_reported",
+      "cases_confirmed",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "The WHO GHO and GTFCC maintain structured annual cholera surveillance datasets by country. The WHO Weekly Epidemiological Record publishes annual cholera tables. These provide validated aggregate figures for Haiti 2024 that can anchor and cross-check subnational data from MSPP/PAHO. Upstream queries used generic 'surveillance dataset' phrasing without naming these specific WHO data products.",
+    "expected_source_type_or_evidence": "WHO Global Health Observatory (GHO) cholera dataset, WHO GTFCC (Global Task Force on Cholera Control) annual data, or WHO Weekly Epidemiological Record (WER) cholera tables for Haiti 2024",
+    "expected_trust_signal": "who.int/data or apps.who.int domain, structured tabular data with country-level annual or quarterly cholera statistics",
+    "language": "en",
+    "target_disease_terms": [
+      "cholera"
+    ],
+    "target_location_terms": [
+      "Haiti"
+    ],
+    "time_terms": [
+      "2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "iter1_q4"
+  },
+  {
+    "query_id": "iter2_q1",
+    "query": "site:mspp.gouv.ht choléra 2024 bulletin rapport épidémiologique",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_probable",
+      "cases_suspected",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "MSPP (mspp.gouv.ht) is the primary national authority for Haiti cholera surveillance and was entirely absent from iteration 1 results. A direct site-scoped search is the most reliable way to surface their 2024 weekly/monthly epidemiological bulletins and cholera situation reports, which contain department-level case and death breakdowns. This is the highest-priority gap from iteration 1.",
+    "expected_source_type_or_evidence": "MSPP weekly or monthly epidemiological bulletins ('bulletins épidémiologiques hebdomadaires/mensuels') or cholera-specific situation reports published on mspp.gouv.ht, with case counts by Haitian department (Ouest, Artibonite, Nord, Sud, etc.) for 2024",
+    "expected_trust_signal": "mspp.gouv.ht domain, French-language official bulletin format, case/death counts attributed to MSPP surveillance system",
+    "language": "fr",
+    "target_disease_terms": [
+      "choléra",
+      "cholera"
+    ],
+    "target_location_terms": [
+      "Haïti",
+      "Haiti"
+    ],
+    "time_terms": [
+      "2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q1"
+  },
+  {
+    "query_id": "iter2_q2",
+    "query": "PAHO cholera Haiti situation report 2024 cases deaths subnational departments",
+    "provider_channel": "official_site_search",
+    "query_type": "domain_limited",
+    "source_type": "international_organization_report",
+    "role_hint": "collection",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_suspected",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Iteration 1 confirmed PAHO published a Haiti Cholera Situation Report 8 on 13 March 2024 and an epidemiological update on 26 April 2024. The PAHO situation report series for Haiti cholera is numbered sequentially; reports 9 through ~15 covering Q2–Q4 2024 are the primary gap. This query targets the full PAHO situation report series for Haiti 2024 with subnational emphasis to surface later reports not yet found.",
+    "expected_source_type_or_evidence": "PAHO Haiti Cholera Situation Reports (numbered series, reports 9–15+) covering April–December 2024, PAHO/AMRO epidemiological updates for the Americas with Haiti-specific data, or PAHO end-of-year cholera summary for Haiti 2024",
+    "expected_trust_signal": "paho.org or iris.paho.org domain, official situation report format with cumulative and weekly case/death counts, MSPP-attributed data",
+    "language": "en",
+    "target_disease_terms": [
+      "cholera"
+    ],
+    "target_location_terms": [
+      "Haiti"
+    ],
+    "time_terms": [
+      "2024"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q2 — PAHO documents index returned Situation Report 8 (March 2024) and April 2024 epidemiological update; later 2024 reports not yet surfaced",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q2"
+  },
+  {
+    "query_id": "iter2_q3",
+    "query": "Haiti cholera 2024 situation report cases deaths UNICEF MSF humanitarian response",
+    "provider_channel": "web_search",
+    "query_type": "general_web",
+    "source_type": "international_organization_report",
+    "role_hint": "collection_support",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_suspected",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "UNICEF Haiti and MSF (Médecins Sans Frontières) publish field-level humanitarian situation reports that often contain cholera case counts at the facility, commune, or department level — data not always captured in PAHO/WHO national summaries. Neither appeared in iteration 1 results. UNICEF Haiti SitReps and MSF field reports are secondary but high-value sources for subnational and hospitalization data. ReliefWeb is the likely aggregation point for these documents.",
+    "expected_source_type_or_evidence": "UNICEF Haiti humanitarian situation reports (unicef.org or reliefweb.int) with cholera component for 2024; MSF operational updates or press releases citing cholera treatment center admissions in Haiti 2024; IRC or other NGO field reports with facility-level cholera data",
+    "expected_trust_signal": "unicef.org, msf.org, or reliefweb.int domain; humanitarian situation report format; case counts attributed to MSPP or facility-level treatment center data",
+    "language": "en",
+    "target_disease_terms": [
+      "cholera"
+    ],
+    "target_location_terms": [
+      "Haiti"
+    ],
+    "time_terms": [
+      "2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q3"
+  },
+  {
+    "query_id": "iter2_q4",
+    "query": "choléra Haïti 2024 cas décès département Artibonite Ouest rapport MSPP OPS",
+    "provider_channel": "web_search",
+    "query_type": "general_web",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_confirmed",
+      "cases_suspected",
+      "deaths",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Subnational (department-level) data is the most critical gap for the target fields. Haiti's cholera burden is historically concentrated in Artibonite and Ouest departments. This French-language query explicitly names these departments alongside MSPP and OPS (PAHO in French) to surface department-specific 2024 surveillance data that may be embedded in MSPP bulletins, PAHO French-language reports, or ReliefWeb documents not returned by the broader queries in iteration 1. Naming specific departments increases precision for subnational_location field coverage.",
+    "expected_source_type_or_evidence": "MSPP epidemiological bulletins or PAHO French-language situation reports with department-level breakdown (Artibonite, Ouest, Nord, Sud, Centre, etc.) for 2024; ReliefWeb documents citing MSPP departmental cholera statistics",
+    "expected_trust_signal": "mspp.gouv.ht, paho.org/fr, or reliefweb.int domain; French-language document with tabular or narrative department-level case/death counts for 2024",
+    "language": "fr",
+    "target_disease_terms": [
+      "choléra",
+      "cholera"
+    ],
+    "target_location_terms": [
+      "Haïti",
+      "Haiti",
+      "Artibonite",
+      "Ouest",
+      "département"
+    ],
+    "time_terms": [
+      "2024"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "iter1_q1 — MSPP French-language query returned no mspp.gouv.ht results; this query adds explicit department names and OPS to improve subnational recall",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "iter2_q4"
+  }
+]

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dataset Decision Flow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Dataset Decision Flow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>No accepted primary case records</h2><pre>{
+  &quot;final_case_dataset&quot;: 0,
+  &quot;final_dataset&quot;: 1,
+  &quot;final_dataset_pre_quality_gate&quot;: 17,
+  &quot;final_dataset_post_review&quot;: 1,
+  &quot;zero_case_statements&quot;: 0,
+  &quot;exposure_monitoring_records&quot;: 2,
+  &quot;surveillance_summary_records&quot;: 12,
+  &quot;outbreak_summary_records&quot;: 1,
+  &quot;context_records&quot;: 0,
+  &quot;unclassified_observation_records&quot;: 15,
+  &quot;non_primary_observations&quot;: 16,
+  &quot;quarantined_records&quot;: 4,
+  &quot;pending_review_records&quot;: 12
+}</pre></section><section><table><tr><th>Record</th><th>Dataset View</th><th>Status</th><th>Reasons</th></tr><tr><td><code>rec_src_search_b15c469d896c_001</code></td><td>final_dataset</td><td>accepted_with_warnings</td><td>[&#x27;record passed deterministic run quality gates&#x27;]</td></tr><tr><td><code>rec_src_search_8d7dfb3aeace_001</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_8d7dfb3aeace_002</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_e6c676751454_001</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_e6c676751454_002</code></td><td>final_dataset_pre_quality_gate</td><td>quarantined_ambiguous_non_primary_observation</td><td>[&#x27;claim-level corroboration marked this record as not eligible for the primary case dataset&#x27;, &#x27;record is a non-primary public-health observation, not an accepted case dataset record&#x27;, &#x27;claim-level corroboration classified record as ambiguous_public_health_observation, not a primary confirmed case dataset record&#x27;, &#x27;no corroborated primary case event supports this record&#x27;]</td></tr><tr><td><code>rec_src_search_e6c676751454_003</code></td><td>final_dataset_pre_quality_gate</td><td>quarantined_ambiguous_non_primary_observation</td><td>[&#x27;claim-level corroboration marked this record as not eligible for the primary case dataset&#x27;, &#x27;record is a non-primary public-health observation, not an accepted case dataset record&#x27;, &#x27;claim-level corroboration classified record as ambiguous_public_health_observation, not a primary confirmed case dataset record&#x27;, &#x27;no corroborated primary case event supports this record&#x27;]</td></tr><tr><td><code>rec_src_search_c8f6e152147e_001</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_c8f6e152147e_002</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_f0d04211eb5c_001</code></td><td>final_dataset_pre_quality_gate</td><td>quarantined_schema_invalid</td><td>[&#x27;direct_collection metric records must resolve whether the table column is current-period, previous-period, or cumulative&#x27;]</td></tr><tr><td><code>rec_src_search_2acdad71566e_001</code></td><td>final_dataset_pre_quality_gate</td><td>quarantined_schema_invalid</td><td>[&#x27;direct_collection metric records must resolve whether the table column is current-period, previous-period, or cumulative&#x27;]</td></tr><tr><td><code>rec_src_search_2acdad71566e_002</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&#x27;, &#x27;record date 2024-11-30 is outside requested task window 2024-12-01 to 2025-02-28&#x27;, &#x27;record date 2024-11-30 is outside requested task window 2024-12-01 to 2025-02-28&#x27;, &#x27;record event period 2024-11-24 to 2024-11-30 does not overlap requested task window 2024-12-01 to 2025-02-28&#x27;, &#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_2acdad71566e_003</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_2acdad71566e_004</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_fb7ff50094aa_001</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_fb7ff50094aa_002</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_fb7ff50094aa_003</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr><tr><td><code>rec_src_search_9007d7feb130_001</code></td><td>final_dataset_pre_quality_gate</td><td>pending_human_review</td><td>[&#x27;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&#x27;]</td></tr></table></section></main>
+</body>
+</html>

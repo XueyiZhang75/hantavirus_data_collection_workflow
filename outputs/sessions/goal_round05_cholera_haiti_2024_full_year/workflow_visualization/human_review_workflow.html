@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 42,
+  &quot;prioritized_review_item_count&quot;: 42,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 0,
+    &quot;P1_high&quot;: 15,
+    &quot;P2_medium&quot;: 0,
+    &quot;P3_low&quot;: 27
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;claim_corroboration_review&quot;: 1,
+    &quot;source_identity_review&quot;: 14,
+    &quot;general_review&quot;: 27
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_claim_corroboration_review_corr_event_001</h2><p><strong>P1_high</strong> claim_corroboration_review</p><p>claim corroboration review - review_claim_corroboration_review_corr_event_001 - Cholera outbreak in Haiti persists, particularly in sites...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_review_corr_event_001&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 92,
+  &quot;issue_type&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;issue_category&quot;: &quot;claim_corroboration_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_9aefe8d01e47_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_001_cases_suspected&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_cases_suspected&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_deaths&quot;,
+    &quot;src_search_9aefe8d01e47&quot;,
+    &quot;corr_event_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_9aefe8d01e47_001_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_001_cases_suspected&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_cases_confirmed&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_cases_suspected&quot;,
+    &quot;claim_rec_src_search_9aefe8d01e47_002_deaths&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_9aefe8d01e47&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;claim corroboration review - review_claim_corroboration_review_corr_event_001 - Cholera outbreak in Haiti persists, particularly in sites...&quot;,
+  &quot;why_it_matters&quot;: &quot;Claim-level support is unresolved or depends on a single source.&quot;,
+  &quot;evidence_quote&quot;: &quot;Primary case claim has no independent corroborating source.&quot;,
+  &quot;source_url&quot;: &quot;https://beaconbio.org/en/report?reportid=e1816dc5-50ab-41c0-90df-bde8617d2d78&amp;eventid=4608b346-c917-4783-9f7d-e6e9af15cb65&amp;locations=aaa9ccfe-ddd5-43a6-93cc-f7ea1f40330c&quot;,
+  &quot;source_title&quot;: &quot;Cholera outbreak in Haiti persists, particularly in sites ... - BEACON&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Is the claim independently corroborated, conflicting, or only single-source evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_review_corr_event_001&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_9aefe8d01e47&quot;,
+    &quot;source_url&quot;: &quot;https://beaconbio.org/en/report?reportid=e1816dc5-50ab-41c0-90df-bde8617d2d78&amp;eventid=4608b346-c917-4783-9f7d-e6e9af15cb65&amp;locations=aaa9ccfe-ddd5-43a6-93cc-f7ea1f40330c&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Primary case claim has no independent corroborating source.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_9551dc7b0b7e</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_9551dc7b0b7e - Situation Report In 2024, humanitarian partners &amp; the Govt....</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_9551dc7b0b7e&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 86,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_9551dc7b0b7e&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_9551dc7b0b7e&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_9551dc7b0b7e - Situation Report In 2024, humanitarian partners &amp; the Govt....&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://x.com/OCHA_Ethiopia/status/1901624800289665470&quot;,
+  &quot;source_title&quot;: &quot;Situation Report In 2024, humanitarian partners &amp; the Govt. of ...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;social_media&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_9551dc7b0b7e&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_9551dc7b0b7e&quot;,
+    &quot;source_url&quot;: &quot;https://x.com/OCHA_Ethiopia/status/1901624800289665470&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;This source presents a compound of significant credibility concerns that collectively justify a low credibility rating, despite the high authority of the underlying organization (OCHA). The canonical URL resolves to an X.com (Twitter) post from the @OCHA_Ethiopia account — a social media post, not a formal report or structured data publication. Several critical misalignments are present: (1) Geographic mismatch: The account handle is OCHA_Ethiopia, but the collection task targets Haiti. The query that surfaced this result was Haiti-specific, suggesting this is a false positive from the search discovery process rather than a genuinely relevant source. (2) Disease relevance is ambiguous: No target disease terms (cholera) were found in the source metadata. The disease_relevance_score of 0.20 is very low, and the source_disease_relevance_status is flagged as &#x27;ambiguous_disease&#x27;. (3) Platform risk: X.com posts are ephemeral, unstructured, and not citable as primary data sources. Even if the post references a formal OCHA situation report, the post itself cannot serve as a data source — only the underlying report it links to (if any) would be eligible. (4) Publisher is null, and the source_type label of &#x27;international_organization_report&#x27; is misleading — this is a social media post, not a report. The label inflation increases the risk of downstream misclassification. (5) The deterministic assessor flagged &#x27;screening_and_critic_disagree&#x27;, indicating internal inconsistency in the pipeline&#x27;s evaluation of this source. (6) The title snippet (&#x27;Situation Report In 2024, humanitarian partners &amp; the Govt. of ...&#x27;) is truncated and does not confirm Haiti or cholera relevance. The high authority_score (0.88) reflects OCHA&#x27;s institutional standing, but authority alone does not confer data usability when the platform, geography, and disease relevance are all misaligned.&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_25902466ae28</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_25902466ae28 - UNICEF Haiti Humanitarian Situation Report No. 3: 1 to 30 Ap...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_25902466ae28&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_25902466ae28&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_25902466ae28&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_25902466ae28 - UNICEF Haiti Humanitarian Situation Report No. 3: 1 to 30 Ap...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://reliefweb.int/report/haiti/unicef-haiti-humanitarian-situation-report-no-3-1-30-april-2024&quot;,
+  &quot;source_title&quot;: &quot;UNICEF Haiti Humanitarian Situation Report No. 3: 1 to 30 April 2024&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_25902466ae28&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_25902466ae28&quot;,
+    &quot;source_url&quot;: &quot;https://reliefweb.int/report/haiti/unicef-haiti-humanitarian-situation-report-no-3-1-30-april-2024&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_42c6ab0993b9</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_42c6ab0993b9 - UNICEF Haiti Humanitarian Situation Report No. 7, 1 July-30 ...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_42c6ab0993b9&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_42c6ab0993b9&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_42c6ab0993b9&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_42c6ab0993b9 - UNICEF Haiti Humanitarian Situation Report No. 7, 1 July-30 ...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://reliefweb.int/report/haiti/unicef-haiti-humanitarian-situation-report-no-7-1-july-30-september-2025&quot;,
+  &quot;source_title&quot;: &quot;UNICEF Haiti Humanitarian Situation Report No. 7, 1 July-30 ...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_42c6ab0993b9&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_42c6ab0993b9&quot;,
+    &quot;source_url&quot;: &quot;https://reliefweb.int/report/haiti/unicef-haiti-humanitarian-situation-report-no-7-1-july-30-september-2025&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_52b7f0d4d92b</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_52b7f0d4d92b - UNICEF Haiti Humanitarian Situation Report No. 6: Mid-Year 2025</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_52b7f0d4d92b&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_52b7f0d4d92b&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_52b7f0d4d92b&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_52b7f0d4d92b - UNICEF Haiti Humanitarian Situation Report No. 6: Mid-Year 2025&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://reliefweb.int/report/haiti/unicef-haiti-humanitarian-situation-report-no-6-mid-year-2025&quot;,
+  &quot;source_title&quot;: &quot;UNICEF Haiti Humanitarian Situation Report No. 6: Mid-Year 2025&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_52b7f0d4d92b&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_52b7f0d4d92b&quot;,
+    &quot;source_url&quot;: &quot;https://reliefweb.int/report/haiti/unicef-haiti-humanitarian-situation-report-no-6-mid-year-2025&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_6dc5eabed325</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_6dc5eabed325 - Water Insecurity, Sociopolitical Instability, and Resurgence...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_6dc5eabed325&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_6dc5eabed325&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_6dc5eabed325&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_6dc5eabed325 - Water Insecurity, Sociopolitical Instability, and Resurgence...&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.ajtmh.org/view/journals/tpmd/113/3/article-p689.xml&quot;,
+  &quot;source_title&quot;: &quot;Water Insecurity, Sociopolitical Instability, and Resurgence of Cholera in Haiti, 2022: An Outbreak Investigation in: The American Journal of Tropical Medicine and Hygiene Volume 113 Issue 3 (2025)&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_6dc5eabed325&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_6dc5eabed325&quot;,
+    &quot;source_url&quot;: &quot;https://www.ajtmh.org/view/journals/tpmd/113/3/article-p689.xml&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_76ddaf069a83</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_76ddaf069a83 - [PDF] Haiti - UNICEF</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_76ddaf069a83&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_76ddaf069a83&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_76ddaf069a83&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_76ddaf069a83 - [PDF] Haiti - UNICEF&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://www.unicef.org/media/164411/file/Haiti-Humanitarian-SitRep-September-2024.pdf&quot;,
+  &quot;source_title&quot;: &quot;[PDF] Haiti - UNICEF&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_76ddaf069a83&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_76ddaf069a83&quot;,
+    &quot;source_url&quot;: &quot;https://www.unicef.org/media/164411/file/Haiti-Humanitarian-SitRep-September-2024.pdf&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_802ab0048156</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_802ab0048156 - Haiti: Cholera - Reports - ReliefWeb Response</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_802ab0048156&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_802ab0048156&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_802ab0048156&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_802ab0048156 - Haiti: Cholera - Reports - ReliefWeb Response&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://response.reliefweb.int/haiti/cholera/reports&quot;,
+  &quot;source_title&quot;: &quot;Haiti: Cholera - Reports - ReliefWeb Response&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_802ab0048156&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_802ab0048156&quot;,
+    &quot;source_url&quot;: &quot;https://response.reliefweb.int/haiti/cholera/reports&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_9aefe8d01e47</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_9aefe8d01e47 - Cholera outbreak in Haiti persists, particularly in sites .....</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_9aefe8d01e47&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_9aefe8d01e47&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_9aefe8d01e47&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_9aefe8d01e47 - Cholera outbreak in Haiti persists, particularly in sites .....&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://beaconbio.org/en/report?reportid=e1816dc5-50ab-41c0-90df-bde8617d2d78&amp;eventid=4608b346-c917-4783-9f7d-e6e9af15cb65&amp;locations=aaa9ccfe-ddd5-43a6-93cc-f7ea1f40330c&quot;,
+  &quot;source_title&quot;: &quot;Cholera outbreak in Haiti persists, particularly in sites ... - BEACON&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_9aefe8d01e47&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_9aefe8d01e47&quot;,
+    &quot;source_url&quot;: &quot;https://beaconbio.org/en/report?reportid=e1816dc5-50ab-41c0-90df-bde8617d2d78&amp;eventid=4608b346-c917-4783-9f7d-e6e9af15cb65&amp;locations=aaa9ccfe-ddd5-43a6-93cc-f7ea1f40330c&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article><article class='card'><h2>review_source_credibility_src_search_b3f2bb1a4939</h2><p><strong>P1_high</strong> source_identity_review</p><p>source identity review - review_source_credibility_src_search_b3f2bb1a4939 - UNICEF Haiti Humanitarian Situation Report No. 9: October 2024</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_source_credibility_src_search_b3f2bb1a4939&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P1_high&quot;,
+  &quot;priority_score&quot;: 78,
+  &quot;issue_type&quot;: &quot;source_credibility&quot;,
+  &quot;issue_category&quot;: &quot;source_identity_review&quot;,
+  &quot;target_type&quot;: &quot;source&quot;,
+  &quot;target_ids&quot;: [
+    &quot;src_search_b3f2bb1a4939&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_b3f2bb1a4939&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;Cholera&quot;,
+  &quot;location&quot;: &quot;Haiti&quot;,
+  &quot;date_or_period&quot;: &quot;2024-01-01-2024-12-31&quot;,
+  &quot;short_title&quot;: &quot;source identity review - review_source_credibility_src_search_b3f2bb1a4939 - UNICEF Haiti Humanitarian Situation Report No. 9: October 2024&quot;,
+  &quot;why_it_matters&quot;: &quot;Publisher or source identity uncertainty can affect source independence and credibility.&quot;,
+  &quot;evidence_quote&quot;: &quot;&quot;,
+  &quot;source_url&quot;: &quot;https://reliefweb.int/report/haiti/unicef-haiti-humanitarian-situation-report-no-9-october-2024&quot;,
+  &quot;source_title&quot;: &quot;UNICEF Haiti Humanitarian Situation Report No. 9: October 2024&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;unknown&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Who is the actual publisher, and is it independent of other evidence?&quot;,
+  &quot;suggested_action&quot;: &quot;Open source identity assessments and source registry metadata.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;approve_source_role&quot;,
+    &quot;override_source_role&quot;,
+    &quot;exclude_source&quot;,
+    &quot;mark_source_needs_review&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_source_credibility_src_search_b3f2bb1a4939&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: false,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: true,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;source_registry&quot;,
+    &quot;source_identity_assessments&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_b3f2bb1a4939&quot;,
+    &quot;source_url&quot;: &quot;https://reliefweb.int/report/haiti/unicef-haiti-humanitarian-situation-report-no-9-october-2024&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;missing_publisher&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

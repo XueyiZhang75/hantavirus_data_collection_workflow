@@ -1,0 +1,353 @@
+[
+  {
+    "query_id": "i1_q1",
+    "query": "CDC FluView influenza surveillance weekly report week 40 2024 United States",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "CDC FluView is the primary U.S. influenza surveillance system. The time window 2024-09-29 to 2024-10-05 corresponds to MMWR Week 40 of 2024. Targeting the CDC FluView weekly report for week 40 directly is the most precise way to retrieve confirmed case counts, hospitalizations, deaths, and subnational breakdowns for this exact period.",
+    "expected_source_type_or_evidence": "CDC FluView weekly report page or PDF for MMWR week 40, 2024-2025 season",
+    "expected_trust_signal": "cdc.gov domain, FluView branding, MMWR week 40 label, season 2024-2025",
+    "language": "en",
+    "target_disease_terms": [
+      "influenza",
+      "flu"
+    ],
+    "target_location_terms": [
+      "United States"
+    ],
+    "time_terms": [
+      "week 40 2024",
+      "September 29 2024",
+      "October 5 2024",
+      "2024-2025 season"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "i1_q1"
+  },
+  {
+    "query_id": "i1_q2",
+    "query": "CDC influenza activity 2024-2025 season start October 2024 cases hospitalizations deaths United States",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "Targets CDC seasonal influenza activity summaries and situation updates for the 2024-2025 season onset, which would cover the late-September to early-October 2024 window. This broader phrasing captures CDC press releases, situation reports, and FluView overview pages that may aggregate case and death data.",
+    "expected_source_type_or_evidence": "CDC influenza season overview, situation update, or FluView interactive dashboard summary",
+    "expected_trust_signal": "cdc.gov domain, 2024-2025 season label, official surveillance language",
+    "language": "en",
+    "target_disease_terms": [
+      "influenza",
+      "flu",
+      "ILI"
+    ],
+    "target_location_terms": [
+      "United States"
+    ],
+    "time_terms": [
+      "October 2024",
+      "2024-2025 season",
+      "season start"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "i1_q2"
+  },
+  {
+    "query_id": "i1_q3",
+    "query": "WHO PAHO influenza update United States October 2024 surveillance cases deaths weekly epidemiological",
+    "provider_channel": "official_site_search",
+    "query_type": "domain_limited",
+    "source_type": "international_organization_report",
+    "role_hint": "validation",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "country",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "WHO and PAHO publish weekly or biweekly global and regional influenza surveillance updates that include U.S. data. These serve as independent validation of CDC figures and may provide additional breakdowns. Targeting October 2024 aligns with the task time window.",
+    "expected_source_type_or_evidence": "WHO global influenza update, PAHO regional influenza bulletin, or FluNet data for week 40 2024",
+    "expected_trust_signal": "who.int or paho.org domain, weekly epidemiological record, FluNet reference",
+    "language": "en",
+    "target_disease_terms": [
+      "influenza"
+    ],
+    "target_location_terms": [
+      "United States",
+      "Americas"
+    ],
+    "time_terms": [
+      "October 2024",
+      "week 40 2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "i1_q3"
+  },
+  {
+    "query_id": "i1_q4",
+    "query": "influenza flu season 2024 United States cases deaths hospitalizations \"October 2024\" OR \"week 40\" site:cdc.gov OR news report",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "News and media reports from late September to early October 2024 may cite CDC or state health department data on flu season onset, providing corroborating evidence quotes, case counts, and subnational location details not yet aggregated in official weekly reports. The OR construction broadens retrieval across both official and news channels.",
+    "expected_source_type_or_evidence": "News articles from major outlets (AP, Reuters, NPR, local health news) citing CDC or state health department flu data for early October 2024",
+    "expected_trust_signal": "Publication date in late September or early October 2024, citation of CDC or state health authority, quantitative case/death figures",
+    "language": "en",
+    "target_disease_terms": [
+      "influenza",
+      "flu"
+    ],
+    "target_location_terms": [
+      "United States"
+    ],
+    "time_terms": [
+      "October 2024",
+      "week 40",
+      "September 29 2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": null,
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_initial_search_plan",
+    "iteration_index": 1,
+    "iterative_query_id": "i1_q4"
+  },
+  {
+    "query_id": "i2_q1",
+    "query": "CDC influenza 2024-2025 season activity summary October 2024 FluSurv-NET hospitalization pediatric mortality week 40",
+    "provider_channel": "official_site_search",
+    "query_type": "official_site",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection",
+    "priority": 1,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "FluSurv-NET is the CDC's influenza hospitalization surveillance network, reporting separately from FluView's ILI/positivity data. Targeting FluSurv-NET for Week 40 2024 will surface hospitalization rates and counts not captured in the main FluView weekly summary. Pediatric mortality surveillance is also a distinct CDC component. This fills the hospitalization and deaths fields that the FluView positivity-focused snippet did not provide.",
+    "expected_source_type_or_evidence": "CDC FluSurv-NET hospitalization surveillance report or CDC influenza-associated pediatric mortality report for week 40 2024",
+    "expected_trust_signal": "cdc.gov domain, FluSurv-NET label, 2024-2025 season, week 40 reference",
+    "language": "en",
+    "target_disease_terms": [
+      "influenza",
+      "flu"
+    ],
+    "target_location_terms": [
+      "United States"
+    ],
+    "time_terms": [
+      "week 40 2024",
+      "October 2024",
+      "2024-2025 season"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "i1_q1 returned CDC FluView Week 40 2024 page but snippet focused on percent positivity and virus subtyping; hospitalization and death counts not visible in snippet — FluSurv-NET is a separate CDC surveillance component requiring a dedicated query",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "i2_q1"
+  },
+  {
+    "query_id": "i2_q2",
+    "query": "WHO PAHO global influenza update week 40 2024 United States Americas surveillance epidemiological",
+    "provider_channel": "official_site_search",
+    "query_type": "domain_limited",
+    "source_type": "international_organization_report",
+    "role_hint": "validation",
+    "priority": 2,
+    "expected_fields": [
+      "disease",
+      "country",
+      "date_reported",
+      "cases_confirmed",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "WHO and PAHO publish weekly global and regional influenza surveillance bulletins that include U.S. data, providing independent international validation of CDC figures. This is the deferred i1_q3 query, now executed in iteration 2. Targeting week 40 2024 specifically aligns with the task time window.",
+    "expected_source_type_or_evidence": "WHO global influenza update bulletin or PAHO regional influenza surveillance report for week 40 2024, including U.S. data tables",
+    "expected_trust_signal": "who.int or paho.org domain, week 40 2024 label, FluNet reference, epidemiological week designation",
+    "language": "en",
+    "target_disease_terms": [
+      "influenza"
+    ],
+    "target_location_terms": [
+      "United States",
+      "Americas",
+      "North America"
+    ],
+    "time_terms": [
+      "week 40 2024",
+      "October 2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": "i1_q3 was planned but not executed in iteration 1",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "i2_q2"
+  },
+  {
+    "query_id": "i2_q3",
+    "query": "influenza flu season start October 2024 United States cases hospitalizations deaths \"week 40\" OR \"September 29\" OR \"October 5\"",
+    "provider_channel": "news_search",
+    "query_type": "news",
+    "source_type": "news_and_situation_report",
+    "role_hint": "collection_support",
+    "priority": 3,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "News and media reports from late September to early October 2024 may cite CDC or state health department data on flu season onset, providing corroborating evidence quotes and quantitative figures. This is the deferred i1_q4 query. The quoted date strings target articles specifically referencing the Week 40 reporting period.",
+    "expected_source_type_or_evidence": "News articles from AP, Reuters, NPR, local health news, or health journalism outlets citing CDC or state health authority flu data for early October 2024",
+    "expected_trust_signal": "Publication date between 2024-09-29 and 2024-10-10, citation of CDC or state health authority, quantitative case/death/hospitalization figures",
+    "language": "en",
+    "target_disease_terms": [
+      "influenza",
+      "flu"
+    ],
+    "target_location_terms": [
+      "United States"
+    ],
+    "time_terms": [
+      "October 2024",
+      "week 40",
+      "September 29 2024",
+      "October 5 2024"
+    ],
+    "is_follow_up_query": false,
+    "previous_iteration_basis": "i1_q4 was planned but not executed in iteration 1",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "i2_q3"
+  },
+  {
+    "query_id": "i2_q4",
+    "query": "state health department influenza surveillance report week 40 2024 \"September 29\" \"October 5\" ILI cases",
+    "provider_channel": "web_search",
+    "query_type": "general_web",
+    "source_type": "official_public_health_agency",
+    "role_hint": "collection_support",
+    "priority": 4,
+    "expected_fields": [
+      "disease",
+      "country",
+      "subnational_location",
+      "locality",
+      "date_reported",
+      "cases_unspecified",
+      "deaths",
+      "hospitalizations",
+      "source_url",
+      "source_type",
+      "evidence_quote"
+    ],
+    "query_rationale": "The current result set has only one state-level report (Mississippi). Additional state health department surveillance reports for Week 40 2024 would provide subnational_location and locality data for the target fields. Quoted date strings 'September 29' and 'October 5' target documents that explicitly cover the task time window. This broadens subnational coverage beyond the single Mississippi result.",
+    "expected_source_type_or_evidence": "State health department PDF or HTML influenza surveillance reports for week 40 2024 from multiple U.S. states (e.g., California, Texas, Florida, New York, or others)",
+    "expected_trust_signal": "State .gov domains (e.g., cdph.ca.gov, dshs.texas.gov, health.ny.gov), explicit week 40 2024 label, date range Sept. 29–Oct. 5 2024",
+    "language": "en",
+    "target_disease_terms": [
+      "influenza",
+      "flu",
+      "ILI"
+    ],
+    "target_location_terms": [
+      "United States",
+      "state"
+    ],
+    "time_terms": [
+      "week 40 2024",
+      "September 29 2024",
+      "October 5 2024"
+    ],
+    "is_follow_up_query": true,
+    "previous_iteration_basis": "i1_q1 returned only Mississippi state report; broader state-level coverage needed for subnational_location field",
+    "execution_status": "planned_not_executed",
+    "query_source": "iterative_llm_refinement",
+    "iteration_index": 2,
+    "iterative_query_id": "i2_q4"
+  }
+]

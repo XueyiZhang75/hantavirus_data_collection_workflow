@@ -1,0 +1,737 @@
+{
+  "plan_id": "exec_source_plan_dengue_brazil_2024_01_01_2024_03_31",
+  "disease": "Dengue",
+  "location": "Brazil",
+  "time_window": "2024-01-01-2024-03-31",
+  "target_fields": [
+    "disease",
+    "country",
+    "subnational_location",
+    "locality",
+    "date_reported",
+    "cases_confirmed",
+    "cases_probable",
+    "cases_suspected",
+    "cases_unspecified",
+    "deaths",
+    "hospitalizations",
+    "source_url",
+    "source_type",
+    "evidence_quote"
+  ],
+  "generation_method": "llm_executable_source_plan",
+  "llm_enabled": true,
+  "execution_status": "planned_not_executed",
+  "warnings": [
+    "source_plan_created_not_executed_stage4",
+    "source_discovery_execution_not_implemented_stage4",
+    "brazil_2024_dengue_epidemic_scale_may_produce_high_volume_subnational_records",
+    "portuguese_language_sources_require_localized_query_coverage",
+    "sinan_datasus_open_data_portals_require_direct_database_access_not_web_search"
+  ],
+  "source_discovery_objectives": [
+    {
+      "objective_id": "obj_collection_001",
+      "objective": "Identify Ministério da Saúde do Brasil (MS/SVS) epidemiological bulletins, situation reports, and SINAN surveillance outputs reporting Dengue human cases, deaths, and hospitalizations in Brazil for Q1 2024 (SE 01–SE 13).",
+      "source_role_hint": "collection",
+      "rationale": "SVS/MS is the primary national authority for dengue surveillance in Brazil. Boletins Epidemiológicos and Informes Técnicos published weekly or periodically during Jan–Mar 2024 are the highest-priority extractable sources for confirmed, probable, suspected, and unspecified case counts, deaths, and hospitalizations at national and subnational levels.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_002",
+      "objective": "Identify Secretarias Estaduais de Saúde (SES) and Secretarias Municipais de Saúde (SMS) bulletins or situation reports for high-burden Brazilian states (e.g., São Paulo, Minas Gerais, Rio de Janeiro, Paraná, Goiás, Bahia, Espírito Santo) covering Jan–Mar 2024.",
+      "source_role_hint": "collection",
+      "rationale": "Subnational health secretariats publish state- and municipality-level dengue data that may not be fully disaggregated in national reports. These are essential for populating subnational_location and locality fields.",
+      "priority": 1
+    },
+    {
+      "objective_id": "obj_collection_003",
+      "objective": "Identify PAHO/OPAS Dengue situation reports, epidemiological alerts, and regional updates covering Brazil for the period 2024-01-01 to 2024-03-31.",
+      "source_role_hint": "collection",
+      "rationale": "PAHO publishes regular dengue situation reports for the Americas that include Brazil-specific case and death counts, often with subnational breakdowns and serotype data. These serve as both collection and cross-validation sources.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_001",
+      "objective": "Identify independent structured databases (e.g., DATASUS/TabNet, InfoDengue, Mosqlimate, ProMED) containing dengue case and death counts for Brazil Q1 2024 to cross-validate extracted records.",
+      "source_role_hint": "validation",
+      "rationale": "Structured databases provide independently aggregated counts that can be compared against extracted records from official bulletins without risk of circular validation. InfoDengue and Mosqlimate offer near-real-time epidemiological data at the municipal level.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_validation_002",
+      "objective": "Identify WHO Disease Outbreak News (DON), Global Health Observatory, or ECDC rapid risk assessments covering the Brazil dengue epidemic of early 2024.",
+      "source_role_hint": "validation",
+      "rationale": "WHO and ECDC international reports provide independently compiled national-level case and death totals that can serve as held-back validation benchmarks against SVS/MS collection records.",
+      "priority": 2
+    },
+    {
+      "objective_id": "obj_context_001",
+      "objective": "Identify peer-reviewed literature, preprints, and technical reports providing case definitions, serotype distributions, severity classifications, and epidemiological context for the Brazil 2024 dengue epidemic.",
+      "source_role_hint": "context",
+      "rationale": "Context sources clarify count semantics (confirmed vs. probable vs. suspected), case definitions used by SVS/MS, DENV serotype circulation (DENV-1, DENV-3 predominance in 2024), and severity thresholds (dengue com sinais de alarme, dengue grave). Essential for correct field mapping during extraction.",
+      "priority": 3
+    },
+    {
+      "objective_id": "obj_context_002",
+      "objective": "Identify ProMED, HealthMap, or reputable news sources reporting on the Brazil dengue emergency declaration and epidemic trajectory in Q1 2024 for situational context.",
+      "source_role_hint": "context",
+      "rationale": "News and situation reports provide timeline anchors, emergency declarations, and early outbreak signals that help contextualize the scale and timing of the epidemic for date_reported and reporting_period field interpretation.",
+      "priority": 4
+    },
+    {
+      "objective_id": "obj_review_001",
+      "objective": "Flag sources with ambiguous count semantics (cumulative vs. weekly incident), unclear geographic scope (national aggregate vs. subnational), or mixed disease reporting (arboviroses aggregate without dengue-specific disaggregation) for human review.",
+      "source_role_hint": "human_review",
+      "rationale": "Brazil's 2024 dengue epidemic generated high-volume reporting with varying aggregation levels. Sources that conflate dengue with Zika/Chikungunya, report only cumulative totals without period attribution, or lack subnational disaggregation require human judgment before extraction.",
+      "priority": 4
+    }
+  ],
+  "planned_source_categories": [
+    {
+      "source_category_id": "cat_001_svs_ms_brazil",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Ministério da Saúde / Secretaria de Vigilância em Saúde (SVS) publishes weekly Boletins Epidemiológicos, Informes Técnicos de Dengue, and SINAN-based surveillance outputs. These are the authoritative primary source for national and subnational dengue case counts, deaths, hospitalizations, and serotype data in Brazil. Q1 2024 was a declared epidemic period with high-frequency reporting.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "portuguese_language_pdfs_may_require_ocr_or_structured_extraction",
+        "cumulative_vs_weekly_count_semantics_must_be_verified_per_bulletin",
+        "sinan_microdata_access_may_require_datasus_direct_query"
+      ]
+    },
+    {
+      "source_category_id": "cat_002_ses_sms_subnational",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "State (SES) and municipal (SMS) health secretariats in high-burden states (São Paulo, Minas Gerais, Rio de Janeiro, Paraná, Goiás, Bahia, Espírito Santo, Mato Grosso do Sul) publish independent epidemiological bulletins with finer geographic granularity than national reports. Essential for subnational_location and locality field population.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "requires_state_by_state_search_coverage",
+        "bulletin_formats_vary_by_state",
+        "some_states_may_not_publish_weekly_bulletins"
+      ]
+    },
+    {
+      "source_category_id": "cat_003_paho_opas",
+      "source_type": "international_organization_report",
+      "role_hint": "collection",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "PAHO/OPAS publishes Dengue Situation Reports for the Americas with country-level and sometimes subnational breakdowns. The 2024 Brazil epidemic was a major PAHO reporting focus. These reports provide independently compiled case and death totals with explicit date attribution.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "paho_reports_may_lag_svs_ms_by_1_2_weeks",
+        "country_totals_may_be_cumulative_requiring_period_disambiguation"
+      ]
+    },
+    {
+      "source_category_id": "cat_004_who_ecdc",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_unspecified",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "WHO Disease Outbreak News and ECDC rapid risk assessments provide independently compiled national-level dengue case and death totals for Brazil that serve as held-back validation benchmarks. These are not primary collection sources but provide cross-check capability.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "who_don_may_not_cover_all_reporting_weeks",
+        "ecdc_coverage_of_brazil_may_be_limited_to_major_epidemic_alerts"
+      ]
+    },
+    {
+      "source_category_id": "cat_005_structured_databases",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "DATASUS/TabNet (SINAN dengue microdata), InfoDengue (Fiocruz/PROCC), and Mosqlimate provide structured, queryable dengue surveillance datasets at municipal and state level. These enable independent validation of extracted case counts and support subnational granularity.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "datasus_requires_direct_tabnet_query_not_web_search",
+        "infodengue_api_access_may_be_required",
+        "data_may_be_provisional_and_subject_to_revision"
+      ]
+    },
+    {
+      "source_category_id": "cat_006_peer_reviewed_literature",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Peer-reviewed studies and preprints on the Brazil 2024 dengue epidemic provide case definitions, serotype data (DENV-1, DENV-3), severity classifications, and epidemiological context. Useful for interpreting count semantics and validating field mapping decisions.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "publication_lag_may_limit_q1_2024_specific_coverage",
+        "preprints_require_quality_screening"
+      ]
+    },
+    {
+      "source_category_id": "cat_007_news_situation_reports",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "why_relevant": "Reputable news sources (G1/Globo, Folha de S.Paulo, Reuters, AP) and ProMED/HealthMap alerts reported on the Brazil 2024 dengue epidemic with specific case and death figures, often citing official sources. Useful for early outbreak signals and timeline anchoring when official bulletins are delayed.",
+      "risk_notes": [
+        "planned_only_not_executed_stage4",
+        "news_figures_may_not_match_official_counts",
+        "requires_source_attribution_verification",
+        "may_conflate_dengue_with_other_arboviruses"
+      ]
+    }
+  ],
+  "planned_queries": [
+    {
+      "query_id": "q_exec_001",
+      "query": "\"dengue Brasil 2024\" cases deaths public health Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue Brasil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_002",
+      "query": "\"dengue Brazil 2024\" cases deaths public health Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "official_site",
+      "provider_channel": "official_site_search",
+      "source_type": "official_public_health_agency",
+      "role_hint": "collection",
+      "priority": 1,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue Brazil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against official_public_health_agency; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_003",
+      "query": "\"dengue Brasil 2024\" outbreak report surveillance Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue Brasil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_004",
+      "query": "\"dengue Brazil 2024\" outbreak report surveillance Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "domain_limited",
+      "provider_channel": "official_site_search",
+      "source_type": "international_organization_report",
+      "role_hint": "validation",
+      "priority": 2,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue Brazil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against international_organization_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_005",
+      "query": "\"dengue Brasil 2024\" epidemiology cases deaths Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "dengue Brasil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_006",
+      "query": "\"dengue Brazil 2024\" epidemiology cases deaths Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "literature",
+      "provider_channel": "literature_api",
+      "source_type": "peer_reviewed_literature",
+      "role_hint": "context",
+      "priority": 4,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote",
+        "case_definition"
+      ],
+      "disease_terms_used": [
+        "dengue Brazil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against peer_reviewed_literature; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_007",
+      "query": "\"dengue Brasil 2024\" surveillance dataset cases deaths Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue Brasil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_008",
+      "query": "\"dengue Brazil 2024\" surveillance dataset cases deaths Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "database",
+      "provider_channel": "database_search",
+      "source_type": "structured_database",
+      "role_hint": "validation",
+      "priority": 3,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue Brazil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against structured_database; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_009",
+      "query": "\"dengue Brasil 2024\" outbreak report cases deaths Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue Brasil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    },
+    {
+      "query_id": "q_exec_010",
+      "query": "\"dengue Brazil 2024\" outbreak report cases deaths Brazil 2024-01-01-2024-03-31 2024",
+      "query_type": "news",
+      "provider_channel": "news_search",
+      "source_type": "news_and_situation_report",
+      "role_hint": "collection_support",
+      "priority": 5,
+      "expected_fields": [
+        "disease",
+        "country",
+        "subnational_location",
+        "locality",
+        "date_reported",
+        "cases_confirmed",
+        "cases_probable",
+        "cases_suspected",
+        "cases_unspecified",
+        "deaths",
+        "hospitalizations",
+        "source_url",
+        "source_type",
+        "evidence_quote"
+      ],
+      "disease_terms_used": [
+        "dengue Brazil 2024"
+      ],
+      "location_terms_used": [
+        "Brazil"
+      ],
+      "time_terms_used": [
+        "2024-01-01-2024-03-31",
+        "2024"
+      ],
+      "query_language": "en",
+      "jurisdiction_hint": null,
+      "official_domain_hint": null,
+      "localized_source_hint": false,
+      "source_priority_reason": null,
+      "rationale": "Executable search query planned for later source discovery against news_and_situation_report; not executed in Stage 4.",
+      "execution_status": "planned_not_executed"
+    }
+  ],
+  "source_planning_risks": [
+    {
+      "risk_id": "risk_semantic_leakage_001",
+      "risk": "A source intended for validation may leak into collection if roles are not enforced during later discovery.",
+      "severity": "high",
+      "applies_to": [
+        "validation",
+        "collection"
+      ],
+      "mitigation": "Keep validation-reserved sources separate until evaluation.",
+      "human_review_trigger": true
+    },
+    {
+      "risk_id": "risk_count_semantics_001",
+      "risk": "Cumulative, annual, newly reported, and suspected counts may be mixed across source categories.",
+      "severity": "medium",
+      "applies_to": [
+        "collection",
+        "validation",
+        "context"
+      ],
+      "mitigation": "Require evidence quotes and count-semantics fields.",
+      "human_review_trigger": true
+    }
+  ],
+  "structured_output_mode": "provider_native"
+}

@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Review Workflow</title>
+  <style>
+body{margin:0;background:#f5f7fb;color:#142033;font-family:Segoe UI,Arial,sans-serif;line-height:1.5}
+header{padding:28px 36px;background:#0f2747;color:#fff}
+header h1{margin:0 0 8px;font-size:30px;letter-spacing:0}
+header p{margin:0;color:#dbeafe}
+main{padding:24px 30px 44px}
+section,.card{border:1px solid #d8e1ed;border-radius:8px;background:#fff;padding:18px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric{border:1px solid #d8e1ed;border-radius:8px;padding:14px;background:#fbfdff}
+.metric span{display:block;color:#637083;font-size:13px}.metric strong{font-size:28px}
+table{width:100%;border-collapse:collapse;background:#fff}td,th{border:1px solid #d8e1ed;padding:8px;text-align:left;vertical-align:top}
+code{background:#edf3f9;border-radius:4px;padding:2px 5px}pre{white-space:pre-wrap;background:#f7f9fc;border:1px solid #d8e1ed;border-radius:6px;padding:12px;overflow:auto}
+.warn{border-left:5px solid #9a6700;background:#fff9eb}.ok{border-left:5px solid #13795b}.bad{border-left:5px solid #b42318}
+a{color:#155eaa}.pill{display:inline-block;border:1px solid #d8e1ed;border-radius:999px;padding:3px 8px;margin:2px;background:#fbfdff}
+@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Human Review Workflow</h1><p>Static artifact-only visualization for the data collection workflow.</p></header>
+<main><section class='warn'><h2>Manual Review Required</h2><p>Generated decision templates are not auto-applied.</p><pre>{
+  &quot;visualization_type&quot;: &quot;human_review_workflow&quot;,
+  &quot;review_item_count&quot;: 130,
+  &quot;prioritized_review_item_count&quot;: 130,
+  &quot;priority_level_counts&quot;: {
+    &quot;P0_critical&quot;: 26,
+    &quot;P1_high&quot;: 64,
+    &quot;P2_medium&quot;: 0,
+    &quot;P3_low&quot;: 40
+  },
+  &quot;issue_category_counts&quot;: {
+    &quot;conflicting_claims_review&quot;: 3,
+    &quot;primary_case_dataset_blocker&quot;: 13,
+    &quot;validation_conflict_review&quot;: 18,
+    &quot;claim_corroboration_review&quot;: 33,
+    &quot;source_identity_review&quot;: 8,
+    &quot;outside_scope_review&quot;: 13,
+    &quot;anomaly_review&quot;: 2,
+    &quot;provenance_review&quot;: 11,
+    &quot;general_review&quot;: 29
+  },
+  &quot;decision_template_path&quot;: &quot;human_review/review_decision_template.json&quot;,
+  &quot;decision_prefill_path&quot;: &quot;human_review/review_decision_prefill.json&quot;,
+  &quot;action_guide_path&quot;: &quot;human_review/review_action_guide.md&quot;,
+  &quot;decisions_auto_applied&quot;: false,
+  &quot;decisions_applied_count&quot;: 0,
+  &quot;warning&quot;: &quot;Generated decision templates are not auto-applied.&quot;,
+  &quot;generated_from_artifacts_only&quot;: true
+}</pre></section><article class='card'><h2>review_claim_corroboration_conflict_corr_event_001</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_001 - [PDF] WEEKLY UPDATE - California West Nile Virus</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_001&quot;,
+  &quot;priority_rank&quot;: 1,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_a39e4fa28013_011_observation&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_012_observation&quot;,
+    &quot;claim_rec_src_search_a666cd39412c_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ccc444806280_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ccc444806280_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_005_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_006_deaths&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_007_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_008_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_009_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_006_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_007_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_008_deaths&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_009_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_010_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_013_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_2fc9cc9ad3e4_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_2fc9cc9ad3e4_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_2fc9cc9ad3e4_003_deaths&quot;,
+    &quot;claim_rec_src_search_2fc9cc9ad3e4_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a666cd39412c_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a666cd39412c_003_deaths&quot;,
+    &quot;claim_rec_src_search_fc3322f3069f_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_fc3322f3069f_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_be93a6fa0503_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_fc3322f3069f_001_deaths&quot;,
+    &quot;claim_rec_src_search_fc3322f3069f_002_deaths&quot;,
+    &quot;src_search_ccc444806280&quot;,
+    &quot;src_search_b9348b953aaa&quot;,
+    &quot;src_search_a39e4fa28013&quot;,
+    &quot;src_search_2fc9cc9ad3e4&quot;,
+    &quot;src_search_a666cd39412c&quot;,
+    &quot;src_search_fc3322f3069f&quot;,
+    &quot;src_search_be93a6fa0503&quot;,
+    &quot;corr_event_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_a39e4fa28013_011_observation&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_012_observation&quot;,
+    &quot;claim_rec_src_search_a666cd39412c_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ccc444806280_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_ccc444806280_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_005_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_006_deaths&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_007_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_008_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_b9348b953aaa_009_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_006_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_007_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_008_deaths&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_009_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_010_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_013_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_2fc9cc9ad3e4_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_2fc9cc9ad3e4_003_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_2fc9cc9ad3e4_003_deaths&quot;,
+    &quot;claim_rec_src_search_2fc9cc9ad3e4_004_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a666cd39412c_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a666cd39412c_003_deaths&quot;,
+    &quot;claim_rec_src_search_fc3322f3069f_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_fc3322f3069f_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_be93a6fa0503_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_fc3322f3069f_001_deaths&quot;,
+    &quot;claim_rec_src_search_fc3322f3069f_002_deaths&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_ccc444806280&quot;,
+    &quot;src_search_b9348b953aaa&quot;,
+    &quot;src_search_a39e4fa28013&quot;,
+    &quot;src_search_2fc9cc9ad3e4&quot;,
+    &quot;src_search_a666cd39412c&quot;,
+    &quot;src_search_fc3322f3069f&quot;,
+    &quot;src_search_be93a6fa0503&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile virus&quot;,
+  &quot;location&quot;: &quot;California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-01-2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_001 - [PDF] WEEKLY UPDATE - California West Nile Virus&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://westnile.ca.gov/download?download_id=4980&quot;,
+  &quot;source_title&quot;: &quot;[PDF] WEEKLY UPDATE - California West Nile Virus&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_001&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_ccc444806280&quot;,
+    &quot;source_url&quot;: &quot;https://westnile.ca.gov/download?download_id=4980&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_claim_corroboration_conflict_corr_event_004</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_004 - West Nile virus, spread by mosquitoes, claims a third li...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_004&quot;,
+  &quot;priority_rank&quot;: 2,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_c0d70a141aca_001_deaths&quot;,
+    &quot;claim_rec_src_search_c0d70a141aca_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_002_cases_unspecified&quot;,
+    &quot;src_search_c0d70a141aca&quot;,
+    &quot;src_search_a39e4fa28013&quot;,
+    &quot;corr_event_004&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_c0d70a141aca_001_deaths&quot;,
+    &quot;claim_rec_src_search_c0d70a141aca_001_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_002_cases_unspecified&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_c0d70a141aca&quot;,
+    &quot;src_search_a39e4fa28013&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile virus&quot;,
+  &quot;location&quot;: &quot;California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-01-2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_004 - West Nile virus, spread by mosquitoes, claims a third li...&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://theintersectionreports.org/west-nile-virus-spread-by-mosquitoes-claims-a-third-life-in-the-san-joaquin-valley&quot;,
+  &quot;source_title&quot;: &quot;West Nile virus, spread by mosquitoes, claims a third life in the San Joaquin Valley - The Intersection&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_004&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_c0d70a141aca&quot;,
+    &quot;source_url&quot;: &quot;https://theintersectionreports.org/west-nile-virus-spread-by-mosquitoes-claims-a-third-life-in-the-san-joaquin-valley&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_claim_corroboration_conflict_corr_event_005</h2><p><strong>P0_critical</strong> conflicting_claims_review</p><p>conflicting claims review - review_claim_corroboration_conflict_corr_event_005 - West Nile virus, spread by mosquitoes, claims a third li...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_claim_corroboration_conflict_corr_event_005&quot;,
+  &quot;priority_rank&quot;: 3,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 112,
+  &quot;issue_type&quot;: &quot;claim_corroboration_conflict&quot;,
+  &quot;issue_category&quot;: &quot;conflicting_claims_review&quot;,
+  &quot;target_type&quot;: &quot;claim&quot;,
+  &quot;target_ids&quot;: [
+    &quot;claim_rec_src_search_c0d70a141aca_002_deaths&quot;,
+    &quot;claim_rec_src_search_c0d70a141aca_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_005_cases_unspecified&quot;,
+    &quot;src_search_c0d70a141aca&quot;,
+    &quot;src_search_a39e4fa28013&quot;,
+    &quot;corr_event_005&quot;
+  ],
+  &quot;target_record_ids&quot;: [],
+  &quot;target_claim_ids&quot;: [
+    &quot;claim_rec_src_search_c0d70a141aca_002_deaths&quot;,
+    &quot;claim_rec_src_search_c0d70a141aca_002_cases_unspecified&quot;,
+    &quot;claim_rec_src_search_a39e4fa28013_005_cases_unspecified&quot;
+  ],
+  &quot;target_source_ids&quot;: [
+    &quot;src_search_c0d70a141aca&quot;,
+    &quot;src_search_a39e4fa28013&quot;
+  ],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile virus&quot;,
+  &quot;location&quot;: &quot;California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-01-2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;conflicting claims review - review_claim_corroboration_conflict_corr_event_005 - West Nile virus, spread by mosquitoes, claims a third li...&quot;,
+  &quot;why_it_matters&quot;: &quot;Comparable claims conflict and may affect cases, date, location, or count semantics.&quot;,
+  &quot;evidence_quote&quot;: &quot;Comparable public-health claims conflict and require review.&quot;,
+  &quot;source_url&quot;: &quot;https://theintersectionreports.org/west-nile-virus-spread-by-mosquitoes-claims-a-third-life-in-the-san-joaquin-valley&quot;,
+  &quot;source_title&quot;: &quot;West Nile virus, spread by mosquitoes, claims a third life in the San Joaquin Valley - The Intersection&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Which claim should be treated as comparable evidence after review?&quot;,
+  &quot;suggested_action&quot;: &quot;review_claim_corroboration&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_claim_corroboration_conflict_corr_event_005&quot;,
+  &quot;blocking_final_case_dataset&quot;: false,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: true,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_c0d70a141aca&quot;,
+    &quot;source_url&quot;: &quot;https://theintersectionreports.org/west-nile-virus-spread-by-mosquitoes-claims-a-third-life-in-the-san-joaquin-valley&quot;,
+    &quot;evidence_quote&quot;: &quot;&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;&quot;,
+    &quot;reason&quot;: &quot;Comparable public-health claims conflict and require review.&quot;
+  }
+}</pre></article><article class='card'><h2>review_linking_event_011</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_011 - What to know about West Nile Virus as cases increase in Northern ...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_011&quot;,
+  &quot;priority_rank&quot;: 4,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_a666cd39412c_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_a666cd39412c_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile Virus Disease&quot;,
+  &quot;location&quot;: &quot;California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-07-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_011 - What to know about West Nile Virus as cases increase in Northern ...&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;There were 29 new West Nile Virus cases in humans last week, bringing the total for the year to 55 cases.&quot;,
+  &quot;source_url&quot;: &quot;https://www.kcra.com/article/what-to-know-about-west-nile-virus-as-cases-increase-in-northern-california/44964537&quot;,
+  &quot;source_title&quot;: &quot;What to know about West Nile Virus as cases increase in Northern ...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_011&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;record date 2024-07-31 is outside requested task window 2024-08-01 to 2024-08-31&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_a666cd39412c&quot;,
+    &quot;source_url&quot;: &quot;https://www.kcra.com/article/what-to-know-about-west-nile-virus-as-cases-increase-in-northern-california/44964537&quot;,
+    &quot;evidence_quote&quot;: &quot;There were 29 new West Nile Virus cases in humans last week, bringing the total for the year to 55 cases.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_a666cd39412c_024&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article><article class='card'><h2>review_linking_event_012</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_012 - 3 cases of West Nile Virus confirmed in Fresno County - ABC30</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_012&quot;,
+  &quot;priority_rank&quot;: 5,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_2fc9cc9ad3e4_002&quot;,
+    &quot;rec_src_search_b9348b953aaa_008&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_2fc9cc9ad3e4_002&quot;,
+    &quot;rec_src_search_b9348b953aaa_008&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile Virus Disease&quot;,
+  &quot;location&quot;: &quot;California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_012 - 3 cases of West Nile Virus confirmed in Fresno County - ABC30&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;The California Department of Public Health reports that as of July 5, there were zero cases of the West Nile Virus in people across the state.&quot;,
+  &quot;source_url&quot;: &quot;https://abc30.com/post/3-cases-west-nile-virus-confirmed-fresno-county/15049337&quot;,
+  &quot;source_title&quot;: &quot;3 cases of West Nile Virus confirmed in Fresno County - ABC30&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_012&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;record as-of date 2024-07-05 is outside requested task window 2024-08-01 to 2024-08-31&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_2fc9cc9ad3e4&quot;,
+    &quot;source_url&quot;: &quot;https://abc30.com/post/3-cases-west-nile-virus-confirmed-fresno-county/15049337&quot;,
+    &quot;evidence_quote&quot;: &quot;The California Department of Public Health reports that as of July 5, there were zero cases of the West Nile Virus in people across the state.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_2fc9cc9ad3e4_010&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article><article class='card'><h2>review_linking_event_014</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_014 - California West Nile Virus Website: Westnile.ca.gov</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_014&quot;,
+  &quot;priority_rank&quot;: 6,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_fc3322f3069f_002&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_fc3322f3069f_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile Virus Disease&quot;,
+  &quot;location&quot;: &quot;California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_014 - California West Nile Virus Website: Westnile.ca.gov&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;| **Human cases (fatal)** | 3 (0) | 791 (32) | 880 (21) | 278 (9) | 382 (22) | 446 (15) | 112 (5) | 112 (6) | 159 (9) | 480 (23) | 387 (19) | 842 (34) | 800 (55) | 461 (21) | 556 (44) | 217 (11) | 225 (6) | 214 (15) | 129 (12) | 209 (15) | 433 (20) | 132 (12) | 116 (11) | 0 (0) | 8,364 (417) |&quot;,
+  &quot;source_url&quot;: &quot;https://westnile.ca.gov&quot;,
+  &quot;source_title&quot;: &quot;California West Nile Virus Website: Westnile.ca.gov&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_014&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_fc3322f3069f&quot;,
+    &quot;source_url&quot;: &quot;https://westnile.ca.gov&quot;,
+    &quot;evidence_quote&quot;: &quot;| **Human cases (fatal)** | 3 (0) | 791 (32) | 880 (21) | 278 (9) | 382 (22) | 446 (15) | 112 (5) | 112 (6) | 159 (9) | 480 (23) | 387 (19) | 842 (34) | 800 (55) | 461 (21) | 556 (44) | 217 (11) | 225 (6) | 214 (15) | 129 (12) | 209 (15) | 433 (20) | 132 (12) | 116 (11) | 0 (0) | 8,364 (417) |&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_fc3322f3069f_019&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article><article class='card'><h2>review_linking_event_015</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_015 - California West Nile Virus Website: Westnile.ca.gov</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_015&quot;,
+  &quot;priority_rank&quot;: 7,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_fc3322f3069f_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_fc3322f3069f_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile Virus Disease&quot;,
+  &quot;location&quot;: &quot;California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_015 - California West Nile Virus Website: Westnile.ca.gov&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;| **Human cases (fatal)** | 3 (0) | 791 (32) | 880 (21) | 278 (9) | 382 (22) | 446 (15) | 112 (5) | 112 (6) | 159 (9) | 480 (23) | 387 (19) | 842 (34) | 800 (55) | 461 (21) | 556 (44) | 217 (11) | 225 (6) | 214 (15) | 129 (12) | 209 (15) | 433 (20) | 132 (12) | 116 (11) | 0 (0) | 8,364 (417) |&quot;,
+  &quot;source_url&quot;: &quot;https://westnile.ca.gov&quot;,
+  &quot;source_title&quot;: &quot;California West Nile Virus Website: Westnile.ca.gov&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;quarantined_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_015&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: true,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_fc3322f3069f&quot;,
+    &quot;source_url&quot;: &quot;https://westnile.ca.gov&quot;,
+    &quot;evidence_quote&quot;: &quot;| **Human cases (fatal)** | 3 (0) | 791 (32) | 880 (21) | 278 (9) | 382 (22) | 446 (15) | 112 (5) | 112 (6) | 159 (9) | 480 (23) | 387 (19) | 842 (34) | 800 (55) | 461 (21) | 556 (44) | 217 (11) | 225 (6) | 214 (15) | 129 (12) | 209 (15) | 433 (20) | 132 (12) | 116 (11) | 0 (0) | 8,364 (417) |&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_fc3322f3069f_019&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article><article class='card'><h2>review_linking_event_016</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_016 - What to know about West Nile Virus as cases increase in Northern ...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_016&quot;,
+  &quot;priority_rank&quot;: 8,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_a666cd39412c_002&quot;,
+    &quot;rec_src_search_ccc444806280_002&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_a666cd39412c_002&quot;,
+    &quot;rec_src_search_ccc444806280_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile Virus Disease&quot;,
+  &quot;location&quot;: &quot;California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_016 - What to know about West Nile Virus as cases increase in Northern ...&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;There were 29 new West Nile Virus cases in humans last week, bringing the total for the year to 55 cases.&quot;,
+  &quot;source_url&quot;: &quot;https://www.kcra.com/article/what-to-know-about-west-nile-virus-as-cases-increase-in-northern-california/44964537&quot;,
+  &quot;source_title&quot;: &quot;What to know about West Nile Virus as cases increase in Northern ...&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_016&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_a666cd39412c&quot;,
+    &quot;source_url&quot;: &quot;https://www.kcra.com/article/what-to-know-about-west-nile-virus-as-cases-increase-in-northern-california/44964537&quot;,
+    &quot;evidence_quote&quot;: &quot;There were 29 new West Nile Virus cases in humans last week, bringing the total for the year to 55 cases.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_a666cd39412c_024&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article><article class='card'><h2>review_linking_event_023</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_023 - 3 cases of West Nile Virus confirmed in Fresno County - ABC30</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_023&quot;,
+  &quot;priority_rank&quot;: 9,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_2fc9cc9ad3e4_001&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_2fc9cc9ad3e4_001&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile Virus Disease&quot;,
+  &quot;location&quot;: &quot;Fresno County, California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_023 - 3 cases of West Nile Virus confirmed in Fresno County - ABC30&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;FRESNO, Calif. (KFSN) -- Fresno County health officials have confirmed three cases of West Nile Virus so far in 2024.&quot;,
+  &quot;source_url&quot;: &quot;https://abc30.com/post/3-cases-west-nile-virus-confirmed-fresno-county/15049337&quot;,
+  &quot;source_title&quot;: &quot;3 cases of West Nile Virus confirmed in Fresno County - ABC30&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_023&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;task-window direct_collection final records require exact current-period semantics; season-to-date, cumulative, annual, previous-period, or broader EW-range records are kept as best-available context or human review&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_2fc9cc9ad3e4&quot;,
+    &quot;source_url&quot;: &quot;https://abc30.com/post/3-cases-west-nile-virus-confirmed-fresno-county/15049337&quot;,
+    &quot;evidence_quote&quot;: &quot;FRESNO, Calif. (KFSN) -- Fresno County health officials have confirmed three cases of West Nile Virus so far in 2024.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_2fc9cc9ad3e4_008&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article><article class='card'><h2>review_linking_event_027</h2><p><strong>P0_critical</strong> primary_case_dataset_blocker</p><p>primary case dataset blocker - review_linking_event_027 - West Nile virus, spread by mosquitoes, claims a third life in the San Joaquin V...</p><pre>{
+  &quot;review_item_id&quot;: &quot;review_linking_event_027&quot;,
+  &quot;priority_rank&quot;: 10,
+  &quot;priority_level&quot;: &quot;P0_critical&quot;,
+  &quot;priority_score&quot;: 107,
+  &quot;issue_type&quot;: &quot;record_linking&quot;,
+  &quot;issue_category&quot;: &quot;primary_case_dataset_blocker&quot;,
+  &quot;target_type&quot;: &quot;record&quot;,
+  &quot;target_ids&quot;: [
+    &quot;rec_src_search_c0d70a141aca_002&quot;
+  ],
+  &quot;target_record_ids&quot;: [
+    &quot;rec_src_search_c0d70a141aca_002&quot;
+  ],
+  &quot;target_claim_ids&quot;: [],
+  &quot;target_source_ids&quot;: [],
+  &quot;target_event_ids&quot;: [],
+  &quot;disease&quot;: &quot;West Nile Virus Disease&quot;,
+  &quot;location&quot;: &quot;Tulare County, California&quot;,
+  &quot;date_or_period&quot;: &quot;2024-08-31&quot;,
+  &quot;short_title&quot;: &quot;primary case dataset blocker - review_linking_event_027 - West Nile virus, spread by mosquitoes, claims a third life in the San Joaquin V...&quot;,
+  &quot;why_it_matters&quot;: &quot;This item can change whether a record is eligible for the primary case dataset.&quot;,
+  &quot;evidence_quote&quot;: &quot;Tulare County: At least 13 human cases, including one death.&quot;,
+  &quot;source_url&quot;: &quot;https://theintersectionreports.org/west-nile-virus-spread-by-mosquitoes-claims-a-third-life-in-the-san-joaquin-valley&quot;,
+  &quot;source_title&quot;: &quot;West Nile virus, spread by mosquitoes, claims a third life in the San Joaquin Valley - The Intersection&quot;,
+  &quot;actual_publisher&quot;: &quot;&quot;,
+  &quot;source_type_final&quot;: &quot;official_public_health_agency&quot;,
+  &quot;source_identity_confidence&quot;: &quot;low&quot;,
+  &quot;current_status&quot;: &quot;pending&quot;,
+  &quot;current_dataset_view&quot;: &quot;pending_review_records&quot;,
+  &quot;suggested_reviewer_question&quot;: &quot;Does this evidence support a task-compatible primary case record?&quot;,
+  &quot;suggested_action&quot;: &quot;Inspect the record, evidence quote, source identity, and quality-gate reasons before editing a decision file.&quot;,
+  &quot;allowed_decision_types&quot;: [
+    &quot;accept_as_is&quot;,
+    &quot;correct_fields&quot;,
+    &quot;reject_record&quot;,
+    &quot;mark_requires_review&quot;,
+    &quot;mark_review_resolved&quot;,
+    &quot;mark_non_countable&quot;,
+    &quot;mark_countable&quot;,
+    &quot;mark_duplicate&quot;,
+    &quot;mark_not_duplicate&quot;,
+    &quot;needs_more_evidence&quot;,
+    &quot;defer_decision&quot;
+  ],
+  &quot;suggested_decision_template_id&quot;: &quot;decision_template_review_linking_event_027&quot;,
+  &quot;blocking_final_case_dataset&quot;: true,
+  &quot;affects_primary_case_dataset&quot;: true,
+  &quot;affects_validation&quot;: false,
+  &quot;affects_source_identity&quot;: false,
+  &quot;affects_corroboration&quot;: false,
+  &quot;affects_quarantine&quot;: false,
+  &quot;recommended_artifacts_to_open&quot;: [
+    &quot;human_review_items&quot;,
+    &quot;record_inclusion_decisions&quot;,
+    &quot;quarantined_records&quot;,
+    &quot;context_records&quot;,
+    &quot;final_case_dataset&quot;,
+    &quot;claims&quot;,
+    &quot;claim_comparisons&quot;,
+    &quot;corroborated_events&quot;
+  ],
+  &quot;warnings&quot;: [
+    &quot;search_provider_not_publisher&quot;,
+    &quot;publisher_from_search_metadata_unverified&quot;,
+    &quot;actual_publisher_unknown&quot;,
+    &quot;direct_target_official_fast_path_skips_source_identity&quot;,
+    &quot;source_role_final=excluded&quot;,
+    &quot;record contains task-compatible public-health data, but the source is not trusted enough for strict final inclusion without human review&quot;
+  ],
+  &quot;source_provenance&quot;: {
+    &quot;source_id&quot;: &quot;src_search_c0d70a141aca&quot;,
+    &quot;source_url&quot;: &quot;https://theintersectionreports.org/west-nile-virus-spread-by-mosquitoes-claims-a-third-life-in-the-san-joaquin-valley&quot;,
+    &quot;evidence_quote&quot;: &quot;Tulare County: At least 13 human cases, including one death.&quot;,
+    &quot;evidence_chunk_id&quot;: &quot;chunk_src_search_c0d70a141aca_006&quot;,
+    &quot;reason&quot;: &quot;Linked event requires review: existing_record_requires_human_review&quot;
+  }
+}</pre></article></main>
+</body>
+</html>

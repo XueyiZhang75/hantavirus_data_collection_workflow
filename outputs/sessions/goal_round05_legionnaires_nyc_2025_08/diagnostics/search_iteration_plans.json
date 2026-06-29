@@ -1,0 +1,427 @@
+[
+  {
+    "iteration_index": 1,
+    "search_objective": "Identify authoritative sources reporting Legionnaires' disease cases, deaths, hospitalizations, and outbreak details in New York City during August 2025 (2025-08-01 to 2025-08-31), covering all target fields: confirmed/probable/suspected/unspecified cases, deaths, hospitalizations, date reported, locality, and evidence quotes.",
+    "search_reasoning": "The upstream plan contains 10 queries across 5 source-type channels but uses overly rigid quoted phrase constructions (e.g., \"Legionnaires disease New York City 2025\" as a single quoted phrase) that are unlikely to match real-world document titles or body text precisely, and embeds the date range string \"2025-08-01-2025-08-31\" literally, which will not match natural-language documents. The upstream queries also duplicate effort across channels with near-identical phrasing. Given the bounds of max 4 queries per iteration and max 10 total, this first iteration must be highly targeted and cover the four most productive channels: (1) NYC DOHMH official public health agency — the primary authoritative source for NYC Legionnaires' disease surveillance and outbreak alerts; (2) NYC Open Data / structured surveillance datasets — NYC publishes Legionnaires' disease case data as open datasets; (3) news search — for August 2025 outbreak reports, case counts, and deaths cited from official sources; (4) CDC/ProMED/WHO international surveillance — for any federal or international situation reports referencing NYC. Queries are rewritten to use natural search syntax rather than over-quoted phrases, and time terms are expressed as natural language (\"August 2025\") to match how documents are actually written. The NYC DOHMH Health Alert Network (HAN) and Epi Data Brief channels are specifically relevant for Legionnaires' disease, which is a notifiable disease in NYC with periodic outbreak investigations. Cooling tower regulations (Local Law 77) make NYC a high-reporting jurisdiction. ProMED and CDC MMWR are secondary validation sources.",
+    "query_batch": [
+      {
+        "query_id": "iter1_q1",
+        "query": "Legionnaires disease New York City August 2025 cases deaths outbreak DOHMH",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_probable",
+          "cases_suspected",
+          "cases_unspecified",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "Targets NYC Department of Health and Mental Hygiene (DOHMH) official communications — health alerts, epi data briefs, press releases, and outbreak investigation reports — for Legionnaires' disease in August 2025. DOHMH is the primary authoritative source for NYC Legionnaires' disease surveillance. Natural-language query without over-quoted phrases improves recall against real document text. 'August 2025' matches how documents are dated.",
+        "expected_source_type_or_evidence": "NYC DOHMH health alert, epi data brief, press release, or outbreak investigation report with case counts and dates",
+        "expected_trust_signal": "Official NYC government domain (nyc.gov), DOHMH authorship, notifiable disease report language",
+        "language": "en",
+        "target_disease_terms": [
+          "Legionnaires disease",
+          "Legionella",
+          "Legionellosis"
+        ],
+        "target_location_terms": [
+          "New York City",
+          "NYC",
+          "DOHMH"
+        ],
+        "time_terms": [
+          "August 2025",
+          "2025"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q1"
+      },
+      {
+        "query_id": "iter1_q2",
+        "query": "Legionnaires disease NYC outbreak August 2025 cooling tower cases hospitalizations",
+        "provider_channel": "news_search",
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 2,
+        "expected_fields": [
+          "disease",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_unspecified",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "News sources frequently report NYC Legionnaires' disease outbreaks with case counts, deaths, and borough-level locality details, often citing DOHMH directly. Cooling tower is included because NYC Local Law 77 makes cooling-tower-linked clusters the dominant outbreak type reported in news. August is peak Legionnaires' season (summer), increasing likelihood of news coverage. This query targets news articles from August 2025 that would contain evidence quotes and numerical case data.",
+        "expected_source_type_or_evidence": "News article from major outlet (NYT, NY Post, NY Daily News, Gothamist, AP) reporting case counts, deaths, or outbreak cluster with DOHMH attribution",
+        "expected_trust_signal": "Named journalist, DOHMH spokesperson quote, specific case/death numbers, borough or neighborhood location",
+        "language": "en",
+        "target_disease_terms": [
+          "Legionnaires disease",
+          "Legionella",
+          "Legionellosis"
+        ],
+        "target_location_terms": [
+          "New York City",
+          "NYC",
+          "Bronx",
+          "Brooklyn",
+          "Manhattan",
+          "Queens",
+          "Staten Island"
+        ],
+        "time_terms": [
+          "August 2025",
+          "2025"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q2"
+      },
+      {
+        "query_id": "iter1_q3",
+        "query": "Legionella pneumophila New York City 2025 surveillance data cases open data health department",
+        "provider_channel": "database_search",
+        "query_type": "database",
+        "source_type": "structured_database",
+        "role_hint": "validation",
+        "priority": 3,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_unspecified",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type"
+        ],
+        "query_rationale": "NYC publishes Legionnaires' disease case data through NYC Open Data and DOHMH surveillance datasets. This query targets structured data portals and dataset landing pages that may contain monthly or weekly case counts for 2025, including August. 'Legionella pneumophila' is the scientific term used in dataset field names and metadata. This channel is distinct from the official site search and may surface data.cityofnewyork.us or similar structured sources.",
+        "expected_source_type_or_evidence": "NYC Open Data dataset, DOHMH surveillance summary table, or CDC NNDSS data extract with NYC Legionnaires' case counts for 2025",
+        "expected_trust_signal": "Official data portal domain (data.cityofnewyork.us, cdc.gov/nndss), dataset metadata with update date, column headers matching case/death fields",
+        "language": "en",
+        "target_disease_terms": [
+          "Legionella pneumophila",
+          "Legionnaires disease",
+          "Legionellosis"
+        ],
+        "target_location_terms": [
+          "New York City",
+          "NYC"
+        ],
+        "time_terms": [
+          "2025"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q3"
+      },
+      {
+        "query_id": "iter1_q4",
+        "query": "Legionnaires disease New York 2025 ProMED MMWR CDC outbreak report August",
+        "provider_channel": "official_site_search",
+        "query_type": "domain_limited",
+        "source_type": "international_organization_report",
+        "role_hint": "validation",
+        "priority": 4,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_unspecified",
+          "deaths",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "ProMED (Program for Monitoring Emerging Diseases) and CDC MMWR are authoritative secondary validation sources that aggregate and republish outbreak reports, including NYC Legionnaires' disease clusters. ProMED posts are frequently the first internationally visible record of US outbreak investigations. MMWR may publish rapid reports or notes on significant NYC clusters. This query targets these channels specifically for August 2025 NYC events, providing cross-validation of case counts from official NYC sources.",
+        "expected_source_type_or_evidence": "ProMED post, CDC MMWR report, or WHO event report referencing NYC Legionnaires' disease cases or outbreak in August 2025",
+        "expected_trust_signal": "ProMED archive post with moderator commentary, MMWR citation with DOI, CDC.gov domain, WHO event page",
+        "language": "en",
+        "target_disease_terms": [
+          "Legionnaires disease",
+          "Legionella",
+          "Legionellosis"
+        ],
+        "target_location_terms": [
+          "New York",
+          "New York City",
+          "NYC"
+        ],
+        "time_terms": [
+          "August 2025",
+          "2025"
+        ],
+        "is_follow_up_query": false,
+        "previous_iteration_basis": null,
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_initial_search_plan",
+        "iteration_index": 1,
+        "iterative_query_id": "iter1_q4"
+      }
+    ],
+    "expected_evidence": [
+      "NYC DOHMH health alert or epi data brief with confirmed Legionnaires' disease case counts for August 2025",
+      "Press release or official statement from NYC DOHMH with outbreak case totals, deaths, and affected borough/neighborhood",
+      "News article citing DOHMH with specific case and death numbers for an August 2025 NYC Legionnaires' cluster",
+      "NYC Open Data or DOHMH surveillance dataset row/table showing monthly Legionnaires' case counts for August 2025",
+      "ProMED post or CDC MMWR note referencing a New York City Legionnaires' disease outbreak in summer/August 2025",
+      "Cooling tower inspection or remediation notice linked to a specific August 2025 NYC Legionnaires' cluster"
+    ],
+    "expected_source_characteristics": [
+      "NYC DOHMH official domain (nyc.gov/health or health.ny.gov) with notifiable disease or outbreak language",
+      "NYC Open Data portal (data.cityofnewyork.us) with Legionnaires' disease dataset updated through 2025",
+      "Major New York news outlet (NYT, NY Post, Daily News, Gothamist, AP, Reuters) with August 2025 dateline",
+      "ProMED-mail archive post with 'LEGIONELLOSIS' subject line and New York geographic tag",
+      "CDC MMWR Morbidity and Mortality Weekly Report with NYC or New York State Legionnaires' data for 2025",
+      "CDC NNDSS (National Notifiable Diseases Surveillance System) weekly tables with New York Legionellosis counts"
+    ],
+    "language_or_localization_reasoning": "All queries are in English. New York City is an English-language jurisdiction; NYC DOHMH publishes all official disease surveillance reports, health alerts, and press releases in English. No localization to other languages is required for this task. Disease terminology is consistent in English: 'Legionnaires' disease', 'Legionellosis', and 'Legionella' are all used in official NYC documents and should be represented across queries to maximize recall.",
+    "trust_considerations": [
+      "Prioritize NYC DOHMH as the primary authoritative source; all other sources should be cross-validated against DOHMH data",
+      "News articles are useful for evidence quotes and locality details but case counts must be traced back to official DOHMH attribution",
+      "NYC Open Data datasets may have publication lag; verify dataset update date covers August 2025",
+      "ProMED posts are secondary aggregators — treat as corroborating, not primary, evidence",
+      "Avoid over-reliance on quoted exact-phrase searches that may miss documents using variant terminology (e.g., 'Legionellosis', 'Legionella pneumonia', 'cooling tower illness')",
+      "August is peak Legionnaires' season in NYC; expect higher-than-baseline case volumes and potential cluster investigations",
+      "NYC Local Law 77 (cooling tower registration and maintenance) means outbreak reports often include cooling tower source identification — this is a trust signal for NYC-specific reports"
+    ],
+    "stop_condition_hypothesis": "Iteration 1 is insufficient on its own; a second iteration will be needed to follow up on any specific outbreak clusters, borough-level breakdowns, or NYC DOHMH data portal datasets identified in iteration 1 results. Stop after iteration 2 if core case/death counts and at least one official source URL are identified.",
+    "warnings": [
+      "Upstream queries used over-quoted exact phrases (e.g., '\"Legionnaires disease New York City 2025\"') and literal date-range strings ('2025-08-01-2025-08-31') that are unlikely to match real document text — these have been rewritten with natural-language phrasing",
+      "The time window (August 2025) is recent; some official surveillance reports or datasets may not yet be published or may have publication lag of 4–8 weeks",
+      "Peer-reviewed literature (upstream q_exec_005/006) is deprioritized in iteration 1 because academic publications on a specific August 2025 event are extremely unlikely to exist within weeks of the event — this channel is deferred to iteration 2 if needed",
+      "Max 4 queries per iteration enforced; the 10 upstream queries have been consolidated into 4 high-priority, non-redundant queries covering the most productive channels",
+      "If no August 2025 specific outbreak is found, iteration 2 should broaden to NYC DOHMH annual surveillance summaries or NYC Open Data Legionnaires' dataset filtered to 2025"
+    ]
+  },
+  {
+    "iteration_index": 2,
+    "search_objective": "Refined follow-up search",
+    "search_reasoning": "Iteration 1 returned strong, highly relevant evidence confirming a major Legionnaires' disease outbreak in Central Harlem, NYC during August 2025. Key quantitative signals are already visible in snippets: 67 cases / 3 deaths (Aug 5), 101 cases / 4 deaths (Aug 14), 112–113 cases / 6 deaths (Aug 25–26), 104+ cases / 7 deaths (Aug 29–30), and 90 hospitalizations (Guardian, Aug 30). The outbreak was declared over on Aug 29. However, three important gaps remain: (1) The nyc.gov domain returned 4 results but the snippets only show the Aug 14 press release — additional official NYC DOHMH press releases (early-outbreak Aug 5 release, Aug 18 update, Aug 26/27 update, and the Aug 29 outbreak-over declaration) are likely on nyc.gov and should be surfaced to anchor authoritative source URLs; (2) CDC.gov returned 3 results but no snippet content was shown — CDC MMWR or NNDSS data for this outbreak may provide structured case/death counts and should be confirmed; (3) The Bronx isolated cases mentioned in the respiratory-therapy.com snippet (two cases in a condominium) represent a secondary cluster that may have separate case counts not yet captured. A second iteration with 4 targeted queries can close these gaps efficiently within the 10-query budget (4 used + 4 new = 8 total, within limit).",
+    "query_batch": [
+      {
+        "query_id": "iter2_q1",
+        "query": "site:nyc.gov Legionnaires disease Central Harlem 2025 outbreak press release",
+        "provider_channel": "official_site_search",
+        "query_type": "official_site",
+        "source_type": "official_public_health_agency",
+        "role_hint": "collection",
+        "priority": 1,
+        "expected_fields": [
+          "disease",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "Iteration 1 returned 4 nyc.gov results but only the Aug 14 press release snippet was shown. This site-restricted query targets the full set of NYC DOHMH press releases on the Central Harlem Legionnaires' cluster, including the Aug 5 initial release (67 cases, 3 deaths), Aug 18 update (5 deaths), Aug 26/27 update (113+ cases, 6 deaths), and the Aug 29 outbreak-over declaration (104 cases, 7 deaths). These are the highest-authority source URLs for all target fields.",
+        "expected_source_type_or_evidence": "NYC DOHMH press releases on nyc.gov with dated case/death counts for the Central Harlem Legionnaires' cluster, August 2025",
+        "expected_trust_signal": "nyc.gov domain, DOHMH authorship, dated press release format, Acting Commissioner Dr. Michelle Morse attribution",
+        "language": "en",
+        "target_disease_terms": [
+          "Legionnaires disease",
+          "Legionella",
+          "Legionellosis"
+        ],
+        "target_location_terms": [
+          "Central Harlem",
+          "New York City",
+          "NYC"
+        ],
+        "time_terms": [
+          "August 2025",
+          "2025"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q1",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q1"
+      },
+      {
+        "query_id": "iter2_q2",
+        "query": "NYC Legionnaires disease Harlem outbreak over August 29 2025 cases deaths hospitalizations Morse",
+        "provider_channel": "news_search",
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 2,
+        "expected_fields": [
+          "disease",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "The Aug 29 outbreak-over declaration is the most data-rich single event: 104+ confirmed cases, 7 deaths, 90 hospitalizations, source identified as Harlem Hospital and new public health lab cooling towers. The healthbeat.org and Guardian snippets confirm this but additional news sources (NYT, AP, NY Post, Gothamist, ABC7NY, NBC NY) likely published detailed articles on Aug 29–30 with full case/death/hospitalization counts and direct quotes from Dr. Morse's press briefing. These would provide corroborating evidence quotes and potentially more granular data.",
+        "expected_source_type_or_evidence": "News articles from Aug 29–30, 2025 reporting outbreak declared over, with final case count (104+), death toll (7), hospitalization count (90), and source identification (Harlem Hospital, public health lab cooling towers)",
+        "expected_trust_signal": "Named journalist, DOHMH press briefing attribution, Dr. Michelle Morse quote, specific final case/death/hospitalization numbers, Aug 29–30 2025 dateline",
+        "language": "en",
+        "target_disease_terms": [
+          "Legionnaires disease",
+          "Legionella"
+        ],
+        "target_location_terms": [
+          "Harlem",
+          "New York City",
+          "NYC"
+        ],
+        "time_terms": [
+          "August 29 2025",
+          "August 30 2025",
+          "August 2025"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q2",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q2"
+      },
+      {
+        "query_id": "iter2_q3",
+        "query": "CDC Legionnaires disease New York City Harlem 2025 MMWR outbreak report cases",
+        "provider_channel": "official_site_search",
+        "query_type": "domain_limited",
+        "source_type": "international_organization_report",
+        "role_hint": "validation",
+        "priority": 3,
+        "expected_fields": [
+          "disease",
+          "country",
+          "subnational_location",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "deaths",
+          "hospitalizations",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "CDC.gov returned 3 results in iteration 1 but no snippet content was shown for any of them. CDC may have published an MMWR Early Release, Morbidity and Mortality Weekly Report note, or Health Alert Network (HAN) advisory on the NYC Harlem Legionnaires' cluster — a significant urban outbreak with 7 deaths and 90+ hospitalizations would typically trigger federal-level reporting. This query specifically targets CDC content to surface those URLs and confirm whether structured federal case data exists for this event.",
+        "expected_source_type_or_evidence": "CDC MMWR report, CDC Health Alert Network advisory, or CDC NNDSS weekly table referencing the NYC Harlem Legionnaires' outbreak with case/death counts",
+        "expected_trust_signal": "cdc.gov domain, MMWR citation, HAN advisory number, NNDSS table format",
+        "language": "en",
+        "target_disease_terms": [
+          "Legionnaires disease",
+          "Legionella",
+          "Legionellosis"
+        ],
+        "target_location_terms": [
+          "New York City",
+          "New York",
+          "Harlem"
+        ],
+        "time_terms": [
+          "2025",
+          "August 2025"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q4",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q3"
+      },
+      {
+        "query_id": "iter2_q4",
+        "query": "Legionnaires disease Bronx New York City 2025 cases condominium cluster investigation",
+        "provider_channel": "news_search",
+        "query_type": "news",
+        "source_type": "news_and_situation_report",
+        "role_hint": "collection_support",
+        "priority": 4,
+        "expected_fields": [
+          "disease",
+          "locality",
+          "date_reported",
+          "cases_confirmed",
+          "cases_suspected",
+          "deaths",
+          "source_url",
+          "source_type",
+          "evidence_quote"
+        ],
+        "query_rationale": "The respiratory-therapy.com snippet mentions a secondary cluster: 'the city is also investigating isolated cases in a condominium in the Bronx, NY, after two people have been diagnosed in the last 12 months.' This is a separate, lower-priority cluster that may have August 2025 case dates. If confirmed within the Aug 1–31 window, it would add a second locality (Bronx) to the dataset. This query targets news coverage of the Bronx cluster to determine whether it falls within the task time window and has reportable case counts.",
+        "expected_source_type_or_evidence": "News article or DOHMH statement about a Bronx Legionnaires' disease cluster in 2025, with case count and investigation status",
+        "expected_trust_signal": "DOHMH attribution, specific Bronx neighborhood or building address, case count, investigation date within August 2025",
+        "language": "en",
+        "target_disease_terms": [
+          "Legionnaires disease",
+          "Legionella"
+        ],
+        "target_location_terms": [
+          "Bronx",
+          "New York City",
+          "NYC"
+        ],
+        "time_terms": [
+          "2025",
+          "August 2025"
+        ],
+        "is_follow_up_query": true,
+        "previous_iteration_basis": "iter1_q1",
+        "execution_status": "planned_not_executed",
+        "query_source": "iterative_llm_refinement",
+        "iteration_index": 2,
+        "iterative_query_id": "iter2_q4"
+      }
+    ],
+    "expected_evidence": [],
+    "expected_source_characteristics": [],
+    "language_or_localization_reasoning": "",
+    "trust_considerations": [],
+    "stop_condition_hypothesis": "",
+    "warnings": [
+      "Iteration 2 uses the final 4 queries of the 10-query budget (4 used in iter1 + 4 in iter2 = 8 total; 2 remain as buffer but max_iterations=2 means this is the final planned iteration). If iter2 does not surface the nyc.gov Aug 5 and Aug 29 press release URLs, the collection workflow should note these as unresolved official source gaps.",
+      "The Bronx secondary cluster (iter2_q4) may span outside the Aug 1–31 window ('two people diagnosed in the last 12 months') — if confirmed as pre-August 2025, it should be excluded from the August 2025 dataset.",
+      "CDC.gov returned 3 results in iter1 with no visible snippet content — these may be general Legionnaires' disease background pages rather than outbreak-specific reports. If iter2_q3 confirms no MMWR or HAN advisory exists for this outbreak, CDC should be noted as a non-contributing source for this specific event.",
+      "Social media results (instagram.com, facebook.com, youtube.com) from iter1 should be excluded from source candidates — they do not meet authoritative source standards for public health data collection.",
+      "Academic journal results (pmc.ncbi.nlm.nih.gov, evidence.nejm.org, bmj.com) from iter1 are almost certainly not about the August 2025 NYC outbreak specifically — peer-reviewed publications on a weeks-old event are implausible. These should be reviewed for relevance but are expected to be excluded."
+    ]
+  }
+]
